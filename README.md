@@ -65,6 +65,8 @@ npm run test:e2e
 
 O repositório está preparado para rodar `lint`, `typecheck`, `build` e Playwright em PRs no GitHub Actions.
 
+Smoke branch de CI criada para validar a pipeline de pull request.
+
 Para os E2Es autenticados no CI, configure estes secrets no repositório:
 - `PLAYWRIGHT_AUTH_EMAIL`
 - `PLAYWRIGHT_AUTH_PASSWORD`
