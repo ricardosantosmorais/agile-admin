@@ -1,0 +1,79 @@
+'use client'
+
+import type { CrudModuleConfig } from '@/src/components/crud-base/types'
+import { normalizeBannerRecord, toBannerPayload } from '@/src/features/banners/services/banners-mappers'
+
+function hiddenUnless(type: string) {
+  return ({ form }: { form: Record<string, unknown> }) => String(form.tipo_link || '') !== type
+}
+
+export const BANNERS_CONFIG: CrudModuleConfig = {
+  key: 'banners',
+  resource: 'banners',
+  routeBase: '/banners',
+  featureKey: 'banners',
+  listTitleKey: 'simpleCrud.modules.banners.title',
+  listTitle: 'Banners',
+  listDescriptionKey: 'simpleCrud.modules.banners.listDescription',
+  listDescription: 'Listagem com área, título, posição, disponibilidade e status ativo.',
+  formTitleKey: 'simpleCrud.modules.banners.formTitle',
+  formTitle: 'Banner',
+  breadcrumbSectionKey: 'simpleCrud.sections.marketing',
+  breadcrumbSection: 'Marketing',
+  breadcrumbModuleKey: 'simpleCrud.modules.banners.title',
+  breadcrumbModule: 'Banners',
+  defaultFilters: { page: 1, perPage: 15, orderBy: 'titulo', sort: 'asc', id: '', 'area:nome::like': '', 'titulo::like': '', posicao: '', disponivel: '', ativo: '' },
+  columns: [
+    { id: 'id', labelKey: 'simpleCrud.fields.id', label: 'ID', sortKey: 'id', thClassName: 'w-[120px]', filter: { kind: 'text', key: 'id' } },
+    { id: 'area', labelKey: 'simpleCrud.fields.area', label: 'Área', sortKey: 'area:nome', render: (record) => String(record.area?.nome || '-'), filter: { kind: 'text', key: 'area:nome::like' } },
+    { id: 'titulo', labelKey: 'simpleCrud.fields.title', label: 'Título', sortKey: 'titulo', tdClassName: 'font-semibold text-slate-950', filter: { kind: 'text', key: 'titulo::like' } },
+    { id: 'posicao', labelKey: 'simpleCrud.fields.position', label: 'Posição', sortKey: 'posicao', thClassName: 'w-[110px]', filter: { kind: 'text', key: 'posicao', inputMode: 'numeric' } },
+    { id: 'disponivel', labelKey: 'marketing.banners.fields.availability', label: 'Disponível', sortKey: 'disponivel', thClassName: 'w-[120px]', valueKey: 'disponivel', filter: { kind: 'select', key: 'disponivel', options: [{ value: '1', label: 'Sim' }, { value: '0', label: 'Não' }] } },
+    { id: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', sortKey: 'ativo', thClassName: 'w-[100px]', valueKey: 'ativo', filter: { kind: 'select', key: 'ativo', options: [{ value: '1', label: 'Sim' }, { value: '0', label: 'Não' }] } },
+  ],
+  mobileTitle: (record) => String(record.titulo || '-'),
+  mobileSubtitle: (record) => String(record.area?.nome || '-'),
+  mobileMeta: (record) => `ID: ${String(record.id || '-')}`,
+  details: [
+    { key: 'permission', labelKey: 'marketing.banners.fields.permission', label: 'Permissão', render: (record) => String(record.permissao || '-') },
+    { key: 'profile', labelKey: 'simpleCrud.fields.profile', label: 'Perfil', render: (record) => String(record.perfil || '-') },
+    { key: 'channel', labelKey: 'marketing.banners.fields.channel', label: 'Canal de exibição', render: (record) => String(record.canal || '-') },
+  ],
+  sections: [
+    {
+      id: 'main',
+      titleKey: 'simpleCrud.sections.main',
+      title: 'Dados principais',
+      layout: 'rows',
+      fields: [
+        { key: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', type: 'toggle' },
+        { key: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Código', type: 'text', layoutClassName: 'max-w-[280px]' },
+        { key: 'permissao', labelKey: 'marketing.banners.fields.permission', label: 'Permissão', type: 'select', required: true, options: [{ value: 'todos', labelKey: 'marketing.banners.options.permissions.all', label: 'Todos' }, { value: 'publico', labelKey: 'marketing.banners.options.permissions.public', label: 'Público' }, { value: 'restrito', labelKey: 'marketing.banners.options.permissions.restricted', label: 'Restrito' }], layoutClassName: 'max-w-[320px]' },
+        { key: 'perfil', labelKey: 'simpleCrud.fields.profile', label: 'Perfil', type: 'select', required: true, options: [{ value: 'todos', labelKey: 'simpleCrud.profile.all', label: 'Todos' }, { value: 'cliente', labelKey: 'simpleCrud.profile.customer', label: 'Cliente' }, { value: 'vendedor', labelKey: 'simpleCrud.profile.seller', label: 'Vendedor' }], layoutClassName: 'max-w-[320px]' },
+        { key: 'canal', labelKey: 'marketing.banners.fields.channel', label: 'Canal de exibição', type: 'select', required: true, options: [{ value: 'todos', labelKey: 'marketing.banners.options.channels.all', label: 'Todos' }, { value: 'app', labelKey: 'marketing.banners.options.channels.app', label: 'App' }, { value: 'pc_mobile', labelKey: 'marketing.banners.options.channels.pcMobile', label: 'PC + Mobile' }], layoutClassName: 'max-w-[320px]' },
+        { key: 'id_area_banner', labelKey: 'simpleCrud.fields.area', label: 'Área', type: 'lookup', optionsResource: 'areas_banner', required: true, lookupStateKey: 'id_area_banner_lookup', layoutClassName: 'max-w-[560px]' },
+        { key: 'imagem', labelKey: 'catalog.fields.banner', label: 'Banner', type: 'image', layoutClassName: 'max-w-3xl' },
+        { key: 'imagem_mobile', labelKey: 'catalog.fields.mobileBanner', label: 'Banner mobile', type: 'image', layoutClassName: 'max-w-3xl' },
+        { key: 'data_inicio', labelKey: 'marketing.banners.fields.startAt', label: 'Data/hora de início', type: 'datetime-local', layoutClassName: 'max-w-[280px]' },
+        { key: 'data_fim', labelKey: 'marketing.banners.fields.endAt', label: 'Data/hora de fim', type: 'datetime-local', layoutClassName: 'max-w-[280px]' },
+        { key: 'posicao', labelKey: 'simpleCrud.fields.position', label: 'Posição', type: 'number', inputMode: 'numeric', layoutClassName: 'max-w-[220px]' },
+        { key: 'titulo', labelKey: 'simpleCrud.fields.title', label: 'Título', type: 'text', layoutClassName: 'max-w-[760px]' },
+        { key: 'tipo_link', labelKey: 'marketing.banners.fields.linkType', label: 'Tipo de link', type: 'select', options: [{ value: 'marca', labelKey: 'marketing.banners.options.linkTypes.brand', label: 'Marca' }, { value: 'fornecedor', labelKey: 'marketing.banners.options.linkTypes.supplier', label: 'Fornecedor' }, { value: 'departamento', labelKey: 'marketing.banners.options.linkTypes.department', label: 'Departamento' }, { value: 'produto', labelKey: 'marketing.banners.options.linkTypes.product', label: 'Produto' }, { value: 'colecao', labelKey: 'marketing.banners.options.linkTypes.collection', label: 'Coleção' }, { value: 'lista', labelKey: 'marketing.banners.options.linkTypes.list', label: 'Lista' }, { value: 'combo', labelKey: 'marketing.banners.options.linkTypes.combo', label: 'Combo' }, { value: 'brinde', labelKey: 'marketing.banners.options.linkTypes.gift', label: 'Brinde' }], layoutClassName: 'max-w-[320px]' },
+        { key: 'id_link_marca', labelKey: 'marketing.banners.options.linkTypes.brand', label: 'Marca', type: 'lookup', optionsResource: 'marcas', hidden: hiddenUnless('marca'), layoutClassName: 'max-w-[560px]' },
+        { key: 'id_link_fornecedor', labelKey: 'marketing.banners.options.linkTypes.supplier', label: 'Fornecedor', type: 'lookup', optionsResource: 'fornecedores', hidden: hiddenUnless('fornecedor'), layoutClassName: 'max-w-[560px]' },
+        { key: 'id_link_departamento', labelKey: 'marketing.banners.options.linkTypes.department', label: 'Departamento', type: 'lookup', optionsResource: 'departamentos', hidden: hiddenUnless('departamento'), layoutClassName: 'max-w-[560px]' },
+        { key: 'id_link_produto', labelKey: 'marketing.banners.options.linkTypes.product', label: 'Produto', type: 'lookup', optionsResource: 'produtos', hidden: hiddenUnless('produto'), layoutClassName: 'max-w-[560px]' },
+        { key: 'id_link_colecao', labelKey: 'marketing.banners.options.linkTypes.collection', label: 'Coleção', type: 'lookup', optionsResource: 'colecoes', hidden: hiddenUnless('colecao'), layoutClassName: 'max-w-[560px]' },
+        { key: 'id_link_lista', labelKey: 'marketing.banners.options.linkTypes.list', label: 'Lista', type: 'lookup', optionsResource: 'listas', hidden: hiddenUnless('lista'), layoutClassName: 'max-w-[560px]' },
+        { key: 'id_link_combo', labelKey: 'marketing.banners.options.linkTypes.combo', label: 'Combo', type: 'lookup', optionsResource: 'promocoes', hidden: hiddenUnless('combo'), layoutClassName: 'max-w-[560px]' },
+        { key: 'id_link_brinde', labelKey: 'marketing.banners.options.linkTypes.gift', label: 'Brinde', type: 'lookup', optionsResource: 'brindes', hidden: hiddenUnless('brinde'), layoutClassName: 'max-w-[560px]' },
+        { key: 'link', labelKey: 'catalog.fields.link', label: 'Link', type: 'text', layoutClassName: 'max-w-[760px]' },
+        { key: 'target', labelKey: 'catalog.fields.target', label: 'Target', type: 'select', options: [{ value: '_self', labelKey: 'marketing.banners.options.targets.self', label: 'Mesma janela' }, { value: '_blank', labelKey: 'marketing.banners.options.targets.blank', label: 'Nova janela' }], layoutClassName: 'max-w-[320px]' },
+      ],
+    },
+  ],
+  listEmbed: 'area',
+  formEmbed: 'area',
+  normalizeRecord: normalizeBannerRecord,
+  beforeSave: toBannerPayload,
+}

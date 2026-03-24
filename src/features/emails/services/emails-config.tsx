@@ -1,0 +1,38 @@
+'use client'
+
+import type { CrudModuleConfig } from '@/src/components/crud-base/types'
+
+export const EMAILS_CONFIG: CrudModuleConfig = {
+  key: 'emails',
+  resource: 'emails',
+  routeBase: '/emails',
+  featureKey: 'emails',
+  listTitleKey: 'simpleCrud.modules.emails.title',
+  listTitle: 'E-mails (Newsletter)',
+  listDescriptionKey: 'simpleCrud.modules.emails.listDescription',
+  listDescription: 'Simple newsletter e-mail registry.',
+  formTitleKey: 'simpleCrud.modules.emails.formTitle',
+  formTitle: 'E-mail',
+  breadcrumbSectionKey: 'simpleCrud.sections.marketing',
+  breadcrumbSection: 'Marketing',
+  breadcrumbModuleKey: 'simpleCrud.modules.emails.title',
+  breadcrumbModule: 'Newsletter emails',
+  defaultFilters: { page: 1, perPage: 15, orderBy: 'email', sort: 'asc', id: '', codigo: '', 'email::like': '', 'nome::like': '', ativo: '' },
+  columns: [
+    { id: 'id', labelKey: 'simpleCrud.fields.id', label: 'ID', sortKey: 'id', thClassName: 'w-[120px]', filter: { kind: 'text', key: 'id' } },
+    { id: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Code', sortKey: 'codigo', thClassName: 'w-[140px]', filter: { kind: 'text', key: 'codigo' } },
+    { id: 'email', labelKey: 'simpleCrud.fields.email', label: 'E-mail', sortKey: 'email', tdClassName: 'font-semibold text-slate-950', filter: { kind: 'text', key: 'email::like' } },
+    { id: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Name', sortKey: 'nome', filter: { kind: 'text', key: 'nome::like' } },
+    { id: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Active', sortKey: 'ativo', thClassName: 'w-[110px]', valueKey: 'ativo', filter: { kind: 'select', key: 'ativo', options: [{ value: '1', label: 'Yes' }, { value: '0', label: 'No' }] } },
+  ],
+  mobileTitle: (record) => String(record.email || '-'),
+  mobileSubtitle: (record) => String(record.nome || '-'),
+  mobileMeta: (record) => `ID: ${record.id}`,
+  sections: [{ id: 'main', titleKey: 'simpleCrud.sections.main', title: 'Main data', layout: 'rows', fields: [
+    { key: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Active', type: 'toggle' },
+    { key: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Code', type: 'text' },
+    { key: 'email', labelKey: 'simpleCrud.fields.email', label: 'E-mail', type: 'email', required: true },
+    { key: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Name', type: 'text' },
+  ] }],
+  beforeSave: (record) => ({ ...record, email: typeof record.email === 'string' ? record.email.toLowerCase() : record.email }),
+}

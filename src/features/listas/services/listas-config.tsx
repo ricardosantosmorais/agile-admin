@@ -1,0 +1,48 @@
+'use client'
+
+import type { CrudModuleConfig } from '@/src/components/crud-base/types'
+
+export const LISTAS_CONFIG: CrudModuleConfig = {
+  key: 'listas',
+  resource: 'listas',
+  routeBase: '/listas',
+  featureKey: 'listas',
+  listTitleKey: 'catalog.listas.title',
+  listTitle: 'Listas',
+  listDescriptionKey: 'catalog.listas.description',
+  listDescription: 'Listagem de listas.',
+  formTitleKey: 'catalog.listas.formTitle',
+  formTitle: 'Lista',
+  breadcrumbSectionKey: 'simpleCrud.sections.catalog',
+  breadcrumbSection: 'Catálogo',
+  breadcrumbModuleKey: 'catalog.listas.title',
+  breadcrumbModule: 'Listas',
+  defaultFilters: { page: 1, perPage: 15, orderBy: 'nome', sort: 'asc', id: '', codigo: '', 'nome::like': '', ativo: '' },
+  columns: [
+    { id: 'id', labelKey: 'simpleCrud.fields.id', label: 'ID', sortKey: 'id', thClassName: 'w-[180px]', filter: { kind: 'text', key: 'id' } },
+    { id: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Código', sortKey: 'codigo', thClassName: 'w-[130px]', filter: { kind: 'text', key: 'codigo' } },
+    { id: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', sortKey: 'nome', tdClassName: 'font-semibold text-slate-950', filter: { kind: 'text', key: 'nome::like' } },
+    { id: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', sortKey: 'ativo', thClassName: 'w-[100px]', valueKey: 'ativo', filter: { kind: 'select', key: 'ativo', options: [{ value: '1', label: 'Sim' }, { value: '0', label: 'Não' }] } },
+  ],
+  mobileTitle: (record) => String(record.nome || '-'),
+  mobileSubtitle: (record) => String(record.codigo || '-'),
+  mobileMeta: (record) => `ID: ${String(record.id || '-')}`,
+  sections: [
+    {
+      id: 'general',
+      titleKey: 'catalog.sections.general',
+      title: 'Dados gerais',
+      layout: 'rows',
+      fields: [
+        { key: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', type: 'toggle' },
+        { key: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Código', type: 'text' },
+        { key: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', type: 'text', required: true },
+        { key: 'imagem', labelKey: 'catalog.fields.banner', label: 'Banner', type: 'image' },
+        { key: 'imagem_mobile', labelKey: 'catalog.fields.mobileBanner', label: 'Banner mobile', type: 'image' },
+        { key: 'link', labelKey: 'catalog.fields.link', label: 'Link do banner', type: 'text' },
+        { key: 'target', labelKey: 'catalog.fields.target', label: 'Target do banner', type: 'select', options: [{ value: '_self', label: 'Mesma janela' }, { value: '_blank', label: 'Nova janela' }] },
+        { key: 'descricao', labelKey: 'catalog.fields.description', label: 'Descrição', type: 'richtext' },
+      ],
+    },
+  ],
+}
