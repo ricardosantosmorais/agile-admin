@@ -16,6 +16,23 @@ Esse criterio evita dois extremos:
 - duplicar comportamento em cada tela;
 - tentar encaixar telas complexas em um componente generico demais.
 
+## Helpers compartilhados
+
+Regra de projeto:
+- antes de criar helper local em `page`, `tab`, `config`, `mappers` ou `services`, verificar primeiro `src/lib/*`, `src/components/*` e services compartilhados ja existentes;
+- coercao de payload, parsing, normalizacao, datas, URLs, lookups, mascaras e validacoes pequenas devem viver em helper compartilhado quando aparecerem em mais de um modulo;
+- se um helper deixar de ser exclusivo de uma feature na mesma tarefa, ele deve ser extraido para o local compartilhado adequado e os usos duplicados devem ser substituidos no mesmo lote;
+- nao manter funcoes identicas ou quase identicas espalhadas com nomes diferentes apenas por conveniencia local.
+- wrappers locais triviais como `normalizeDecimal`, `normalizeCurrency`, `parseDecimal` e equivalentes nao devem nascer em `config`, `page` ou `service` quando `src/lib/*` ja cobre o caso.
+
+Locais preferenciais:
+- `src/lib/api-payload.ts`: coercao segura de payload (`asRecord`, `asArray`, `asString`, `asNumber`, `asBoolean`);
+- `src/lib/lookup-options.ts`: lookups, labels e ids normalizados;
+- `src/lib/value-parsers.ts`: digitos, inteiros, decimais localizados, telefone e formatacao de input;
+- `src/lib/date-time-input.ts`: conversao entre `datetime-local` e contrato da API;
+- `src/lib/validators.ts`: validacoes pequenas reaproveitaveis;
+- `src/lib/url.ts`: normalizacao simples de rotas e links.
+
 ## Shell e navegacao
 
 ### `PageHeader`
@@ -75,10 +92,16 @@ Responsabilidade:
 
 Uso recomendado:
 - qualquer tela com listagem padrao server-side.
+- abas relacionais com volume alto, desde que a carga, filtros e paginação sejam server-side.
 
 Nao tentar usar para:
 - telas que sao mais painel operacional do que listagem;
 - fluxos de arvore, dual list ou composicoes muito especificas.
+
+Regra de migracao:
+- se a aba relacional puder acumular dezenas ou centenas de registros, nao usar tabela local carregando tudo;
+- nesses casos, aplicar o mesmo padrao das telas maiores: `AppDataTable` + `DataTableFiltersCard` + paginação server-side;
+- `SelectableDataTable` fica restrita a relacoes pequenas e operacionais.
 
 ### `DataTableFilters`
 Arquivo: [data-table-filters.tsx](/C:/Projetos/admin-v2-web/src/components/data-table/data-table-filters.tsx)
@@ -92,6 +115,12 @@ Padrao atual:
 - botao de filtros no lado esquerdo do cabecalho do card;
 - sem titulo duplicado de listagem;
 - filtros ocultos por padrao.
+
+Regra de migracao:
+- se o legado usa autocomplete em um filtro, o v2 tambem deve usar autocomplete;
+- nao rebaixar filtro relacional para campo texto apenas por conveniencia tecnica;
+- quando houver busca por entidade relacionada, preferir `LookupSelect` ou variante equivalente.
+- filtros monetarios e percentuais devem manter mascara e afixo tambem na listagem quando essa entrada existir no legado ou fizer parte do fluxo operacional.
 
 ### `DataTableToolbar`
 Arquivo: [data-table-toolbar.tsx](/C:/Projetos/admin-v2-web/src/components/data-table/data-table-toolbar.tsx)
@@ -162,6 +191,9 @@ Responsabilidade:
 Uso recomendado:
 - formularios hibridos;
 - telas em que a parte linear pode ser componentizada, mas ainda existe uma secao relacional separada.
+
+Regra:
+- `select` que ja declara uma opcao vazia explicitamente no config nao deve receber uma segunda opcao `Selecione` automaticamente.
 
 Exemplo atual:
 - `Grupos de Clientes`.
@@ -251,6 +283,13 @@ Arquivo: [form-field.tsx](/C:/Projetos/admin-v2-web/src/components/ui/form-field
 Responsabilidade:
 - invólucro simples de label, ajuda e erro quando a tela nao esta em layout de linha.
 
+Regra de migracao:
+- se o legado exibe descricao, dica operacional ou observacao de uso para um campo, essa ajuda deve ser carregada para o v2;
+- isso vale para formularios principais e para modais;
+- helper text do legado nao deve ser descartado quando ele explica regra de negocio ou operacao.
+- quando o campo for obrigatorio, o v2 deve explicitar isso no proprio label com asterisco e manter feedback visual local no campo;
+- nao depender apenas de toast global para o usuario descobrir qual campo obrigatorio faltou.
+
 ### `RichTextEditor`
 Arquivo: [rich-text-editor.tsx](/C:/Projetos/admin-v2-web/src/components/ui/rich-text-editor.tsx)
 
@@ -280,6 +319,24 @@ Uso atual:
 - `Colecoes`;
 - `Marcas`;
 - outras telas com `type: 'image'`.
+
+### `StepIndicator`
+Arquivo: [step-indicator.tsx](/C:/Projetos/admin-v2-web/src/components/ui/step-indicator.tsx)
+
+Responsabilidade:
+- exibir progresso sequencial em fluxos com etapas;
+- destacar etapa atual, concluídas e pendentes;
+- manter leitura rápida do caminho restante.
+
+Uso recomendado:
+- wizards;
+- formulários operacionais divididos em passos;
+- fluxos em que o usuário precisa revisar antes de salvar.
+
+Regra:
+- usar quando a experiência for realmente sequencial;
+- não substituir abas quando as seções forem independentes e navegáveis em qualquer ordem;
+- a etapa final deve deixar claro o resumo ou revisão do que será persistido.
 
 ### `IconPickerField`
 Arquivo: [icon-picker-field.tsx](/C:/Projetos/admin-v2-web/src/components/ui/icon-picker-field.tsx)

@@ -4,6 +4,18 @@ import { httpClient } from '@/src/services/http/http-client'
 import type { CrudDataClient, CrudListFilters, CrudListResponse, CrudOption, CrudRecord, CrudResource } from '@/src/components/crud-base/types'
 
 const CRUD_OPTIONS_PATHS: Record<CrudResource, string> = {
+  produtos_precificadores: '/api/produtos-x-precificadores',
+  tributos: '/api/tributos',
+  tributos_partilha: '/api/tributos-partilha',
+  'produtos/filiais': '/api/produtos-x-filiais',
+  tabelas_preco: '/api/lookups/tabelas_preco',
+  formas_pagamento: '/api/lookups/formas_pagamento',
+  condicoes_pagamento: '/api/lookups/condicoes_pagamento',
+  limites_credito: '/api/limites-credito',
+  grupos_filiais: '/api/grupos-filiais',
+  sequenciais: '/api/sequenciais',
+  'implantacao/fases': '/api/fases',
+  formas_entrega: '/api/formas-entrega',
   transportadoras: '/api/transportadoras',
   portos: '/api/portos',
   areas_atuacao: '/api/areas-de-atuacao',
@@ -38,13 +50,10 @@ const CRUD_OPTIONS_PATHS: Record<CrudResource, string> = {
   filiais: '/api/lookups/filiais',
   canais_distribuicao: '/api/lookups/canais_distribuicao',
   perfis_administradores: '/api/administradores/perfis',
-  tabelas_preco: '/api/lookups/tabelas_preco',
   produtos: '/api/lookups/produtos',
   promocoes: '/api/lookups/promocoes',
   compre_ganhe: '/api/compre-e-ganhe',
   brindes: '/api/lookups/brindes',
-  formas_pagamento: '/api/lookups/formas_pagamento',
-  condicoes_pagamento: '/api/lookups/condicoes_pagamento',
 }
 
 function buildParams(filters: CrudListFilters, embed?: string) {
@@ -183,6 +192,29 @@ export async function loadCrudLookupOptions(resource: CrudResource, query: strin
 
   writeLookupCache(cacheKey, normalized)
   return cloneCrudOptions(normalized)
+}
+
+export async function resolveCrudLookupOption(resource: CrudResource, id: string) {
+  const normalizedId = id.trim()
+  if (!normalizedId) {
+    return null
+  }
+
+  const response = await httpClient<Array<CrudOption | LookupItem>>(`/api/lookups/${resource}?id=${encodeURIComponent(normalizedId)}`, {
+    method: 'GET',
+    cache: 'no-store',
+  })
+
+  const item = response[0]
+  if (!item) {
+    return null
+  }
+
+  if ('value' in item && typeof item.value === 'string' && 'label' in item && typeof item.label === 'string') {
+    return { value: item.value, label: item.label }
+  }
+
+  return mapCrudOption(item)
 }
 
 export function clearCrudLookupCache() {

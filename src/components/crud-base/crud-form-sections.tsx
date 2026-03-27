@@ -2,6 +2,7 @@
 
 import { BooleanChoice } from '@/src/components/ui/boolean-choice'
 import { DateInput } from '@/src/components/ui/date-input'
+import { FileUploadField } from '@/src/components/ui/file-upload-field'
 import { FormField } from '@/src/components/ui/form-field'
 import { IconPickerField } from '@/src/components/ui/icon-picker-field'
 import { ImageUploadField } from '@/src/components/ui/image-upload-field'
@@ -12,8 +13,10 @@ import { SectionCard } from '@/src/components/ui/section-card'
 import { TimeInput } from '@/src/components/ui/time-input'
 import { loadCrudLookupOptions } from '@/src/components/crud-base/crud-client'
 import type { CrudFieldOption, CrudModuleConfig, CrudOption, CrudRecord } from '@/src/components/crud-base/types'
+import { useAuth } from '@/src/contexts/auth-context'
 import { useI18n } from '@/src/i18n/use-i18n'
 import { cepMask, cnpjMask, cpfMask, currencyMask, decimalMask, phoneMask } from '@/src/lib/input-masks'
+import { createProfileUploadHandler } from '@/src/lib/uploads'
 
 function resolveOptionLabel(option: CrudFieldOption, t: ReturnType<typeof useI18n>['t']) {
   return 'labelKey' in option ? t(option.labelKey, option.label) : option.label
@@ -96,6 +99,8 @@ export function CrudFormSections({
   sectionIds,
 }: CrudFormSectionsProps) {
   const { t } = useI18n()
+  const { session } = useAuth()
+  const tenantBucketUrl = session?.currentTenant.assetsBucketUrl ?? ''
   const sections = sectionIds?.length
     ? config.sections.filter((section) => sectionIds.includes(section.id))
     : config.sections
@@ -115,10 +120,18 @@ export function CrudFormSections({
           >
             {section.fields.filter((field) => !(field.hidden?.({ form, isEditing: Boolean(form.id) }) ?? false)).map((field) => {
               const label = t(field.labelKey, field.label)
+              const helperText = field.helperTextKey ? t(field.helperTextKey, field.helperText || '') : field.helperText
               const value = form[field.key]
               const disabled = typeof field.disabled === 'function'
                 ? field.disabled({ form, isEditing: Boolean(form.id) })
                 : Boolean(field.disabled)
+              const uploadHandler = field.uploadProfileId
+                ? createProfileUploadHandler({
+                    profileId: field.uploadProfileId,
+                    tenantBucketUrl,
+                    folder: field.uploadFolder,
+                  })
+                : undefined
               const fieldClassName = field.layoutClassName ?? (
                 section.layout === 'rows'
                   ? 'w-full'
@@ -139,7 +152,10 @@ export function CrudFormSections({
                 if (section.layout === 'rows') {
                   return (
                     <div key={field.key} className="grid items-center gap-3 md:grid-cols-[180px_minmax(0,360px)] md:gap-8">
-                      <div className="text-[13px] font-medium text-slate-700">{label}</div>
+                      <div className="text-[13px] font-medium text-slate-700">
+                        {label}
+                        {field.required ? <span className="ml-1 text-rose-500">*</span> : null}
+                      </div>
                       <div className={fieldClassName}>
                         {renderBooleanField({
                           value,
@@ -147,11 +163,7 @@ export function CrudFormSections({
                           onChange: (nextValue) => patch(field.key, nextValue),
                           t,
                         })}
-                        {field.helperTextKey || field.helperText ? (
-                          <p className="mt-1.5 text-xs text-slate-500">
-                            {field.helperTextKey ? t(field.helperTextKey, field.helperText || '') : field.helperText}
-                          </p>
-                        ) : null}
+                        {helperText ? <p className="mt-1.5 text-xs text-slate-500">{helperText}</p> : null}
                       </div>
                     </div>
                   )
@@ -170,6 +182,7 @@ export function CrudFormSections({
               }
 
               const options = field.options?.map((option) => ({ value: option.value, label: resolveOptionLabel(option, t) })) ?? optionsMap[field.key] ?? []
+              const hasEmptySelectOption = options.some((option) => option.value === '')
               const fieldControl = field.type === 'textarea' ? (
                 <textarea rows={field.rows ?? 10} value={String(value ?? '')} onChange={(event) => patch(field.key, event.target.value)} className={`${inputClasses()} min-h-[220px] resize-y`} disabled={readOnly || disabled} placeholder={field.placeholder} />
               ) : field.type === 'richtext' ? (
@@ -226,13 +239,10 @@ export function CrudFormSections({
                   disabled={readOnly || disabled}
                 />
               ) : field.type === 'select' ? (
-                <>
-                  <select value={String(value ?? '')} onChange={(event) => patch(field.key, event.target.value)} className={inputClasses()} disabled={readOnly || disabled}>
-                    <option value="">{t('common.select', 'Select')}</option>
-                    {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </select>
-                  {field.helperTextKey || field.helperText ? <span className="text-xs text-slate-500">{field.helperTextKey ? t(field.helperTextKey, field.helperText || '') : field.helperText}</span> : null}
-                </>
+                <select value={String(value ?? '')} onChange={(event) => patch(field.key, event.target.value)} className={inputClasses()} disabled={readOnly || disabled}>
+                  {hasEmptySelectOption ? null : <option value="">{t('common.select', 'Select')}</option>}
+                  {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                </select>
               ) : field.type === 'color' ? (
                 <div className="flex max-w-md items-center gap-3.5">
                   <input
@@ -261,6 +271,19 @@ export function CrudFormSections({
                     value={String(value ?? '')}
                     onChange={(nextValue) => patch(field.key, nextValue)}
                     disabled={readOnly || disabled}
+                    onUploadFile={uploadHandler}
+                  />
+                </div>
+              ) : field.type === 'file' ? (
+                <div className="max-w-3xl">
+                  <FileUploadField
+                    value={String(value ?? '')}
+                    onChange={(nextValue) => patch(field.key, nextValue)}
+                    disabled={readOnly || disabled}
+                    accept={field.accept}
+                    formatsLabel={field.uploadFormatsLabel}
+                    maxSizeLabel={field.maxSizeLabel}
+                    onUploadFile={uploadHandler}
                   />
                 </div>
               ) : field.type === 'icon' ? (
@@ -272,41 +295,32 @@ export function CrudFormSections({
                   />
                 </div>
               ) : field.type === 'date' ? (
-                <>
-                  <DateInput
-                    value={String(value ?? '')}
-                    onChange={(event) => patch(field.key, event.target.value)}
-                    disabled={readOnly || disabled}
-                  />
-                  {field.helperTextKey || field.helperText ? <span className="text-xs text-slate-500">{field.helperTextKey ? t(field.helperTextKey, field.helperText || '') : field.helperText}</span> : null}
-                </>
+                <DateInput
+                  value={String(value ?? '')}
+                  onChange={(event) => patch(field.key, event.target.value)}
+                  disabled={readOnly || disabled}
+                />
               ) : field.type === 'time' ? (
-                <>
-                  <TimeInput
-                    value={String(value ?? '')}
-                    onChange={(event) => patch(field.key, event.target.value)}
-                    disabled={readOnly || disabled}
-                  />
-                  {field.helperTextKey || field.helperText ? <span className="text-xs text-slate-500">{field.helperTextKey ? t(field.helperTextKey, field.helperText || '') : field.helperText}</span> : null}
-                </>
+                <TimeInput
+                  value={String(value ?? '')}
+                  onChange={(event) => patch(field.key, event.target.value)}
+                  disabled={readOnly || disabled}
+                />
               ) : (
-                <>
-                  {withAdornment(
-                    <input
-                      type={field.type}
-                      value={String(value ?? '')}
-                      onChange={(event) => patch(field.key, field.mask ? applyMask(field.mask, event.target.value) : event.target.value)}
-                      className={inputClasses()}
-                      disabled={readOnly || disabled}
-                      placeholder={field.placeholder}
-                      inputMode={field.inputMode}
-                      maxLength={field.maxLength}
-                    />,
-                    field.prefixText,
-                    field.suffixText,
-                  )}
-                  {field.helperTextKey || field.helperText ? <span className="text-xs text-slate-500">{field.helperTextKey ? t(field.helperTextKey, field.helperText || '') : field.helperText}</span> : null}
-                </>
+                withAdornment(
+                  <input
+                    type={field.type}
+                    value={String(value ?? '')}
+                    onChange={(event) => patch(field.key, field.mask ? applyMask(field.mask, event.target.value) : event.target.value)}
+                    className={inputClasses()}
+                    disabled={readOnly || disabled}
+                    placeholder={field.placeholder}
+                    inputMode={field.inputMode}
+                    maxLength={field.maxLength}
+                  />,
+                  field.prefixText,
+                  field.suffixText,
+                )
               )
 
               if (section.layout === 'rows') {
@@ -315,13 +329,14 @@ export function CrudFormSections({
                     <div className="pt-2.5 text-[13px] font-medium text-slate-700">{label}</div>
                     <div className={fieldClassName}>
                       {fieldControl}
+                      {helperText ? <p className="mt-1.5 text-xs text-slate-500">{helperText}</p> : null}
                     </div>
                   </div>
                 )
               }
 
               return (
-                <FormField key={field.key} label={label} className={fieldClassName}>
+                <FormField key={field.key} label={label} className={fieldClassName} helperText={helperText} asLabel={field.type !== 'richtext'} required={field.required === true}>
                   {fieldControl}
                 </FormField>
               )

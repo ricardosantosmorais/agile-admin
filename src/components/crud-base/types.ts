@@ -3,8 +3,21 @@
 import type { InputHTMLAttributes } from 'react'
 import type { AppDataTableFilterConfig } from '@/src/components/data-table/types'
 import type { FeatureKey } from '@/src/features/auth/services/permissions'
+import type { LookupOption } from '@/src/components/ui/lookup-select'
 
 export type CrudResource =
+  | 'produtos_precificadores'
+  | 'tributos'
+  | 'tributos_partilha'
+  | 'produtos/filiais'
+  | 'tabelas_preco'
+  | 'formas_pagamento'
+  | 'condicoes_pagamento'
+  | 'limites_credito'
+  | 'grupos_filiais'
+  | 'sequenciais'
+  | 'implantacao/fases'
+  | 'formas_entrega'
   | 'transportadoras'
   | 'portos'
   | 'areas_atuacao'
@@ -39,13 +52,10 @@ export type CrudResource =
   | 'filiais'
   | 'canais_distribuicao'
   | 'perfis_administradores'
-  | 'tabelas_preco'
   | 'produtos'
   | 'promocoes'
   | 'compre_ganhe'
   | 'brindes'
-  | 'formas_pagamento'
-  | 'condicoes_pagamento'
 
 export type CrudRecord = {
   id?: string
@@ -55,7 +65,7 @@ export type CrudRecord = {
   nome?: string | null
   titulo?: string | null
   email?: string | null
-  posicao?: number | null
+  posicao?: number | string | null
   link_externo?: string | null
   perfil?: string | null
   texto?: string | null
@@ -109,7 +119,7 @@ export type CrudFieldConfig = {
   key: string
   labelKey: string
   label: string
-  type: 'text' | 'email' | 'password' | 'number' | 'date' | 'time' | 'datetime-local' | 'textarea' | 'richtext' | 'select' | 'lookup' | 'toggle' | 'color' | 'image' | 'icon'
+  type: 'text' | 'email' | 'password' | 'number' | 'date' | 'time' | 'datetime-local' | 'textarea' | 'richtext' | 'select' | 'lookup' | 'toggle' | 'color' | 'image' | 'file' | 'icon'
   defaultValue?: string | number | boolean | null
   hidden?: (context: { form: CrudRecord; isEditing: boolean }) => boolean
   disabled?: boolean | ((context: { form: CrudRecord; isEditing: boolean }) => boolean)
@@ -127,6 +137,12 @@ export type CrudFieldConfig = {
   lookupStateKey?: string
   helperTextKey?: string
   helperText?: string
+  accept?: Record<string, string[]>
+  uploadFormatsLabel?: string
+  maxSizeLabel?: string
+  uploadProfileId?: import('@/src/lib/upload-targets').UploadProfileId
+  uploadFolder?: string
+  validate?: (context: { value: unknown; form: CrudRecord; isEditing: boolean }) => string | null
 }
 
 export type CrudSectionConfig = {
@@ -150,7 +166,8 @@ export type CrudColumnFilterConfig =
   | ({ kind: 'text'; key: keyof CrudListFilters; placeholder?: string; inputMode?: InputHTMLAttributes<HTMLInputElement>['inputMode'] } & CrudFilterMeta)
   | ({ kind: 'select'; key: keyof CrudListFilters; options: Array<{ value: string; label: string; labelKey?: string }>; emptyLabel?: string } & CrudFilterMeta)
   | ({ kind: 'date-range'; fromKey: keyof CrudListFilters; toKey: keyof CrudListFilters } & CrudFilterMeta)
-  | ({ kind: 'number-range'; fromKey: keyof CrudListFilters; toKey: keyof CrudListFilters; inputMode?: InputHTMLAttributes<HTMLInputElement>['inputMode'] } & CrudFilterMeta)
+  | ({ kind: 'number-range'; fromKey: keyof CrudListFilters; toKey: keyof CrudListFilters; inputMode?: InputHTMLAttributes<HTMLInputElement>['inputMode']; mask?: 'currency' | 'decimal'; prefixText?: string; suffixText?: string } & CrudFilterMeta)
+  | ({ kind: 'lookup'; key: keyof CrudListFilters; loadOptions: (query: string, page: number, perPage: number) => Promise<LookupOption[]>; pageSize?: number } & CrudFilterMeta)
   | ({ kind: 'custom'; render: Extract<AppDataTableFilterConfig<CrudListFilters>, { kind: 'custom' }>['render'] } & CrudFilterMeta)
 
 export type CrudColumnConfig = {

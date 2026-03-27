@@ -1,0 +1,150 @@
+'use client'
+
+import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
+import {
+  normalizeCurrency,
+  normalizeInteger,
+  parseInteger,
+  parseNullableCurrency,
+  trimNullable,
+} from '@/src/features/financeiro/services/financeiro-form'
+
+function normalizeRecord(record: CrudRecord): CrudRecord {
+  const next: CrudRecord = {
+    ...record,
+    parcelas: normalizeInteger(record.parcelas),
+    posicao: normalizeInteger(record.posicao),
+    prazo_medio: normalizeInteger(record.prazo_medio),
+    prazo_primeira_parcela: normalizeInteger(record.prazo_primeira_parcela),
+    intervalo_parcelas: normalizeInteger(record.intervalo_parcelas),
+    indice: normalizeInteger(record.indice),
+    pedido_minimo: normalizeCurrency(record.pedido_minimo),
+    pedido_maximo: normalizeCurrency(record.pedido_maximo),
+    desconto: normalizeCurrency(record.desconto),
+    acrescimo: normalizeCurrency(record.acrescimo),
+    juros: normalizeCurrency(record.juros),
+    fator: normalizeCurrency(record.fator),
+    valor_taxas: normalizeCurrency(record.valor_taxas),
+  }
+  return next
+}
+
+function beforeSave(record: CrudRecord): CrudRecord {
+  return {
+    ...record,
+    codigo: trimNullable(record.codigo),
+    nome: trimNullable(record.nome),
+    parcelas: parseInteger(record.parcelas),
+    posicao: parseInteger(record.posicao),
+    prazo_medio: parseInteger(record.prazo_medio),
+    prazo_primeira_parcela: parseInteger(record.prazo_primeira_parcela),
+    intervalo_parcelas: parseInteger(record.intervalo_parcelas),
+    indice: parseInteger(record.indice),
+    pedido_minimo: parseNullableCurrency(record.pedido_minimo),
+    pedido_maximo: parseNullableCurrency(record.pedido_maximo),
+    desconto: parseNullableCurrency(record.desconto),
+    acrescimo: parseNullableCurrency(record.acrescimo),
+    juros: parseNullableCurrency(record.juros),
+    fator: parseNullableCurrency(record.fator),
+    valor_taxas: parseNullableCurrency(record.valor_taxas),
+  }
+}
+
+export const CONDICOES_PAGAMENTO_CONFIG: CrudModuleConfig = {
+  key: 'condicoes-pagamento',
+  resource: 'condicoes_pagamento',
+  routeBase: '/condicoes-de-pagamento',
+  featureKey: 'condicoesPagamento',
+  listTitleKey: 'financial.paymentTerms.title',
+  listTitle: 'Condições de pagamento',
+  listDescriptionKey: 'financial.paymentTerms.listDescription',
+  listDescription: 'Listagem com prazo médio, parcelas e status.',
+  formTitleKey: 'financial.paymentTerms.formTitle',
+  formTitle: 'Condição de pagamento',
+  breadcrumbSectionKey: 'routes.financeiro',
+  breadcrumbSection: 'Financeiro',
+  breadcrumbModuleKey: 'routes.condicoesPagamento',
+  breadcrumbModule: 'Condições de pagamento',
+  listEmbed: '',
+  formEmbed: 'filiais.filial',
+  defaultFilters: {
+    page: 1,
+    perPage: 15,
+    orderBy: 'nome',
+    sort: 'asc',
+    id: '',
+    'codigo::like': '',
+    'nome::like': '',
+    ativo: '',
+  },
+  columns: [
+    { id: 'id', labelKey: 'simpleCrud.fields.id', label: 'ID', sortKey: 'id', thClassName: 'w-[180px]', filter: { kind: 'text', key: 'id' } },
+    { id: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Código', sortKey: 'codigo', thClassName: 'w-[140px]', filter: { kind: 'text', key: 'codigo::like' } },
+    { id: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', sortKey: 'nome', tdClassName: 'font-semibold text-slate-950', filter: { kind: 'text', key: 'nome::like' } },
+    { id: 'prazo_medio', labelKey: 'financial.paymentTerms.fields.averageTerm', label: 'Prazo médio', sortKey: 'prazo_medio' },
+    { id: 'parcelas', labelKey: 'financial.paymentTerms.fields.installments', label: 'Parcelas', sortKey: 'parcelas', thClassName: 'w-[120px]' },
+    { id: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', sortKey: 'ativo', thClassName: 'w-[100px]', valueKey: 'ativo', filter: { kind: 'select', key: 'ativo', options: [{ value: '1', label: 'Sim' }, { value: '0', label: 'Não' }] } },
+  ],
+  mobileTitle: (record) => String(record.nome || '-'),
+  mobileSubtitle: (record) => `Parcelas: ${String(record.parcelas || '-')}`,
+  mobileMeta: (record) => `ID: ${String(record.id || '-')}`,
+  sections: [
+    {
+      id: 'flags',
+      titleKey: 'financial.sections.general',
+      title: 'Dados gerais',
+      layout: 'rows',
+      fields: [
+        { key: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', type: 'toggle' },
+        { key: 'restrito', labelKey: 'financial.paymentTerms.fields.restricted', label: 'Restrito', type: 'toggle' },
+        { key: 'app', labelKey: 'financial.paymentTerms.fields.appOnly', label: 'Exclusivo APP', type: 'toggle' },
+        { key: 'modifica_precificador_fixo', labelKey: 'financial.paymentTerms.fields.fixedPricing', label: 'Modifica precificador fixo', type: 'toggle' },
+      ],
+    },
+    {
+      id: 'basic',
+      titleKey: 'financial.sections.general',
+      title: 'Dados básicos',
+      layout: 'rows',
+      fields: [
+        { key: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Código', type: 'text' },
+        {
+          key: 'perfil',
+          labelKey: 'simpleCrud.fields.profile',
+          label: 'Perfil',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'todos', labelKey: 'common.profiles.all', label: 'Todos' },
+            { value: 'cliente', labelKey: 'common.profiles.customer', label: 'Cliente' },
+            { value: 'vendedor', labelKey: 'common.profiles.seller', label: 'Vendedor' },
+          ],
+        },
+        { key: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', type: 'text', required: true },
+        { key: 'parcelas', labelKey: 'financial.paymentTerms.fields.installments', label: 'Parcelas', type: 'number' },
+        { key: 'posicao', labelKey: 'simpleCrud.fields.position', label: 'Posição', type: 'number' },
+        { key: 'prazo_medio', labelKey: 'financial.paymentTerms.fields.averageTerm', label: 'Prazo médio (dias)', type: 'number' },
+        { key: 'prazo_primeira_parcela', labelKey: 'financial.paymentTerms.fields.firstInstallment', label: 'Primeira parcela (dias)', type: 'number' },
+        { key: 'intervalo_parcelas', labelKey: 'financial.paymentTerms.fields.installmentInterval', label: 'Intervalo das parcelas (dias)', type: 'number' },
+        { key: 'indice', labelKey: 'financial.paymentTerms.fields.priceIndex', label: 'Índice da tabela de preço', type: 'number' },
+      ],
+    },
+    {
+      id: 'pricing',
+      titleKey: 'financial.paymentTerms.sections.pricing',
+      title: 'Valores e taxas',
+      layout: 'rows',
+      fields: [
+        { key: 'pedido_minimo', labelKey: 'financial.paymentTerms.fields.minimumOrder', label: 'Pedido mínimo', type: 'text', mask: 'currency', prefixText: 'R$' },
+        { key: 'pedido_maximo', labelKey: 'financial.paymentTerms.fields.maximumOrder', label: 'Pedido máximo', type: 'text', mask: 'currency', prefixText: 'R$' },
+        { key: 'desconto', labelKey: 'financial.paymentTerms.fields.discount', label: 'Desconto', type: 'text', mask: 'currency' },
+        { key: 'acrescimo', labelKey: 'financial.paymentTerms.fields.increase', label: 'Acréscimo', type: 'text', mask: 'currency' },
+        { key: 'juros', labelKey: 'financial.paymentTerms.fields.interest', label: 'Juros', type: 'text', mask: 'currency' },
+        { key: 'fator', labelKey: 'financial.paymentTerms.fields.factor', label: 'Fator', type: 'text', mask: 'currency' },
+        { key: 'valor_taxas', labelKey: 'financial.paymentTerms.fields.fees', label: 'Taxas', type: 'text', mask: 'currency', prefixText: 'R$' },
+      ],
+    },
+  ],
+  normalizeRecord,
+  beforeSave,
+}

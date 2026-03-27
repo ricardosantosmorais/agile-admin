@@ -1,43 +1,9 @@
 'use client'
 
-import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
+import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import { cepMask, currencyMask, parseCurrencyInput } from '@/src/lib/input-masks'
-
-function normalizeDecimal(value: unknown, precision = 3) {
-  if (value === null || value === undefined || value === '') {
-    return ''
-  }
-
-  const parsed = typeof value === 'number'
-    ? value
-    : Number(String(value).trim().replace(',', '.'))
-
-  if (!Number.isFinite(parsed)) {
-    return ''
-  }
-
-  return parsed.toLocaleString('pt-BR', {
-    minimumFractionDigits: precision,
-    maximumFractionDigits: precision,
-  })
-}
-
-function normalizeLookup(record: CrudRecord, idKey: string, relationKey: string, lookupStateKey: string) {
-  const relation = record[relationKey]
-  if (!relation || typeof relation !== 'object' || Array.isArray(relation)) {
-    return {
-      [lookupStateKey]: record[idKey]
-        ? { id: String(record[idKey]), label: String(record[idKey]) }
-        : null,
-    }
-  }
-
-  const value = String((relation as { id?: unknown }).id || record[idKey] || '')
-  const label = String((relation as { nome?: unknown; titulo?: unknown }).nome || (relation as { titulo?: unknown }).titulo || value || '')
-  return {
-    [lookupStateKey]: value ? { id: value, label } : null,
-  }
-}
+import { normalizeLookupState } from '@/src/lib/lookup-options'
+import { formatLocalizedDecimal } from '@/src/lib/value-parsers'
 
 export const PRACAS_CONFIG: CrudModuleConfig = {
   key: 'pracas',
@@ -60,7 +26,7 @@ export const PRACAS_CONFIG: CrudModuleConfig = {
     { id: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Código', sortKey: 'codigo', thClassName: 'w-[140px]', filter: { kind: 'text', key: 'codigo' } },
     { id: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', sortKey: 'nome', tdClassName: 'font-semibold text-slate-950', filter: { kind: 'text', key: 'nome::like' } },
     { id: 'pedido_minimo', labelKey: 'logistics.pracas.fields.minimumOrder', label: 'Pedido mínimo', render: (record) => record.pedido_minimo ? `R$ ${currencyMask(String(record.pedido_minimo))}` : '-', visibility: 'xl' },
-    { id: 'peso_minimo', labelKey: 'logistics.pracas.fields.minimumWeight', label: 'Peso mínimo', render: (record) => record.peso_minimo ? `${normalizeDecimal(record.peso_minimo, 3)} kg` : '-', visibility: 'xl' },
+    { id: 'peso_minimo', labelKey: 'logistics.pracas.fields.minimumWeight', label: 'Peso mínimo', render: (record) => record.peso_minimo ? `${formatLocalizedDecimal(record.peso_minimo, 3)} kg` : '-', visibility: 'xl' },
     { id: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', sortKey: 'ativo', thClassName: 'w-[100px]', valueKey: 'ativo', filter: { kind: 'select', key: 'ativo', options: [{ value: '1', label: 'Sim' }, { value: '0', label: 'Não' }] } },
   ],
   mobileTitle: (record) => String(record.nome || '-'),
@@ -91,9 +57,9 @@ export const PRACAS_CONFIG: CrudModuleConfig = {
     cep_de: cepMask(String(record.cep_de || '')),
     cep_ate: cepMask(String(record.cep_ate || '')),
     pedido_minimo: record.pedido_minimo === null || record.pedido_minimo === undefined ? '' : currencyMask(String(record.pedido_minimo)),
-    peso_minimo: normalizeDecimal(record.peso_minimo, 3),
-    ...normalizeLookup(record, 'id_rota', 'rota', 'id_rota_lookup'),
-    ...normalizeLookup(record, 'id_tabela_preco', 'tabela_preco', 'id_tabela_preco_lookup'),
+    peso_minimo: formatLocalizedDecimal(record.peso_minimo, 3),
+    ...normalizeLookupState(record, 'id_rota', 'rota', 'id_rota_lookup'),
+    ...normalizeLookupState(record, 'id_tabela_preco', 'tabela_preco', 'id_tabela_preco_lookup'),
   }),
   beforeSave: (record) => ({
     ...record,

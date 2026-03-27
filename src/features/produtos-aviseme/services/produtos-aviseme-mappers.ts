@@ -1,21 +1,4 @@
-type ApiRecord = Record<string, unknown>
-
-function asRecord(value: unknown): ApiRecord {
-  return typeof value === 'object' && value !== null ? value as ApiRecord : {}
-}
-
-function asArray(value: unknown) {
-  return Array.isArray(value) ? value : []
-}
-
-function asString(value: unknown) {
-  return typeof value === 'string' ? value : ''
-}
-
-function asNumber(value: unknown) {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : 0
-}
+import { asArray, asNumber, asRecord, asString } from '@/src/lib/api-payload'
 
 export type AvisemeListItem = {
   id: string

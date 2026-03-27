@@ -2,7 +2,22 @@ import type { AuthPermission, AuthSession } from '@/src/features/auth/types/auth
 import { normalizeSearchValue } from '@/src/lib/text-normalization'
 
 export type FeatureKey =
+  | 'produtosPrecificadores'
+  | 'produtosFiliais'
+  | 'tributos'
+  | 'tributosPartilha'
+  | 'produtosTabelasPreco'
+  | 'formasPagamento'
+  | 'condicoesPagamento'
+  | 'tabelasPreco'
+  | 'limitesCredito'
+  | 'filiais'
+  | 'canaisDistribuicao'
+  | 'gruposFiliais'
+  | 'fases'
+  | 'sequenciais'
   | 'dashboard'
+  | 'formasEntrega'
   | 'transportadoras'
   | 'portos'
   | 'areasAtuacao'
@@ -70,9 +85,69 @@ type FeatureAccess = {
 }
 
 const featureConfigs: Record<FeatureKey, FeatureConfig> = {
+  produtosPrecificadores: {
+    label: 'Produtos x Precificadores',
+    matchers: ['produtos x precificadores', 'produto x precificadores', 'produtos-precificadores', 'produtos_precificadores', 'precificadores produtos'],
+  },
+  produtosFiliais: {
+    label: 'Produtos x Filiais',
+    matchers: ['produto x filial', 'produtos x filiais', 'produtos-filial', 'produtos_filial', 'produtos-filiais', 'produtos_filiais'],
+  },
+  tributos: {
+    label: 'Tributos',
+    matchers: ['tributo', 'tributos'],
+  },
+  tributosPartilha: {
+    label: 'Tributos x Partilha',
+    matchers: ['tributos x partilha', 'tributo x partilha', 'tributos-partilha', 'tributos_partilha'],
+  },
+  produtosTabelasPreco: {
+    label: 'Produtos x Tabelas de Preco',
+    matchers: ['produtos x tabelas de preco', 'produto x tabelas de preco', 'produtos-tabelas-preco', 'produtos_tabelas_preco'],
+  },
+  formasPagamento: {
+    label: 'Formas de Pagamento',
+    matchers: ['forma de pagamento', 'formas de pagamento', 'formas-pagamento', 'formas_pagamento'],
+  },
+  condicoesPagamento: {
+    label: 'Condicoes de Pagamento',
+    matchers: ['condicao de pagamento', 'condicoes de pagamento', 'condicoes-pagamento', 'condicoes_pagamento'],
+  },
+  tabelasPreco: {
+    label: 'Tabelas de Preco',
+    matchers: ['tabela de preco', 'tabelas de preco', 'tabelas-preco', 'tabelas_preco'],
+  },
+  limitesCredito: {
+    label: 'Limites de Credito',
+    matchers: ['limite de credito', 'limites de credito', 'limites-credito', 'limites_credito'],
+  },
+  filiais: {
+    label: 'Filiais',
+    matchers: ['filial', 'filiais'],
+  },
+  canaisDistribuicao: {
+    label: 'Canais de Distribuicao',
+    matchers: ['canal de distribuicao', 'canais de distribuicao', 'canais-distribuicao', 'canais_distribuicao'],
+  },
+  gruposFiliais: {
+    label: 'Grupos de Filiais',
+    matchers: ['grupo de filiais', 'grupos de filiais', 'grupo filial', 'grupos filial', 'grupos-filiais', 'grupos_filiais'],
+  },
+  fases: {
+    label: 'Fases',
+    matchers: ['fase', 'fases', 'implantacao/fases', 'implantacao-fases'],
+  },
+  sequenciais: {
+    label: 'Sequenciais',
+    matchers: ['sequencial', 'sequenciais'],
+  },
   dashboard: {
     label: 'Dashboard',
     matchers: ['dashboard', 'inicio'],
+  },
+  formasEntrega: {
+    label: 'Formas de Entrega',
+    matchers: ['forma de entrega', 'formas de entrega', 'formas-entrega', 'formas_entrega'],
   },
   transportadoras: {
     label: 'Transportadoras',

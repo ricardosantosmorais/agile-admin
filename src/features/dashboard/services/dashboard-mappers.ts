@@ -1,23 +1,6 @@
 import type { DashboardSnapshot } from '@/src/lib/fake-data'
-
-type ApiRecord = Record<string, unknown>
-
-function asRecord(value: unknown): ApiRecord {
-  return typeof value === 'object' && value !== null ? (value as ApiRecord) : {}
-}
-
-function asArray<T = unknown>(value: unknown): T[] {
-  return Array.isArray(value) ? (value as T[]) : []
-}
-
-function asNumber(value: unknown) {
-  const numeric = Number(value ?? 0)
-  return Number.isFinite(numeric) ? numeric : 0
-}
-
-function asString(value: unknown, fallback = '') {
-  return typeof value === 'string' ? value : fallback
-}
+import { asArray, asNumber, asRecord, asString } from '@/src/lib/api-payload'
+import type { ApiRecord } from '@/src/lib/api-payload'
 
 function percent(part: number, total: number) {
   if (total <= 0) {

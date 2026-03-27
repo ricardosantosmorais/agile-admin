@@ -1,24 +1,8 @@
 'use client'
 
-import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
+import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import { cepMask } from '@/src/lib/input-masks'
-
-function normalizeLookup(record: CrudRecord, idKey: string, relationKey: string, lookupStateKey: string) {
-  const relation = record[relationKey]
-  if (!relation || typeof relation !== 'object' || Array.isArray(relation)) {
-    return {
-      [lookupStateKey]: record[idKey]
-        ? { id: String(record[idKey]), label: String(record[idKey]) }
-        : null,
-    }
-  }
-
-  const value = String((relation as { id?: unknown }).id || record[idKey] || '')
-  const label = String((relation as { nome?: unknown }).nome || value || '')
-  return {
-    [lookupStateKey]: value ? { id: value, label } : null,
-  }
-}
+import { normalizeLookupState } from '@/src/lib/lookup-options'
 
 export const AREAS_ATUACAO_CONFIG: CrudModuleConfig = {
   key: 'areas-atuacao',
@@ -67,7 +51,7 @@ export const AREAS_ATUACAO_CONFIG: CrudModuleConfig = {
     ...record,
     cep_de: cepMask(String(record.cep_de || '')),
     cep_ate: cepMask(String(record.cep_ate || '')),
-    ...normalizeLookup(record, 'id_praca', 'praca', 'id_praca_lookup'),
+    ...normalizeLookupState(record, 'id_praca', 'praca', 'id_praca_lookup'),
   }),
   beforeSave: (record) => ({
     ...record,

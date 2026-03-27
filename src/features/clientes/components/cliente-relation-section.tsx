@@ -38,12 +38,11 @@ export function ClienteRelationSection<TItem>({
     <SectionCard
       title={title}
       className="min-w-0 overflow-hidden"
-      action={
-        action ??
-        (!readOnly ? (
-          <RelationActions hasSelection={hasSelection} onDelete={onDelete} onCreate={onCreate} />
-        ) : null)
-      }
+      action={action !== undefined
+        ? action
+        : !readOnly ? (
+            <RelationActions hasSelection={hasSelection} onDelete={onDelete} onCreate={onCreate} />
+          ) : null}
     >
       <SelectableDataTable<TItem>
         items={items}

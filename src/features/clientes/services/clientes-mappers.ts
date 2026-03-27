@@ -10,37 +10,9 @@ import type {
   ClientLookupOption,
 } from '@/src/features/clientes/types/clientes'
 import { formatCpfCnpj } from '@/src/lib/formatters'
-
-type ApiRecord = Record<string, unknown>
-
-function asRecord(value: unknown): ApiRecord {
-  return typeof value === 'object' && value !== null ? (value as ApiRecord) : {}
-}
-
-function asArray(value: unknown) {
-  return Array.isArray(value) ? value : []
-}
-
-function asString(value: unknown) {
-  return typeof value === 'string' ? value : ''
-}
-
-function asBoolean(value: unknown) {
-  return value === true || value === 1 || value === '1'
-}
-
-function asNumber(value: unknown) {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return value
-  }
-
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : 0
-}
-
-function digitsOnly(value: string) {
-  return value.replace(/\D/g, '')
-}
+import { asArray, asBoolean, asNumber, asRecord, asString } from '@/src/lib/api-payload'
+import { toLookupOption } from '@/src/lib/lookup-options'
+import { digitsOnly } from '@/src/lib/value-parsers'
 
 function formatPhone(ddd: string, phone: string) {
   const digits = `${digitsOnly(ddd)}${digitsOnly(phone)}`
@@ -85,25 +57,6 @@ function toDateInputValue(value: string) {
   }
 
   return date.toISOString().slice(0, 10)
-}
-
-function toLookupOption(value: unknown, labelKeys: string[] = ['nome']): ClientLookupOption | null {
-  const item = asRecord(value)
-  const id = asString(item.id)
-  const label =
-    labelKeys.map((key) => asString(item[key])).find(Boolean)
-    || asString(item.nome)
-    || asString(item.nome_fantasia)
-    || asString(item.titulo)
-
-  if (!id && !label) {
-    return null
-  }
-
-  return {
-    id,
-    label,
-  }
 }
 
 function mapBranch(value: unknown): ClientAssociatedBranch {
@@ -378,7 +331,7 @@ export function mapLookupResponse(payload: unknown, labelKeys: string[]): Client
   const items = Array.isArray(payload) ? payload : asArray(source.data)
 
   for (const item of items) {
-    const option = toLookupOption(item, labelKeys)
+      const option = toLookupOption(item, labelKeys)
     if (!option) {
       continue
     }

@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { AsyncState } from '@/src/components/ui/async-state'
 import { PageHeader } from '@/src/components/ui/page-header'
 import { PageToast } from '@/src/components/ui/page-toast'
+import { resolveCrudLookupOption } from '@/src/components/crud-base/crud-client'
 import { CrudFormSections } from '@/src/components/crud-base/crud-form-sections'
 import { AccessDeniedState } from '@/src/features/auth/components/access-denied-state'
 import { useFeatureAccess } from '@/src/features/auth/hooks/use-feature-access'
@@ -83,7 +84,39 @@ export function CrudFormPage({ config, client, id }: { config: CrudModuleConfig;
       try {
         const loaded = await client.getById(resolvedId, config.formEmbed)
         if (!alive) return
-        setForm(config.normalizeRecord ? config.normalizeRecord(loaded) : loaded)
+        const normalized = config.normalizeRecord ? config.normalizeRecord(loaded) : loaded
+        const lookupFields = config.sections.flatMap((section) => section.fields).filter((field) => field.type === 'lookup' && field.optionsResource)
+        const lookupEntries = await Promise.all(lookupFields.map(async (field) => {
+          const stateKey = field.lookupStateKey ?? `${field.key}_lookup`
+          const currentLookup = normalized[stateKey]
+          const currentId = String(normalized[field.key] ?? '').trim()
+
+          if (!currentId) {
+            return [stateKey, null] as const
+          }
+
+          if (currentLookup && typeof currentLookup === 'object' && currentLookup !== null && 'label' in currentLookup) {
+            const currentLabel = String((currentLookup as { label?: unknown }).label ?? '').trim()
+            if (currentLabel && currentLabel !== currentId) {
+              return [stateKey, currentLookup] as const
+            }
+          }
+
+          try {
+            const resolved = await resolveCrudLookupOption(field.optionsResource!, currentId)
+            return [
+              stateKey,
+              resolved ? { id: resolved.value, label: resolved.label } : currentLookup ?? { id: currentId, label: currentId },
+            ] as const
+          } catch {
+            return [stateKey, currentLookup ?? { id: currentId, label: currentId }] as const
+          }
+        }))
+
+        setForm({
+          ...normalized,
+          ...Object.fromEntries(lookupEntries.filter(([, value]) => value)),
+        })
       } catch (loadError) {
         if (!alive) return
         setError(loadError instanceof Error ? loadError : new Error(loadErrorMessageRef.current))
@@ -141,6 +174,11 @@ export function CrudFormPage({ config, client, id }: { config: CrudModuleConfig;
           setFeedback(t('common.validEmail', 'Enter a valid e-mail.'))
           return
         }
+        const customValidationMessage = field.validate?.({ value, form, isEditing })
+        if (customValidationMessage) {
+          setFeedback(t(customValidationMessage, customValidationMessage))
+          return
+        }
       }
     }
 
@@ -172,7 +210,9 @@ export function CrudFormPage({ config, client, id }: { config: CrudModuleConfig;
               </button>
             ) : null}
             {config.renderHeaderActions?.({ id: resolvedId, isEditing, readOnly })}
-            <Link href={config.routeBase} className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold text-slate-700"><ArrowLeft className="h-4 w-4" />{t('common.back', 'Back')}</Link>
+            {!isFooterVisible ? (
+              <Link href={config.routeBase} className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold text-slate-700"><ArrowLeft className="h-4 w-4" />{t('common.back', 'Back')}</Link>
+            ) : null}
           </div>
         }
       />

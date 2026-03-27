@@ -1,6 +1,5 @@
 import type { NotificationDetail, NotificationsListResponse, TopbarNotification } from '@/src/features/notifications/types/notifications'
-
-type ApiRecord = Record<string, unknown>
+import { asArray, asBoolean, asRecord, asString } from '@/src/lib/api-payload'
 
 const notificationDateFormatter = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit',
@@ -9,22 +8,6 @@ const notificationDateFormatter = new Intl.DateTimeFormat('pt-BR', {
   hour: '2-digit',
   minute: '2-digit',
 })
-
-function asRecord(value: unknown): ApiRecord {
-  return typeof value === 'object' && value !== null ? (value as ApiRecord) : {}
-}
-
-function asArray<T>(value: unknown): T[] {
-  return Array.isArray(value) ? (value as T[]) : []
-}
-
-function asString(value: unknown) {
-  return typeof value === 'string' ? value : ''
-}
-
-function asBoolean(value: unknown) {
-  return value === true || value === 1 || value === '1'
-}
 
 function formatNotificationDate(value: unknown) {
   const raw = asString(value)

@@ -1,5 +1,7 @@
 import type { CrudRecord } from '@/src/components/crud-base/types'
+import { formatApiDateToInput, formatInputDateToApiEnd, formatInputDateToApiStart } from '@/src/lib/date-input'
 import { parseCurrencyInput } from '@/src/lib/input-masks'
+import { parseInteger } from '@/src/lib/value-parsers'
 
 export type CampanhaTipo = 'leve_pague' | 'desconto_unidade' | 'compre_junto'
 
@@ -9,32 +11,6 @@ function normalizeString(value: unknown) {
 
 function normalizeBoolean(value: unknown) {
   return value === true || value === 1 || value === '1'
-}
-
-function formatApiDateToInput(value: unknown) {
-  const normalized = normalizeString(value)
-  const match = normalized.match(/^(\d{4}-\d{2}-\d{2})/)
-  return match ? match[1] : ''
-}
-
-function toApiStartDate(value: unknown) {
-  const normalized = normalizeString(value)
-  return normalized ? `${normalized} 00:00:00` : null
-}
-
-function toApiEndDate(value: unknown) {
-  const normalized = normalizeString(value)
-  return normalized ? `${normalized} 23:59:59` : null
-}
-
-function parseIntegerOrNull(value: unknown) {
-  const normalized = normalizeString(value)
-  if (!normalized) {
-    return null
-  }
-
-  const parsed = Number(normalized)
-  return Number.isFinite(parsed) ? parsed : null
 }
 
 function parseDiscount(value: unknown) {
@@ -64,8 +40,8 @@ export function normalizeCampanhaRecord(record: CrudRecord): CrudRecord {
 
 export function toCampanhaPayload(record: CrudRecord, tipo: CampanhaTipo): CrudRecord {
   const nome = normalizeString(record.nome)
-  const dataInicio = toApiStartDate(record.data_inicio)
-  const dataFim = toApiEndDate(record.data_fim)
+  const dataInicio = formatInputDateToApiStart(record.data_inicio)
+  const dataFim = formatInputDateToApiEnd(record.data_fim)
 
   if (!nome) {
     throw new Error('Informe o nome da campanha.')
@@ -86,8 +62,8 @@ export function toCampanhaPayload(record: CrudRecord, tipo: CampanhaTipo): CrudR
   }
 
   if (tipo === 'leve_pague') {
-    const quantidadePedido = parseIntegerOrNull(record.quantidade_pedido)
-    const quantidadePagamento = parseIntegerOrNull(record.quantidade_pagamento)
+    const quantidadePedido = parseInteger(record.quantidade_pedido)
+    const quantidadePagamento = parseInteger(record.quantidade_pagamento)
     if (!quantidadePedido || quantidadePedido < 2) {
       throw new Error('Informe um valor válido para Leve.')
     }
@@ -100,12 +76,12 @@ export function toCampanhaPayload(record: CrudRecord, tipo: CampanhaTipo): CrudR
 
     payload.quantidade_pedido = quantidadePedido
     payload.quantidade_pagamento = quantidadePagamento
-    payload.quantidade_maxima = parseIntegerOrNull(record.quantidade_maxima)
+    payload.quantidade_maxima = parseInteger(record.quantidade_maxima)
     return payload
   }
 
   if (tipo === 'desconto_unidade') {
-    const quantidadePedido = parseIntegerOrNull(record.quantidade_pedido)
+    const quantidadePedido = parseInteger(record.quantidade_pedido)
     const desconto = parseDiscount(record.desconto)
     if (!quantidadePedido || quantidadePedido < 1) {
       throw new Error('Informe uma quantidade válida.')
@@ -115,7 +91,7 @@ export function toCampanhaPayload(record: CrudRecord, tipo: CampanhaTipo): CrudR
     }
 
     payload.quantidade_pedido = quantidadePedido
-    payload.quantidade_maxima = parseIntegerOrNull(record.quantidade_maxima)
+    payload.quantidade_maxima = parseInteger(record.quantidade_maxima)
     payload.desconto = desconto
     return payload
   }

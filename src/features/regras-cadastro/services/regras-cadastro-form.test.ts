@@ -93,10 +93,32 @@ describe('regras-cadastro-form', () => {
       id_filial: '1',
       id_canal_distribuicao: '2',
       id_vendedor: '3',
+      id_tabela_canal_distribuicao: '4',
     })
 
     expect(mapped.id_filial_lookup).toEqual({ id: '1', label: '1' })
     expect(mapped.id_canal_distribuicao_lookup).toEqual({ id: '2', label: '2' })
     expect(mapped.id_vendedor_lookup).toEqual({ id: '3', label: '3' })
+    expect(mapped.id_tabela_canal_distribuicao_lookup).toEqual({ id: '4', label: '4' })
+  })
+
+  it('does not serialize unsupported relations removed from the current model', () => {
+    const payload = toRegraCadastroPayload({
+      id: '100',
+      ativo: true,
+      nome: 'Regra alinhada',
+      id_tabela_canal_distribuicao_lookup: { id: '7', label: 'Canal Sul' },
+      id_vendedor_canal_distribuicao_lookup: { id: '8', label: 'Campo legado' },
+      id_cliente_vendedor_lookup: { id: '9', label: 'Campo legado' },
+    })
+
+    expect(payload).toMatchObject({
+      id: '100',
+      ativo: true,
+      nome: 'Regra alinhada',
+      id_tabela_canal_distribuicao: '7',
+    })
+    expect(payload).not.toHaveProperty('id_vendedor_canal_distribuicao')
+    expect(payload).not.toHaveProperty('id_cliente_vendedor')
   })
 })

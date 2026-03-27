@@ -30,6 +30,7 @@ import {
   useDashboardSequencedSnapshot,
   type DashboardPhaseId,
 } from '@/src/features/dashboard/hooks/use-dashboard-sequenced-snapshot'
+import { useIntersectionOnce } from '@/src/hooks/use-intersection-once'
 import { translateDashboardMetricLabel } from '@/src/features/dashboard/services/dashboard-i18n'
 import { useI18n } from '@/src/i18n/use-i18n'
 import { formatCompactCurrency, formatCurrency, formatNumber, formatPercent } from '@/src/lib/formatters'
@@ -242,19 +243,47 @@ function LightTable({
   )
 }
 
+function LazyDashboardSection({
+  phaseIds,
+  isReady,
+  fallback,
+  requestPhases,
+  children,
+}: {
+  phaseIds: DashboardPhaseId[]
+  isReady: boolean
+  fallback: ReactNode
+  requestPhases: (phaseIds: DashboardPhaseId | DashboardPhaseId[]) => void
+  children: ReactNode
+}) {
+  const { ref, hasIntersected } = useIntersectionOnce<HTMLDivElement>()
+
+  useEffect(() => {
+    if (!hasIntersected) {
+      return
+    }
+
+    requestPhases(phaseIds)
+  }, [hasIntersected, phaseIds, requestPhases])
+
+  return <div ref={ref}>{isReady ? children : fallback}</div>
+}
+
 export function DashboardPage() {
   const dashboardRef = useRef<HTMLDivElement | null>(null)
   const { currentTenant } = useTenant()
   const { locale, t } = useI18n()
   const [isExportingPdf, setIsExportingPdf] = useState(false)
   const {
+    allPhaseIds,
     presetRanges,
     selectedRange,
     setSelectedRange,
     snapshot,
     completedPhases,
-    currentPhase,
     error,
+    requestPhases,
+    ensurePhasesLoaded,
     refreshSnapshot,
   } = useDashboardSequencedSnapshot(currentTenant.id)
 
@@ -295,6 +324,13 @@ export function DashboardPage() {
     setIsExportingPdf(true)
 
     try {
+      await ensurePhasesLoaded(allPhaseIds)
+      await new Promise<void>((resolve) => {
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => resolve())
+        })
+      })
+
       const canvas = await toCanvas(dashboardRef.current, {
         cacheBust: true,
         pixelRatio: 1.5,
@@ -372,7 +408,16 @@ export function DashboardPage() {
               </section>
             ) : null}
 
-            {hasPhase('customers') ? (
+            <LazyDashboardSection
+              phaseIds={['customers']}
+              isReady={hasPhase('customers')}
+              requestPhases={requestPhases}
+              fallback={
+                <SectionCard title={t('dashboard.customersIndicatorsTitle', 'Indicadores de clientes')} description={t('dashboard.customersIndicatorsLoading', 'Carregando a base de clientes do periodo.')}>
+                  <SectionSkeleton lines={4} />
+                </SectionCard>
+              }
+            >
               <SectionCard title={t('dashboard.customersIndicatorsTitle', 'Indicadores de clientes')} description={t('dashboard.customersIndicatorsDescription', 'Indicadores complementares do tenant no periodo selecionado.')}>
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4">
                   {snapshot.customerMetrics.map((metric) => (
@@ -393,13 +438,18 @@ export function DashboardPage() {
                   ))}
                 </div>
               </SectionCard>
-            ) : currentPhase === 'customers' ? (
-              <SectionCard title={t('dashboard.customersIndicatorsTitle', 'Indicadores de clientes')} description={t('dashboard.customersIndicatorsLoading', 'Carregando a base de clientes do periodo.')}>
-                <SectionSkeleton lines={4} />
-              </SectionCard>
-            ) : null}
+            </LazyDashboardSection>
 
-            {hasPhase('series') ? (
+            <LazyDashboardSection
+              phaseIds={['series']}
+              isReady={hasPhase('series')}
+              requestPhases={requestPhases}
+              fallback={
+                <SectionCard title={t('dashboard.dailyRevenueTitle', 'Faturamento por dia')} description={t('dashboard.dailyRevenueLoading', 'Carregando a serie historica e os alertas do periodo.')}>
+                  <SectionSkeleton chart />
+                </SectionCard>
+              }
+            >
               <div className="space-y-4 xl:space-y-5">
                 <SectionCard
                   title={t('dashboard.dailyRevenueTitle', 'Faturamento por dia')}
@@ -451,13 +501,18 @@ export function DashboardPage() {
                   </div>
                 </SectionCard>
               </div>
-            ) : currentPhase === 'series' ? (
-              <SectionCard title={t('dashboard.dailyRevenueTitle', 'Faturamento por dia')} description={t('dashboard.dailyRevenueLoading', 'Carregando a serie historica e os alertas do periodo.')}>
-                <SectionSkeleton chart />
-              </SectionCard>
-            ) : null}
+            </LazyDashboardSection>
 
-            {hasPhase('funnel') ? (
+            <LazyDashboardSection
+              phaseIds={['funnel']}
+              isReady={hasPhase('funnel')}
+              requestPhases={requestPhases}
+              fallback={
+                <SectionCard title={t('dashboard.funnelTitle', 'Funil de conversao')} description={t('dashboard.funnelLoading', 'Carregando as etapas principais do funil.')}>
+                  <SectionSkeleton chart />
+                </SectionCard>
+              }
+            >
               <div className="grid gap-4 xl:grid-cols-2">
                 <SectionCard title={t('dashboard.funnelTitle', 'Funil de conversao')} description={t('dashboard.funnelDescription', 'Carrinho, pedidos validos e faturado.')}>
                   <ChartFrame>
@@ -522,13 +577,18 @@ export function DashboardPage() {
                   </ChartFrame>
                 </SectionCard>
               </div>
-            ) : currentPhase === 'funnel' ? (
-              <SectionCard title={t('dashboard.funnelTitle', 'Funil de conversao')} description={t('dashboard.funnelLoading', 'Carregando as etapas principais do funil.')}>
-                <SectionSkeleton chart />
-              </SectionCard>
-            ) : null}
+            </LazyDashboardSection>
 
-            {hasPhase('mix') ? (
+            <LazyDashboardSection
+              phaseIds={['mix']}
+              isReady={hasPhase('mix')}
+              requestPhases={requestPhases}
+              fallback={
+                <SectionCard title={t('dashboard.deviceSalesTitle', 'Vendas por dispositivo')} description={t('dashboard.mixLoading', 'Carregando a distribuicao de canais e emitentes.')}>
+                  <SectionSkeleton chart />
+                </SectionCard>
+              }
+            >
               <div className="grid gap-4 xl:grid-cols-2">
                 <SectionCard title={t('dashboard.deviceSalesTitle', 'Vendas por dispositivo')} description={t('dashboard.deviceSalesDescription', 'Participacao das vendas por canal de origem.')}>
                   <ChartFrame>
@@ -590,13 +650,18 @@ export function DashboardPage() {
                   </ChartFrame>
                 </SectionCard>
               </div>
-            ) : currentPhase === 'mix' ? (
-              <SectionCard title={t('dashboard.deviceSalesTitle', 'Vendas por dispositivo')} description={t('dashboard.mixLoading', 'Carregando a distribuicao de canais e emitentes.')}>
-                <SectionSkeleton chart />
-              </SectionCard>
-            ) : null}
+            </LazyDashboardSection>
 
-            {hasPhase('clients') ? (
+            <LazyDashboardSection
+              phaseIds={['clients']}
+              isReady={hasPhase('clients')}
+              requestPhases={requestPhases}
+              fallback={
+                <SectionCard title={t('dashboard.topClientsTitle', 'Top clientes do periodo')} description={t('dashboard.topClientsLoading', 'Carregando listas e recompra do periodo.')}>
+                  <SectionSkeleton chart />
+                </SectionCard>
+              }
+            >
               <SectionCard title={t('dashboard.topClientsTitle', 'Top clientes do periodo')} description={t('dashboard.topClientsDescription', 'Clientes com maior valor vendido no periodo selecionado.')}>
                 <LightTable
                   disableScroll={isExportingPdf}
@@ -612,13 +677,18 @@ export function DashboardPage() {
                   }))}
                 />
               </SectionCard>
-            ) : currentPhase === 'clients' ? (
-              <SectionCard title={t('dashboard.topClientsTitle', 'Top clientes do periodo')} description={t('dashboard.topClientsLoading', 'Carregando listas e recompra do periodo.')}>
-                <SectionSkeleton chart />
-              </SectionCard>
-            ) : null}
+            </LazyDashboardSection>
 
-            {hasPhase('operations') ? (
+            <LazyDashboardSection
+              phaseIds={['operations']}
+              isReady={hasPhase('operations')}
+              requestPhases={requestPhases}
+              fallback={
+                <SectionCard title={t('dashboard.revenuePerHourTitle', 'Receita por hora')} description={t('dashboard.operationsLoading', 'Carregando operacao e ranking de produtos.')}>
+                  <SectionSkeleton chart />
+                </SectionCard>
+              }
+            >
               <div className="space-y-4 xl:space-y-5">
                 <SectionCard title={t('dashboard.topProductsTitle', 'Top produtos do periodo')} description={t('dashboard.topProductsDescription', 'Produtos com maior valor vendido no periodo selecionado.')}>
                   {hasTopProductsData ? (
@@ -674,13 +744,18 @@ export function DashboardPage() {
                   </ChartFrame>
                 </SectionCard>
               </div>
-            ) : currentPhase === 'operations' ? (
-              <SectionCard title={t('dashboard.revenuePerHourTitle', 'Receita por hora')} description={t('dashboard.operationsLoading', 'Carregando operacao e ranking de produtos.')}>
-                <SectionSkeleton chart />
-              </SectionCard>
-            ) : null}
+            </LazyDashboardSection>
 
-            {hasPhase('clients') && hasPhase('payments') ? (
+            <LazyDashboardSection
+              phaseIds={['clients', 'payments']}
+              isReady={hasPhase('clients') && hasPhase('payments')}
+              requestPhases={requestPhases}
+              fallback={
+                <SectionCard title={t('dashboard.paymentMethodsTitle', 'Formas de pagamento')} description={t('dashboard.paymentsLoading', 'Carregando pagamentos e resumo de incentivos.')}>
+                  <SectionSkeleton chart />
+                </SectionCard>
+              }
+            >
               <div className="grid gap-4 xl:grid-cols-2">
                 <SectionCard title={t('dashboard.rebuyRateTitle', 'Taxa de recompra')} description={t('dashboard.rebuyRateDescription', 'Clientes do periodo que voltaram a comprar em 30, 60 e 90 dias.')}>
                   <div className="mb-2.5 flex items-center justify-between rounded-[0.95rem] border border-[#eee7dc] bg-[#fbfaf6] px-3 py-2.5 text-[11px] text-slate-600">
@@ -741,40 +816,18 @@ export function DashboardPage() {
                   </ChartFrame>
                 </SectionCard>
               </div>
-            ) : hasPhase('payments') ? (
-              <SectionCard title={t('dashboard.paymentMethodsTitle', 'Formas de pagamento')} description={t('dashboard.paymentMethodsDescription', 'Distribuicao do valor vendido por tipo de pagamento.')}>
-                <ChartFrame>
-                  <ResponsiveChart>
-                    <PieChart>
-                      <Pie data={paymentRows} dataKey="value" nameKey="name" innerRadius={48} outerRadius={92} paddingAngle={4}>
-                        {paymentRows.map((item, index) => (
-                          <Cell key={String(item.name ?? index)} fill={chartPalette[index % chartPalette.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        content={
-                          <CustomTooltip
-                            lines={(row) => [
-                              `${t('dashboard.tooltip.type', 'Type')}: ${row.name || t('dashboard.noType', 'No type')}`,
-                              `${t('dashboard.tooltip.records', 'Records')}: ${formatNumber(row.registros ?? 0)}`,
-                              `${t('dashboard.tooltip.value', 'Value')}: ${formatCurrency(row.valor ?? row.value ?? 0)}`,
-                              `${t('dashboard.tooltip.share', 'Share')}: ${formatPercent(row.value ?? 0)}`,
-                            ]}
-                          />
-                        }
-                      />
-                      <Legend wrapperStyle={{ fontSize: '12px' }} />
-                    </PieChart>
-                  </ResponsiveChart>
-                </ChartFrame>
-              </SectionCard>
-            ) : currentPhase === 'payments' ? (
-              <SectionCard title={t('dashboard.paymentMethodsTitle', 'Formas de pagamento')} description={t('dashboard.paymentsLoading', 'Carregando pagamentos e resumo de incentivos.')}>
-                <SectionSkeleton chart />
-              </SectionCard>
-            ) : null}
+            </LazyDashboardSection>
 
-            {hasPhase('payments') ? (
+            <LazyDashboardSection
+              phaseIds={['payments']}
+              isReady={hasPhase('payments')}
+              requestPhases={requestPhases}
+              fallback={
+                <SectionCard title={t('dashboard.marketingOverviewTitle', 'Visao de marketing')} description={t('dashboard.paymentsLoading', 'Carregando pagamentos e resumo de incentivos.')}>
+                  <SectionSkeleton lines={4} />
+                </SectionCard>
+              }
+            >
               <SectionCard title={t('dashboard.marketingOverviewTitle', 'Visao de marketing')} description={t('dashboard.marketingOverviewDescription', 'Indicadores de incentivo e impacto comercial do periodo.')}>
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                   {snapshot.marketingMetrics.map((metric) => (
@@ -782,9 +835,18 @@ export function DashboardPage() {
                   ))}
                 </div>
               </SectionCard>
-            ) : null}
+            </LazyDashboardSection>
 
-            {hasPhase('marketingMix') ? (
+            <LazyDashboardSection
+              phaseIds={['marketingMix']}
+              isReady={hasPhase('marketingMix')}
+              requestPhases={requestPhases}
+              fallback={
+                <SectionCard title={t('dashboard.incentivesMixTitle', 'Mix de incentivos')} description={t('dashboard.incentivesLoading', 'Carregando a distribuicao dos incentivos.')}>
+                  <SectionSkeleton chart />
+                </SectionCard>
+              }
+            >
               <div className="space-y-4 xl:space-y-5">
                 <SectionCard title={t('dashboard.incentivesMixTitle', 'Mix de incentivos')} description={t('dashboard.incentivesMixDescription', 'Distribuicao exclusiva por tipo de incentivo.')}>
                   <ChartFrame>
@@ -874,13 +936,18 @@ export function DashboardPage() {
                   </SectionCard>
                 </div>
               </div>
-            ) : currentPhase === 'marketingMix' ? (
-              <SectionCard title={t('dashboard.incentivesMixTitle', 'Mix de incentivos')} description={t('dashboard.incentivesLoading', 'Carregando a distribuicao dos incentivos.')}>
-                <SectionSkeleton chart />
-              </SectionCard>
-            ) : null}
+            </LazyDashboardSection>
 
-            {hasPhase('marketingTops') ? (
+            <LazyDashboardSection
+              phaseIds={['marketingTops']}
+              isReady={hasPhase('marketingTops')}
+              requestPhases={requestPhases}
+              fallback={
+                <SectionCard title={t('dashboard.topCouponsTitle', 'Top cupons por receita')} description={t('dashboard.marketingTopsLoading', 'Carregando os rankings finais do periodo.')}>
+                  <SectionSkeleton chart />
+                </SectionCard>
+              }
+            >
               <div className="grid gap-4 xl:grid-cols-2">
                 <SectionCard title={t('dashboard.topCouponsTitle', 'Top cupons por receita')} description={t('dashboard.topCouponsDescription', 'Cupons com maior receita no periodo.')}>
                   <ChartFrame>
@@ -943,11 +1010,7 @@ export function DashboardPage() {
                   </ChartFrame>
                 </SectionCard>
               </div>
-            ) : currentPhase === 'marketingTops' ? (
-              <SectionCard title={t('dashboard.topCouponsTitle', 'Top cupons por receita')} description={t('dashboard.marketingTopsLoading', 'Carregando os rankings finais do periodo.')}>
-                <SectionSkeleton chart />
-              </SectionCard>
-            ) : null}
+            </LazyDashboardSection>
           </>
         ) : null}
       </AsyncState>

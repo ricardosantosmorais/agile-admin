@@ -1,32 +1,8 @@
 import type { CrudRecord } from '@/src/components/crud-base/types'
+import { asBoolean, asString } from '@/src/lib/api-payload'
+import { formatApiDateTimeToInput, formatInputDateTimeToApi } from '@/src/lib/date-time-input'
 
-function asString(value: unknown) {
-  return typeof value === 'string' ? value : ''
-}
-
-function asBoolean(value: unknown) {
-  return value === true || value === 1 || value === '1'
-}
-
-export function formatApiDateTimeToInput(value: unknown) {
-  const normalized = asString(value).trim()
-  if (!normalized) {
-    return ''
-  }
-
-  const match = normalized.match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2})/)
-  return match ? `${match[1]}T${match[2]}:${match[3]}` : ''
-}
-
-export function formatInputDateTimeToApi(value: unknown) {
-  const normalized = asString(value).trim()
-  if (!normalized) {
-    return null
-  }
-
-  const match = normalized.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})$/)
-  return match ? `${match[1]} ${match[2]}:${match[3]}:00` : null
-}
+export { formatApiDateTimeToInput, formatInputDateTimeToApi } from '@/src/lib/date-time-input'
 
 export function normalizeNotificacaoRecord(record: CrudRecord): CrudRecord {
   return {

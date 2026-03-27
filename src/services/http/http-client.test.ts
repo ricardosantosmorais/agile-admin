@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { clearSessionClientPhase, setSessionClientPhase } from '@/src/features/auth/services/session-client-gate'
 import { httpClient, HttpError, SESSION_LOST_EVENT } from '@/src/services/http/http-client'
 
 describe('http-client session loss notifications', () => {
@@ -7,10 +8,13 @@ describe('http-client session loss notifications', () => {
 
   beforeEach(() => {
     vi.stubGlobal('fetch', fetchMock)
+    fetchMock.mockReset()
     dispatchEventSpy.mockClear()
+    clearSessionClientPhase()
   })
 
   afterEach(() => {
+    clearSessionClientPhase()
     vi.unstubAllGlobals()
   })
 
@@ -35,5 +39,29 @@ describe('http-client session loss notifications', () => {
 
     const event = dispatchEventSpy.mock.calls[0][0] as CustomEvent
     expect(event.type).toBe(SESSION_LOST_EVENT)
+  })
+
+  it('blocks protected requests locally while the session is locked in the client', async () => {
+    setSessionClientPhase('ended')
+
+    await expect(httpClient('/api/dashboard', { method: 'POST' })).rejects.toMatchObject({
+      status: 401,
+      payload: expect.objectContaining({
+        blockedByClientSessionGate: true,
+        phase: 'ended',
+      }),
+    })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('still allows auth session probes while the warning modal is open', async () => {
+    setSessionClientPhase('warning')
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }))
+
+    await expect(httpClient('/api/auth/session', { method: 'GET' })).resolves.toEqual({ ok: true })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 })

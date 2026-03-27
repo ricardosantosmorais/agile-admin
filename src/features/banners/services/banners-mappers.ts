@@ -1,4 +1,6 @@
 import type { CrudRecord } from '@/src/components/crud-base/types'
+import { asString } from '@/src/lib/api-payload'
+import { formatApiDateTimeToInput, formatInputDateTimeToApi } from '@/src/lib/date-time-input'
 
 const LINK_FIELD_BY_TYPE = {
   marca: 'id_link_marca',
@@ -13,9 +15,7 @@ const LINK_FIELD_BY_TYPE = {
 
 type BannerLinkType = keyof typeof LINK_FIELD_BY_TYPE
 
-function normalizeString(value: unknown) {
-  return typeof value === 'string' ? value : ''
-}
+const normalizeString = asString
 
 export function getBannerLinkFieldKey(tipoLink: unknown) {
   const normalized = normalizeString(tipoLink) as BannerLinkType | ''
@@ -27,33 +27,7 @@ export function getBannerLinkedObjectId(record: CrudRecord) {
   return linkField ? normalizeString(record[linkField]) : ''
 }
 
-export function formatApiDateTimeToInput(value: unknown) {
-  const normalized = normalizeString(value).trim()
-  if (!normalized) {
-    return ''
-  }
-
-  const match = normalized.match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2})/)
-  if (match) {
-    return `${match[1]}T${match[2]}:${match[3]}`
-  }
-
-  return ''
-}
-
-export function formatInputDateTimeToApi(value: unknown) {
-  const normalized = normalizeString(value).trim()
-  if (!normalized) {
-    return null
-  }
-
-  const match = normalized.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})$/)
-  if (!match) {
-    return null
-  }
-
-  return `${match[1]} ${match[2]}:${match[3]}:00`
-}
+export { formatApiDateTimeToInput, formatInputDateTimeToApi } from '@/src/lib/date-time-input'
 
 function buildLinkRecordFields(idObjeto: string, tipoLink: string) {
   return {

@@ -89,13 +89,18 @@ O legado já tinha um fluxo robusto de sessão. O v2 replica esse comportamento 
 - opção de continuar sessão;
 - modal final bloqueante quando a sessão morre.
 
-Além do modal, quando a sessão entra no estado encerrado o frontend invalida imediatamente o estado autenticado local e desmonta o shell protegido. Isso evita navegação residual mesmo se o modal for removido manualmente do DOM.
-
 Tempos padrão atuais:
 - inatividade: `7200s`
 - aviso: `120s`
 
 Também há interceptação automática de `401` no `httpClient`, que dispara o fluxo global de perda de sessão.
+
+## Comportamento final de inatividade
+- após 2 horas sem atividade, o app abre apenas o modal de aviso;
+- o aviso exibe contagem regressiva de 2 minutos e permite somente continuar a sessão;
+- ao fim do contador, o app encerra a sessão remota, limpa a persistência local e bloqueia novas requisições protegidas no cliente;
+- a tela atual permanece visível sob um modal final bloqueante, sem redirect automático;
+- reload, nova navegação protegida ou ação explícita do usuário levam para `/login`.
 
 ## Papel das bridges `app/api/*`
 As rotas bridge fazem:

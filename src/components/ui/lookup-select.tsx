@@ -39,7 +39,6 @@ export function LookupSelect<TOption extends LookupOption>({
   const triggerRef = useRef<HTMLButtonElement | null>(null)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
   const listRef = useRef<HTMLDivElement | null>(null)
-  const suppressFetchRef = useRef(false)
   const [dropdownStyle, setDropdownStyle] = useState<{
     top?: number
     bottom?: number
@@ -62,11 +61,6 @@ export function LookupSelect<TOption extends LookupOption>({
 
   useEffect(() => {
     if (!open) {
-      return
-    }
-
-    if (suppressFetchRef.current) {
-      suppressFetchRef.current = false
       return
     }
 
@@ -153,7 +147,6 @@ export function LookupSelect<TOption extends LookupOption>({
   }
 
   function commitSelection(nextValue: TOption | null) {
-    suppressFetchRef.current = true
     setOpen(false)
     setQuery('')
     setOptions([])

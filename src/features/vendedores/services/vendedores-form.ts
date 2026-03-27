@@ -1,25 +1,11 @@
-import type { LookupOption } from '@/src/components/ui/lookup-select'
 import type {
   VendedorCanalDistribuicaoRelation,
   VendedorFormRecord,
   VendedorType,
 } from '@/src/features/vendedores/types/vendedores'
 import { cnpjMask, cpfMask, phoneMask } from '@/src/lib/input-masks'
-
-function toLookupOption(value: unknown, labelKeys: string[]): LookupOption | null {
-  if (!value || typeof value !== 'object') {
-    return null
-  }
-
-  const record = value as Record<string, unknown>
-  const id = String(record.id || '')
-  const label = labelKeys.map((key) => String(record[key] || '')).find(Boolean) || id
-  return id ? { id, label } : null
-}
-
-function digitsOnly(value: string) {
-  return value.replace(/\D/g, '')
-}
+import { toLookupOption } from '@/src/lib/lookup-options'
+import { digitsOnly } from '@/src/lib/value-parsers'
 
 export function createEmptyVendedorForm(): VendedorFormRecord {
   return {

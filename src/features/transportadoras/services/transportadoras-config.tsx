@@ -3,15 +3,8 @@
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 import { BRAZILIAN_STATES } from '@/src/lib/brazil'
 import { cepMask, cnpjMask, cpfMask, phoneMask } from '@/src/lib/input-masks'
-
-function splitPhone(value: unknown) {
-  const digits = String(value || '').replace(/\D/g, '')
-  if (!digits) return { ddd: '', number: '' }
-  return {
-    ddd: digits.slice(0, 2),
-    number: digits.slice(2),
-  }
-}
+import { validateCepLength } from '@/src/lib/validators'
+import { splitPhone } from '@/src/lib/value-parsers'
 
 export const TRANSPORTADORAS_CONFIG: CrudModuleConfig = {
   key: 'transportadoras',
@@ -69,7 +62,7 @@ export const TRANSPORTADORAS_CONFIG: CrudModuleConfig = {
         { key: 'telefone1', labelKey: 'logistics.transportadoras.fields.phone1', label: 'Telefone 1', type: 'text', mask: 'phone' },
         { key: 'telefone2', labelKey: 'logistics.transportadoras.fields.phone2', label: 'Telefone 2', type: 'text', mask: 'phone' },
         { key: 'celular', labelKey: 'logistics.transportadoras.fields.mobile', label: 'Celular', type: 'text', mask: 'mobile' },
-        { key: 'cep', labelKey: 'logistics.transportadoras.fields.zipCode', label: 'CEP', type: 'text', mask: 'cep' },
+        { key: 'cep', labelKey: 'logistics.transportadoras.fields.zipCode', label: 'CEP', type: 'text', mask: 'cep', validate: ({ value }) => validateCepLength(value) },
         { key: 'endereco', labelKey: 'logistics.transportadoras.fields.address', label: 'Endereço', type: 'text' },
         { key: 'numero', labelKey: 'logistics.transportadoras.fields.number', label: 'Número', type: 'text' },
         { key: 'complemento', labelKey: 'logistics.transportadoras.fields.complement', label: 'Complemento', type: 'text' },
@@ -109,9 +102,16 @@ export const TRANSPORTADORAS_CONFIG: CrudModuleConfig = {
     return {
       ...record,
       cnpj_cpf: document,
-      nome_fantasia: tipo === 'PF' ? String(record.nome || '') : String(record.nome_fantasia || ''),
-      razao_social: tipo === 'PF' ? '' : String(record.razao_social || ''),
-      pessoa_contato: tipo === 'PF' ? '' : String(record.pessoa_contato || ''),
+      nome_fantasia: tipo === 'PF' ? String(record.nome || '').trim() : String(record.nome_fantasia || '').trim(),
+      razao_social: tipo === 'PF' ? '' : String(record.razao_social || '').trim(),
+      pessoa_contato: tipo === 'PF' ? '' : String(record.pessoa_contato || '').trim(),
+      email: String(record.email || '').trim() || null,
+      endereco: String(record.endereco || '').trim() || null,
+      numero: String(record.numero || '').trim() || null,
+      complemento: String(record.complemento || '').trim() || null,
+      bairro: String(record.bairro || '').trim() || null,
+      cidade: String(record.cidade || '').trim() || null,
+      uf: String(record.uf || '').trim().toUpperCase() || null,
       ddd1: tel1.ddd,
       telefone1: tel1.number,
       ddd2: tel2.ddd,

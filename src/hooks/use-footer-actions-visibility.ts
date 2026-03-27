@@ -1,34 +1,67 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+
+function isElementVisible(element: HTMLElement) {
+  const bounds = element.getBoundingClientRect()
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+  const viewportWidth = window.innerWidth || document.documentElement.clientWidth
+
+  return bounds.bottom > 0
+    && bounds.right > 0
+    && bounds.top < viewportHeight
+    && bounds.left < viewportWidth
+}
 
 export function useFooterActionsVisibility<T extends HTMLElement>() {
-  const footerRef = useRef<T | null>(null)
-  const [isFooterVisible, setIsFooterVisible] = useState(
-    typeof window !== 'undefined' && typeof IntersectionObserver === 'undefined',
-  )
+  const [node, setNode] = useState<T | null>(null)
+  const [isFooterVisible, setIsFooterVisible] = useState(false)
+
+  const footerRef = useCallback((element: T | null) => {
+    setNode(element)
+    if (!element) {
+      setIsFooterVisible(false)
+    }
+  }, [])
 
   useEffect(() => {
-    const element = footerRef.current
-    if (!element) {
+    if (!node) {
       return
     }
 
-    if (typeof IntersectionObserver === 'undefined') {
-      return
+    const updateVisibility = () => {
+      setIsFooterVisible(isElementVisible(node))
     }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsFooterVisible(entry.isIntersecting)
-      },
-      { threshold: 0.15 },
-    )
+    updateVisibility()
+    const animationFrame = window.requestAnimationFrame(updateVisibility)
 
-    observer.observe(element)
+    window.addEventListener('resize', updateVisibility)
+    window.addEventListener('scroll', updateVisibility, { passive: true })
 
-    return () => observer.disconnect()
-  }, [])
+    const resizeObserver = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(() => updateVisibility())
+      : null
+    resizeObserver?.observe(node)
+
+    const intersectionObserver = typeof IntersectionObserver !== 'undefined'
+      ? new IntersectionObserver(
+          ([entry]) => {
+            setIsFooterVisible(entry.isIntersecting || isElementVisible(node))
+          },
+          { threshold: 0 },
+        )
+      : null
+    intersectionObserver?.observe(node)
+
+    return () => {
+      window.cancelAnimationFrame(animationFrame)
+      window.removeEventListener('resize', updateVisibility)
+      window.removeEventListener('scroll', updateVisibility)
+      resizeObserver?.disconnect()
+      intersectionObserver?.disconnect()
+    }
+  }, [node])
 
   return { footerRef, isFooterVisible }
 }

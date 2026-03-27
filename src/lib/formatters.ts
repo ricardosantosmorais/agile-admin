@@ -1,3 +1,5 @@
+import { parseLocalizedNumber } from '@/src/lib/value-parsers'
+
 export function formatCurrency(value: number) {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -33,6 +35,24 @@ export function formatNumber(value: number) {
 
 export function formatPercent(value: number) {
   return `${value.toFixed(1).replace('.', ',')}%`
+}
+
+export function formatLocalizedCurrency(value: unknown, fallback = '-') {
+  const numeric = typeof value === 'number' ? value : parseLocalizedNumber(value)
+  if (numeric === null || !Number.isFinite(numeric)) {
+    return fallback
+  }
+
+  return formatCurrency(numeric)
+}
+
+export function formatLocalizedPercent(value: unknown, fallback = '-') {
+  const numeric = typeof value === 'number' ? value : parseLocalizedNumber(value)
+  if (numeric === null || !Number.isFinite(numeric)) {
+    return fallback
+  }
+
+  return formatPercent(numeric)
 }
 
 export function formatDate(value: string) {

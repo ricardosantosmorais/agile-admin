@@ -1,22 +1,9 @@
 import type { AuthPermission, AuthSession, AuthTenant, AuthUser } from '@/src/features/auth/types/auth'
-
-type ApiRecord = Record<string, unknown>
-
-function asRecord(value: unknown): ApiRecord {
-  return typeof value === 'object' && value !== null ? (value as ApiRecord) : {}
-}
-
-function asString(value: unknown) {
-  return typeof value === 'string' ? value : ''
-}
+import { asNumber, asRecord, asString } from '@/src/lib/api-payload'
+import type { ApiRecord } from '@/src/lib/api-payload'
 
 function isTruthyBoolean(value: unknown) {
   return value === true || value === 1 || value === '1'
-}
-
-function asNumber(value: unknown) {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : undefined
 }
 
 function getOptionalBoolean(...values: unknown[]) {
@@ -56,6 +43,7 @@ function mapTenant(value: unknown): AuthTenant {
     codigo: asString(tenant.codigo || tenant.sigla || tenant.id),
     status: asString(tenant.status || 'Operando'),
     url: asString(tenant.url) || undefined,
+    assetsBucketUrl: asString(tenant.s3_bucket || tenant.url_imagens || tenant.assets_url) || undefined,
     mondayUrl: asString(tenant.monday_url || tenant.mondayUrl) || undefined,
     iconeUrl: asString(tenant.ico || tenant.icone || tenant.logo),
     clusterHost: asString(cluster.host),
@@ -150,8 +138,8 @@ export function mapAuthSession(payload: unknown): AuthSession {
       ? [normalizedCurrentTenant, ...tenants]
       : tenants,
     currentTenant: normalizedCurrentTenant,
-    sessionIdleTimeoutSeconds: asNumber(source.session_idle_timeout_seconds || source.sessionIdleTimeoutSeconds),
-    sessionWarningTimeoutSeconds: asNumber(source.session_warning_timeout_seconds || source.sessionWarningTimeoutSeconds),
+    sessionIdleTimeoutSeconds: asNumber(source.session_idle_timeout_seconds || source.sessionIdleTimeoutSeconds, undefined),
+    sessionWarningTimeoutSeconds: asNumber(source.session_warning_timeout_seconds || source.sessionWarningTimeoutSeconds, undefined),
   }
 }
 

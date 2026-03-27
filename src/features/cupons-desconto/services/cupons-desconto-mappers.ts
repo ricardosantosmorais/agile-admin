@@ -1,4 +1,8 @@
 import type { CrudRecord } from '@/src/components/crud-base/types'
+import { formatApiDateToInput, formatInputDateToApiEnd, formatInputDateToApiStart } from '@/src/lib/date-input'
+import { formatLocalizedDecimal, parseInteger, parseLocalizedNumber } from '@/src/lib/value-parsers'
+
+export { formatApiDateToInput, formatInputDateToApiEnd, formatInputDateToApiStart }
 
 function normalizeString(value: unknown) {
   return typeof value === 'string' ? value.trim() : ''
@@ -8,39 +12,8 @@ function normalizeBoolean(value: unknown) {
   return value === true || value === 1 || value === '1'
 }
 
-function normalizeIntegerInput(value: unknown) {
-  const normalized = normalizeString(value)
-  if (!normalized) {
-    return ''
-  }
-
-  return normalized.replace(/\D+/g, '')
-}
-
-function parseIntegerOrNull(value: unknown) {
-  const digits = normalizeIntegerInput(value)
-  return digits ? Number(digits) : null
-}
-
 function parseIntegerOrZero(value: unknown) {
-  const digits = normalizeIntegerInput(value)
-  return digits ? Number(digits) : 0
-}
-
-function normalizeDecimalString(value: string) {
-  if (!value) {
-    return ''
-  }
-
-  if (value.includes('.') && value.includes(',')) {
-    return value.replace(/\./g, '').replace(',', '.')
-  }
-
-  if (value.includes(',')) {
-    return value.replace(',', '.')
-  }
-
-  return value
+  return parseInteger(value) ?? 0
 }
 
 export function parseMoneyValue(value: unknown) {
@@ -49,8 +22,7 @@ export function parseMoneyValue(value: unknown) {
     return null
   }
 
-  const parsed = Number(normalizeDecimalString(normalized))
-  return Number.isFinite(parsed) ? parsed : null
+  return parseLocalizedNumber(normalized)
 }
 
 export function formatMoneyInput(value: unknown) {
@@ -63,30 +35,7 @@ export function formatMoneyInput(value: unknown) {
     return ''
   }
 
-  return new Intl.NumberFormat('pt-BR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(parsed)
-}
-
-export function formatApiDateToInput(value: unknown) {
-  const normalized = normalizeString(value)
-  if (!normalized) {
-    return ''
-  }
-
-  const match = normalized.match(/^(\d{4}-\d{2}-\d{2})/)
-  return match ? match[1] : ''
-}
-
-export function formatInputDateToApiStart(value: unknown) {
-  const normalized = normalizeString(value)
-  return normalized ? `${normalized} 00:00:00` : null
-}
-
-export function formatInputDateToApiEnd(value: unknown) {
-  const normalized = normalizeString(value)
-  return normalized ? `${normalized} 23:59:59` : null
+  return formatLocalizedDecimal(parsed, 2)
 }
 
 export function getCouponTypeLabel(type: unknown) {
@@ -242,8 +191,8 @@ export function toCupomDescontoPayload(record: CrudRecord): CrudRecord {
     pedido_minimo: parseMoneyValue(record.pedido_minimo),
     pedido_maximo: parseMoneyValue(record.pedido_maximo),
     usos: undefined,
-    limite_usos: parseIntegerOrZero(record.limite_usos),
-    itens_distintos: parseIntegerOrNull(record.itens_distintos),
+    limite_usos: parseInteger(record.limite_usos) ?? 0,
+    itens_distintos: parseInteger(record.itens_distintos),
     prazo_medio_pagamento: averageTermPayment,
     id_forma_pagamento: normalizeString(record.id_forma_pagamento) || null,
     id_condicao_pagamento: averageTermPayment > 0 ? null : normalizeString(record.id_condicao_pagamento) || null,

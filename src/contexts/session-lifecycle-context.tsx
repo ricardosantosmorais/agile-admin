@@ -1,16 +1,17 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { PropsWithChildren } from 'react'
 import { usePathname } from 'next/navigation'
-import { Clock3, LogIn } from 'lucide-react'
+import { Clock3 } from 'lucide-react'
 import { useAuth } from '@/src/features/auth/hooks/use-auth'
 import {
-  hasAuthenticatedSessionMarker,
+  clearSensitiveClientState,
   markSessionLocked,
   readSessionLock,
 } from '@/src/features/auth/services/auth-tab-storage'
 import { authService } from '@/src/features/auth/services/auth-service'
+import { clearSessionClientPhase, setSessionClientPhase } from '@/src/features/auth/services/session-client-gate'
 import { useI18n } from '@/src/i18n/use-i18n'
 import { SESSION_LOST_EVENT, type SessionLostReason } from '@/src/services/http/http-client'
 
@@ -113,14 +114,51 @@ function readGlobalSessionEnd() {
   return readJson<SessionEndPayload>(SESSION_END_KEY)
 }
 
-function isReloadNavigation() {
-  if (typeof window === 'undefined' || typeof window.performance === 'undefined') {
-    return false
+function resolveInitialSessionModalState(): SessionModalState {
+  if (typeof window === 'undefined') {
+    return null
   }
 
-  const navigationEntries = window.performance.getEntriesByType('navigation')
-  const navigationEntry = navigationEntries[0] as PerformanceNavigationTiming | undefined
-  return navigationEntry?.type === 'reload'
+  const locked = readSessionLock()
+  if (locked?.reason) {
+    return {
+      phase: 'ended',
+      reason: locked.reason as SessionLostReason,
+    }
+  }
+
+  const ended = readGlobalSessionEnd()
+  if (ended?.reason) {
+    return {
+      phase: 'ended',
+      reason: ended.reason,
+    }
+  }
+
+  const lastActivityTs = readGlobalActivityTs()
+  if (!lastActivityTs) {
+    return null
+  }
+
+  const now = Date.now()
+  const warningAt = lastActivityTs + (DEFAULT_IDLE_TIMEOUT_SECONDS * 1000)
+  const expireAt = warningAt + (DEFAULT_WARNING_TIMEOUT_SECONDS * 1000)
+
+  if (now >= expireAt) {
+    return {
+      phase: 'ended',
+      reason: 'expired_no_action',
+    }
+  }
+
+  if (now >= warningAt) {
+    return {
+      phase: 'warning',
+      reason: 'idle_timeout',
+    }
+  }
+
+  return null
 }
 
 function formatCountdown(totalSeconds: number) {
@@ -173,10 +211,10 @@ export function getSessionEndCopy(t: TranslateFn, reason: SessionLostReason) {
 }
 
 export function SessionLifecycleProvider({ children }: PropsWithChildren) {
-  const { isAuthenticated, refreshSession, session, status } = useAuth()
+  const { isAuthenticated, refreshSession, session } = useAuth()
   const { t } = useI18n()
   const pathname = usePathname()
-  const [modalState, setModalState] = useState<SessionModalState>(null)
+  const [modalState, setModalState] = useState<SessionModalState>(() => resolveInitialSessionModalState())
   const [countdownSeconds, setCountdownSeconds] = useState(DEFAULT_WARNING_TIMEOUT_SECONDS)
   const [isContinuing, setIsContinuing] = useState(false)
   const lastActivityWriteRef = useRef(0)
@@ -184,20 +222,34 @@ export function SessionLifecycleProvider({ children }: PropsWithChildren) {
   const expireAtRef = useRef(0)
   const countdownIntervalRef = useRef<number | null>(null)
   const sessionTabIdRef = useRef('')
+  const sessionEndedRef = useRef(false)
   const logoutRequestedRef = useRef(false)
   const isLoginPage = pathname === '/login'
-  const hasSessionMarker = hasAuthenticatedSessionMarker()
-  const hasLockedSession = Boolean(readSessionLock())
-  const reloadedAfterSessionEnd = !isLoginPage
-    && status === 'unauthenticated'
-    && hasSessionMarker
-    && hasLockedSession
-    && isReloadNavigation()
   const shouldBlockUnauthenticatedRedirect = modalState?.phase === 'ended'
-    || (!reloadedAfterSessionEnd && !isLoginPage && status === 'unauthenticated' && hasSessionMarker)
 
   const idleTimeoutMs = (session?.sessionIdleTimeoutSeconds ?? DEFAULT_IDLE_TIMEOUT_SECONDS) * 1000
   const warningTimeoutMs = (session?.sessionWarningTimeoutSeconds ?? DEFAULT_WARNING_TIMEOUT_SECONDS) * 1000
+
+  useLayoutEffect(() => {
+    const initialState = resolveInitialSessionModalState()
+    if (!initialState) {
+      return
+    }
+
+    sessionEndedRef.current = initialState.phase === 'ended'
+    setSessionClientPhase(initialState.phase === 'warning' ? 'warning' : 'ended')
+    setModalState((current) => current ?? initialState)
+
+    if (initialState.phase === 'ended' && !isLoginPage) {
+      markSessionLocked(initialState.reason)
+      clearSensitiveClientState({ preserveGlobalSessionSignals: true })
+
+      if (!logoutRequestedRef.current) {
+        logoutRequestedRef.current = true
+        void authService.logout().catch(() => undefined)
+      }
+    }
+  }, [isLoginPage])
 
   const clearCountdownTimer = useCallback(() => {
     if (countdownIntervalRef.current) {
@@ -230,6 +282,7 @@ export function SessionLifecycleProvider({ children }: PropsWithChildren) {
     clearCountdownTimer()
     setModalState((current) => (current?.phase === 'warning' ? null : current))
     setIsContinuing(false)
+    setSessionClientPhase('active')
   }, [clearCountdownTimer])
 
   const openEndedModal = useCallback((reason: SessionLostReason, broadcast = true) => {
@@ -237,12 +290,25 @@ export function SessionLifecycleProvider({ children }: PropsWithChildren) {
       return
     }
 
+    if (sessionEndedRef.current) {
+      return
+    }
+
+    sessionEndedRef.current = true
+
     closeWarning()
     markSessionLocked(reason)
+    clearSensitiveClientState({ preserveGlobalSessionSignals: true })
+    setSessionClientPhase('ended')
     setModalState({ phase: 'ended', reason })
 
     if (broadcast) {
       writeGlobalSessionEnd(reason, sessionTabIdRef.current)
+    }
+
+    if (!logoutRequestedRef.current) {
+      logoutRequestedRef.current = true
+      void authService.logout().catch(() => undefined)
     }
   }, [closeWarning, isLoginPage])
 
@@ -251,6 +317,7 @@ export function SessionLifecycleProvider({ children }: PropsWithChildren) {
       return
     }
 
+    setSessionClientPhase('warning')
     setModalState((current) => current ?? { phase: 'warning', reason: 'idle_timeout' })
   }, [isLoginPage, modalState?.phase])
 
@@ -274,56 +341,46 @@ export function SessionLifecycleProvider({ children }: PropsWithChildren) {
     }
   }, [closeWarning, openEndedModal, refreshSession, syncDeadlinesFromGlobalActivity])
 
+  const evaluateSessionPhase = useCallback(() => {
+    const now = Date.now()
+
+    if (now >= expireAtRef.current) {
+      openEndedModal('expired_no_action')
+      return
+    }
+
+    if (now >= warningStartsAtRef.current) {
+      openWarningModal()
+      return
+    }
+
+    if (modalState?.phase === 'warning') {
+      closeWarning()
+    }
+  }, [closeWarning, modalState?.phase, openEndedModal, openWarningModal])
+
   useEffect(() => {
     sessionTabIdRef.current = getSessionTabId()
   }, [])
 
   useEffect(() => {
-    if (isLoginPage) {
-      return
-    }
-
-    const sessionLock = readSessionLock()
-    if (!sessionLock) {
-      return
-    }
-
-    if (isReloadNavigation()) {
-      return
-    }
-
-    openEndedModal((sessionLock.reason as SessionLostReason) || 'unknown', false)
-  }, [isLoginPage, openEndedModal])
-
-  useEffect(() => {
-    if (!shouldBlockUnauthenticatedRedirect || modalState?.phase === 'ended') {
-      return
-    }
-
-    openEndedModal('session_expired_or_recycled', false)
-  }, [modalState?.phase, openEndedModal, shouldBlockUnauthenticatedRedirect])
-
-  useEffect(() => {
-    if (modalState?.phase !== 'ended') {
+    if (isAuthenticated && !isLoginPage && modalState === null) {
+      sessionEndedRef.current = false
       logoutRequestedRef.current = false
-      return
     }
-
-    if (logoutRequestedRef.current) {
-      return
-    }
-
-    logoutRequestedRef.current = true
-    void authService.logout().catch(() => undefined)
-  }, [modalState?.phase])
+  }, [isAuthenticated, isLoginPage, modalState])
 
   useEffect(() => {
     if (!isAuthenticated || isLoginPage) {
       closeWarning()
+      if (!isLoginPage) {
+        clearSessionClientPhase()
+      }
       return
     }
 
     syncDeadlinesFromGlobalActivity(true)
+    evaluateSessionPhase()
 
     const onActivity = () => {
       const now = Date.now()
@@ -340,22 +397,21 @@ export function SessionLifecycleProvider({ children }: PropsWithChildren) {
       syncDeadlinesFromGlobalActivity(false)
     }
 
+    const onWake = () => {
+      syncDeadlinesFromGlobalActivity(false)
+      evaluateSessionPhase()
+    }
+
     const events: Array<keyof WindowEventMap> = ['click', 'keydown', 'mousemove', 'mouseup', 'touchend', 'scroll']
     for (const eventName of events) {
       window.addEventListener(eventName, onActivity, { passive: true })
     }
+    window.addEventListener('focus', onWake)
+    window.addEventListener('pageshow', onWake)
+    document.addEventListener('visibilitychange', onWake)
 
     const intervalId = window.setInterval(() => {
-      const now = Date.now()
-
-      if (now >= expireAtRef.current) {
-        openEndedModal('expired_no_action')
-        return
-      }
-
-      if (now >= warningStartsAtRef.current) {
-        openWarningModal()
-      }
+      evaluateSessionPhase()
     }, 1000)
 
     return () => {
@@ -363,9 +419,12 @@ export function SessionLifecycleProvider({ children }: PropsWithChildren) {
         window.removeEventListener(eventName, onActivity)
       }
 
+      window.removeEventListener('focus', onWake)
+      window.removeEventListener('pageshow', onWake)
+      document.removeEventListener('visibilitychange', onWake)
       window.clearInterval(intervalId)
     }
-  }, [closeWarning, isAuthenticated, isLoginPage, modalState?.phase, openEndedModal, openWarningModal, syncDeadlinesFromGlobalActivity])
+  }, [closeWarning, evaluateSessionPhase, isAuthenticated, isLoginPage, modalState?.phase, syncDeadlinesFromGlobalActivity])
 
   useEffect(() => {
     if (modalState?.phase !== 'warning') {
@@ -459,14 +518,6 @@ export function SessionLifecycleProvider({ children }: PropsWithChildren) {
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => openEndedModal('idle_timeout')}
-                className="inline-flex h-12 items-center justify-center rounded-full border border-[#ddd3c4] px-5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-              >
-                <LogIn className="mr-2 h-4 w-4" />
-                {t('session.ended.goToLogin', 'Ir para login')}
-              </button>
               <button
                 type="button"
                 onClick={() => void continueSession()}
