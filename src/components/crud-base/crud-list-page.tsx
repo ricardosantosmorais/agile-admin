@@ -42,6 +42,7 @@ function resolveFilterConfig(column: CrudModuleConfig['columns'][number], t: Ret
     case 'text':
     case 'date-range':
     case 'number-range':
+    case 'lookup':
     case 'custom':
       return { ...column.filter, id: column.id, label }
     default:

@@ -10,6 +10,7 @@ const lookupConfig: Record<string, { path: string; labelKeys: string[]; searchFi
   segmentos: { path: 'segmentos', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   canais_distribuicao: { path: 'canais_distribuicao', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   filiais: { path: 'filiais', labelKeys: ['nome_fantasia', 'nome'], searchField: 'nome_fantasia::like', order: 'nome_fantasia' },
+  grupos_filiais: { path: 'grupos_filiais', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   vendedores: { path: 'vendedores', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   supervisores: { path: 'supervisores', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   produtos: { path: 'produtos', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
@@ -47,16 +48,19 @@ export async function GET(
   }
 
   const q = (request.nextUrl.searchParams.get('q') || '').trim()
+  const id = (request.nextUrl.searchParams.get('id') || '').trim()
   const page = request.nextUrl.searchParams.get('page') || '1'
   const perPage = request.nextUrl.searchParams.get('perPage') || '15'
   const params = new URLSearchParams({
-    page,
-    perpage: perPage,
+    page: id ? '1' : page,
+    perpage: id ? '1' : perPage,
     order: config.order || 'nome',
     sort: 'asc',
   })
 
-  if (q) {
+  if (id) {
+    params.set('id', id)
+  } else if (q) {
     params.set(config.searchField, q)
   }
 

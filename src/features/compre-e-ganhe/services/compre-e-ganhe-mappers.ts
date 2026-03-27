@@ -1,5 +1,7 @@
 import type { CrudRecord } from '@/src/components/crud-base/types'
+import { formatApiDateToInput, formatInputDateToApiEnd, formatInputDateToApiStart } from '@/src/lib/date-input'
 import { parseCurrencyInput } from '@/src/lib/input-masks'
+import { parseInteger } from '@/src/lib/value-parsers'
 
 function normalizeString(value: unknown) {
   return typeof value === 'string' ? value.trim() : ''
@@ -7,32 +9,6 @@ function normalizeString(value: unknown) {
 
 function normalizeBoolean(value: unknown) {
   return value === true || value === 1 || value === '1'
-}
-
-function parseIntegerOrNull(value: unknown) {
-  const normalized = normalizeString(value)
-  if (!normalized) {
-    return null
-  }
-
-  const parsed = Number(normalized)
-  return Number.isFinite(parsed) ? parsed : null
-}
-
-function formatApiDateToInput(value: unknown) {
-  const normalized = normalizeString(value)
-  const match = normalized.match(/^(\d{4}-\d{2}-\d{2})/)
-  return match ? match[1] : ''
-}
-
-function toApiStartDate(value: unknown) {
-  const normalized = normalizeString(value)
-  return normalized ? `${normalized} 00:00:00` : null
-}
-
-function toApiEndDate(value: unknown) {
-  const normalized = normalizeString(value)
-  return normalized ? `${normalized} 23:59:59` : null
 }
 
 export function normalizeCompreEGanheRecord(record: CrudRecord): CrudRecord {
@@ -64,8 +40,8 @@ export function normalizeCompreEGanheRecord(record: CrudRecord): CrudRecord {
 export function toCompreEGanhePayload(record: CrudRecord): CrudRecord {
   const nome = normalizeString(record.nome)
   const perfil = normalizeString(record.perfil)
-  const dataInicio = toApiStartDate(record.data_inicio)
-  const dataFim = toApiEndDate(record.data_fim)
+  const dataInicio = formatInputDateToApiStart(record.data_inicio)
+  const dataFim = formatInputDateToApiEnd(record.data_fim)
 
   if (!nome) {
     throw new Error('Informe o nome da campanha.')
@@ -87,8 +63,8 @@ export function toCompreEGanhePayload(record: CrudRecord): CrudRecord {
     descricao: typeof record.descricao === 'string' ? record.descricao : '',
     id_grupo_promocao: normalizeString(record.id_grupo_promocao) || null,
     perfil,
-    maximo_brindes: parseIntegerOrNull(record.maximo_brindes),
-    quantidade_maxima_cliente: parseIntegerOrNull(record.quantidade_maxima_cliente),
+    maximo_brindes: parseInteger(record.maximo_brindes),
+    quantidade_maxima_cliente: parseInteger(record.quantidade_maxima_cliente),
     data_inicio: dataInicio,
     data_fim: dataFim,
     imagem: normalizeString(record.imagem) || null,
@@ -144,7 +120,7 @@ export function toBrindeProdutoPayload(brindeId: string, record: CrudRecord) {
     throw new Error('Selecione o produto.')
   }
 
-  const quantidade = parseIntegerOrNull(record.quantidade)
+  const quantidade = parseInteger(record.quantidade)
   if (quantidade === null || quantidade < 0) {
     throw new Error('Informe a quantidade.')
   }
@@ -157,7 +133,7 @@ export function toBrindeProdutoPayload(brindeId: string, record: CrudRecord) {
     id_embalagem: normalizeString(record.id_embalagem) || null,
     id_regra: normalizeString(record.id_regra) || null,
     quantidade,
-    quantidade_maxima: parseIntegerOrNull(record.quantidade_maxima),
+    quantidade_maxima: parseInteger(record.quantidade_maxima),
   }
 }
 

@@ -3,18 +3,7 @@
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 import { formatNullableCurrency } from '@/src/lib/formatters'
 import { parseCurrencyInput } from '@/src/lib/input-masks'
-
-function normalizeDecimal(value: unknown, precision = 2) {
-  const numeric = typeof value === 'number' ? value : Number(value)
-  if (!Number.isFinite(numeric)) {
-    return ''
-  }
-
-  return numeric.toLocaleString('pt-BR', {
-    minimumFractionDigits: precision,
-    maximumFractionDigits: precision,
-  })
-}
+import { formatLocalizedDecimal } from '@/src/lib/value-parsers'
 
 export const SEGMENTOS_CLIENTES_CONFIG: CrudModuleConfig = {
   key: 'segmentos-clientes',
@@ -37,7 +26,7 @@ export const SEGMENTOS_CLIENTES_CONFIG: CrudModuleConfig = {
     { id: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Código', sortKey: 'codigo', thClassName: 'w-[140px]', filter: { kind: 'text', key: 'codigo' } },
     { id: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', sortKey: 'nome', tdClassName: 'font-semibold text-slate-950', filter: { kind: 'text', key: 'nome::like' } },
     { id: 'pedido_minimo', labelKey: 'people.customerSegments.fields.minimumOrder', label: 'Pedido mínimo', sortKey: 'pedido_minimo', render: (record) => formatNullableCurrency(record.pedido_minimo as string | number | null | undefined), filter: { kind: 'number-range', fromKey: 'pedido_minimo::ge', toKey: 'pedido_minimo::le', labelKey: 'people.customerSegments.fields.minimumOrder', label: 'Pedido mínimo', inputMode: 'decimal' } },
-    { id: 'peso_minimo', labelKey: 'people.customerSegments.fields.minimumWeight', label: 'Peso mínimo', sortKey: 'peso_minimo', render: (record) => record.peso_minimo ? `${normalizeDecimal(record.peso_minimo as string | number | null | undefined, 3)} kg` : '-', filter: { kind: 'number-range', fromKey: 'peso_minimo::ge', toKey: 'peso_minimo::le', labelKey: 'people.customerSegments.fields.minimumWeight', label: 'Peso mínimo', inputMode: 'decimal' } },
+    { id: 'peso_minimo', labelKey: 'people.customerSegments.fields.minimumWeight', label: 'Peso mínimo', sortKey: 'peso_minimo', render: (record) => record.peso_minimo ? `${formatLocalizedDecimal(record.peso_minimo as string | number | null | undefined, 3)} kg` : '-', filter: { kind: 'number-range', fromKey: 'peso_minimo::ge', toKey: 'peso_minimo::le', labelKey: 'people.customerSegments.fields.minimumWeight', label: 'Peso mínimo', inputMode: 'decimal' } },
     { id: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', sortKey: 'ativo', thClassName: 'w-[110px]', valueKey: 'ativo', filter: { kind: 'select', key: 'ativo', options: [{ value: '1', label: 'Yes' }, { value: '0', label: 'No' }] } },
   ],
   mobileTitle: (record) => String(record.nome || '-'),
@@ -63,8 +52,8 @@ export const SEGMENTOS_CLIENTES_CONFIG: CrudModuleConfig = {
     ativo: record.ativo === true || record.ativo === 1 || record.ativo === '1',
     codigo: String(record.codigo || ''),
     nome: String(record.nome || ''),
-    pedido_minimo: normalizeDecimal(record.pedido_minimo, 2),
-    peso_minimo: normalizeDecimal(record.peso_minimo, 3),
+    pedido_minimo: formatLocalizedDecimal(record.pedido_minimo, 2),
+    peso_minimo: formatLocalizedDecimal(record.peso_minimo, 3),
   }),
   beforeSave: (record: CrudRecord) => ({
     id: String(record.id || '') || undefined,

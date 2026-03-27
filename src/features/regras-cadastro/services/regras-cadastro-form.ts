@@ -1,41 +1,9 @@
 import type { CrudRecord } from '@/src/components/crud-base/types'
 import { BRAZILIAN_STATES } from '@/src/lib/brazil'
+import { toBooleanChoiceValue } from '@/src/lib/boolean-utils'
 import { cepMask, parseCurrencyInput } from '@/src/lib/input-masks'
-
-type LookupOption = {
-  id: string
-  label: string
-}
-
-function toLookupOption(value: unknown, labelKeys: string[], fallbackId?: unknown) {
-  const record = value && typeof value === 'object' ? value as Record<string, unknown> : {}
-  const id = String(record.id || fallbackId || '')
-  const label = labelKeys.map((key) => String(record[key] || '')).find(Boolean) || id
-  return id ? { id, label } satisfies LookupOption : null
-}
-
-function toBooleanChoice(value: unknown) {
-  if (value === true || value === 1 || value === '1' || value === 'S') {
-    return '1'
-  }
-  if (value === false || value === 0 || value === '0' || value === 'N') {
-    return '0'
-  }
-  return ''
-}
-
-function digitsOnly(value: unknown) {
-  return String(value || '').replace(/\D/g, '')
-}
-
-function nullableLookupId(value: unknown) {
-  if (value && typeof value === 'object' && 'id' in (value as Record<string, unknown>)) {
-    return String((value as { id: unknown }).id || '') || null
-  }
-
-  const normalized = String(value || '').trim()
-  return normalized || null
-}
+import { nullableLookupId, toLookupOption } from '@/src/lib/lookup-options'
+import { digitsOnly } from '@/src/lib/value-parsers'
 
 export function createEmptyRegraCadastroForm(): CrudRecord {
   return {
@@ -65,8 +33,6 @@ export function createEmptyRegraCadastroForm(): CrudRecord {
     limite_credito: '',
     id_cliente_canal_distribuicao: '',
     id_tabela_canal_distribuicao: '',
-    id_vendedor_canal_distribuicao: '',
-    id_cliente_vendedor: '',
   }
 }
 
@@ -83,7 +49,7 @@ export function mapRegraCadastroDetail(payload: unknown): CrudRecord {
     ativo: record.ativo === true || record.ativo === 1 || record.ativo === '1',
     nome: String(record.nome || ''),
     codigo: String(record.codigo || ''),
-    contribuinte: toBooleanChoice(record.contribuinte),
+    contribuinte: toBooleanChoiceValue(record.contribuinte),
     tipo: String(record.tipo || ''),
     tipo_cliente: String(record.tipo_cliente || ''),
     inscricao_estadual: String(record.inscricao_estadual || ''),
@@ -116,10 +82,6 @@ export function mapRegraCadastroDetail(payload: unknown): CrudRecord {
     id_cliente_canal_distribuicao_lookup: toLookupOption(record.cliente_canal_distribuicao, ['nome'], record.id_cliente_canal_distribuicao),
     id_tabela_canal_distribuicao: toLookupOption(record.tabela_canal_distribuicao, ['nome'], record.id_tabela_canal_distribuicao),
     id_tabela_canal_distribuicao_lookup: toLookupOption(record.tabela_canal_distribuicao, ['nome'], record.id_tabela_canal_distribuicao),
-    id_vendedor_canal_distribuicao: toLookupOption(record.vendedor_canal_distribuicao, ['nome'], record.id_vendedor_canal_distribuicao),
-    id_vendedor_canal_distribuicao_lookup: toLookupOption(record.vendedor_canal_distribuicao, ['nome'], record.id_vendedor_canal_distribuicao),
-    id_cliente_vendedor: toLookupOption(record.cliente_vendedor, ['nome'], record.id_cliente_vendedor),
-    id_cliente_vendedor_lookup: toLookupOption(record.cliente_vendedor, ['nome'], record.id_cliente_vendedor),
   }
 }
 
@@ -151,7 +113,5 @@ export function toRegraCadastroPayload(form: CrudRecord) {
     limite_credito: parseCurrencyInput(String(form.limite_credito || '')),
     id_cliente_canal_distribuicao: nullableLookupId(form.id_cliente_canal_distribuicao_lookup ?? form.id_cliente_canal_distribuicao),
     id_tabela_canal_distribuicao: nullableLookupId(form.id_tabela_canal_distribuicao_lookup ?? form.id_tabela_canal_distribuicao),
-    id_vendedor_canal_distribuicao: nullableLookupId(form.id_vendedor_canal_distribuicao_lookup ?? form.id_vendedor_canal_distribuicao),
-    id_cliente_vendedor: nullableLookupId(form.id_cliente_vendedor_lookup ?? form.id_cliente_vendedor),
   }
 }

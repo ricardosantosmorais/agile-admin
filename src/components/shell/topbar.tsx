@@ -22,6 +22,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AsyncState } from '@/src/components/ui/async-state'
 import { flattenMenuItems, getMenuItems } from '@/src/components/navigation/menu-items'
+import { useSessionLifecycle } from '@/src/contexts/session-lifecycle-context'
 import { useAuth } from '@/src/features/auth/hooks/use-auth'
 import type { NotificationReadReceipt, TopbarNotification } from '@/src/features/notifications/types/notifications'
 import { useTenant } from '@/src/contexts/tenant-context'
@@ -106,6 +107,7 @@ function InfoCopyRow({ label, value }: { label: string; value?: string }) {
 export function Topbar() {
   const router = useRouter()
   const { logout, session, user } = useAuth()
+  const { shouldBlockUnauthenticatedRedirect } = useSessionLifecycle()
   const { currentTenant, isSwitchingTenant, switchTenant, tenants } = useTenant()
   const { theme, toggleTheme, toggleSidebar } = useUi()
   const { locale, setLocale, t } = useI18n()
@@ -161,6 +163,16 @@ export function Topbar() {
     let isMounted = true
 
     async function loadNotifications() {
+      if (shouldBlockUnauthenticatedRedirect || !session) {
+        if (isMounted) {
+          setNotifications([])
+          setPendingReadReceipts([])
+          setNotificationsError('')
+          setNotificationsLoading(false)
+        }
+        return
+      }
+
       setNotificationsLoading(true)
       setNotificationsError('')
 
@@ -194,9 +206,13 @@ export function Topbar() {
     return () => {
       isMounted = false
     }
-  }, [currentTenant.id])
+  }, [currentTenant.id, session, shouldBlockUnauthenticatedRedirect])
 
   useEffect(() => {
+    if (shouldBlockUnauthenticatedRedirect) {
+      return
+    }
+
     if (activePanel !== 'notifications' || !pendingReadReceipts.length || hasMarkedNotificationsRef.current || isMarkingNotificationsRef.current) {
       return
     }
@@ -225,7 +241,7 @@ export function Topbar() {
     return () => {
       isMounted = false
     }
-  }, [activePanel, pendingReadReceipts])
+  }, [activePanel, pendingReadReceipts, shouldBlockUnauthenticatedRedirect])
 
   function togglePanel(panel: TopbarPanel) {
     setActivePanel((current) => (current === panel ? 'none' : panel))

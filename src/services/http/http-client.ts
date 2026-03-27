@@ -1,3 +1,6 @@
+import { getSessionClientPhase } from '@/src/features/auth/services/session-client-gate'
+import { captureOperationalClientError } from '@/src/lib/sentry'
+
 export class HttpError extends Error {
   status: number
   payload: unknown
@@ -91,6 +94,14 @@ function shouldNotifySessionLoss(path: string) {
   ].some((prefix) => path.startsWith(prefix))
 }
 
+function canRequestWhileSessionBlocked(path: string) {
+  return [
+    '/api/auth/logout',
+    '/api/auth/login',
+    '/api/auth/session',
+  ].some((prefix) => path.startsWith(prefix))
+}
+
 export function notifySessionLost(reason: SessionLostReason, message: string, status = 401, path = '') {
   if (typeof window === 'undefined') {
     return
@@ -108,6 +119,18 @@ export function notifySessionLost(reason: SessionLostReason, message: string, st
 
 export async function httpClient<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
   const path = getRequestPath(input)
+  const method = String(init?.method || 'GET').toUpperCase()
+  const phase = getSessionClientPhase()
+
+  if ((phase === 'warning' || phase === 'ended') && !canRequestWhileSessionBlocked(path)) {
+    throw new HttpError('Sessão encerrada. Faça login novamente para continuar.', 401, {
+      message: 'Sessão encerrada. Faça login novamente para continuar.',
+      blockedByClientSessionGate: true,
+      path,
+      phase,
+    })
+  }
+
   const response = await fetch(input, {
     ...init,
     headers: {
@@ -127,6 +150,13 @@ export async function httpClient<T>(input: RequestInfo | URL, init?: RequestInit
     if (response.status === 401 && shouldNotifySessionLoss(path)) {
       notifySessionLost(inferSessionLostReason(response.status, message), message, response.status, path)
     }
+
+    captureOperationalClientError({
+      path,
+      method,
+      status: response.status,
+      payload,
+    })
 
     throw new HttpError(message, response.status, payload)
   }

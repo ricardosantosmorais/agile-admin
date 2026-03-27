@@ -1,4 +1,8 @@
 import type { CrudRecord } from '@/src/components/crud-base/types'
+import { formatApiDateToInput, formatInputDateToApiEnd, formatInputDateToApiStart } from '@/src/lib/date-input'
+import { formatLocalizedDecimal, parseInteger, parseLocalizedNumber } from '@/src/lib/value-parsers'
+
+export { formatApiDateToInput }
 
 function normalizeString(value: unknown) {
   return typeof value === 'string' ? value.trim() : ''
@@ -6,31 +10,6 @@ function normalizeString(value: unknown) {
 
 function normalizeBoolean(value: unknown) {
   return value === true || value === 1 || value === '1'
-}
-
-function parseIntegerOrNull(value: unknown) {
-  const digits = normalizeString(value).replace(/\D+/g, '')
-  return digits ? Number(digits) : null
-}
-
-function parseIntegerOrZero(value: unknown) {
-  return parseIntegerOrNull(value) ?? 0
-}
-
-function normalizeDecimalString(value: string) {
-  if (!value) {
-    return ''
-  }
-
-  if (value.includes('.') && value.includes(',')) {
-    return value.replace(/\./g, '').replace(',', '.')
-  }
-
-  if (value.includes(',')) {
-    return value.replace(',', '.')
-  }
-
-  return value
 }
 
 export function parseMoneyValue(value: unknown) {
@@ -43,8 +22,7 @@ export function parseMoneyValue(value: unknown) {
     return null
   }
 
-  const parsed = Number(normalizeDecimalString(normalized))
-  return Number.isFinite(parsed) ? parsed : null
+  return parseLocalizedNumber(normalized)
 }
 
 export function formatMoneyInput(value: unknown) {
@@ -57,30 +35,7 @@ export function formatMoneyInput(value: unknown) {
     return ''
   }
 
-  return new Intl.NumberFormat('pt-BR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(parsed)
-}
-
-export function formatApiDateToInput(value: unknown) {
-  const normalized = normalizeString(value)
-  if (!normalized) {
-    return ''
-  }
-
-  const match = normalized.match(/^(\d{4}-\d{2}-\d{2})/)
-  return match ? match[1] : ''
-}
-
-function formatInputDateToApiStart(value: unknown) {
-  const normalized = normalizeString(value)
-  return normalized ? `${normalized} 00:00:00` : null
-}
-
-function formatInputDateToApiEnd(value: unknown) {
-  const normalized = normalizeString(value)
-  return normalized ? `${normalized} 23:59:59` : null
+  return formatLocalizedDecimal(parsed, 2)
 }
 
 export function getComboTypeLabel(type: unknown) {
@@ -158,7 +113,7 @@ export function toComboPayload(record: CrudRecord): CrudRecord {
     id_grupo_promocao: normalizeString(record.id_grupo_promocao) || null,
     data_inicio: dataInicio,
     data_fim: dataFim,
-    itens_distintos: parseIntegerOrZero(record.itens_distintos),
+    itens_distintos: parseInteger(record.itens_distintos) ?? 0,
     imagem: normalizeString(record.imagem) || null,
     imagem_mobile: normalizeString(record.imagem_mobile) || null,
     descricao: typeof record.descricao === 'string' ? record.descricao : '',
@@ -181,8 +136,8 @@ export function toComboProdutoPayload(comboId: string, record: CrudRecord) {
     id_marca: tipo === 'marca' ? normalizeString(record.id_marca) || null : null,
     preco: parseMoneyValue(record.preco),
     desconto: parseMoneyValue(record.desconto),
-    pedido_minimo: parseIntegerOrNull(record.pedido_minimo),
-    pedido_maximo: parseIntegerOrNull(record.pedido_maximo),
+    pedido_minimo: parseInteger(record.pedido_minimo),
+    pedido_maximo: parseInteger(record.pedido_maximo),
   }
 }
 

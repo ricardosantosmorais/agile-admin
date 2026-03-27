@@ -82,7 +82,7 @@ export const GRUPOS_COMBOS_CONFIG: CrudModuleConfig = {
         { key: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', type: 'toggle' },
         { key: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Código', type: 'text', layoutClassName: 'max-w-[320px]', maxLength: 32 },
         { key: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', type: 'text', required: true, layoutClassName: 'max-w-[720px]', maxLength: 255 },
-        { key: 'imagem', labelKey: 'marketing.comboGroups.fields.image', label: 'Imagem', type: 'image' },
+        { key: 'imagem', labelKey: 'marketing.comboGroups.fields.image', label: 'Imagem', type: 'image', uploadProfileId: 'tenant-public-images', uploadFolder: 'grupos-combos' },
         { key: 'descricao', labelKey: 'marketing.comboGroups.fields.description', label: 'Descrição', type: 'textarea', rows: 5, layoutClassName: 'max-w-[720px]' },
       ],
     },

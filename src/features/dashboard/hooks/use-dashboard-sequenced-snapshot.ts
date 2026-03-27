@@ -47,6 +47,8 @@ const phaseDefinitions: DashboardPhaseDefinition[] = [
   { id: 'marketingTops', blocks: ['marketing_tops'] },
 ]
 
+const orderedPhaseIds = phaseDefinitions.map((phase) => phase.id)
+
 function formatDateInput(date: Date) {
   return date.toISOString().slice(0, 10)
 }
@@ -173,21 +175,33 @@ function mergePhaseSnapshot(current: DashboardSnapshot, partial: DashboardSnapsh
   }
 }
 
+function normalizeRequestedPhases(phaseIds: DashboardPhaseId[]) {
+  const requested = new Set(phaseIds)
+  return orderedPhaseIds.filter((phaseId) => requested.has(phaseId))
+}
+
 export function useDashboardSequencedSnapshot(tenantId: string) {
   const today = useMemo(() => new Date(), [])
   const presetRanges = useMemo(() => getDefaultPresetRanges(today), [today])
   const [selectedRange, setSelectedRange] = useState<DateRangeValue>(() => {
     const stored = readStoredDashboardRange()
-    return stored
-      ? { start: stored.start, end: stored.end }
-      : presetRanges[0].range
+    return stored ? { start: stored.start, end: stored.end } : presetRanges[0].range
   })
   const [snapshot, setSnapshot] = useState<DashboardSnapshot | null>(null)
+  const [requestedPhases, setRequestedPhases] = useState<DashboardPhaseId[]>(['summary'])
   const [completedPhases, setCompletedPhases] = useState<DashboardPhaseId[]>([])
-  const [currentPhase, setCurrentPhase] = useState<DashboardPhaseId | null>(null)
+  const [failedPhases, setFailedPhases] = useState<DashboardPhaseId[]>([])
   const [error, setError] = useState('')
   const [refreshToken, setRefreshToken] = useState(0)
   const forceRefreshRef = useRef(false)
+  const cycleForceRefreshRef = useRef(false)
+  const phaseWaitersRef = useRef<
+    Array<{
+      phaseIds: DashboardPhaseId[]
+      resolve: () => void
+      reject: (error: Error) => void
+    }>
+  >([])
 
   const selectedRangeLabel = useMemo(() => {
     const preset = presetRanges.find(
@@ -199,6 +213,17 @@ export function useDashboardSequencedSnapshot(tenantId: string) {
 
     return `${selectedRange.start} a ${selectedRange.end}`
   }, [presetRanges, selectedRange.end, selectedRange.start])
+
+  const currentPhase = useMemo(
+    () =>
+      orderedPhaseIds.find(
+        (phaseId) =>
+          requestedPhases.includes(phaseId) &&
+          !completedPhases.includes(phaseId) &&
+          !failedPhases.includes(phaseId),
+      ) ?? null,
+    [completedPhases, failedPhases, requestedPhases],
+  )
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -216,81 +241,141 @@ export function useDashboardSequencedSnapshot(tenantId: string) {
   }, [selectedRange.end, selectedRange.start, selectedRangeLabel])
 
   useEffect(() => {
-    let cancelled = false
     const baseSnapshot = createEmptySnapshot(selectedRangeLabel)
-    const shouldForceRefresh = forceRefreshRef.current
+    cycleForceRefreshRef.current = forceRefreshRef.current
     forceRefreshRef.current = false
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSnapshot(baseSnapshot)
     setCompletedPhases([])
-    setCurrentPhase(phaseDefinitions[0]?.id ?? null)
+    setFailedPhases([])
     setError('')
+  }, [refreshToken, selectedRange.end, selectedRange.start, selectedRangeLabel, tenantId])
 
-    async function load() {
-      let hasFailures = false
+  useEffect(() => {
+    if (!currentPhase) {
+      return
+    }
 
-      for (const phase of phaseDefinitions) {
+    const phaseDefinition = phaseDefinitions.find((entry) => entry.id === currentPhase)
+    if (!phaseDefinition) {
+      return
+    }
+
+    const baseSnapshot = createEmptySnapshot(selectedRangeLabel)
+    const phaseId = phaseDefinition.id
+    const phaseBlocks = phaseDefinition.blocks
+    let cancelled = false
+
+    async function loadPhase() {
+      try {
+        const partial = await appData.dashboard.getSnapshotByBlocks(
+          tenantId,
+          selectedRange.start,
+          selectedRange.end,
+          selectedRangeLabel,
+          phaseBlocks,
+          { forceRefresh: cycleForceRefreshRef.current },
+        )
+
         if (cancelled) {
           return
         }
 
-        setCurrentPhase(phase.id)
-
-        try {
-          const partial = await appData.dashboard.getSnapshotByBlocks(
-            tenantId,
-            selectedRange.start,
-            selectedRange.end,
-            selectedRangeLabel,
-            phase.blocks,
-            { forceRefresh: shouldForceRefresh },
-          )
-
-          if (cancelled) {
-            return
-          }
-
-          setSnapshot((current) => mergePhaseSnapshot(current ?? baseSnapshot, partial, phase.id))
-          setCompletedPhases((current) => [...current, phase.id])
-        } catch (phaseError) {
-          if (cancelled) {
-            return
-          }
-
-          hasFailures = true
-          setError(
-            phaseError instanceof Error
-              ? phaseError.message
-              : 'Não foi possível carregar parte dos dados do dashboard.',
-          )
+        setSnapshot((current) => mergePhaseSnapshot(current ?? baseSnapshot, partial, phaseId))
+        setCompletedPhases((current) => (current.includes(phaseId) ? current : [...current, phaseId]))
+      } catch (phaseError) {
+        if (cancelled) {
+          return
         }
-      }
 
-      if (!cancelled) {
-        setCurrentPhase(null)
-        if (!hasFailures) {
-          setError('')
-        }
+        const normalizedError = phaseError instanceof Error
+          ? phaseError
+          : new Error('Nao foi possivel carregar parte dos dados do dashboard.')
+
+        setFailedPhases((current) => (current.includes(phaseId) ? current : [...current, phaseId]))
+        setError(normalizedError.message)
       }
     }
 
-    void load()
+    void loadPhase()
 
     return () => {
       cancelled = true
     }
-  }, [refreshToken, selectedRange.end, selectedRange.start, selectedRangeLabel, tenantId])
+  }, [currentPhase, selectedRange.end, selectedRange.start, selectedRangeLabel, tenantId])
+
+  useEffect(() => {
+    if (cycleForceRefreshRef.current && completedPhases.length > 0) {
+      cycleForceRefreshRef.current = false
+    }
+  }, [completedPhases])
+
+  useEffect(() => {
+    if (!phaseWaitersRef.current.length) {
+      return
+    }
+
+    const remainingWaiters: typeof phaseWaitersRef.current = []
+
+    for (const waiter of phaseWaitersRef.current) {
+      const failedPhase = waiter.phaseIds.find((phaseId) => failedPhases.includes(phaseId))
+      if (failedPhase) {
+        waiter.reject(new Error(`Falha ao carregar a fase ${failedPhase} do dashboard.`))
+        continue
+      }
+
+      const isComplete = waiter.phaseIds.every((phaseId) => completedPhases.includes(phaseId))
+      if (isComplete) {
+        waiter.resolve()
+        continue
+      }
+
+      remainingWaiters.push(waiter)
+    }
+
+    phaseWaitersRef.current = remainingWaiters
+  }, [completedPhases, failedPhases])
+
+  function requestPhases(phaseIds: DashboardPhaseId | DashboardPhaseId[]) {
+    const nextIds = Array.isArray(phaseIds) ? phaseIds : [phaseIds]
+
+    setRequestedPhases((current) => {
+      const normalized = normalizeRequestedPhases([...current, ...nextIds])
+      if (normalized.length === current.length && normalized.every((phaseId, index) => phaseId === current[index])) {
+        return current
+      }
+
+      return normalized
+    })
+  }
+
+  function ensurePhasesLoaded(phaseIds: DashboardPhaseId[]) {
+    requestPhases(phaseIds)
+
+    if (phaseIds.every((phaseId) => completedPhases.includes(phaseId))) {
+      return Promise.resolve()
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      phaseWaitersRef.current.push({ phaseIds, resolve, reject })
+    })
+  }
 
   return {
+    allPhaseIds: orderedPhaseIds,
     presetRanges,
     selectedRange,
     selectedRangeLabel,
     setSelectedRange,
     snapshot,
+    requestedPhases,
     completedPhases,
+    failedPhases,
     currentPhase,
     error,
+    requestPhases,
+    ensurePhasesLoaded,
     refreshSnapshot: () => {
       forceRefreshRef.current = true
       setRefreshToken((current) => current + 1)

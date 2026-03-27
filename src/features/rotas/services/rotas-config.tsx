@@ -2,24 +2,7 @@
 
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import { parseCurrencyInput } from '@/src/lib/input-masks'
-
-function normalizeDecimal(value: unknown, precision = 3) {
-  const raw = String(value ?? '').trim()
-  if (!raw) {
-    return ''
-  }
-
-  const normalized = raw.replace(/\./g, '').replace(',', '.')
-  const parsed = Number(normalized)
-  if (!Number.isFinite(parsed)) {
-    return ''
-  }
-
-  return parsed.toLocaleString('pt-BR', {
-    minimumFractionDigits: precision,
-    maximumFractionDigits: precision,
-  })
-}
+import { formatLocalizedDecimal } from '@/src/lib/value-parsers'
 
 function normalizeTime(value: unknown) {
   const raw = String(value ?? '').trim()
@@ -94,7 +77,7 @@ export const ROTAS_CONFIG: CrudModuleConfig = {
   normalizeRecord: (record) => ({
     ...record,
     horario_corte: normalizeTime(record.horario_corte),
-    limite_peso: normalizeDecimal(record.limite_peso, 3),
+    limite_peso: formatLocalizedDecimal(record.limite_peso, 3),
   }),
   beforeSave: (record) => ({
     ...record,

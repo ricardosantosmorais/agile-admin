@@ -1,26 +1,13 @@
-import { expect, test, type Locator, type Page } from '@playwright/test'
-import { openModuleFromMenu } from '@/e2e/helpers/auth'
+import { expect, test } from '@playwright/test'
+import { dateInputAt, filterByCode, openPromotionsModule, textInputAt } from '@/e2e/helpers/crud'
 
 test.setTimeout(120_000)
 
-function formRoot(page: Page): Locator {
-  return page.locator('form').first()
-}
-
-function formTextInput(page: Page, index: number): Locator {
-  return formRoot(page).locator('input[type="text"]').nth(index)
-}
-
-function formDateInput(page: Page, index: number): Locator {
-  return formRoot(page).locator('input[type="date"]').nth(index)
-}
-
-async function openList(page: Page) {
-  await openModuleFromMenu(page, {
-    parents: [/promoções|promocoes|promotions/i],
+async function openList(page: Parameters<typeof openPromotionsModule>[0]) {
+  await openPromotionsModule(page, {
     linkName: /compre junto|buy together/i,
     urlPattern: /\/compre-junto(?:\?|$)/,
-    readyLocator: page.getByRole('button', { name: /atualizar|refresh/i }),
+    path: '/compre-junto',
   })
 }
 
@@ -30,12 +17,12 @@ test('creates a buy together campaign, loads products tab and deletes it', async
 
   await openList(page)
   await page.getByRole('link', { name: /novo|new/i }).click()
-  await expect(page).toHaveURL(/\/compre-junto\/novo$/)
+  await expect(page).toHaveURL(/\/compre-junto\/novo$/, { timeout: 30_000 })
 
-  await formTextInput(page, 0).fill(uniqueCode)
-  await formTextInput(page, 1).fill(uniqueName)
-  await formDateInput(page, 0).fill('2026-03-24')
-  await formDateInput(page, 1).fill('2026-03-31')
+  await textInputAt(page, 0).fill(uniqueCode)
+  await textInputAt(page, 1).fill(uniqueName)
+  await dateInputAt(page, 0).fill('2026-03-24')
+  await dateInputAt(page, 1).fill('2026-03-31')
   await page.getByRole('button', { name: /salvar|save/i }).first().click()
   await page.waitForURL(/\/compre-junto\/[^/]+\/editar$/, { timeout: 60_000 })
 
@@ -43,6 +30,7 @@ test('creates a buy together campaign, loads products tab and deletes it', async
   await expect(page.getByText(/nenhum produto foi vinculado à campanha|no products have been linked to the campaign/i)).toBeVisible({ timeout: 30_000 })
 
   await openList(page)
+  await filterByCode(page, uniqueCode)
   const savedRow = page.locator('tbody tr').filter({ hasText: uniqueCode }).first()
   await expect(savedRow).toBeVisible({ timeout: 30_000 })
   await savedRow.locator('button').last().click()

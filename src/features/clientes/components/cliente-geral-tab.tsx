@@ -26,13 +26,13 @@ export function ClienteGeralTab({ form, readOnly, onPatch }: ClienteGeralTabProp
           <FormRow label={t('clientes.form.general.active', 'Active')} contentClassName="max-w-[360px]">
             <BooleanChoice value={form.ativo} onChange={(value) => onPatch('ativo', value)} disabled={readOnly} trueLabel={t('common.yes', 'Yes')} falseLabel={t('common.no', 'No')} />
           </FormRow>
-          <FormRow label={t('clientes.form.general.blocked', 'Blocked')} contentClassName="max-w-[360px]">
+          <FormRow label={t('clientes.form.general.blocked', 'Blocked')} contentClassName="max-w-[360px]" helperText={t('clientes.form.general.blockedHint', 'Indica se o cliente está bloqueado para realizar pedidos.')}>
             <BooleanChoice value={form.bloqueado} onChange={(value) => onPatch('bloqueado', value)} disabled={readOnly} trueLabel={t('common.yes', 'Yes')} falseLabel={t('common.no', 'No')} />
           </FormRow>
-          <FormRow label={t('clientes.form.general.blockedPlatform', 'Platform blocked')} contentClassName="max-w-[360px]">
+          <FormRow label={t('clientes.form.general.blockedPlatform', 'Platform blocked')} contentClassName="max-w-[360px]" helperText={t('clientes.form.general.blockedPlatformHint', 'Indica se o cliente está bloqueado na plataforma.')}>
             <BooleanChoice value={form.bloqueadoPlataforma} onChange={() => undefined} disabled trueLabel={t('common.yes', 'Yes')} falseLabel={t('common.no', 'No')} />
           </FormRow>
-          <FormRow label={t('clientes.form.general.released', 'Released')} contentClassName="max-w-[360px]">
+          <FormRow label={t('clientes.form.general.released', 'Released')} contentClassName="max-w-[360px]" helperText={t('clientes.form.general.releasedHint', 'Indica se os pedidos do cliente serão liberados sem aprovação do vendedor.')}>
             <BooleanChoice value={form.liberado} onChange={(value) => onPatch('liberado', value)} disabled={readOnly} trueLabel={t('common.yes', 'Yes')} falseLabel={t('common.no', 'No')} />
           </FormRow>
           <FormRow label={t('clientes.form.general.code', 'Code')} contentClassName="max-w-[320px]">

@@ -27,9 +27,10 @@ export function PageToast({ message, tone = 'error', onClose, durationMs = 4500 
   const isError = tone === 'error'
 
   return (
-    <div className="sticky top-5 z-30">
+    <div className="pointer-events-none fixed left-1/2 top-5 z-[160] w-full max-w-3xl -translate-x-1/2 px-4">
       <div className={[
         'mx-auto flex max-w-3xl items-start gap-3 rounded-[1.1rem] border px-4 py-3 shadow-[0_18px_40px_rgba(15,23,42,0.12)] backdrop-blur',
+        'pointer-events-auto',
         isError ? 'border-rose-200 bg-rose-50/95 text-rose-700' : 'border-emerald-200 bg-emerald-50/95 text-emerald-700',
       ].join(' ')}>
         <div className="pt-0.5">

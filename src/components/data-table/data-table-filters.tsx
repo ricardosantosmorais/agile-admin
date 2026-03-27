@@ -3,9 +3,12 @@
 import { ChevronDown, Search as SearchIcon } from 'lucide-react'
 import { DateInput } from '@/src/components/ui/date-input'
 import { FormField } from '@/src/components/ui/form-field'
+import { InputWithAffix } from '@/src/components/ui/input-with-affix'
 import { inputClasses } from '@/src/components/ui/input-styles'
+import { LookupSelect } from '@/src/components/ui/lookup-select'
 import type { AppDataTableColumn, AppDataTableFilterConfig } from '@/src/components/data-table/types'
 import { useI18n } from '@/src/i18n/use-i18n'
+import { currencyMask, decimalMask } from '@/src/lib/input-masks'
 
 type DataTableFiltersCardProps<TFilters> = {
   title?: string
@@ -41,6 +44,18 @@ function toInputValue(value: unknown) {
   return typeof value === 'string' || typeof value === 'number' ? String(value) : ''
 }
 
+function applyMask(mask: 'currency' | 'decimal' | undefined, value: string) {
+  if (mask === 'currency') {
+    return currencyMask(value)
+  }
+
+  if (mask === 'decimal') {
+    return decimalMask(value)
+  }
+
+  return value
+}
+
 function buildDefaultSummary<TFilters>(filter: AppDataTableFilterConfig<TFilters>, filters: TFilters) {
   switch (filter.kind) {
     case 'text': {
@@ -65,6 +80,11 @@ function buildDefaultSummary<TFilters>(filter: AppDataTableFilterConfig<TFilters
       const from = toInputValue(filters[filter.fromKey])
       const to = toInputValue(filters[filter.toKey])
       return from || to ? filter.summaryLabel ?? filter.label : null
+    }
+    case 'lookup': {
+      const value = toInputValue(filters[filter.key])
+      const label = toInputValue(filters[`${String(filter.key)}_label` as keyof TFilters])
+      return value ? `${filter.summaryLabel ?? filter.label}: ${label || value}` : null
     }
     case 'custom':
       return null
@@ -128,21 +148,43 @@ function renderFilterField<TFilters>(
       return (
         <FormField label={filter.label}>
           <div className="grid grid-cols-2 gap-3">
-            <input
-              type="number"
+            <InputWithAffix
+              type={filter.mask ? 'text' : 'number'}
+              prefix={filter.prefixText}
+              suffix={filter.suffixText}
               value={toInputValue(draft[filter.fromKey])}
-              onChange={(event) => patchDraft(filter.fromKey, event.target.value as TFilters[typeof filter.fromKey])}
+              onChange={(event) => patchDraft(filter.fromKey, applyMask(filter.mask, event.target.value) as TFilters[typeof filter.fromKey])}
               inputMode={filter.inputMode}
-              className={inputClasses()}
             />
-            <input
-              type="number"
+            <InputWithAffix
+              type={filter.mask ? 'text' : 'number'}
+              prefix={filter.prefixText}
+              suffix={filter.suffixText}
               value={toInputValue(draft[filter.toKey])}
-              onChange={(event) => patchDraft(filter.toKey, event.target.value as TFilters[typeof filter.toKey])}
+              onChange={(event) => patchDraft(filter.toKey, applyMask(filter.mask, event.target.value) as TFilters[typeof filter.toKey])}
               inputMode={filter.inputMode}
-              className={inputClasses()}
             />
           </div>
+        </FormField>
+      )
+    case 'lookup':
+      return (
+        <FormField label={filter.label}>
+          <LookupSelect
+            label={filter.label}
+            value={toInputValue(draft[filter.key])
+              ? {
+                  id: toInputValue(draft[filter.key]),
+                  label: toInputValue(draft[`${String(filter.key)}_label` as keyof TFilters]) || toInputValue(draft[filter.key]),
+                }
+              : null}
+            onChange={(value) => {
+              patchDraft(filter.key, (value?.id ?? '') as TFilters[typeof filter.key])
+              patchDraft(`${String(filter.key)}_label` as keyof TFilters, (value?.label ?? '') as TFilters[keyof TFilters])
+            }}
+            loadOptions={filter.loadOptions}
+            pageSize={filter.pageSize}
+          />
         </FormField>
       )
     case 'custom':

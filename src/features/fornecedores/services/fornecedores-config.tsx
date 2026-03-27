@@ -3,15 +3,7 @@
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 import { BRAZILIAN_STATES } from '@/src/lib/brazil'
 import { cepMask, cnpjMask, cpfMask, phoneMask } from '@/src/lib/input-masks'
-
-function splitPhone(value: unknown) {
-  const digits = String(value || '').replace(/\D/g, '')
-  if (!digits) return { ddd: '', number: '' }
-  return {
-    ddd: digits.slice(0, 2),
-    number: digits.slice(2),
-  }
-}
+import { splitPhone } from '@/src/lib/value-parsers'
 
 export const FORNECEDORES_CONFIG: CrudModuleConfig = {
   key: 'fornecedores',
@@ -68,8 +60,8 @@ export const FORNECEDORES_CONFIG: CrudModuleConfig = {
         { key: 'bairro', labelKey: 'catalog.fornecedores.fields.district', label: 'Bairro', type: 'text' },
         { key: 'cidade', labelKey: 'catalog.fornecedores.fields.city', label: 'Cidade', type: 'text' },
         { key: 'uf', labelKey: 'catalog.fornecedores.fields.state', label: 'UF', type: 'select', options: BRAZILIAN_STATES.map((uf) => ({ value: uf, label: uf })) },
-        { key: 'imagem', labelKey: 'catalog.fields.banner', label: 'Banner', type: 'image' },
-        { key: 'imagem_mobile', labelKey: 'catalog.fields.mobileBanner', label: 'Banner mobile', type: 'image' },
+        { key: 'imagem', labelKey: 'catalog.fields.banner', label: 'Banner', type: 'image', uploadProfileId: 'tenant-public-images', uploadFolder: 'fornecedores' },
+        { key: 'imagem_mobile', labelKey: 'catalog.fields.mobileBanner', label: 'Banner mobile', type: 'image', uploadProfileId: 'tenant-public-images', uploadFolder: 'fornecedores' },
       ],
     },
   ],

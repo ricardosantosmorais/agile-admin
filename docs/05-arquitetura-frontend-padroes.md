@@ -101,3 +101,17 @@ EstratÃ©gia:
 - labels de menu vindos da API traduzidos por chave estÃ¡vel/fallback;
 - sem persistÃªncia em banco para idioma.
 
+## Observabilidade
+O projeto possui integração base com Sentry no App Router.
+
+Pontos de entrada:
+- `instrumentation.ts`
+- `instrumentation-client.ts`
+- `sentry.server.config.ts`
+- `sentry.edge.config.ts`
+- `app/global-error.tsx`
+
+Regra:
+- a integração de observabilidade deve ficar na infraestrutura da aplicação, não espalhada em telas;
+- upload de sourcemaps depende de `SENTRY_AUTH_TOKEN` no ambiente de build;
+- DSNs client-side devem usar `NEXT_PUBLIC_SENTRY_DSN`.

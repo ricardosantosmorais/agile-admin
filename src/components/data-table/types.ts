@@ -2,6 +2,7 @@
 
 import type { InputHTMLAttributes, ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
+import type { LookupOption } from '@/src/components/ui/lookup-select'
 
 export type AppDataTableBreakpoint = 'always' | 'lg' | 'xl' | '2xl'
 
@@ -45,6 +46,16 @@ export type AppDataTableNumberRangeFilter<TFilters> = AppDataTableBaseFilter<TFi
   fromKey: keyof TFilters
   toKey: keyof TFilters
   inputMode?: InputHTMLAttributes<HTMLInputElement>['inputMode']
+  mask?: 'currency' | 'decimal'
+  prefixText?: string
+  suffixText?: string
+}
+
+export type AppDataTableLookupFilter<TFilters> = AppDataTableBaseFilter<TFilters> & {
+  kind: 'lookup'
+  key: keyof TFilters
+  loadOptions: (query: string, page: number, perPage: number) => Promise<LookupOption[]>
+  pageSize?: number
 }
 
 export type AppDataTableCustomFilter<TFilters> = AppDataTableBaseFilter<TFilters> & {
@@ -60,6 +71,7 @@ export type AppDataTableFilterConfig<TFilters> =
   | AppDataTableSelectFilter<TFilters>
   | AppDataTableDateRangeFilter<TFilters>
   | AppDataTableNumberRangeFilter<TFilters>
+  | AppDataTableLookupFilter<TFilters>
   | AppDataTableCustomFilter<TFilters>
 
 export type AppDataTableColumn<TItem, TFilters = never> = {

@@ -4,6 +4,7 @@ export type AuthTenant = {
   codigo: string
   status: string
   url?: string
+  assetsBucketUrl?: string
   mondayUrl?: string
   iconeUrl?: string
   clusterHost?: string

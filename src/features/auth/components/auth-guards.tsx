@@ -17,10 +17,12 @@ function SessionEndedOverlay({
   title,
   text,
   onGoToLogin,
+  loginLabel,
 }: {
   title: string
   text: string
   onGoToLogin: () => void
+  loginLabel: string
 }) {
   return (
     <div className="fixed inset-0 z-[280] flex items-center justify-center bg-[rgba(15,23,42,0.14)] p-4 backdrop-blur-[3px]">
@@ -42,7 +44,7 @@ function SessionEndedOverlay({
             className="inline-flex h-12 items-center justify-center rounded-full bg-[#0f172a] px-5 text-sm font-semibold text-white transition hover:bg-slate-900"
           >
             <LogIn className="mr-2 h-4 w-4" />
-            Ir para login
+            {loginLabel}
           </button>
         </div>
       </div>
@@ -75,14 +77,18 @@ export function ProtectedRoute({ children }: GuardProps) {
     const endedCopy = getSessionEndCopy(t, endedReason ?? 'unknown')
 
     return (
-      <SessionEndedOverlay
-        title={endedCopy.title}
-        text={endedCopy.text}
-        onGoToLogin={() => {
-          clearAuthenticatedSessionMarker()
-          void logout()
-        }}
-      />
+      <>
+        {children}
+        <SessionEndedOverlay
+          title={endedCopy.title}
+          text={endedCopy.text}
+          loginLabel={t('session.ended.goToLogin', 'Ir para login')}
+          onGoToLogin={() => {
+            clearAuthenticatedSessionMarker()
+            void logout()
+          }}
+        />
+      </>
     )
   }
 

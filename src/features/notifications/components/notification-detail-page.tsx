@@ -9,30 +9,15 @@ import { SectionCard } from '@/src/components/ui/section-card'
 import { useAuth } from '@/src/features/auth/hooks/use-auth'
 import { useAsyncData } from '@/src/hooks/use-async-data'
 import { useRouteParams } from '@/src/next/route-context'
+import { normalizeActionHref } from '@/src/lib/url'
 import { appData } from '@/src/services/app-data'
-
-function getActionHref(url?: string) {
-  if (!url) {
-    return ''
-  }
-
-  if (/^https?:\/\//i.test(url)) {
-    return url
-  }
-
-  if (url.startsWith('/')) {
-    return url
-  }
-
-  return `/${url.replace(/^\/+/, '')}`
-}
 
 export function NotificationDetailPage() {
   useAuth()
   const { id } = useRouteParams<{ id?: string }>()
   const notificationState = useAsyncData(() => (id ? appData.shell.getNotificationById(id) : Promise.resolve(null)), [id])
   const notification = notificationState.data
-  const actionHref = getActionHref(notification?.url)
+  const actionHref = normalizeActionHref(notification?.url)
   const isExternalAction = /^https?:\/\//i.test(actionHref)
 
   useEffect(() => {

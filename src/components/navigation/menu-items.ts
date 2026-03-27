@@ -95,6 +95,11 @@ type LegacyRootDefinition = {
 }
 
 const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
+  'produtos-precificadores-list': '/produtos-x-precificadores',
+  'produtos-filial-list': '/produtos-x-filiais',
+  'tributos-list': '/tributos',
+  'tributos-partilha-list': '/tributos-partilha',
+  'produtos-tabelas-preco-list': '/produtos-x-tabelas-de-preco',
   dashboard: '/dashboard',
   'administradores-list': '/administradores',
   'administradores-master-list': '/administradores',
@@ -122,6 +127,16 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
   'produtos-departamentos-list': '/produtos-departamentos',
   'produtos-aviseme-list': '/avise-me',
   'transportadoras-list': '/transportadoras',
+  'filiais-list': '/filiais',
+  'canais-distribuicao-list': '/canais-de-distribuicao',
+  'grupos-filiais-list': '/grupos-de-filiais',
+  'fases-list': '/fases',
+  'sequenciais-list': '/sequenciais',
+  'limites-credito-list': '/limites-de-credito',
+  'formas-pagamento-list': '/formas-de-pagamento',
+  'condicoes-pagamento-list': '/condicoes-de-pagamento',
+  'tabelas-preco-list': '/tabelas-de-preco',
+  'formas-entrega-list': '/formas-de-entrega',
   'portos-list': '/portos',
   'areas-atuacao-list': '/areas-de-atuacao',
   'pracas-list': '/pracas',

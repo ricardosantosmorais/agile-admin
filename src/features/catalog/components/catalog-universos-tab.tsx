@@ -6,6 +6,7 @@ import { BooleanChoice } from '@/src/components/ui/boolean-choice'
 import { ConfirmDialog } from '@/src/components/ui/confirm-dialog'
 import { CrudModal } from '@/src/components/ui/crud-modal'
 import { FormField } from '@/src/components/ui/form-field'
+import { StatusBadge } from '@/src/components/ui/status-badge'
 import { TooltipIconButton } from '@/src/components/ui/tooltip-icon-button'
 import { ClienteRelationSection } from '@/src/features/clientes/components/cliente-relation-section'
 import { CatalogLookupSelect } from '@/src/features/catalog/components/catalog-lookup-select'
@@ -235,7 +236,15 @@ export function CatalogUniversosTab({
         columns={[
           { header: t('catalog.universos.type', 'Tipo'), render: (item) => universeTypeLabel(item.tipo, t) },
           { header: t('catalog.universos.value', 'Valor'), cellClassName: 'font-semibold text-slate-950', render: (item) => universeValueLabel(item) },
-          { header: t('catalog.universos.restriction', 'Restrição'), headerClassName: 'w-[120px]', render: (item) => item.restricao ? t('common.yes', 'Sim') : t('common.no', 'Não') },
+          {
+            header: t('catalog.universos.restriction', 'Restrição'),
+            headerClassName: 'w-[120px]',
+            render: (item) => (
+              <StatusBadge tone={item.restricao ? 'warning' : 'success'}>
+                {item.restricao ? t('common.yes', 'Sim') : t('common.no', 'Não')}
+              </StatusBadge>
+            ),
+          },
           {
             header: t('common.actions', 'Ações'),
             headerClassName: 'w-[104px]',

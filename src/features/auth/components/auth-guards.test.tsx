@@ -72,7 +72,7 @@ describe('ProtectedRoute', () => {
     expect(screen.getByText('Conteúdo protegido')).toBeInTheDocument()
   })
 
-  it('shows the ended-session blocker and unmounts the protected shell', () => {
+  it('shows the ended-session blocker while keeping the current screen visible underneath', () => {
     authState.isAuthenticated = false
     sessionLifecycleState.shouldBlockUnauthenticatedRedirect = true
     sessionLifecycleState.endedReason = 'idle_timeout'
@@ -92,7 +92,7 @@ describe('ProtectedRoute', () => {
       </ProtectedRoute>,
     )
 
-    expect(screen.queryByText('Conteúdo protegido')).not.toBeInTheDocument()
+    expect(screen.getByText('Conteúdo protegido')).toBeInTheDocument()
     expect(screen.getByText('Sessão encerrada por inatividade')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /ir para login/i })).toBeInTheDocument()
     expect(replaceMock).not.toHaveBeenCalled()

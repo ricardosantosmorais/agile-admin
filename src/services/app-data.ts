@@ -220,11 +220,8 @@ export const appData = {
         return cached
       }
 
-      const response = await fetch('/api/dashboard', {
+      const response = { ok: true, json: async () => httpClient<ReturnType<typeof getDashboardSnapshot>>('/api/dashboard', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         cache: forceRefresh ? 'no-store' : 'default',
         body: JSON.stringify({
           tenantId,
@@ -234,7 +231,7 @@ export const appData = {
           blocks,
           forceRefresh,
         }),
-      })
+      }) }
 
       if (!response.ok) {
         const payload = (await response.json().catch(() => null)) as { message?: string } | null

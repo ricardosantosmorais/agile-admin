@@ -134,7 +134,7 @@ export function clearSessionLock() {
   window.localStorage.removeItem(SESSION_LOCK_KEY)
 }
 
-export function clearSensitiveClientState() {
+export function clearSensitiveClientState(options?: { preserveGlobalSessionSignals?: boolean }) {
   if (typeof window === 'undefined') {
     return
   }
@@ -159,7 +159,14 @@ export function clearSensitiveClientState() {
       continue
     }
 
-    if (key.startsWith('dashboard-v2:') || SENSITIVE_LOCAL_STORAGE_KEYS.includes(key)) {
+    const preserveGlobalSessionSignals = options?.preserveGlobalSessionSignals === true
+    const isPreservedGlobalSignal = preserveGlobalSessionSignals && (
+      key === 'admin-v2-web:session-activity-global'
+      || key === 'admin-v2-web:session-end-global'
+      || key === SESSION_LOCK_KEY
+    )
+
+    if (!isPreservedGlobalSignal && (key.startsWith('dashboard-v2:') || SENSITIVE_LOCAL_STORAGE_KEYS.includes(key))) {
       window.localStorage.removeItem(key)
     }
   }

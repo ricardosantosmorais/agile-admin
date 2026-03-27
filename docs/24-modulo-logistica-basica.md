@@ -8,7 +8,7 @@ Esta etapa fecha a base simples do menu `Logística` no `admin-v2-web` para os m
 - Praças
 - Rotas
 
-`Formas de entrega` permanece fora deste documento porque continua como a próxima etapa de migração.
+`Formas de entrega` foi concluído em etapa posterior e está documentado separadamente.
 
 ## Referências usadas
 - Legado em `C:\Projetos\admin`
@@ -49,4 +49,4 @@ Esta etapa fecha a base simples do menu `Logística` no `admin-v2-web` para os m
 - E2E autenticado cobrindo o fluxo feliz principal dos cinco módulos via tela.
 
 ## Pendências conhecidas
-- `Formas de entrega` continua pendente e deve reaproveitar a base desta etapa apenas onde fizer sentido.
+- módulos mais densos de logística ainda podem exigir componentes relacionais adicionais conforme novas migrações.

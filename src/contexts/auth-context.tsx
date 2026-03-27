@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { PropsWithChildren } from 'react'
 import { authService } from '@/src/features/auth/services/auth-service'
 import {
@@ -16,7 +16,9 @@ import {
   storeActiveTenantId,
   storePendingLogin,
 } from '@/src/features/auth/services/auth-tab-storage'
+import { clearSessionClientPhase } from '@/src/features/auth/services/session-client-gate'
 import type { AuthSession, AuthUser } from '@/src/features/auth/types/auth'
+import { applySentrySessionContext } from '@/src/lib/sentry'
 
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated' | 'challenge'
 
@@ -51,6 +53,29 @@ export function AuthProvider({ children }: PropsWithChildren) {
     loadPendingLogin() ? getChallengeFallbackMessage() : '',
   )
 
+  const applySession = useCallback((nextSession: AuthSession) => {
+    applySentrySessionContext(nextSession)
+    setSession(nextSession)
+    storeActiveTenantId(nextSession.currentTenant.id)
+    markAuthenticatedSession()
+    clearSessionClientPhase()
+    clearPendingLogin()
+    setChallengeMessage('')
+    setStatus('authenticated')
+  }, [])
+
+  const clearSessionState = useCallback(() => {
+    applySentrySessionContext(null)
+    clearSensitiveClientState()
+    clearAuthenticatedSessionMarker()
+    clearSessionClientPhase()
+    clearSessionLock()
+    clearPendingLogin()
+    setSession(null)
+    setChallengeMessage('')
+    setStatus('unauthenticated')
+  }, [])
+
   useEffect(() => {
     let isMounted = true
     let retryTimeoutId: number | null = null
@@ -71,12 +96,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
         }
 
         if (sessionProbe.kind === 'authenticated') {
-          setSession(sessionProbe.session)
-          storeActiveTenantId(sessionProbe.session.currentTenant.id)
+          applySession(sessionProbe.session)
           clearSessionLock()
-          clearPendingLogin()
-          setChallengeMessage('')
-          setStatus('authenticated')
           return
         }
 
@@ -90,20 +111,29 @@ export function AuthProvider({ children }: PropsWithChildren) {
           }
 
           setStatus(loadPendingLogin() ? 'challenge' : 'unauthenticated')
+          if (!loadPendingLogin()) {
+            applySentrySessionContext(null)
+            setSession(null)
+          }
           return
         }
 
         if (loadPendingLogin()) {
+          applySentrySessionContext(null)
           setStatus('challenge')
           setChallengeMessage(getChallengeFallbackMessage())
           return
         }
+        applySentrySessionContext(null)
+        setSession(null)
         setStatus('unauthenticated')
       } catch {
         if (!isMounted) {
           return
         }
 
+        applySentrySessionContext(null)
+        setSession(null)
         setStatus(loadPendingLogin() ? 'challenge' : 'unauthenticated')
       }
     }
@@ -116,18 +146,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
         window.clearTimeout(retryTimeoutId)
       }
     }
-  }, [])
+  }, [applySession])
 
   const value = useMemo<AuthContextValue>(() => {
-    function applySession(nextSession: AuthSession) {
-      setSession(nextSession)
-      storeActiveTenantId(nextSession.currentTenant.id)
-      markAuthenticatedSession()
-      clearPendingLogin()
-      setChallengeMessage('')
-      setStatus('authenticated')
-    }
-
     return {
       status,
       isAuthenticated: status === 'authenticated' && Boolean(session),
@@ -187,23 +208,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
           // noop
         }
 
-        clearSensitiveClientState()
-        clearAuthenticatedSessionMarker()
-        clearSessionLock()
-        clearPendingLogin()
-        setSession(null)
-        setChallengeMessage('')
-        setStatus('unauthenticated')
+        clearSessionState()
         window.location.replace('/login')
       },
       invalidateSession: () => {
-        clearSensitiveClientState()
-        clearAuthenticatedSessionMarker()
-        clearSessionLock()
-        clearPendingLogin()
-        setSession(null)
-        setChallengeMessage('')
-        setStatus('unauthenticated')
+        clearSessionState()
       },
       refreshSession: async () => {
         const sessionProbe = await authService.probeSession(loadActiveTenantId() || undefined)
@@ -218,6 +227,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         }
 
         if (sessionProbe.kind === 'unauthenticated') {
+          clearSessionState()
           return false
         }
 
@@ -228,7 +238,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         applySession(nextSession)
       },
     }
-  }, [challengeMessage, session, status])
+  }, [applySession, challengeMessage, clearSessionState, session, status])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronDown, Dot } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { getMenuItems } from '@/src/components/navigation/menu-items'
@@ -38,6 +38,10 @@ export function Sidebar() {
   const [openGroup, setOpenGroup] = useState<string | null>(activeGroup)
   const topLevelItemClass = 'text-[15px] font-semibold leading-6 tracking-[-0.01em]'
   const childItemClass = 'text-sm font-semibold leading-6 tracking-[-0.01em]'
+
+  useEffect(() => {
+    setOpenGroup(activeGroup)
+  }, [activeGroup])
 
   return (
     <aside
