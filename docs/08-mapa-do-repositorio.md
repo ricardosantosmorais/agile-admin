@@ -1,7 +1,7 @@
 # 08 - Mapa do Repositório
 
 ## Visão geral
-Estrutura atual observada em `C:\Projetos\admin-v2-web\src` e `C:\Projetos\admin-v2-web\app`.
+Estrutura atual observada em `../src` e `../app`.
 
 ## `app/`
 Responsável por:
@@ -81,7 +81,7 @@ Utilitários e helpers puros:
 Encadeamento de providers globais da aplicação.
 
 Arquivo principal:
-- [app-providers.tsx](/C:/Projetos/admin-v2-web/src/providers/app-providers.tsx)
+- [app-providers.tsx](../src/providers/app-providers.tsx)
 
 ## `docs/`
 Documentação do v2.
@@ -90,4 +90,3 @@ Objetivo:
 - consolidar arquitetura e fluxos atuais;
 - servir de base para onboarding;
 - preparar evolução e apresentação do produto.
-

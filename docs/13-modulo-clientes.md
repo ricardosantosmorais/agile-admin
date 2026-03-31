@@ -16,27 +16,27 @@ Por isso, `Clientes` foi usado como base de decisao para boa parte da arquitetur
 ## Estrutura da feature
 
 Arquivos principais:
-- [clientes-list-page.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/clientes-list-page.tsx)
-- [cliente-form-page.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/cliente-form-page.tsx)
-- [use-clientes-list-controller.ts](/C:/Projetos/admin-v2-web/src/features/clientes/hooks/use-clientes-list-controller.ts)
-- [clientes-list.ts](/C:/Projetos/admin-v2-web/src/features/clientes/services/clientes-list.ts)
-- [cliente-form.ts](/C:/Projetos/admin-v2-web/src/features/clientes/services/cliente-form.ts)
-- [clientes-mappers.ts](/C:/Projetos/admin-v2-web/src/features/clientes/services/clientes-mappers.ts)
-- [clientes.ts](/C:/Projetos/admin-v2-web/src/features/clientes/types/clientes.ts)
+- [clientes-list-page.tsx](../src/features/clientes/components/clientes-list-page.tsx)
+- [cliente-form-page.tsx](../src/features/clientes/components/cliente-form-page.tsx)
+- [use-clientes-list-controller.ts](../src/features/clientes/hooks/use-clientes-list-controller.ts)
+- [clientes-list.ts](../src/features/clientes/services/clientes-list.ts)
+- [cliente-form.ts](../src/features/clientes/services/cliente-form.ts)
+- [clientes-mappers.ts](../src/features/clientes/services/clientes-mappers.ts)
+- [clientes.ts](../src/features/clientes/types/clientes.ts)
 
 Subcomponentes importantes:
-- [cliente-geral-tab.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/cliente-geral-tab.tsx)
-- [cliente-classificacao-tab.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/cliente-classificacao-tab.tsx)
-- [cliente-filiais-tab.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/cliente-filiais-tab.tsx)
-- [cliente-vendedores-tab.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/cliente-vendedores-tab.tsx)
-- [cliente-formas-tab.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/cliente-formas-tab.tsx)
-- [cliente-condicoes-tab.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/cliente-condicoes-tab.tsx)
-- [cliente-adicionais-tab.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/cliente-adicionais-tab.tsx)
+- [cliente-geral-tab.tsx](../src/features/clientes/components/cliente-geral-tab.tsx)
+- [cliente-classificacao-tab.tsx](../src/features/clientes/components/cliente-classificacao-tab.tsx)
+- [cliente-filiais-tab.tsx](../src/features/clientes/components/cliente-filiais-tab.tsx)
+- [cliente-vendedores-tab.tsx](../src/features/clientes/components/cliente-vendedores-tab.tsx)
+- [cliente-formas-tab.tsx](../src/features/clientes/components/cliente-formas-tab.tsx)
+- [cliente-condicoes-tab.tsx](../src/features/clientes/components/cliente-condicoes-tab.tsx)
+- [cliente-adicionais-tab.tsx](../src/features/clientes/components/cliente-adicionais-tab.tsx)
 
 Modais da listagem:
-- [client-linked-users-modal.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/client-linked-users-modal.tsx)
-- [client-linked-sellers-modal.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/client-linked-sellers-modal.tsx)
-- [client-unlock-modal.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/client-unlock-modal.tsx)
+- [client-linked-users-modal.tsx](../src/features/clientes/components/client-linked-users-modal.tsx)
+- [client-linked-sellers-modal.tsx](../src/features/clientes/components/client-linked-sellers-modal.tsx)
+- [client-unlock-modal.tsx](../src/features/clientes/components/client-unlock-modal.tsx)
 
 ## Papel arquitetural do modulo
 `Clientes` nao usa `CrudFormPage` nem `CrudListPage` como composicao final.
@@ -62,7 +62,7 @@ Ou seja, a regra da feature continua local, mas a infraestrutura visual e de flu
 ## Listagem
 
 ### Composicao
-A listagem principal esta em [clientes-list-page.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/clientes-list-page.tsx).
+A listagem principal esta em [clientes-list-page.tsx](../src/features/clientes/components/clientes-list-page.tsx).
 
 Ela usa:
 - `PageHeader` com breadcrumb e `Atualizar`;
@@ -73,7 +73,7 @@ Ela usa:
 - `AppDataTable` para renderizacao da grade.
 
 ### Controller da listagem
-O estado da listagem foi movido para [use-clientes-list-controller.ts](/C:/Projetos/admin-v2-web/src/features/clientes/hooks/use-clientes-list-controller.ts).
+O estado da listagem foi movido para [use-clientes-list-controller.ts](../src/features/clientes/hooks/use-clientes-list-controller.ts).
 
 Esse controller centraliza:
 - filtros e draft de filtros;
@@ -100,7 +100,7 @@ Esse conjunto foi herdado do legado e mantido no v2 em formato de acoes por linh
 ## Formulario
 
 ### Composicao geral
-O formulario principal esta em [cliente-form-page.tsx](/C:/Projetos/admin-v2-web/src/features/clientes/components/cliente-form-page.tsx).
+O formulario principal esta em [cliente-form-page.tsx](../src/features/clientes/components/cliente-form-page.tsx).
 
 Responsabilidades do container:
 - carregar o cliente;
@@ -140,7 +140,7 @@ Isso evita que `cliente-form-page.tsx` vire um container monolitico.
 ## Mapeamento e payload
 
 ### `clientes-mappers.ts`
-Arquivo: [clientes-mappers.ts](/C:/Projetos/admin-v2-web/src/features/clientes/services/clientes-mappers.ts)
+Arquivo: [clientes-mappers.ts](../src/features/clientes/services/clientes-mappers.ts)
 
 Papel:
 - converter respostas da API em modelo de formulario;

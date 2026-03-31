@@ -7,7 +7,7 @@ No legado, acesso era controlado principalmente por:
 - injeção de flags por módulo
 
 No v2, isso foi centralizado em:
-- [permissions.ts](/C:/Projetos/admin-v2-web/src/features/auth/services/permissions.ts)
+- [permissions.ts](../src/features/auth/services/permissions.ts)
 
 O arquivo resolve acesso por `FeatureKey` e expõe ações como:
 - `canList`
@@ -31,9 +31,9 @@ Diferença principal:
 
 ## Menu
 Arquivos centrais:
-- [menu-items.ts](/C:/Projetos/admin-v2-web/src/components/navigation/menu-items.ts)
-- [sidebar.tsx](/C:/Projetos/admin-v2-web/src/components/shell/sidebar.tsx)
-- [topbar.tsx](/C:/Projetos/admin-v2-web/src/components/shell/topbar.tsx)
+- [menu-items.ts](../src/components/navigation/menu-items.ts)
+- [sidebar.tsx](../src/components/shell/sidebar.tsx)
+- [topbar.tsx](../src/components/shell/topbar.tsx)
 
 ## Como o menu é montado
 O menu do v2 parte de três fontes:

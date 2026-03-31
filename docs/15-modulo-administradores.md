@@ -13,12 +13,12 @@ Diferente de `Usuarios`, aqui existe formulario principal completo. Diferente de
 ## Estrutura da feature
 
 Arquivos principais:
-- [administradores-list-page.tsx](/C:/Projetos/admin-v2-web/src/features/administradores/components/administradores-list-page.tsx)
-- [administrador-form-page.tsx](/C:/Projetos/admin-v2-web/src/features/administradores/components/administrador-form-page.tsx)
-- [administrador-password-page.tsx](/C:/Projetos/admin-v2-web/src/features/administradores/components/administrador-password-page.tsx)
-- [administradores-config.tsx](/C:/Projetos/admin-v2-web/src/features/administradores/services/administradores-config.tsx)
-- [administradores-client.ts](/C:/Projetos/admin-v2-web/src/features/administradores/services/administradores-client.ts)
-- [administradores-mappers.ts](/C:/Projetos/admin-v2-web/src/features/administradores/services/administradores-mappers.ts)
+- [administradores-list-page.tsx](../src/features/administradores/components/administradores-list-page.tsx)
+- [administrador-form-page.tsx](../src/features/administradores/components/administrador-form-page.tsx)
+- [administrador-password-page.tsx](../src/features/administradores/components/administrador-password-page.tsx)
+- [administradores-config.tsx](../src/features/administradores/services/administradores-config.tsx)
+- [administradores-client.ts](../src/features/administradores/services/administradores-client.ts)
+- [administradores-mappers.ts](../src/features/administradores/services/administradores-mappers.ts)
 
 ## Papel arquitetural do modulo
 `Administradores` e a referencia do projeto para um CRUD administrativo completo apoiado quase inteiramente na base compartilhada.
@@ -36,7 +36,7 @@ Isso permite manter o modulo enxuto sem perder paridade funcional com o legado.
 ## Listagem
 
 ### Base usada
-A listagem em [administradores-list-page.tsx](/C:/Projetos/admin-v2-web/src/features/administradores/components/administradores-list-page.tsx) nao usa `CrudListPage` direto, mas ja esta muito proxima da base:
+A listagem em [administradores-list-page.tsx](../src/features/administradores/components/administradores-list-page.tsx) nao usa `CrudListPage` direto, mas ja esta muito proxima da base:
 - `useCrudListController` controla filtros, pagina, ordenacao, selecao e exclusao;
 - `ADMINISTRADORES_CONFIG` concentra colunas, details e labels;
 - a pagina ficou responsavel apenas pela composicao final e pelas acoes especificas.
@@ -61,7 +61,7 @@ O que mudou:
 ## Formulario
 
 ### Base usada
-[administrador-form-page.tsx](/C:/Projetos/admin-v2-web/src/features/administradores/components/administrador-form-page.tsx) e hoje um wrapper fino de [CrudFormPage](/C:/Projetos/admin-v2-web/src/components/crud-base/crud-form-page.tsx).
+[administrador-form-page.tsx](../src/features/administradores/components/administrador-form-page.tsx) e hoje um wrapper fino de [CrudFormPage](../src/components/crud-base/crud-form-page.tsx).
 
 Isso foi possivel porque o formulario:
 - e linear;
@@ -70,7 +70,7 @@ Isso foi possivel porque o formulario:
 - cabe bem em configuracao.
 
 ### O que a config centraliza
-[administradores-config.tsx](/C:/Projetos/admin-v2-web/src/features/administradores/services/administradores-config.tsx) concentra:
+[administradores-config.tsx](../src/features/administradores/services/administradores-config.tsx) concentra:
 - campos e layout;
 - perfil como options assincronas;
 - senha e confirmacao apenas na criacao;
@@ -82,7 +82,7 @@ Esse desenho e a melhor expressao atual do conceito de `CrudFormPage`.
 ## Alteracao de senha
 
 ### Tela dedicada
-Arquivo: [administrador-password-page.tsx](/C:/Projetos/admin-v2-web/src/features/administradores/components/administrador-password-page.tsx)
+Arquivo: [administrador-password-page.tsx](../src/features/administradores/components/administrador-password-page.tsx)
 
 O fluxo de senha e separado do formulario principal, como no legado.
 
@@ -98,7 +98,7 @@ Com isso, `Administradores` e `Usuarios` mantem o mesmo comportamento de UX para
 ## Cliente de dados
 
 ### `administradores-client.ts`
-Arquivo: [administradores-client.ts](/C:/Projetos/admin-v2-web/src/features/administradores/services/administradores-client.ts)
+Arquivo: [administradores-client.ts](../src/features/administradores/services/administradores-client.ts)
 
 Responsabilidades:
 - listar administradores;

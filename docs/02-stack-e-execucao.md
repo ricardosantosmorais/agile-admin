@@ -1,7 +1,7 @@
 # 02 - Stack e Execução
 
 ## Stack principal
-Base observada em `C:\Projetos\admin-v2-web\package.json`:
+Base observada em `../package.json`:
 
 - Next.js 16
 - React 19
@@ -39,4 +39,3 @@ O ciclo mínimo esperado antes de subir mudança é:
 - `npm run build`
 
 No estado atual do projeto, esse é o baseline de verificação automática implementado e usado durante a migração.
-

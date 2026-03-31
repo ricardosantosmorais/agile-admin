@@ -15,14 +15,14 @@ O modulo combina:
 ## Estrutura da feature
 
 Arquivos principais:
-- [vendedores-list-page.tsx](/C:/Projetos/admin-v2-web/src/features/vendedores/components/vendedores-list-page.tsx)
-- [vendedor-form-page.tsx](/C:/Projetos/admin-v2-web/src/features/vendedores/components/vendedor-form-page.tsx)
-- [vendedor-canais-tab.tsx](/C:/Projetos/admin-v2-web/src/features/vendedores/components/vendedor-canais-tab.tsx)
-- [vendedor-linked-users-modal.tsx](/C:/Projetos/admin-v2-web/src/features/vendedores/components/vendedor-linked-users-modal.tsx)
-- [vendedores-client.ts](/C:/Projetos/admin-v2-web/src/features/vendedores/services/vendedores-client.ts)
-- [vendedores-config.tsx](/C:/Projetos/admin-v2-web/src/features/vendedores/services/vendedores-config.tsx)
-- [vendedores-form.ts](/C:/Projetos/admin-v2-web/src/features/vendedores/services/vendedores-form.ts)
-- [vendedores.ts](/C:/Projetos/admin-v2-web/src/features/vendedores/types/vendedores.ts)
+- [vendedores-list-page.tsx](../src/features/vendedores/components/vendedores-list-page.tsx)
+- [vendedor-form-page.tsx](../src/features/vendedores/components/vendedor-form-page.tsx)
+- [vendedor-canais-tab.tsx](../src/features/vendedores/components/vendedor-canais-tab.tsx)
+- [vendedor-linked-users-modal.tsx](../src/features/vendedores/components/vendedor-linked-users-modal.tsx)
+- [vendedores-client.ts](../src/features/vendedores/services/vendedores-client.ts)
+- [vendedores-config.tsx](../src/features/vendedores/services/vendedores-config.tsx)
+- [vendedores-form.ts](../src/features/vendedores/services/vendedores-form.ts)
+- [vendedores.ts](../src/features/vendedores/types/vendedores.ts)
 
 ## Papel arquitetural do modulo
 `Vendedores` e um modulo proprio apoiado em componentes compartilhados.
@@ -57,7 +57,7 @@ Isso permite manter fora da pagina:
 - selecao.
 
 ### O que continua local
-[vendedores-list-page.tsx](/C:/Projetos/admin-v2-web/src/features/vendedores/components/vendedores-list-page.tsx) continua local porque concentra a parte operacional:
+[vendedores-list-page.tsx](../src/features/vendedores/components/vendedores-list-page.tsx) continua local porque concentra a parte operacional:
 - abrir usuarios vinculados;
 - carregar usuarios vinculados do vendedor;
 - remover vinculo de usuario;
@@ -68,7 +68,7 @@ Esse e um bom exemplo de tela que reaproveita controller compartilhado sem perde
 ## Formulario
 
 ### Estrutura
-[vendedor-form-page.tsx](/C:/Projetos/admin-v2-web/src/features/vendedores/components/vendedor-form-page.tsx) trabalha com duas abas:
+[vendedor-form-page.tsx](../src/features/vendedores/components/vendedor-form-page.tsx) trabalha com duas abas:
 - Geral;
 - Canais de distribuicao.
 
@@ -101,7 +101,7 @@ Esse comportamento vive no proprio modulo, nao na base generica.
 ## Aba de canais de distribuicao
 
 ### Componente dedicado
-Arquivo: [vendedor-canais-tab.tsx](/C:/Projetos/admin-v2-web/src/features/vendedores/components/vendedor-canais-tab.tsx)
+Arquivo: [vendedor-canais-tab.tsx](../src/features/vendedores/components/vendedor-canais-tab.tsx)
 
 Papel:
 - listar canais do vendedor;
@@ -114,7 +114,7 @@ Essa aba reforca por que `Vendedores` nao cabe bem em `CrudFormPage` puro.
 ## Modal de usuarios vinculados
 
 ### Componente dedicado
-Arquivo: [vendedor-linked-users-modal.tsx](/C:/Projetos/admin-v2-web/src/features/vendedores/components/vendedor-linked-users-modal.tsx)
+Arquivo: [vendedor-linked-users-modal.tsx](../src/features/vendedores/components/vendedor-linked-users-modal.tsx)
 
 Papel:
 - listar usuarios vinculados ao vendedor;
@@ -126,7 +126,7 @@ Esse modal aproxima `Vendedores` de `Clientes` no aspecto operacional da listage
 ## Mapeadores e payload
 
 ### `vendedores-form.ts`
-Arquivo: [vendedores-form.ts](/C:/Projetos/admin-v2-web/src/features/vendedores/services/vendedores-form.ts)
+Arquivo: [vendedores-form.ts](../src/features/vendedores/services/vendedores-form.ts)
 
 Responsabilidades:
 - criar estado inicial;

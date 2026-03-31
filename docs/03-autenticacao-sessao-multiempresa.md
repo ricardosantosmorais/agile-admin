@@ -11,13 +11,13 @@ No v2, o fluxo foi reorganizado em camadas explícitas:
 - bridges `app/api/*`
 
 Arquivos principais:
-- [auth-context.tsx](/C:/Projetos/admin-v2-web/src/contexts/auth-context.tsx)
-- [auth-service.ts](/C:/Projetos/admin-v2-web/src/features/auth/services/auth-service.ts)
-- [auth-session.ts](/C:/Projetos/admin-v2-web/src/features/auth/services/auth-session.ts)
-- [auth-tab-storage.ts](/C:/Projetos/admin-v2-web/src/features/auth/services/auth-tab-storage.ts)
-- [tenant-context.tsx](/C:/Projetos/admin-v2-web/src/contexts/tenant-context.tsx)
-- [session-lifecycle-context.tsx](/C:/Projetos/admin-v2-web/src/contexts/session-lifecycle-context.tsx)
-- [http-client.ts](/C:/Projetos/admin-v2-web/src/services/http/http-client.ts)
+- [auth-context.tsx](../src/contexts/auth-context.tsx)
+- [auth-service.ts](../src/features/auth/services/auth-service.ts)
+- [auth-session.ts](../src/features/auth/services/auth-session.ts)
+- [auth-tab-storage.ts](../src/features/auth/services/auth-tab-storage.ts)
+- [tenant-context.tsx](../src/contexts/tenant-context.tsx)
+- [session-lifecycle-context.tsx](../src/contexts/session-lifecycle-context.tsx)
+- [http-client.ts](../src/services/http/http-client.ts)
 
 ## Login
 Fluxo atual:

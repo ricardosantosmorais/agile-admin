@@ -15,17 +15,17 @@ Esse desenho foi mantido no v2.
 ## Estrutura da feature
 
 Arquivos principais:
-- [usuarios-list-page.tsx](/C:/Projetos/admin-v2-web/src/features/usuarios/components/usuarios-list-page.tsx)
-- [usuario-password-page.tsx](/C:/Projetos/admin-v2-web/src/features/usuarios/components/usuario-password-page.tsx)
-- [usuarios-config.tsx](/C:/Projetos/admin-v2-web/src/features/usuarios/services/usuarios-config.tsx)
-- [usuarios-client.ts](/C:/Projetos/admin-v2-web/src/features/usuarios/services/usuarios-client.ts)
-- [usuarios-mappers.ts](/C:/Projetos/admin-v2-web/src/features/usuarios/services/usuarios-mappers.ts)
-- [usuarios.ts](/C:/Projetos/admin-v2-web/src/features/usuarios/types/usuarios.ts)
+- [usuarios-list-page.tsx](../src/features/usuarios/components/usuarios-list-page.tsx)
+- [usuario-password-page.tsx](../src/features/usuarios/components/usuario-password-page.tsx)
+- [usuarios-config.tsx](../src/features/usuarios/services/usuarios-config.tsx)
+- [usuarios-client.ts](../src/features/usuarios/services/usuarios-client.ts)
+- [usuarios-mappers.ts](../src/features/usuarios/services/usuarios-mappers.ts)
+- [usuarios.ts](../src/features/usuarios/types/usuarios.ts)
 
 Modais operacionais:
-- [usuario-linked-clients-modal.tsx](/C:/Projetos/admin-v2-web/src/features/usuarios/components/usuario-linked-clients-modal.tsx)
-- [usuario-linked-seller-modal.tsx](/C:/Projetos/admin-v2-web/src/features/usuarios/components/usuario-linked-seller-modal.tsx)
-- [usuario-accesses-modal.tsx](/C:/Projetos/admin-v2-web/src/features/usuarios/components/usuario-accesses-modal.tsx)
+- [usuario-linked-clients-modal.tsx](../src/features/usuarios/components/usuario-linked-clients-modal.tsx)
+- [usuario-linked-seller-modal.tsx](../src/features/usuarios/components/usuario-linked-seller-modal.tsx)
+- [usuario-accesses-modal.tsx](../src/features/usuarios/components/usuario-accesses-modal.tsx)
 
 ## Papel arquitetural do modulo
 `Usuarios` tambem nao foi modelado como CRUD completo de criar/editar.
@@ -40,7 +40,7 @@ No v2, a listagem aproveita base compartilhada, mas mantem os modais especificos
 ## Listagem
 
 ### Controller
-Hoje a listagem usa `useCrudListController`, com configuracao em [usuarios-config.tsx](/C:/Projetos/admin-v2-web/src/features/usuarios/services/usuarios-config.tsx).
+Hoje a listagem usa `useCrudListController`, com configuracao em [usuarios-config.tsx](../src/features/usuarios/services/usuarios-config.tsx).
 
 Isso centraliza:
 - filtros;
@@ -50,7 +50,7 @@ Isso centraliza:
 - refresh;
 - exclusao.
 
-Com isso, [usuarios-list-page.tsx](/C:/Projetos/admin-v2-web/src/features/usuarios/components/usuarios-list-page.tsx) ficou focada em:
+Com isso, [usuarios-list-page.tsx](../src/features/usuarios/components/usuarios-list-page.tsx) ficou focada em:
 - definir colunas;
 - abrir modais especificos;
 - compor a experiencia da listagem.
@@ -74,7 +74,7 @@ Colunas principais:
 ## Modais operacionais
 
 ### Clientes vinculados
-Modal: [usuario-linked-clients-modal.tsx](/C:/Projetos/admin-v2-web/src/features/usuarios/components/usuario-linked-clients-modal.tsx)
+Modal: [usuario-linked-clients-modal.tsx](../src/features/usuarios/components/usuario-linked-clients-modal.tsx)
 
 Papel:
 - listar clientes vinculados ao usuario;
@@ -82,14 +82,14 @@ Papel:
 - suportar scroll interno sem rolar o fundo.
 
 ### Vendedor vinculado
-Modal: [usuario-linked-seller-modal.tsx](/C:/Projetos/admin-v2-web/src/features/usuarios/components/usuario-linked-seller-modal.tsx)
+Modal: [usuario-linked-seller-modal.tsx](../src/features/usuarios/components/usuario-linked-seller-modal.tsx)
 
 Papel:
 - exibir o vendedor vinculado;
 - remover o vinculo com confirmacao.
 
 ### Acessos do usuario
-Modal: [usuario-accesses-modal.tsx](/C:/Projetos/admin-v2-web/src/features/usuarios/components/usuario-accesses-modal.tsx)
+Modal: [usuario-accesses-modal.tsx](../src/features/usuarios/components/usuario-accesses-modal.tsx)
 
 Papel:
 - exibir historico ou consulta de acessos do usuario;
@@ -98,14 +98,14 @@ Papel:
 ## Alteracao de senha
 
 ### Tela dedicada
-Arquivo: [usuario-password-page.tsx](/C:/Projetos/admin-v2-web/src/features/usuarios/components/usuario-password-page.tsx)
+Arquivo: [usuario-password-page.tsx](../src/features/usuarios/components/usuario-password-page.tsx)
 
 A senha nao e alterada dentro de um formulario geral de usuario. O fluxo esta em rota especifica.
 
 Esse comportamento replica o desenho operacional do legado.
 
 ### Feedback em tempo real
-O modulo usa [password-rules-feedback.tsx](/C:/Projetos/admin-v2-web/src/components/ui/password-rules-feedback.tsx).
+O modulo usa [password-rules-feedback.tsx](../src/components/ui/password-rules-feedback.tsx).
 
 Isso garante:
 - validacao visual em tempo real;
@@ -121,7 +121,7 @@ Regras atuais:
 ## Cliente de dados
 
 ### `usuarios-client.ts`
-Arquivo: [usuarios-client.ts](/C:/Projetos/admin-v2-web/src/features/usuarios/services/usuarios-client.ts)
+Arquivo: [usuarios-client.ts](../src/features/usuarios/services/usuarios-client.ts)
 
 Responsabilidades:
 - listar usuarios;

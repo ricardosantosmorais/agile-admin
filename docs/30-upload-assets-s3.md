@@ -6,13 +6,13 @@ Este documento registra o desenho atual do upload de assets no `admin-v2-web`, o
 ## Estado atual do v2
 
 Base compartilhada:
-- [asset-upload-field.tsx](/C:/Projetos/admin-v2-web/src/components/ui/asset-upload-field.tsx)
-- [image-upload-field.tsx](/C:/Projetos/admin-v2-web/src/components/ui/image-upload-field.tsx)
-- [file-upload-field.tsx](/C:/Projetos/admin-v2-web/src/components/ui/file-upload-field.tsx)
-- [uploads.ts](/C:/Projetos/admin-v2-web/src/lib/uploads.ts)
-- [upload-targets.ts](/C:/Projetos/admin-v2-web/src/lib/upload-targets.ts)
-- [upload-profiles.ts](/C:/Projetos/admin-v2-web/src/lib/upload-profiles.ts)
-- [route.ts](/C:/Projetos/admin-v2-web/app/api/uploads/route.ts)
+- [asset-upload-field.tsx](../src/components/ui/asset-upload-field.tsx)
+- [image-upload-field.tsx](../src/components/ui/image-upload-field.tsx)
+- [file-upload-field.tsx](../src/components/ui/file-upload-field.tsx)
+- [uploads.ts](../src/lib/uploads.ts)
+- [upload-targets.ts](../src/lib/upload-targets.ts)
+- [upload-profiles.ts](../src/lib/upload-profiles.ts)
+- [route.ts](../app/api/uploads/route.ts)
 
 Comportamento:
 - `ImageUploadField` continua compatível com os formulários atuais;
@@ -74,7 +74,7 @@ Comportamento:
 
 ## Telas do v2 que usam o componente atual
 
-Mapeamento atual em [upload-profiles.ts](/C:/Projetos/admin-v2-web/src/lib/upload-profiles.ts), via `CURRENT_IMAGE_UPLOAD_USAGE`.
+Mapeamento atual em [upload-profiles.ts](../src/lib/upload-profiles.ts), via `CURRENT_IMAGE_UPLOAD_USAGE`.
 
 Hoje usam upload de imagem no v2:
 - `Banners`
@@ -117,10 +117,10 @@ Regra atual do v2:
 ## Variáveis de ambiente preparadas
 
 Arquivo local:
-- [`.env.local`](/C:/Projetos/admin-v2-web/.env.local)
+- [`.env.local`](../.env.local)
 
 Referência:
-- [`.env.example`](/C:/Projetos/admin-v2-web/.env.example)
+- [`.env.example`](../.env.example)
 
 Chaves adicionadas:
 - `UPLOAD_DRIVER`

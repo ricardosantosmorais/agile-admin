@@ -32,7 +32,7 @@ Função:
 
 ### CRUDs simples
 O padrão genérico está em:
-- [crud-route.ts](/C:/Projetos/admin-v2-web/src/services/http/crud-route.ts)
+- [crud-route.ts](../src/services/http/crud-route.ts)
 
 Ele cobre:
 - listagem;

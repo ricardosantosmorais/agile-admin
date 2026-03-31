@@ -1,7 +1,7 @@
 # 05 - Arquitetura Frontend e Padrões
 
 ## Providers
-Ordem atual dos providers em [app-providers.tsx](/C:/Projetos/admin-v2-web/src/providers/app-providers.tsx):
+Ordem atual dos providers em [app-providers.tsx](../src/providers/app-providers.tsx):
 1. `I18nProvider`
 2. `UiProvider`
 3. `AuthProvider`
@@ -32,11 +32,11 @@ Os módulos atuais tendem a seguir este desenho:
 
 ### Listagens
 Arquivos principais:
-- [crud-list-page.tsx](/C:/Projetos/admin-v2-web/src/components/crud-base/crud-list-page.tsx)
-- [use-crud-list-controller.ts](/C:/Projetos/admin-v2-web/src/components/crud-base/use-crud-list-controller.ts)
-- [app-data-table.tsx](/C:/Projetos/admin-v2-web/src/components/data-table/app-data-table.tsx)
-- [data-table-filters.tsx](/C:/Projetos/admin-v2-web/src/components/data-table/data-table-filters.tsx)
-- [data-table-toolbar.tsx](/C:/Projetos/admin-v2-web/src/components/data-table/data-table-toolbar.tsx)
+- [crud-list-page.tsx](../src/components/crud-base/crud-list-page.tsx)
+- [use-crud-list-controller.ts](../src/components/crud-base/use-crud-list-controller.ts)
+- [app-data-table.tsx](../src/components/data-table/app-data-table.tsx)
+- [data-table-filters.tsx](../src/components/data-table/data-table-filters.tsx)
+- [data-table-toolbar.tsx](../src/components/data-table/data-table-toolbar.tsx)
 
 Uso ideal:
 - CRUDs lineares usam `CrudListPage`;
@@ -44,8 +44,8 @@ Uso ideal:
 
 ### Formulários
 Arquivos principais:
-- [crud-form-page.tsx](/C:/Projetos/admin-v2-web/src/components/crud-base/crud-form-page.tsx)
-- [crud-form-sections.tsx](/C:/Projetos/admin-v2-web/src/components/crud-base/crud-form-sections.tsx)
+- [crud-form-page.tsx](../src/components/crud-base/crud-form-page.tsx)
+- [crud-form-sections.tsx](../src/components/crud-base/crud-form-sections.tsx)
 
 Capacidades atuais:
 - seções em linha;
@@ -74,7 +74,7 @@ Nesses casos, o padrão adotado é:
 
 ## Upload de imagem
 O v2 já possui componente próprio de upload:
-- [image-upload-field.tsx](/C:/Projetos/admin-v2-web/src/components/ui/image-upload-field.tsx)
+- [image-upload-field.tsx](../src/components/ui/image-upload-field.tsx)
 
 Estado atual:
 - usa `react-dropzone`;
@@ -83,7 +83,7 @@ Estado atual:
 
 ## Editor rico
 O editor atual usa Tiptap:
-- [rich-text-editor.tsx](/C:/Projetos/admin-v2-web/src/components/ui/rich-text-editor.tsx)
+- [rich-text-editor.tsx](../src/components/ui/rich-text-editor.tsx)
 
 Recursos já implementados:
 - HTML real;
@@ -102,7 +102,7 @@ Estratégia:
 - sem persistência em banco para idioma.
 
 ## Observabilidade
-O projeto possui integra��o base com Sentry no App Router.
+O projeto possui integração base com Sentry no App Router.
 
 Pontos de entrada:
 - `instrumentation.ts`
@@ -112,6 +112,6 @@ Pontos de entrada:
 - `app/global-error.tsx`
 
 Regra:
-- a integra��o de observabilidade deve ficar na infraestrutura da aplica��o, n�o espalhada em telas;
+- a integração de observabilidade deve ficar na infraestrutura da aplicação, não espalhada em telas;
 - upload de sourcemaps depende de `SENTRY_AUTH_TOKEN` no ambiente de build;
 - DSNs client-side devem usar `NEXT_PUBLIC_SENTRY_DSN`.

@@ -36,7 +36,7 @@ Locais preferenciais:
 ## Shell e navegacao
 
 ### `PageHeader`
-Arquivo: [page-header.tsx](/C:/Projetos/admin-v2-web/src/components/ui/page-header.tsx)
+Arquivo: [page-header.tsx](../src/components/ui/page-header.tsx)
 
 Responsabilidade:
 - breadcrumb;
@@ -54,7 +54,7 @@ Regra:
 - em formularios, acoes como `Voltar`, `Salvar` contextual e `Alterar senha` podem viver aqui.
 
 ### `Topbar`
-Arquivo: [topbar.tsx](/C:/Projetos/admin-v2-web/src/components/shell/topbar.tsx)
+Arquivo: [topbar.tsx](../src/components/shell/topbar.tsx)
 
 Responsabilidade:
 - troca de tenant;
@@ -63,7 +63,7 @@ Responsabilidade:
 - acoes globais do usuario.
 
 ### `Sidebar`
-Arquivo: [sidebar.tsx](/C:/Projetos/admin-v2-web/src/components/shell/sidebar.tsx)
+Arquivo: [sidebar.tsx](../src/components/shell/sidebar.tsx)
 
 Responsabilidade:
 - menu principal;
@@ -78,7 +78,7 @@ Regras atuais:
 ## Base de listagem
 
 ### `AppDataTable`
-Arquivo: [app-data-table.tsx](/C:/Projetos/admin-v2-web/src/components/data-table/app-data-table.tsx)
+Arquivo: [app-data-table.tsx](../src/components/data-table/app-data-table.tsx)
 
 Responsabilidade:
 - tabela desktop;
@@ -104,7 +104,7 @@ Regra de migracao:
 - `SelectableDataTable` fica restrita a relacoes pequenas e operacionais.
 
 ### `DataTableFilters`
-Arquivo: [data-table-filters.tsx](/C:/Projetos/admin-v2-web/src/components/data-table/data-table-filters.tsx)
+Arquivo: [data-table-filters.tsx](../src/components/data-table/data-table-filters.tsx)
 
 Responsabilidade:
 - renderizar os filtros embutidos no card da listagem;
@@ -123,14 +123,14 @@ Regra de migracao:
 - filtros monetarios e percentuais devem manter mascara e afixo tambem na listagem quando essa entrada existir no legado ou fizer parte do fluxo operacional.
 
 ### `DataTableToolbar`
-Arquivo: [data-table-toolbar.tsx](/C:/Projetos/admin-v2-web/src/components/data-table/data-table-toolbar.tsx)
+Arquivo: [data-table-toolbar.tsx](../src/components/data-table/data-table-toolbar.tsx)
 
 Responsabilidade:
 - organizar botoes de listagem;
 - manter altura e ritmo visual iguais para `Filtros`, `Novo` e outras acoes.
 
 ### `useDataTableState`
-Arquivo: [use-data-table-state.ts](/C:/Projetos/admin-v2-web/src/components/data-table/use-data-table-state.ts)
+Arquivo: [use-data-table-state.ts](../src/components/data-table/use-data-table-state.ts)
 
 Responsabilidade:
 - selecao de linhas;
@@ -146,7 +146,7 @@ Uso:
 ## Base generica de CRUD
 
 ### `CrudListPage`
-Arquivo: [crud-list-page.tsx](/C:/Projetos/admin-v2-web/src/components/crud-base/crud-list-page.tsx)
+Arquivo: [crud-list-page.tsx](../src/components/crud-base/crud-list-page.tsx)
 
 Responsabilidade:
 - compor `PageHeader`, card de listagem, filtros e `AppDataTable`;
@@ -161,7 +161,7 @@ Nao use quando:
 - a experiencia principal nao e um CRUD simples.
 
 ### `CrudFormPage`
-Arquivo: [crud-form-page.tsx](/C:/Projetos/admin-v2-web/src/components/crud-base/crud-form-page.tsx)
+Arquivo: [crud-form-page.tsx](../src/components/crud-base/crud-form-page.tsx)
 
 Responsabilidade:
 - carregar registro;
@@ -181,7 +181,7 @@ Nao use quando:
 - a tela concentra modais, tabelas relacionais e logica operacional forte.
 
 ### `CrudFormSections`
-Arquivo: [crud-form-sections.tsx](/C:/Projetos/admin-v2-web/src/components/crud-base/crud-form-sections.tsx)
+Arquivo: [crud-form-sections.tsx](../src/components/crud-base/crud-form-sections.tsx)
 
 Responsabilidade:
 - renderizar secoes de formulario a partir de configuracao;
@@ -199,7 +199,7 @@ Exemplo atual:
 - `Grupos de Clientes`.
 
 ### `useCrudListController`
-Arquivo: [use-crud-list-controller.ts](/C:/Projetos/admin-v2-web/src/components/crud-base/use-crud-list-controller.ts)
+Arquivo: [use-crud-list-controller.ts](../src/components/crud-base/use-crud-list-controller.ts)
 
 Responsabilidade:
 - persistencia de filtros;
@@ -218,7 +218,7 @@ Exemplos atuais:
 ## Base especializada de catalogo
 
 ### `TabbedCatalogFormPage`
-Arquivo: [tabbed-catalog-form-page.tsx](/C:/Projetos/admin-v2-web/src/features/catalog/components/tabbed-catalog-form-page.tsx)
+Arquivo: [tabbed-catalog-form-page.tsx](../src/features/catalog/components/tabbed-catalog-form-page.tsx)
 
 Responsabilidade:
 - formularios de catalogo com abas;
@@ -235,7 +235,7 @@ Regra:
 - se so houver uma aba util, a barra de abas nao deve aparecer.
 
 ### `CatalogProductsTab`
-Arquivo: [catalog-products-tab.tsx](/C:/Projetos/admin-v2-web/src/features/catalog/components/catalog-products-tab.tsx)
+Arquivo: [catalog-products-tab.tsx](../src/features/catalog/components/catalog-products-tab.tsx)
 
 Responsabilidade:
 - relacionamento entre entidade de catalogo e produtos;
@@ -248,7 +248,7 @@ Uso atual:
 ## Componentes de formulario
 
 ### `LookupSelect`
-Arquivo: [lookup-select.tsx](/C:/Projetos/admin-v2-web/src/components/ui/lookup-select.tsx)
+Arquivo: [lookup-select.tsx](../src/components/ui/lookup-select.tsx)
 
 Responsabilidade:
 - autocomplete assinc para entidades relacionadas.
@@ -262,7 +262,7 @@ Uso:
 - demais lookups.
 
 ### `BooleanChoice`
-Arquivo: [boolean-choice.tsx](/C:/Projetos/admin-v2-web/src/components/ui/boolean-choice.tsx)
+Arquivo: [boolean-choice.tsx](../src/components/ui/boolean-choice.tsx)
 
 Responsabilidade:
 - escolha booleana compacta no estilo `Sim / Nao`.
@@ -271,14 +271,14 @@ Padrao atual:
 - substitui checkbox e switch nos formularios novos.
 
 ### `FormRow`
-Arquivo: [form-row.tsx](/C:/Projetos/admin-v2-web/src/components/ui/form-row.tsx)
+Arquivo: [form-row.tsx](../src/components/ui/form-row.tsx)
 
 Responsabilidade:
 - linha de formulario com label a esquerda e campo a direita;
 - padrao usado para aproximar a ergonomia do legado.
 
 ### `FormField`
-Arquivo: [form-field.tsx](/C:/Projetos/admin-v2-web/src/components/ui/form-field.tsx)
+Arquivo: [form-field.tsx](../src/components/ui/form-field.tsx)
 
 Responsabilidade:
 - invólucro simples de label, ajuda e erro quando a tela nao esta em layout de linha.
@@ -291,7 +291,7 @@ Regra de migracao:
 - nao depender apenas de toast global para o usuario descobrir qual campo obrigatorio faltou.
 
 ### `RichTextEditor`
-Arquivo: [rich-text-editor.tsx](/C:/Projetos/admin-v2-web/src/components/ui/rich-text-editor.tsx)
+Arquivo: [rich-text-editor.tsx](../src/components/ui/rich-text-editor.tsx)
 
 Responsabilidade:
 - editor HTML do v2;
@@ -304,7 +304,7 @@ Uso atual:
 - campos HTML de catalogo quando necessario.
 
 ### `ImageUploadField`
-Arquivo: [image-upload-field.tsx](/C:/Projetos/admin-v2-web/src/components/ui/image-upload-field.tsx)
+Arquivo: [image-upload-field.tsx](../src/components/ui/image-upload-field.tsx)
 
 Responsabilidade:
 - upload de imagem no front;
@@ -321,7 +321,7 @@ Uso atual:
 - outras telas com `type: 'image'`.
 
 ### `StepIndicator`
-Arquivo: [step-indicator.tsx](/C:/Projetos/admin-v2-web/src/components/ui/step-indicator.tsx)
+Arquivo: [step-indicator.tsx](../src/components/ui/step-indicator.tsx)
 
 Responsabilidade:
 - exibir progresso sequencial em fluxos com etapas;
@@ -339,7 +339,7 @@ Regra:
 - a etapa final deve deixar claro o resumo ou revisão do que será persistido.
 
 ### `IconPickerField`
-Arquivo: [icon-picker-field.tsx](/C:/Projetos/admin-v2-web/src/components/ui/icon-picker-field.tsx)
+Arquivo: [icon-picker-field.tsx](../src/components/ui/icon-picker-field.tsx)
 
 Responsabilidade:
 - permitir escolher um icone do sistema;
@@ -351,26 +351,26 @@ Uso atual:
 ## Componentes de feedback e bloqueio
 
 ### `PageToast`
-Arquivo: [page-toast.tsx](/C:/Projetos/admin-v2-web/src/components/ui/page-toast.tsx)
+Arquivo: [page-toast.tsx](../src/components/ui/page-toast.tsx)
 
 Responsabilidade:
 - mensagem temporaria de erro ou sucesso no topo da pagina;
 - substitui cards fixos de erro apos save.
 
 ### `AsyncState`
-Arquivo: [async-state.tsx](/C:/Projetos/admin-v2-web/src/components/ui/async-state.tsx)
+Arquivo: [async-state.tsx](../src/components/ui/async-state.tsx)
 
 Responsabilidade:
 - padrao de carregando, vazio e erro.
 
 ### `ConfirmDialog`
-Arquivo: [confirm-dialog.tsx](/C:/Projetos/admin-v2-web/src/components/ui/confirm-dialog.tsx)
+Arquivo: [confirm-dialog.tsx](../src/components/ui/confirm-dialog.tsx)
 
 Responsabilidade:
 - confirmacoes de exclusao e acoes destrutivas.
 
 ### `OverlayModal`
-Arquivo: [overlay-modal.tsx](/C:/Projetos/admin-v2-web/src/components/ui/overlay-modal.tsx)
+Arquivo: [overlay-modal.tsx](../src/components/ui/overlay-modal.tsx)
 
 Responsabilidade:
 - modal base;
@@ -385,7 +385,7 @@ Uso atual:
 ## Componentes de sessao e seguranca
 
 ### `PasswordRulesFeedback`
-Arquivo: [password-rules-feedback.tsx](/C:/Projetos/admin-v2-web/src/components/ui/password-rules-feedback.tsx)
+Arquivo: [password-rules-feedback.tsx](../src/components/ui/password-rules-feedback.tsx)
 
 Responsabilidade:
 - feedback em tempo real para politica de senha;
@@ -398,20 +398,20 @@ Uso atual:
 ## Componentes de apresentacao
 
 ### `SectionCard`
-Arquivo: [section-card.tsx](/C:/Projetos/admin-v2-web/src/components/ui/section-card.tsx)
+Arquivo: [section-card.tsx](../src/components/ui/section-card.tsx)
 
 Responsabilidade:
 - card base para secoes e formularios;
 - padrao de padding e respiro visual.
 
 ### `StatusBadge`
-Arquivo: [status-badge.tsx](/C:/Projetos/admin-v2-web/src/components/ui/status-badge.tsx)
+Arquivo: [status-badge.tsx](../src/components/ui/status-badge.tsx)
 
 Responsabilidade:
 - badge padronizada para estados como `Sim/Não`, `Ativo/Inativo` e equivalentes.
 
 ### `StatCard`
-Arquivo: [stat-card.tsx](/C:/Projetos/admin-v2-web/src/components/ui/stat-card.tsx)
+Arquivo: [stat-card.tsx](../src/components/ui/stat-card.tsx)
 
 Responsabilidade:
 - cards de indicadores do dashboard.

@@ -64,8 +64,8 @@ Mostrar módulos já migrados:
 
 ## Material de apoio recomendado
 Para montar a apresentação futuramente, usar como fonte:
-- [01-visao-geral.md](/C:/Projetos/admin-v2-web/docs/01-visao-geral.md)
-- [03-autenticacao-sessao-multiempresa.md](/C:/Projetos/admin-v2-web/docs/03-autenticacao-sessao-multiempresa.md)
-- [05-arquitetura-frontend-padroes.md](/C:/Projetos/admin-v2-web/docs/05-arquitetura-frontend-padroes.md)
-- [06-modulos-e-cobertura-atual.md](/C:/Projetos/admin-v2-web/docs/06-modulos-e-cobertura-atual.md)
-- [07-diferencas-para-o-legado.md](/C:/Projetos/admin-v2-web/docs/07-diferencas-para-o-legado.md)
+- [01-visao-geral.md](01-visao-geral.md)
+- [03-autenticacao-sessao-multiempresa.md](03-autenticacao-sessao-multiempresa.md)
+- [05-arquitetura-frontend-padroes.md](05-arquitetura-frontend-padroes.md)
+- [06-modulos-e-cobertura-atual.md](06-modulos-e-cobertura-atual.md)
+- [07-diferencas-para-o-legado.md](07-diferencas-para-o-legado.md)
