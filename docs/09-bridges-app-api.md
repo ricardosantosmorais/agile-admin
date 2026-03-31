@@ -56,8 +56,23 @@ Alguns módulos têm rotas próprias além do CRUD padrão:
 - `grades/[id]/valores`
 - `produtos-departamentos/products`
 - `produtos-departamentos/departments`
+- `produtos/[id]/filiais`
+- `produtos/[id]/embalagens`
+- `produtos/[id]/relacionados`
+- `produtos/[id]/imagens`
+- `pedidos/[id]/aprovar`
+- `pedidos/[id]/cancelar`
+- `pedidos/[id]/entrega`
+- `pedidos/[id]/observacoes-internas`
+- `editor-sql/execute`
+- `editor-sql/queries`
 
 Esses casos existem quando o módulo tem relação, modal operacional ou fluxo não linear.
+
+Casos recentes:
+- `Produtos` combina bridge principal com relações especializadas por aba de edição;
+- `Pedidos` usa bridges operacionais orientadas a detalhe e ação;
+- `Editor SQL` usa bridges próprias para APIs externas fora da `api-v3`.
 
 ## Contrato de sessão
 A maioria das bridges segue o mesmo padrão:
@@ -80,4 +95,3 @@ Antes de criar uma nova tela:
 2. se houver relação ou fluxo operacional, criar rota especializada;
 3. manter a adaptação na bridge, não no componente visual;
 4. sempre preservar `token + tenantId` como contrato mínimo.
-

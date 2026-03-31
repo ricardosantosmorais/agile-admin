@@ -95,6 +95,11 @@ Uso:
 - o Editor SQL não usa a `api-v3`;
 - ele chama APIs externas legadas via bridge em `app/api/editor-sql/*`.
 
+### Amplify SSR
+- para deploy no AWS Amplify com SSR, as variáveis necessárias ao runtime server-side do Next precisam ser exportadas no build para `.env.production`;
+- o repositório possui [../amplify.yml](../amplify.yml) para copiar as variáveis necessárias antes do `npm run build`;
+- sem esse passo, rotas `app/api/*` podem subir com `process.env` vazio no runtime publicado, mesmo com a variável cadastrada no painel do Amplify.
+
 ## Validação mínima antes de subir mudanças
 O ciclo mínimo esperado continua sendo:
 - `npm run lint`

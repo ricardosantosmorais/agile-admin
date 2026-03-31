@@ -53,6 +53,17 @@ Exemplos:
 - `administradores`
 - `colecoes`
 - `departamentos`
+- `produtos`
+- `pedidos`
+- `editor-sql`
+
+Exemplos recentes com estrutura própria:
+- `src/features/produtos/`
+  - página tabulada com seções lineares e abas relacionais;
+- `src/features/pedidos/`
+  - listagem operacional e detalhe denso;
+- `src/features/editor-sql/`
+  - página operacional com Monaco, workspace local e integrações externas.
 
 ## `src/services/`
 Infraestrutura de serviços transversais.
@@ -61,6 +72,7 @@ Destaques:
 - `src/services/http/http-client.ts`
 - `src/services/http/server-api.ts`
 - `src/services/http/crud-route.ts`
+- `src/services/http/external-admin-api.ts`
 
 ## `src/i18n/`
 Infraestrutura de idioma:
@@ -90,3 +102,8 @@ Objetivo:
 - consolidar arquitetura e fluxos atuais;
 - servir de base para onboarding;
 - preparar evolução e apresentação do produto.
+
+Documentos de módulo mais recentes:
+- [31 - Módulo Produtos](./31-modulo-produtos.md)
+- [32 - Módulo Pedidos](./32-modulo-pedidos.md)
+- [33 - Módulo Ferramentas > Editor SQL](./33-modulo-ferramentas-editor-sql.md)
