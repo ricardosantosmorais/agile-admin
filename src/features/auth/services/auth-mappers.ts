@@ -144,6 +144,10 @@ export function mapAuthSession(payload: unknown): AuthSession {
 }
 
 export function extractApiErrorMessage(payload: unknown, fallbackMessage: string) {
+  if (typeof payload === 'string') {
+    return payload || fallbackMessage
+  }
+
   const source = asRecord(payload)
   const error = asRecord(source.error)
   return (

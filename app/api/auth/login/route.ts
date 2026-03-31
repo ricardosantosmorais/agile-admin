@@ -62,6 +62,13 @@ export async function POST(request: NextRequest) {
   })
 
   if (!result.ok) {
+    console.error('auth.login.failed', {
+      status: result.status,
+      apiBaseUrl: process.env.ADMIN_URL_API_V3 || process.env.NEXT_PUBLIC_API_V3_URL || '',
+      payloadType: typeof result.payload,
+      payload: typeof result.payload === 'string' ? result.payload.slice(0, 500) : result.payload,
+    })
+
     const message = extractApiErrorMessage(result.payload, 'Não foi possível entrar no painel.')
 
     if (isAuthenticationChallenge(message)) {
