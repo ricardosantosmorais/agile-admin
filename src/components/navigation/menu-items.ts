@@ -95,6 +95,10 @@ type LegacyRootDefinition = {
 }
 
 const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
+  'editor-sql-form': '/ferramentas/editor-sql',
+  'editor-sql-tabed-form': '/ferramentas/editor-sql',
+  'pedidos-list': '/pedidos',
+  'produtos-list': '/produtos',
   'produtos-precificadores-list': '/produtos-x-precificadores',
   'produtos-filial-list': '/produtos-x-filiais',
   'tributos-list': '/tributos',

@@ -73,3 +73,33 @@ export function formatCpfCnpj(value: unknown, fallback = '-') {
 
   return raw || fallback
 }
+
+export function formatCep(value: unknown, fallback = '-') {
+  const raw = String(value ?? '').trim()
+  const digits = raw.replace(/\D/g, '')
+
+  if (digits.length === 8) {
+    return digits.replace(/^(\d{5})(\d{3})$/, '$1-$2')
+  }
+
+  return raw || fallback
+}
+
+export function formatPhone(ddd: unknown, phone: unknown, fallback = '-') {
+  const areaCode = String(ddd ?? '').trim().replace(/\D/g, '')
+  const number = String(phone ?? '').trim().replace(/\D/g, '')
+
+  if (!areaCode || !number) {
+    return fallback
+  }
+
+  if (number.length === 9) {
+    return `(${areaCode}) ${number.replace(/^(\d{5})(\d{4})$/, '$1-$2')}`
+  }
+
+  if (number.length === 8) {
+    return `(${areaCode}) ${number.replace(/^(\d{4})(\d{4})$/, '$1-$2')}`
+  }
+
+  return `(${areaCode}) ${number}`
+}

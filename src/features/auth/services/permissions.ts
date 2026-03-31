@@ -2,6 +2,9 @@ import type { AuthPermission, AuthSession } from '@/src/features/auth/types/auth
 import { normalizeSearchValue } from '@/src/lib/text-normalization'
 
 export type FeatureKey =
+  | 'pedidos'
+  | 'editorSql'
+  | 'produtos'
   | 'produtosPrecificadores'
   | 'produtosFiliais'
   | 'tributos'
@@ -85,6 +88,18 @@ type FeatureAccess = {
 }
 
 const featureConfigs: Record<FeatureKey, FeatureConfig> = {
+  pedidos: {
+    label: 'Pedidos',
+    matchers: ['pedido', 'pedidos', 'pedidos-list', 'pedido-list'],
+  },
+  editorSql: {
+    label: 'Editor SQL',
+    matchers: ['editor sql', 'editor-sql', 'editor-sql-form', 'editor-sql-tabed-form', 'tools-editor-sql'],
+  },
+  produtos: {
+    label: 'Produtos',
+    matchers: ['produto', 'produtos', 'produtos-list', 'produtos-form'],
+  },
   produtosPrecificadores: {
     label: 'Produtos x Precificadores',
     matchers: ['produtos x precificadores', 'produto x precificadores', 'produtos-precificadores', 'produtos_precificadores', 'precificadores produtos'],

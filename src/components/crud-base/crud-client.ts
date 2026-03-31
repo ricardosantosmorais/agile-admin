@@ -84,7 +84,7 @@ function buildParams(filters: CrudListFilters, embed?: string) {
   return params
 }
 
-function sanitizeCrudPayload(payload: CrudRecord) {
+export function sanitizeCrudPayload(payload: CrudRecord) {
   const result: CrudRecord = {}
 
   for (const [key, value] of Object.entries(payload)) {

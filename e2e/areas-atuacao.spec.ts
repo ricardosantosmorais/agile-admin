@@ -1,5 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { deleteFirstFilteredRow, fieldInput, filterByCode, openFirstFilteredRowForEdit, openLogisticsModule, pickLookupOption } from '@/e2e/helpers/crud'
+import {
+  deleteFirstFilteredRow,
+  fieldInput,
+  filterByCode,
+  openFirstFilteredRowForEdit,
+  openLogisticsModule,
+  pickFirstLookupOption,
+} from '@/e2e/helpers/crud'
 
 test.setTimeout(180_000)
 
@@ -32,7 +39,7 @@ test('creates, filters, edits and deletes coverage areas through the UI', async 
   })
 
   await page.getByRole('link', { name: /novo|new/i }).click()
-  await pickLookupOption(page, /^rota|route$/i, /rota base|rot-/i)
+  await pickFirstLookupOption(page, /^rota|route$/i, routeName)
   await fieldInput(page, /^c[oó]digo$/i).fill(marketAreaCode)
   await fieldInput(page, /^nome$/i).fill(marketAreaName)
   await fieldInput(page, /^cep inicial|zip start$/i).fill('60000-000')
@@ -50,7 +57,7 @@ test('creates, filters, edits and deletes coverage areas through the UI', async 
   await page.getByRole('link', { name: /novo|new/i }).click()
   await fieldInput(page, /^c[oó]digo$/i).fill(code)
   await fieldInput(page, /^nome$/i).fill(name)
-  await pickLookupOption(page, /^praça|market area$/i, /praça base|pra-/i)
+  await pickFirstLookupOption(page, /^praça|praca|market area$/i, marketAreaName)
   await fieldInput(page, /^cep inicial|zip start$/i).fill('60000-000')
   await fieldInput(page, /^cep final|zip end$/i).fill('60199-999')
   await page.getByRole('button', { name: /salvar|save/i }).first().click()

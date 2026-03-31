@@ -179,7 +179,7 @@ export type CrudColumnConfig = {
   thClassName?: string
   tdClassName?: string
   filter?: CrudColumnFilterConfig
-  render?: (record: CrudRecord, context: { tenantUrl?: string | null }) => React.ReactNode
+  render?: (record: CrudRecord, context: { tenantUrl?: string | null; assetsBucketUrl?: string | null }) => React.ReactNode
   valueKey?: string
 }
 
@@ -211,6 +211,7 @@ export type CrudModuleConfig = {
   mobileSubtitle?: (record: CrudRecord) => React.ReactNode
   mobileMeta?: (record: CrudRecord) => React.ReactNode
   details?: CrudDetailsItem[]
+  actionsColumnClassName?: string
   extraFilters?: CrudColumnFilterConfig[]
   sections: CrudSectionConfig[]
   listEmbed?: string

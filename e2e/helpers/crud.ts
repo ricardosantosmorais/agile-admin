@@ -62,18 +62,35 @@ export async function deleteFirstFilteredRow(page: Page) {
 
 export async function pickLookupOption(page: Page, label: RegExp, optionText: RegExp) {
   await fieldButton(page, label).click()
-  await page.getByRole('textbox').last().fill('')
-  await page.getByRole('button').filter({ hasText: optionText }).first().click()
+  const search = page.getByRole('textbox').last()
+  const panel = search.locator('xpath=ancestor::div[contains(@class,"fixed")][1]')
+  await search.fill('')
+  const option = panel.getByRole('button').filter({ hasText: optionText }).first()
+  await option.scrollIntoViewIfNeeded()
+  await option.dispatchEvent('pointerdown')
 }
 
 export async function pickFirstLookupOption(page: Page, label: RegExp, query = '') {
   await fieldButton(page, label).click()
   const search = page.getByRole('textbox').last()
+  const panel = search.locator('xpath=ancestor::div[contains(@class,"fixed")][1]')
   await search.fill(query)
-  const option = page.locator('button').filter({ has: page.locator('p.font-medium') }).first()
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const directMatch = query
+    ? panel.getByRole('button', { name: new RegExp(escapedQuery, 'i') }).first()
+    : null
+
+  if (directMatch && await directMatch.isVisible().catch(() => false)) {
+    const text = (await directMatch.textContent())?.trim() || ''
+    await directMatch.click()
+    return text
+  }
+
+  const option = panel.locator('p.font-medium').first().locator('xpath=ancestor::button[1]')
   await expect(option).toBeVisible({ timeout: 20_000 })
+  await option.scrollIntoViewIfNeeded()
   const text = (await option.textContent())?.trim() || ''
-  await option.click()
+  await option.dispatchEvent('pointerdown')
   return text
 }
 
@@ -226,8 +243,36 @@ export async function openPriceStockModule(
   })
 }
 
+export async function openCatalogModule(
+  page: Page,
+  {
+    linkName,
+    urlPattern,
+    path,
+  }: {
+    linkName: RegExp
+    urlPattern: RegExp
+    path: string
+  },
+) {
+  await openCrudModule(page, {
+    parents: [/cat[aá]logo|catalog/i],
+    linkName,
+    urlPattern,
+    path,
+  })
+}
+
 export async function openFirstFilteredRowForEdit(page: Page, urlPattern: RegExp) {
-  await page.locator('tbody tr').first().locator('a').first().click()
+  const row = page.locator('tbody tr').first()
+  const editLink = row.locator('a[href*="/editar"]').first()
+
+  if (await editLink.isVisible().catch(() => false)) {
+    await editLink.click()
+  } else {
+    await row.locator('a').first().click()
+  }
+
   await expect(page).toHaveURL(urlPattern, { timeout: 30_000 })
 }
 

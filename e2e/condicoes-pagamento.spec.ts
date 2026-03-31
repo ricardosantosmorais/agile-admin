@@ -1,5 +1,13 @@
 import { expect, test } from '@playwright/test'
-import { deleteFirstFilteredRow, fieldInput, filterByCode, openFinancialModule, openFirstFilteredRowForEdit } from '@/e2e/helpers/crud'
+import {
+  deleteFirstFilteredRow,
+  fieldInput,
+  filterByCode,
+  numberInputAt,
+  openFinancialModule,
+  openFirstFilteredRowForEdit,
+  selectAt,
+} from '@/e2e/helpers/crud'
 
 test.setTimeout(180_000)
 
@@ -16,9 +24,10 @@ test('creates, filters, edits, checks branches tab and deletes payment terms thr
 
   await page.getByRole('link', { name: /novo|new/i }).click()
   await fieldInput(page, /^c[oó]digo$/i).fill(code)
+  await selectAt(page, 0).selectOption('todos')
   await fieldInput(page, /^nome$/i).fill(name)
-  await page.getByRole('spinbutton', { name: /parcelas|installments/i }).fill('3')
-  await page.getByRole('spinbutton', { name: /prazo médio|average term/i }).fill('28')
+  await numberInputAt(page, 0).fill('3')
+  await numberInputAt(page, 2).fill('28')
   await page.getByRole('button', { name: /salvar|save/i }).first().click()
   await expect(page).toHaveURL(/\/condicoes-de-pagamento\/[^/]+\/editar$/, { timeout: 30_000 })
 

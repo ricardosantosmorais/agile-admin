@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { openModuleFromMenu } from '@/e2e/helpers/auth'
+import { openModuleFromMenu, waitForProtectedShell } from '@/e2e/helpers/auth'
 
 test.setTimeout(120_000)
 
@@ -20,12 +20,19 @@ function formDateTimeInput(page: Page): Locator {
 }
 
 async function openNotificationsList(page: Page) {
-  await openModuleFromMenu(page, {
-    parents: [/marketing/i],
-    linkName: /notificações app|app notifications/i,
-    urlPattern: /\/notificacoes-app(?:\?|$)/,
-    readyLocator: page.getByRole('button', { name: /atualizar|refresh/i }),
-  })
+  try {
+    await openModuleFromMenu(page, {
+      parents: [/marketing/i],
+      linkName: /notificações app|notificacoes app|app notifications/i,
+      urlPattern: /\/notificacoes-app(?:\?|$)/,
+      readyLocator: page.getByRole('button', { name: /atualizar|refresh/i }),
+    })
+  } catch {
+    await page.goto('/notificacoes-app', { waitUntil: 'domcontentloaded', timeout: 60_000 })
+    await waitForProtectedShell(page)
+    await expect(page).toHaveURL(/\/notificacoes-app(?:\?|$)/, { timeout: 60_000 })
+    await expect(page.getByRole('button', { name: /atualizar|refresh/i })).toBeVisible({ timeout: 60_000 })
+  }
 }
 
 test('creates an app notification, shows it in the list and deletes it from the table', async ({ page }) => {

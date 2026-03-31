@@ -1,15 +1,15 @@
-# 06 - Módulos e Cobertura Atual
+﻿# 06 - MÃ³dulos e Cobertura Atual
 
-## Cobertura já migrada
+## Cobertura jÃ¡ migrada
 
 ### Base
 - Login
 - Dashboard
-- Notificações
+- NotificaÃ§Ãµes
 
-### Cadastros Básicos / Manutenção
+### Cadastros BÃ¡sicos / ManutenÃ§Ã£o
 - Filiais
-- Canais de distribuição
+- Canais de distribuiÃ§Ã£o
 - Grupos de filiais
 - Fases
 - Sequenciais
@@ -23,18 +23,19 @@
 - Segmentos de Clientes
 - Regras de Cadastro
 - Vendedores
-- Usuários
+- UsuÃ¡rios
 - Administradores
 
-### Catálogo / Conteúdo
+### CatÃ¡logo / ConteÃºdo
+- Produtos
 - Linhas
 - Cores
 - Banners
-- Áreas de Banner
-- Áreas de Página
+- Ãreas de Banner
+- Ãreas de PÃ¡gina
 - E-mails
-- Páginas
-- Coleções
+- PÃ¡ginas
+- ColeÃ§Ãµes
 - Listas
 - Marcas
 - Departamentos
@@ -50,35 +51,37 @@
 - Desconto na Unidade
 - Compre Junto
 - Cupons Desconto
-- Notificações App
+- NotificaÃ§Ãµes App
 - Avise-me
 
-### Logística
+### LogÃ­stica
 - Formas de entrega
 - Transportadoras
 - Portos
-- Áreas de atuação
-- Praças
+- Ãreas de atuaÃ§Ã£o
+- PraÃ§as
 - Rotas
 
 ### Financeiro
-- Limites de crédito
-- Condições de pagamento
-- Tabelas de preço
+- Limites de crÃ©dito
+- CondiÃ§Ãµes de pagamento
+- Tabelas de preÃ§o
 - Formas de pagamento
 
-### Preços e Estoques
+### PreÃ§os e Estoques
 - Tributos
 - Tributos x Partilha
 - Produtos x Filiais
-- Produtos x Tabelas de Preço
+- Produtos x Tabelas de PreÃ§o
 - Produtos x Precificadores
 
-Observações atuais de cobertura:
-- `Dashboard` passou a carregar fases e gráficos sob demanda, conforme a seção entra no viewport, mantendo a carga completa apenas na exportação de PDF.
-- `Leve e Pague` já aceita vínculo manual por ID/código e também por autocomplete, mantendo persistência por `id_produto`.
-- `Compre e Ganhe` já cobre grupo promocional amigável no formulário, labels traduzidas nas grades relacionais e embalagem dinâmica por produto nas abas de regras e produtos.
-- `Preços e Estoques` agora combina CRUDs lineares com uma tela operacional de `Precificação rápida` para `Produtos x Tabelas de Preço` e um wizard próprio para `Produtos x Precificadores`.
+ObservaÃ§Ãµes atuais de cobertura:
+- `Dashboard` passou a carregar fases e grÃ¡ficos sob demanda, conforme a seÃ§Ã£o entra no viewport, mantendo a carga completa apenas na exportaÃ§Ã£o de PDF.
+- `Leve e Pague` jÃ¡ aceita vÃ­nculo manual por ID/cÃ³digo e tambÃ©m por autocomplete, mantendo persistÃªncia por `id_produto`.
+- `Compre e Ganhe` jÃ¡ cobre grupo promocional amigÃ¡vel no formulÃ¡rio, labels traduzidas nas grades relacionais e embalagem dinÃ¢mica por produto nas abas de regras e produtos.
+- `PreÃ§os e Estoques` agora combina CRUDs lineares com uma tela operacional de `PrecificaÃ§Ã£o rÃ¡pida` para `Produtos x Tabelas de PreÃ§o` e um wizard prÃ³prio para `Produtos x Precificadores`.
+- `Produtos` jÃ¡ possui listagem, formulÃ¡rio principal e abas relacionais de ediÃ§Ã£o no v2 (`Filiais`, `Embalagens`, `Relacionados`, `Imagens` e seleÃ§Ã£o dinÃ¢mica de `Grades e cores`).
+- `Pedidos` jÃ¡ cobre listagem server-side, filtros principais do legado, detalhe operacional e aÃ§Ãµes de aprovar pagamento / cancelar pedido com motivo.
 
 ## Estado arquitetural da cobertura
 
@@ -87,7 +90,7 @@ Usam majoritariamente:
 - `CrudListPage`
 - `CrudFormPage`
 
-### Formulários híbridos
+### FormulÃ¡rios hÃ­bridos
 Usam:
 - `CrudFormSections`
 - componentes relacionais locais
@@ -95,21 +98,24 @@ Usam:
 Casos:
 - grupos de clientes
 - regras de cadastro
-- catálogo com abas
+- catÃ¡logo com abas
 
 ### Telas operacionais
-Continuam como páginas próprias, com mais regra de negócio:
+Continuam como pÃ¡ginas prÃ³prias, com mais regra de negÃ³cio:
 - clientes
 - contatos
 - vendedores
-- usuários
+- usuÃ¡rios
 - formas de entrega
-- produtos x tabelas de preço
+- produtos x tabelas de preÃ§o
 - produtos x precificadores
 
-## O que ainda não está fechado
-- módulos mais complexos como produtos;
-- módulos administrativos com payload relacional ou árvore, como `Perfis`;
-- áreas ainda mapeadas para `/legacy/...`;
+## O que ainda nÃ£o estÃ¡ fechado
+- refinamentos complementares de `Produtos`, caso surjam regras avanÃ§adas adicionais de `Grades` no QA funcional;
+- mÃ³dulos administrativos com payload relacional ou Ã¡rvore, como `Perfis`;
+- Ã¡reas ainda mapeadas para `/legacy/...`;
 - cobertura E2E autenticada ainda precisa de uma harness compartilhada mais estável no ambiente local;
 - integração completa de upload com backend/S3 em todos os módulos elegíveis.
+### Pedidos
+- Pedidos
+

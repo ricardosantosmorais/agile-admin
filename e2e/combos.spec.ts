@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { dateInputAt, filterByCode, numberInputAt, openPromotionsModule, selectAt, textInputAt } from '@/e2e/helpers/crud'
+import { dateInputAt, filterByCode, numberInputAt, openFirstFilteredRowForEdit, openPromotionsModule, selectAt, textInputAt } from '@/e2e/helpers/crud'
 
 test.setTimeout(120_000)
 
@@ -42,8 +42,7 @@ test('creates, filters, edits, validates tabs and deletes a combo through the UI
   const savedRow = page.locator('tbody tr').filter({ hasText: uniqueCode }).first()
   await expect(savedRow).toContainText(editedName)
 
-  await savedRow.locator('a').first().click()
-  await expect(page).toHaveURL(/\/combos\/[^/]+\/editar$/, { timeout: 30_000 })
+  await openFirstFilteredRowForEdit(page, /\/combos\/[^/]+\/editar$/)
   await expect(textInputAt(page, 1)).toHaveValue(editedName)
 
   await openCombosList(page)

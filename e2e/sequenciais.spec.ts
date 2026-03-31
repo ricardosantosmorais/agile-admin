@@ -4,7 +4,7 @@ import { deleteFirstFilteredRow, ensureFiltersVisible, openCrudModule, openFirst
 test.setTimeout(180_000)
 
 test('creates, filters, edits and deletes sequences through the UI', async ({ page }) => {
-  const sequenceValue = String(Date.now()).slice(-6)
+  const sequenceValue = String(100000 + (Date.now() % 800000))
   const editedSequenceValue = String(Number(sequenceValue) + 1)
 
   await openCrudModule(page, {

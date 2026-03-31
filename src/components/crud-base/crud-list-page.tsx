@@ -55,6 +55,7 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
   const access = useFeatureAccess(config.featureKey)
   const { session } = useAuth()
   const tenantUrl = session?.currentTenant.url ?? null
+  const assetsBucketUrl = session?.currentTenant.assetsBucketUrl ?? null
   const controller = useCrudListController(config, client, access.canDelete)
 
   const columns = useMemo(() => config.columns.map((column) => ({
@@ -67,7 +68,7 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
     filter: resolveFilterConfig(column, t),
     cell: (record: CrudRecord) => {
       if (column.render) {
-        return column.render(record, { tenantUrl })
+        return column.render(record, { tenantUrl, assetsBucketUrl })
       }
       if (column.id === 'ativo') {
         const activeValue = record.ativo as unknown
@@ -82,7 +83,7 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
       const value = column.valueKey ? record[column.valueKey] : record[column.id]
       return <span className="truncate">{String(value ?? '-')}</span>
     },
-  }) satisfies AppDataTableColumn<CrudRecord, CrudListFilters>), [config.columns, t, tenantUrl])
+  }) satisfies AppDataTableColumn<CrudRecord, CrudListFilters>), [assetsBucketUrl, config.columns, t, tenantUrl])
 
   if (!access.canList) {
     return <AccessDeniedState title={t(config.listTitleKey, config.listTitle)} backHref="/dashboard" />
@@ -152,6 +153,7 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
               { id: 'edit', label: access.canEdit ? t('simpleCrud.actions.edit', 'Edit') : t('simpleCrud.actions.view', 'View'), icon: access.canEdit ? Pencil : SearchIcon, href: `${config.routeBase}/${record.id}/editar`, visible: access.canEdit || access.canView },
               { id: 'delete', label: t('simpleCrud.actions.delete', 'Delete'), icon: Trash2, onClick: () => controller.setConfirmDeleteIds([record.id]), tone: 'danger', visible: access.canDelete },
             ]}
+            actionsColumnClassName={config.actionsColumnClassName}
             selectable
             selectedIds={controller.tableState.selectedIds}
             allSelected={controller.tableState.allSelected}

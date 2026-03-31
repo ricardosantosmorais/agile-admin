@@ -35,9 +35,8 @@ test('produtos x precificadores creates via wizard and deletes', async ({ page }
   await expect(page.getByText(/combinações|combinations/i)).toBeVisible()
 
   await page.getByRole('button', { name: /^save$|^salvar$/i }).last().click()
-  await expect(page).toHaveURL(/\/produtos-x-precificadores\/.+\/editar$/, { timeout: 30_000 })
+  await expect(page).toHaveURL(/\/produtos-x-precificadores(?:\?|$)/, { timeout: 30_000 })
 
-  await page.goto('/produtos-x-precificadores', { waitUntil: 'domcontentloaded' })
   await page.getByRole('button', { name: /filtros|filters/i }).click()
   await page.getByRole('textbox', { name: /^nome$/i }).fill(ruleName)
   await page.getByRole('button', { name: /aplicar filtros|apply filters/i }).click()

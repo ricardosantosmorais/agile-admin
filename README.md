@@ -79,6 +79,21 @@ Na execuÃ§Ã£o de PR, o pipeline publica como artifact:
 - screenshots de falha
 - traces
 
+## Deploy para Amplify
+
+O deploy para o Amplify acontece pelo prÃƒÂ³prio continuous deployment da AWS, desde que o app jÃƒÂ¡ esteja conectado ao repositÃƒÂ³rio e ÃƒÂ  branch publicada.
+
+Fluxo recomendado:
+- o GitHub Actions valida `lint`, `typecheck`, `build` e Playwright na PR;
+- a branch publicada deve ter branch protection com os checks obrigatÃƒÂ³rios;
+- depois do merge aprovado, o Amplify detecta o novo commit na branch e faz o deploy automaticamente.
+
+Secrets de E2E que continuam necessÃƒÂ¡rios no GitHub Actions:
+- `PLAYWRIGHT_AUTH_EMAIL`
+- `PLAYWRIGHT_AUTH_PASSWORD`
+- `PLAYWRIGHT_AUTH_CODE` opcional
+- `PLAYWRIGHT_AUTH_TENANT_ID` opcional
+
 ## Estrutura
 
 - `app/`: rotas e layouts do Next
