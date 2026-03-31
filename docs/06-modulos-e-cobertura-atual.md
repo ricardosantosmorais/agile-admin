@@ -75,13 +75,37 @@
 - Produtos x Tabelas de Preço
 - Produtos x Precificadores
 
-Observações atuais de cobertura:
-- `Dashboard` passou a carregar fases e gráficos sob demanda, conforme a seção entra no viewport, mantendo a carga completa apenas na exportação de PDF.
-- `Leve e Pague` já aceita vínculo manual por ID/código e também por autocomplete, mantendo persistência por `id_produto`.
-- `Compre e Ganhe` já cobre grupo promocional amigável no formulário, labels traduzidas nas grades relacionais e embalagem dinâmica por produto nas abas de regras e produtos.
-- `Preços e Estoques` agora combina CRUDs lineares com uma tela operacional de `Precificação rápida` para `Produtos x Tabelas de Preço` e um wizard próprio para `Produtos x Precificadores`.
-- `Produtos` já possui listagem, formulário principal e abas relacionais de edição no v2 (`Filiais`, `Embalagens`, `Relacionados`, `Imagens` e seleção dinâmica de `Grades e cores`).
-- `Pedidos` já cobre listagem server-side, filtros principais do legado, detalhe operacional e ações de aprovar pagamento / cancelar pedido com motivo.
+### Pedidos
+- Pedidos
+
+### Ferramentas
+- Editor SQL
+
+## Observações atuais de cobertura
+- `Dashboard` carrega fases e gráficos sob demanda, mantendo a carga completa apenas na exportação de PDF.
+- `Produtos` já possui listagem, formulário principal e abas relacionais de edição no v2:
+  - `Filiais`
+  - `Embalagens`
+  - `Relacionados`
+  - `Imagens`
+  - seleção dinâmica de `Grades e cores`
+- `Pedidos` já cobre:
+  - listagem server-side;
+  - filtros principais do legado;
+  - detalhe operacional;
+  - ações de aprovar pagamento e cancelar pedido com motivo;
+  - atualização de observações internas e entrega;
+  - timeline e logs no detalhe.
+- `Preços e Estoques` combina CRUDs lineares com:
+  - `Precificação rápida` para `Produtos x Tabelas de Preço`;
+  - wizard próprio para `Produtos x Precificadores`.
+- `Ferramentas > Editor SQL` já possui:
+  - Monaco;
+  - múltiplas abas;
+  - fullscreen;
+  - resultado em tabela ou JSON;
+  - exportação e cópia;
+  - restore local do workspace por usuário e tenant no navegador.
 
 ## Estado arquitetural da cobertura
 
@@ -94,11 +118,13 @@ Usam majoritariamente:
 Usam:
 - `CrudFormSections`
 - componentes relacionais locais
+- formulários tabulados
 
-Casos:
+Casos típicos:
 - grupos de clientes
 - regras de cadastro
 - catálogo com abas
+- produtos
 
 ### Telas operacionais
 Continuam como páginas próprias, com mais regra de negócio:
@@ -109,13 +135,12 @@ Continuam como páginas próprias, com mais regra de negócio:
 - formas de entrega
 - produtos x tabelas de preço
 - produtos x precificadores
+- pedidos
+- editor SQL
 
 ## O que ainda não está fechado
 - refinamentos complementares de `Produtos`, caso surjam regras avançadas adicionais de `Grades` no QA funcional;
 - módulos administrativos com payload relacional ou árvore, como `Perfis`;
 - áreas ainda mapeadas para `/legacy/...`;
-- cobertura E2E autenticada ainda precisa de uma harness compartilhada mais estável no ambiente local;
-- integração completa de upload com backend/S3 em todos os módulos elegíveis.
-### Pedidos
-- Pedidos
-
+- integração completa de upload com backend/S3 em todos os módulos elegíveis;
+- melhorias futuras de ergonomia do Editor SQL puramente no frontend, como formatação manual e ações por seleção.

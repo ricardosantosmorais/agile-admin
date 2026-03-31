@@ -1,7 +1,6 @@
-# Módulo Produtos
+# 31 - Módulo Produtos
 
 ## Escopo atual no v2
-
 O módulo `Produtos` entrou no v2 com a base principal do recurso:
 
 - listagem server-side com filtros centrais do legado;
@@ -19,8 +18,7 @@ O módulo `Produtos` entrou no v2 com a base principal do recurso:
   - `Imagens`
 
 ## Recurso principal
-
-- recurso base: `produtos`
+- recurso base: `produtos`;
 - bridges:
   - `GET /api/produtos`
   - `POST /api/produtos`
@@ -40,7 +38,6 @@ O módulo `Produtos` entrou no v2 com a base principal do recurso:
   - `DELETE /api/produtos/[id]/imagens`
 
 ## Aderências já cobertas
-
 - novo registro salva e segue para edição;
 - edição salva e retorna para a listagem;
 - listagem com filtros:
@@ -61,22 +58,20 @@ O módulo `Produtos` entrou no v2 com a base principal do recurso:
   - `Embalagens`
   - `Relacionados`
   - `Imagens`
-- persistência da seleção dinâmica de `Grades e cores` via `ids_grades_json`, com sincronização para `produtos/grades_valores` na bridge.
+- persistência da seleção dinâmica de `Grades e cores` via `ids_grades_json`, com sincronização para `produtos/grades_valores` na bridge;
+- imagens públicas do produto resolvidas tanto para registros antigos quanto para uploads novos.
 
 ## Cobertura atual
-
 - unitário:
   - `src/features/produtos/services/produtos-mappers.test.ts`
 - E2E:
   - `e2e/produtos.spec.ts`
 
 ## Pendências conhecidas
-
 Ainda restam refinamentos do legado dentro do módulo:
 
 - experiência operacional mais profunda de `Grades`, caso seja necessário suportar regras avançadas adicionais;
 - validações mais densas e fluxos complementares específicos do legado, se aparecerem no QA funcional.
 
 ## Observação arquitetural
-
 `Produtos` não deve ser tratado como `CrudFormPage` linear. O módulo exige uma página tabulada própria, com bridge principal do recurso e tabs relacionais plugadas por contexto do produto em edição.
