@@ -1,43 +1,43 @@
-# ADR-003 - Sessao, expiracao e multiabas no frontend
+# ADR-003 - Sessão, expiração e multiabas no frontend
 
 ## Status
 Aceita
 
 ## Contexto
-No legado, havia controle robusto de sessao, expiracao e navegacao multiabas.
+No legado, havia controle robusto de sessão, expiração e navegação multiabas.
 
-No v2, nao bastava redirecionar silenciosamente para login quando a sessao expirasse. Era necessario:
-- manter experiencia equivalente ao legado;
-- avisar o usuario antes da expiracao;
-- permitir continuidade de sessao;
+No v2, não bastava redirecionar silenciosamente para login quando a sessão expirasse. Era necessário:
+- manter experiência equivalente ao legado;
+- avisar o usuário antes da expiração;
+- permitir continuidade de sessão;
 - propagar estado entre abas;
-- bloquear o uso da aplicacao quando a sessao realmente acabasse.
+- bloquear o uso da aplicação quando a sessão realmente acabasse.
 
-## Decisao
-O v2 implementa controle de sessao no frontend com:
-- contexto global de ciclo de vida da sessao;
-- sincronizacao entre abas;
-- modal de aviso antes da expiracao;
-- modal bloqueante de sessao encerrada;
-- renovacao explicita da sessao quando o usuario escolhe continuar.
+## Decisão
+O v2 implementa controle de sessão no frontend com:
+- contexto global de ciclo de vida da sessão;
+- sincronização entre abas;
+- modal de aviso antes da expiração;
+- modal bloqueante de sessão encerrada;
+- renovação explícita da sessão quando o usuário escolhe continuar.
 
-## Consequencias
+## Consequências
 
 ### Positivas
-- experiencia mais clara e previsivel para o usuario;
+- experiência mais clara e previsível para o usuário;
 - comportamento alinhado ao legado;
 - menor risco de perda silenciosa de contexto;
 - suporte real a multiabas.
 
 ### Custos
 - maior complexidade no frontend;
-- necessidade de coordenar estado de sessao, auth e tenant;
-- mais pontos de teste para o fluxo de expiracao.
+- necessidade de coordenar estado de sessão, auth e tenant;
+- mais pontos de teste para o fluxo de expiração.
 
 ## Impacto
-Essa decisao afeta diretamente:
+Essa decisão afeta diretamente:
 - `auth-context`;
 - `session-lifecycle-context`;
-- guards de autenticacao;
+- guards de autenticação;
 - fluxo de logout;
 - tratamento global de `401`.

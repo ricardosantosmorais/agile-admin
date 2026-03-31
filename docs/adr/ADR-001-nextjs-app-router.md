@@ -4,25 +4,25 @@
 Aceita
 
 ## Contexto
-O legado foi construido com frontend, backend PHP e renderizacao acoplados na mesma aplicacao.
+O legado foi construído com frontend, backend PHP e renderização acoplados na mesma aplicação.
 
-No v2, era necessario:
+No v2, era necessário:
 - separar o frontend da estrutura antiga;
-- permitir navegacao moderna e componentizacao real;
-- organizar layout, autenticacao, contexto de tenant e modulos de forma previsivel;
-- preparar o projeto para evolucao incremental por modulo.
+- permitir navegação moderna e componentização real;
+- organizar layout, autenticação, contexto de tenant e módulos de forma previsível;
+- preparar o projeto para evolução incremental por módulo.
 
-## Decisao
+## Decisão
 O `admin-v2-web` adota `Next.js` com `App Router` como base do frontend.
 
-## Consequencias
+## Consequências
 
 ### Positivas
-- layouts protegidos e publicos ficam declarativos;
-- rotas de pagina e rotas `app/api` convivem no mesmo projeto;
+- layouts protegidos e públicos ficam declarativos;
+- rotas de página e rotas `app/api` convivem no mesmo projeto;
 - `server components` e `client components` podem ser combinados de forma controlada;
-- contexto de autenticacao e tenant pode ser encapsulado na arvore da aplicacao;
-- a arquitetura suporta migracao modulo a modulo sem depender da estrutura do legado.
+- contexto de autenticação e tenant pode ser encapsulado na árvore da aplicação;
+- a arquitetura suporta migração módulo a módulo sem depender da estrutura do legado.
 
 ### Custos
 - exige disciplina clara entre client e server;
@@ -30,8 +30,8 @@ O `admin-v2-web` adota `Next.js` com `App Router` como base do frontend.
 - a equipe precisa dominar `App Router`, `Route Handlers` e contexto no frontend.
 
 ## Impacto
-Todas as decisoes seguintes do v2 partem desse ponto:
+Todas as decisões seguintes do v2 partem desse ponto:
 - bridges `app/api`;
 - contextos globais;
-- paginas protegidas;
-- padroes de CRUD e listagem.
+- páginas protegidas;
+- padrões de CRUD e listagem.
