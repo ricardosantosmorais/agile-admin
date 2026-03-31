@@ -1,0 +1,49 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - Remove-Item .env.production -ErrorAction SilentlyContinue
+        - |
+          @(
+            'ADMIN_URL_API_V3'
+            'AUTH_SESSION_SECRET'
+            'AUTH_COOKIE_SECURE'
+            'SENTRY_DSN'
+            'NEXT_PUBLIC_SENTRY_DSN'
+            'SENTRY_AUTH_TOKEN'
+            'SENTRY_ENVIRONMENT'
+            'NEXT_PUBLIC_SENTRY_ENVIRONMENT'
+            'SENTRY_TRACES_SAMPLE_RATE'
+            'NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE'
+            'SENTRY_DEBUG'
+            'NEXT_PUBLIC_SENTRY_DEBUG'
+            'UPLOAD_S3_ACCESS_KEY_ID'
+            'UPLOAD_S3_SECRET_ACCESS_KEY'
+            'UPLOAD_S3_REGION'
+            'UPLOAD_S3_PUBLIC_BUCKET'
+            'UPLOAD_S3_PRIVATE_BUCKET'
+            'UPLOAD_S3_PUBLIC_BASE_URL'
+            'ADMIN_URL_API_PAINELB2B'
+            'ADMIN_API_PAINELB2B_TOKEN'
+            'ADMIN_URL_API_AGILESYNC'
+            'ADMIN_API_AGILESYNC_TOKEN'
+          ) | ForEach-Object {
+            $value = [Environment]::GetEnvironmentVariable($_)
+            if (![string]::IsNullOrWhiteSpace($value)) {
+              "$_=$value" | Out-File -FilePath .env.production -Append -Encoding utf8
+            }
+          }
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - .npm-cache/**/*
+      - node_modules/**/*
+      - .next/cache/**/*

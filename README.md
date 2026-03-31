@@ -94,6 +94,18 @@ Secrets de E2E que continuam necessÃƒÂ¡rios no GitHub Actions:
 - `PLAYWRIGHT_AUTH_CODE` opcional
 - `PLAYWRIGHT_AUTH_TENANT_ID` opcional
 
+### Ambiente SSR do Amplify
+
+Para o `Next.js` com SSR e `app/api/*`, as variÃƒÂ¡veis configuradas no painel do Amplify nÃƒÂ£o ficam disponÃƒÂ­veis automaticamente no runtime do Next.
+
+Por isso, o repositÃƒÂ³rio possui um [amplify.yml](/C:/Projetos/admin-v2-web/amplify.yml) que copia as variÃƒÂ¡veis necessÃƒÂ¡rias do ambiente de build para `.env.production` antes do `next build`.
+
+Se uma variÃƒÂ¡vel de servidor estiver vazia no runtime publicado, conferir:
+- se ela foi cadastrada no painel do Amplify;
+- se a branch publicada recebeu novo deploy;
+- se o `amplify.yml` do repositÃƒÂ³rio foi aplicado no build;
+- se a variÃƒÂ¡vel estÃƒÂ¡ incluÃƒÂ­da na lista exportada para `.env.production`.
+
 ## Estrutura
 
 - `app/`: rotas e layouts do Next
