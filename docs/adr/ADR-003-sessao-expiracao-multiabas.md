@@ -19,7 +19,8 @@ O v2 implementa controle de sessão no frontend com:
 - sincronização entre abas;
 - modal de aviso antes da expiração;
 - modal bloqueante de sessão encerrada;
-- renovação explícita da sessão quando o usuário escolhe continuar.
+- renovação explícita da sessão quando o usuário escolhe continuar;
+- congelamento da visão atual da sessão durante o estado final de encerramento, para preservar a tela já carregada até o usuário ir para o login.
 
 ## Consequências
 
@@ -27,7 +28,8 @@ O v2 implementa controle de sessão no frontend com:
 - experiência mais clara e previsível para o usuário;
 - comportamento alinhado ao legado;
 - menor risco de perda silenciosa de contexto;
-- suporte real a multiabas.
+- suporte real a multiabas;
+- a tela carregada não se desmonta ao aparecer o modal final.
 
 ### Custos
 - maior complexidade no frontend;

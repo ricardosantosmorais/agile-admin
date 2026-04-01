@@ -10,6 +10,11 @@ const useSessionLifecycleMock = vi.fn()
 const authState = vi.hoisted(() => ({
   isAuthenticated: true,
   isLoading: false,
+  session: {
+    user: {
+      id: '1',
+    },
+  } as { user: { id: string } } | null,
   logout: vi.fn(),
 }))
 
@@ -56,6 +61,11 @@ describe('ProtectedRoute', () => {
     authState.logout.mockReset()
     authState.isAuthenticated = true
     authState.isLoading = false
+    authState.session = {
+      user: {
+        id: '1',
+      },
+    }
     sessionLifecycleState.shouldBlockUnauthenticatedRedirect = false
     sessionLifecycleState.endedReason = null
     useAuthMock.mockReturnValue(authState)
@@ -96,5 +106,32 @@ describe('ProtectedRoute', () => {
     expect(screen.getByText('Sessão encerrada por inatividade')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /ir para login/i })).toBeInTheDocument()
     expect(replaceMock).not.toHaveBeenCalled()
+  })
+
+  it('redirects to login after reload when the session is already ended and there is no frozen view left', () => {
+    authState.isAuthenticated = false
+    authState.session = null
+    sessionLifecycleState.shouldBlockUnauthenticatedRedirect = true
+    sessionLifecycleState.endedReason = 'expired_no_action'
+    useAuthMock.mockReturnValue({
+      ...authState,
+      isAuthenticated: false,
+      session: null,
+    })
+    useSessionLifecycleMock.mockReturnValue({
+      ...sessionLifecycleState,
+      shouldBlockUnauthenticatedRedirect: true,
+      endedReason: 'expired_no_action',
+    })
+
+    renderWithProviders(
+      <ProtectedRoute>
+        <div>Conteúdo protegido</div>
+      </ProtectedRoute>,
+    )
+
+    expect(screen.queryByText('Conteúdo protegido')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /ir para login/i })).not.toBeInTheDocument()
+    expect(replaceMock).toHaveBeenCalledWith('/login?from=%2Fdashboard')
   })
 })

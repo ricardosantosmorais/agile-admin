@@ -1,15 +1,18 @@
-'use client'
-
 import { Suspense } from 'react'
-import { PublicRoute } from '@/src/features/auth/components/auth-guards'
+import { redirect } from 'next/navigation'
 import { LoginPage } from '@/src/features/auth/components/login-page'
+import { readAuthSession } from '@/src/features/auth/services/auth-session'
 
-export default function LoginRoutePage() {
+export default async function LoginRoutePage() {
+  const session = await readAuthSession()
+
+  if (session) {
+    redirect('/dashboard')
+  }
+
   return (
-    <PublicRoute>
-      <Suspense fallback={null}>
-        <LoginPage />
-      </Suspense>
-    </PublicRoute>
+    <Suspense fallback={null}>
+      <LoginPage />
+    </Suspense>
   )
 }

@@ -2,10 +2,12 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { PropsWithChildren } from 'react'
+import { usePathname } from 'next/navigation'
 import { authService } from '@/src/features/auth/services/auth-service'
 import {
   clearAuthenticatedSessionMarker,
   clearPendingLogin,
+  clearSessionEndSignal,
   clearSessionLock,
   clearSensitiveClientState,
   hasAuthenticatedSessionMarker,
@@ -33,7 +35,7 @@ type AuthContextValue = {
   submitAuthenticationCode: (codigoAutenticacao: string) => Promise<'authenticated'>
   cancelAuthenticationChallenge: () => void
   logout: () => Promise<void>
-  invalidateSession: () => void
+  invalidateSession: (options?: { preserveView?: boolean }) => void
   refreshSession: () => Promise<boolean>
   switchTenant: (tenantId: string) => Promise<void>
 }
@@ -47,8 +49,10 @@ function getChallengeFallbackMessage() {
 }
 
 export function AuthProvider({ children }: PropsWithChildren) {
+  const pathname = usePathname()
   const [status, setStatus] = useState<AuthStatus>(() => (loadPendingLogin() ? 'challenge' : 'loading'))
   const [session, setSession] = useState<AuthSession | null>(null)
+  const [frozenSession, setFrozenSession] = useState<AuthSession | null>(null)
   const [challengeMessage, setChallengeMessage] = useState(() =>
     loadPendingLogin() ? getChallengeFallbackMessage() : '',
   )
@@ -56,25 +60,39 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const applySession = useCallback((nextSession: AuthSession) => {
     applySentrySessionContext(nextSession)
     setSession(nextSession)
+    setFrozenSession(nextSession)
     storeActiveTenantId(nextSession.currentTenant.id)
     markAuthenticatedSession()
+    clearSessionEndSignal()
+    clearSessionLock()
     clearSessionClientPhase()
     clearPendingLogin()
     setChallengeMessage('')
     setStatus('authenticated')
   }, [])
 
-  const clearSessionState = useCallback(() => {
+  const clearSessionState = useCallback((options?: { preserveView?: boolean }) => {
+    const preserveView = options?.preserveView === true
+
     applySentrySessionContext(null)
-    clearSensitiveClientState()
-    clearAuthenticatedSessionMarker()
+    clearSensitiveClientState({ preserveGlobalSessionSignals: preserveView })
+    if (!preserveView) {
+      clearAuthenticatedSessionMarker()
+    }
     clearSessionClientPhase()
-    clearSessionLock()
+    if (!preserveView) {
+      clearSessionLock()
+    }
     clearPendingLogin()
     setSession(null)
+    if (!preserveView) {
+      setFrozenSession(null)
+    } else {
+      setFrozenSession((current) => current ?? session)
+    }
     setChallengeMessage('')
     setStatus('unauthenticated')
-  }, [])
+  }, [session])
 
   useEffect(() => {
     let isMounted = true
@@ -82,7 +100,21 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     async function bootstrap(attempt = 0) {
       try {
+        const pendingLogin = loadPendingLogin()
+        const shouldSkipSessionProbeOnLogin = pathname === '/login' && !pendingLogin && !hasAuthenticatedSessionMarker()
+
+        if (shouldSkipSessionProbeOnLogin) {
+          applySentrySessionContext(null)
+          setFrozenSession(null)
+          setSession(null)
+          setChallengeMessage('')
+          setStatus('unauthenticated')
+          return
+        }
+
         if (readSessionLock() && !loadPendingLogin()) {
+          applySentrySessionContext(null)
+          setFrozenSession(null)
           setSession(null)
           setChallengeMessage('')
           setStatus('unauthenticated')
@@ -113,6 +145,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
           setStatus(loadPendingLogin() ? 'challenge' : 'unauthenticated')
           if (!loadPendingLogin()) {
             applySentrySessionContext(null)
+            setFrozenSession(null)
             setSession(null)
           }
           return
@@ -120,11 +153,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
         if (loadPendingLogin()) {
           applySentrySessionContext(null)
+          setFrozenSession(null)
+          setSession(null)
           setStatus('challenge')
           setChallengeMessage(getChallengeFallbackMessage())
           return
         }
         applySentrySessionContext(null)
+        setFrozenSession(null)
         setSession(null)
         setStatus('unauthenticated')
       } catch {
@@ -133,6 +169,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         }
 
         applySentrySessionContext(null)
+        setFrozenSession(null)
         setSession(null)
         setStatus(loadPendingLogin() ? 'challenge' : 'unauthenticated')
       }
@@ -146,15 +183,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
         window.clearTimeout(retryTimeoutId)
       }
     }
-  }, [applySession])
+  }, [applySession, pathname])
 
   const value = useMemo<AuthContextValue>(() => {
+    const visibleSession = session ?? frozenSession
     return {
       status,
       isAuthenticated: status === 'authenticated' && Boolean(session),
       isLoading: status === 'loading',
-      user: session?.user ?? null,
-      session,
+      user: visibleSession?.user ?? null,
+      session: visibleSession,
       challengeMessage,
       login: async (email: string, senha: string) => {
         const tenantId = loadActiveTenantId()
@@ -211,8 +249,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
         clearSessionState()
         window.location.replace('/login')
       },
-      invalidateSession: () => {
-        clearSessionState()
+      invalidateSession: (options) => {
+        clearSessionState(options)
       },
       refreshSession: async () => {
         const sessionProbe = await authService.probeSession(loadActiveTenantId() || undefined)
@@ -238,7 +276,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         applySession(nextSession)
       },
     }
-  }, [applySession, challengeMessage, clearSessionState, session, status])
+  }, [applySession, challengeMessage, clearSessionState, frozenSession, session, status])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

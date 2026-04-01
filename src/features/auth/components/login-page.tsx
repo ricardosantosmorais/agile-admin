@@ -14,6 +14,7 @@ export function LoginPage() {
   const {
     cancelAuthenticationChallenge,
     challengeMessage,
+    invalidateSession,
     login,
     status,
     submitAuthenticationCode,
@@ -49,6 +50,12 @@ export function LoginPage() {
     setEmail(pendingLogin.email)
     setSenha(pendingLogin.senha)
   }, [])
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      invalidateSession()
+    }
+  }, [invalidateSession, status])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()

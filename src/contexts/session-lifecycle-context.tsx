@@ -6,7 +6,9 @@ import { usePathname } from 'next/navigation'
 import { Clock3 } from 'lucide-react'
 import { useAuth } from '@/src/features/auth/hooks/use-auth'
 import {
-  clearSensitiveClientState,
+  clearSessionEndSignal,
+  clearSessionLock,
+  isAuthenticatedSessionRecentlyEstablished,
   markSessionLocked,
   readSessionLock,
 } from '@/src/features/auth/services/auth-tab-storage'
@@ -211,7 +213,7 @@ export function getSessionEndCopy(t: TranslateFn, reason: SessionLostReason) {
 }
 
 export function SessionLifecycleProvider({ children }: PropsWithChildren) {
-  const { isAuthenticated, refreshSession, session } = useAuth()
+  const { invalidateSession, isAuthenticated, refreshSession, session } = useAuth()
   const { t } = useI18n()
   const pathname = usePathname()
   const [modalState, setModalState] = useState<SessionModalState>(() => resolveInitialSessionModalState())
@@ -242,14 +244,14 @@ export function SessionLifecycleProvider({ children }: PropsWithChildren) {
 
     if (initialState.phase === 'ended' && !isLoginPage) {
       markSessionLocked(initialState.reason)
-      clearSensitiveClientState({ preserveGlobalSessionSignals: true })
+      invalidateSession({ preserveView: true })
 
       if (!logoutRequestedRef.current) {
         logoutRequestedRef.current = true
         void authService.logout().catch(() => undefined)
       }
     }
-  }, [isLoginPage])
+  }, [invalidateSession, isLoginPage])
 
   const clearCountdownTimer = useCallback(() => {
     if (countdownIntervalRef.current) {
@@ -298,7 +300,7 @@ export function SessionLifecycleProvider({ children }: PropsWithChildren) {
 
     closeWarning()
     markSessionLocked(reason)
-    clearSensitiveClientState({ preserveGlobalSessionSignals: true })
+    invalidateSession({ preserveView: true })
     setSessionClientPhase('ended')
     setModalState({ phase: 'ended', reason })
 
@@ -310,7 +312,7 @@ export function SessionLifecycleProvider({ children }: PropsWithChildren) {
       logoutRequestedRef.current = true
       void authService.logout().catch(() => undefined)
     }
-  }, [closeWarning, isLoginPage])
+  }, [closeWarning, invalidateSession, isLoginPage])
 
   const openWarningModal = useCallback(() => {
     if (isLoginPage || modalState?.phase === 'ended') {
@@ -364,11 +366,29 @@ export function SessionLifecycleProvider({ children }: PropsWithChildren) {
   }, [])
 
   useEffect(() => {
-    if (isAuthenticated && !isLoginPage && modalState === null) {
+    if (isLoginPage) {
+      setModalState(null)
+      clearCountdownTimer()
+      setIsContinuing(false)
+      clearSessionClientPhase()
+      clearSessionEndSignal()
+      clearSessionLock()
+      sessionEndedRef.current = false
+      logoutRequestedRef.current = false
+      return
+    }
+
+    if (isAuthenticated) {
+      setModalState(null)
+      clearCountdownTimer()
+      setIsContinuing(false)
+      clearSessionEndSignal()
+      clearSessionLock()
+      setSessionClientPhase('active')
       sessionEndedRef.current = false
       logoutRequestedRef.current = false
     }
-  }, [isAuthenticated, isLoginPage, modalState])
+  }, [clearCountdownTimer, isAuthenticated, isLoginPage])
 
   useEffect(() => {
     if (!isAuthenticated || isLoginPage) {
@@ -469,6 +489,10 @@ export function SessionLifecycleProvider({ children }: PropsWithChildren) {
     }
 
     const onSessionLost = (event: Event) => {
+      if (isAuthenticatedSessionRecentlyEstablished()) {
+        return
+      }
+
       const detail = (event as CustomEvent<{ reason?: SessionLostReason }>).detail
       openEndedModal(detail?.reason ?? 'http_401')
     }

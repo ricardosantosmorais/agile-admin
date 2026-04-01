@@ -5,7 +5,9 @@ import type { PendingLogin } from '@/src/features/auth/types/auth'
 const ACTIVE_TENANT_KEY = 'admin-v2-web:tenant'
 const PENDING_LOGIN_KEY = 'admin-v2-web:auth-pending'
 const AUTHENTICATED_MARKER_KEY = 'admin-v2-web:auth-seen'
+const AUTHENTICATED_AT_KEY = 'admin-v2-web:auth-established-at'
 const SESSION_LOCK_KEY = 'admin-v2-web:session-locked'
+const SESSION_END_KEY = 'admin-v2-web:session-end-global'
 const SENSITIVE_SESSION_KEYS = [
   ACTIVE_TENANT_KEY,
   PENDING_LOGIN_KEY,
@@ -15,6 +17,7 @@ const SENSITIVE_LOCAL_STORAGE_KEYS = [
   ACTIVE_TENANT_KEY,
   PENDING_LOGIN_KEY,
   AUTHENTICATED_MARKER_KEY,
+  AUTHENTICATED_AT_KEY,
   SESSION_LOCK_KEY,
   'admin-v2-web:session-activity-global',
   'admin-v2-web:session-end-global',
@@ -87,6 +90,7 @@ export function markAuthenticatedSession() {
   }
 
   window.localStorage.setItem(AUTHENTICATED_MARKER_KEY, '1')
+  window.localStorage.setItem(AUTHENTICATED_AT_KEY, String(Date.now()))
 }
 
 export function clearAuthenticatedSessionMarker() {
@@ -95,6 +99,26 @@ export function clearAuthenticatedSessionMarker() {
   }
 
   window.localStorage.removeItem(AUTHENTICATED_MARKER_KEY)
+  window.localStorage.removeItem(AUTHENTICATED_AT_KEY)
+}
+
+export function readAuthenticatedSessionEstablishedAt() {
+  if (typeof window === 'undefined') {
+    return 0
+  }
+
+  const raw = window.localStorage.getItem(AUTHENTICATED_AT_KEY)
+  const value = raw ? Number(raw) : 0
+  return Number.isFinite(value) ? value : 0
+}
+
+export function isAuthenticatedSessionRecentlyEstablished(windowMs = 5000) {
+  const establishedAt = readAuthenticatedSessionEstablishedAt()
+  if (!establishedAt) {
+    return false
+  }
+
+  return Date.now() - establishedAt <= windowMs
 }
 
 export function readSessionLock() {
@@ -132,6 +156,14 @@ export function clearSessionLock() {
   }
 
   window.localStorage.removeItem(SESSION_LOCK_KEY)
+}
+
+export function clearSessionEndSignal() {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  window.localStorage.removeItem(SESSION_END_KEY)
 }
 
 export function clearSensitiveClientState(options?: { preserveGlobalSessionSignals?: boolean }) {

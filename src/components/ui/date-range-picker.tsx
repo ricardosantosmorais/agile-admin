@@ -113,11 +113,11 @@ export function DateRangePicker({
   }
 
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef} className="relative w-full sm:w-auto">
       <button
         type="button"
         onClick={() => (isOpen ? setIsOpen(false) : openPicker())}
-        className="inline-flex h-10 min-w-[240px] items-center justify-between gap-2 rounded-full border border-line bg-white px-3.5 text-sm font-semibold text-slate-700 transition hover:border-accent/20 hover:text-accent"
+        className="inline-flex h-10 w-full items-center justify-between gap-2 rounded-full border border-line bg-white px-3.5 text-sm font-semibold text-slate-700 transition hover:border-accent/20 hover:text-accent sm:min-w-[240px] sm:w-auto"
       >
         <span className="inline-flex items-center gap-2 truncate">
           <CalendarRange className="h-4 w-4 shrink-0" />
@@ -133,8 +133,8 @@ export function DateRangePicker({
       {isOpen ? (
         <div
           className={[
-            'absolute top-12 z-50 w-[380px] rounded-[1.5rem] border border-line bg-white p-4 shadow-2xl',
-            align === 'right' ? 'right-0' : 'left-0',
+            'absolute top-12 z-50 w-[min(92vw,380px)] rounded-[1.5rem] border border-line bg-white p-4 shadow-2xl sm:w-[380px]',
+            align === 'right' ? 'right-0 max-sm:left-1/2 max-sm:-translate-x-1/2' : 'left-0',
           ].join(' ')}
         >
           <div className="mb-3">

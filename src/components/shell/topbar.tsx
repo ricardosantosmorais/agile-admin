@@ -252,9 +252,9 @@ export function Topbar() {
 
   return (
     <>
-      <header ref={rootRef} className="relative z-[1] rounded-[1.45rem] border border-[#ebe6d8] bg-white px-3.5 py-3 shadow-[0_16px_40px_rgba(15,23,42,0.06)]">
+      <header ref={rootRef} className="relative z-[1] rounded-[1.45rem] border border-[#ebe6d8] bg-white px-3 py-3 shadow-[0_16px_40px_rgba(15,23,42,0.06)] lg:px-3.5">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex min-w-0 items-center gap-2.5">
+          <div className="flex min-w-0 items-start gap-2.5 lg:items-center xl:flex-1">
             <button
               type="button"
               onClick={toggleSidebar}
@@ -264,7 +264,7 @@ export function Topbar() {
               <Menu className="h-4 w-4" />
             </button>
 
-            <div className="relative w-full max-w-[320px] xl:w-[320px]">
+            <div className="relative min-w-0 flex-1 lg:max-w-[320px] xl:w-[320px]">
               <button
                 type="button"
                 onClick={() => togglePanel('tenant')}
@@ -332,7 +332,7 @@ export function Topbar() {
               ) : null}
             </div>
 
-            <div className="relative min-w-0 flex-1">
+            <div className="relative hidden min-w-0 flex-1 lg:block xl:max-w-[420px]">
               <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-[#e7e0d1] bg-[#fdfcf8] px-3.5 py-2.5">
                 <Search className="h-4 w-4 shrink-0 text-slate-400" />
                 <input
@@ -421,7 +421,7 @@ export function Topbar() {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 xl:flex-nowrap">
+          <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap xl:ml-4 xl:shrink-0">
             <div className="flex items-center overflow-hidden rounded-2xl border border-[#e7e0d1] bg-white p-1">
               {SUPPORTED_LOCALES.map((supportedLocale) => (
                 <button
@@ -463,20 +463,20 @@ export function Topbar() {
               </>
             </IconTooltipButton>
 
-            <div className="relative">
+            <div className="relative ml-auto sm:ml-0">
               <button
                 type="button"
                 onClick={() => togglePanel('user')}
-                className="flex h-10 items-center gap-2 rounded-2xl border border-[#e7e0d1] bg-white px-2.5 text-left text-slate-900 transition hover:border-accent/20 sm:px-3"
+                className="flex h-10 items-center gap-2 rounded-2xl border border-[#e7e0d1] bg-white px-2 text-left text-slate-900 transition hover:border-accent/20 sm:px-3"
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#eff7f3] text-[13px] font-extrabold text-accent">
                   {user?.avatarFallback ?? 'U'}
                 </div>
-                <div className="hidden min-w-0 sm:block">
+                <div className="hidden min-w-0 xl:block">
                   <p className="truncate text-[13px] font-bold leading-4">{user?.nome}</p>
                   <p className="truncate text-[11px] text-slate-500">{user?.cargo}</p>
                 </div>
-                <ChevronDown className="hidden h-4 w-4 text-slate-400 sm:block" />
+                <ChevronDown className="hidden h-4 w-4 text-slate-400 xl:block" />
               </button>
 
               {activePanel === 'history' ? (
@@ -505,7 +505,7 @@ export function Topbar() {
               ) : null}
 
               {activePanel === 'user' ? (
-                <div className="absolute right-0 top-12 z-50 w-[360px] rounded-[1.5rem] border border-line bg-white p-4 shadow-2xl">
+                <div className="absolute right-0 top-12 z-50 w-[min(92vw,360px)] rounded-[1.5rem] border border-line bg-white p-4 shadow-2xl">
                   <div className="rounded-[1.25rem] bg-slate-950 px-4 py-4 text-white">
                     <p className="text-base font-bold">{user?.nome}</p>
                     <p className="mt-1 text-sm text-slate-300">{user?.email}</p>

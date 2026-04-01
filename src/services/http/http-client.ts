@@ -1,3 +1,4 @@
+import { isAuthenticatedSessionRecentlyEstablished } from '@/src/features/auth/services/auth-tab-storage'
 import { getSessionClientPhase } from '@/src/features/auth/services/session-client-gate'
 import { captureOperationalClientError } from '@/src/lib/sentry'
 
@@ -87,6 +88,10 @@ function inferSessionLostReason(status: number, message: string): SessionLostRea
 }
 
 function shouldNotifySessionLoss(path: string) {
+  if (isAuthenticatedSessionRecentlyEstablished()) {
+    return false
+  }
+
   return ![
     '/api/auth/logout',
     '/api/auth/session',

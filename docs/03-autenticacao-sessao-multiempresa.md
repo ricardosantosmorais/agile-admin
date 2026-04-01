@@ -26,6 +26,12 @@ Fluxo atual:
 3. o app grava um cookie HTTP-only assinado;
 4. o `AuthProvider` materializa a sessão no cliente.
 
+Comportamento de entrada:
+- acessar `/` sem sessão válida redireciona para `/login`, sem parâmetros extras;
+- acessar `/` com sessão válida redireciona para `/dashboard`;
+- acessar `/login` com sessão válida redireciona diretamente para `/dashboard`;
+- acessar `/login` sem sessão válida não deve disparar probe inicial de `/api/auth/session` quando a aba está limpa e não existe 2FA pendente.
+
 O fluxo também suporta autenticação em duas etapas:
 - o login pode retornar `requiresTwoFactor`;
 - o estado pendente fica em `sessionStorage`;
@@ -98,9 +104,32 @@ Também há interceptação automática de `401` no `httpClient`, que dispara o 
 ## Comportamento final de inatividade
 - após 2 horas sem atividade, o app abre apenas o modal de aviso;
 - o aviso exibe contagem regressiva de 2 minutos e permite somente continuar a sessão;
-- ao fim do contador, o app encerra a sessão remota, limpa a persistência local e bloqueia novas requisições protegidas no cliente;
-- a tela atual permanece visível sob um modal final bloqueante, sem redirect automático;
-- reload, nova navegação protegida ou ação explícita do usuário levam para `/login`.
+- ao fim do contador, o app encerra a sessão remota, limpa a persistência sensível local e bloqueia novas requisições protegidas no cliente;
+- a visão atual da sessão fica congelada em memória até o usuário ir para o login;
+- a tela atual permanece visível e intacta sob um modal final bloqueante, sem redirect automático e sem desmontar o conteúdo que já estava carregado;
+- reload da página, nova navegação protegida ou ação explícita do usuário levam para `/login`;
+- o congelamento da tela vale apenas enquanto a aba continua viva; após `F5`, a memória local do estado congelado some e o app deve redirecionar imediatamente para o login.
+
+## Plano de validação recomendado
+Checklist funcional para confirmar que o fluxo ficou estável:
+
+1. Abrir uma tela operacional com conteúdo dinâmico já carregado, por exemplo `Editor SQL`, `Pedidos` ou uma edição tabulada de catálogo.
+2. Ficar inativo até abrir o modal de aviso de 2 minutos.
+3. Confirmar que, durante o aviso:
+   - a tela de fundo continua igual;
+   - nenhuma área dinâmica é desmontada;
+   - não há redirect para `/login`.
+4. Não clicar em continuar e aguardar o modal final de sessão encerrada.
+5. Confirmar que, após o encerramento:
+   - o conteúdo carregado continua visível atrás do modal;
+   - não aparece estado vazio, erro 401 visível ou tela quebrada atrás do modal;
+   - não há loop de chamadas para `/api/auth/logout`;
+   - não há chamadas protegidas adicionais como notificações, dashboard ou dados da tela.
+6. Pressionar `F5` com o modal final aberto e confirmar que o app vai direto para `/login`, sem tentar remontar a tela protegida.
+7. Clicar em `Ir para login` e confirmar que só então ocorre a navegação para `/login`.
+8. Repetir o teste com duas abas abertas para validar sincronização multiabas:
+   - aba A expira;
+   - aba B deve mostrar o modal final sem desmontar a tela de fundo.
 
 ## Papel das bridges `app/api/*`
 As rotas bridge fazem:

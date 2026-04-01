@@ -15,6 +15,19 @@ Essa ordem define:
 - controle global de sessão;
 - tenant corrente.
 
+## Shell responsiva
+Base relevante:
+- [../src/layouts/auth-shell.tsx](../src/layouts/auth-shell.tsx)
+- [../src/components/shell/topbar.tsx](../src/components/shell/topbar.tsx)
+- [../src/components/shell/sidebar.tsx](../src/components/shell/sidebar.tsx)
+- [../src/contexts/ui-context.tsx](../src/contexts/ui-context.tsx)
+
+Padrão atual:
+- no desktop, a sidebar fica fixa na lateral e a topbar expõe o acesso rápido;
+- no mobile, o botão hambúrguer abre um drawer lateral com o menu;
+- no mobile, o campo de acesso rápido fica oculto para preservar espaço útil;
+- a topbar deve priorizar tenant, ações essenciais e legibilidade, sem quebrar o layout.
+
 ## Padrão de módulo
 Os módulos atuais tendem a seguir este desenho:
 - `services/`

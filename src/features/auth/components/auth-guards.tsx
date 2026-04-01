@@ -53,19 +53,29 @@ function SessionEndedOverlay({
 }
 
 export function ProtectedRoute({ children }: GuardProps) {
-  const { isAuthenticated, isLoading, logout } = useAuth()
+  const { isAuthenticated, isLoading, logout, session } = useAuth()
   const { endedReason, shouldBlockUnauthenticatedRedirect } = useSessionLifecycle()
   const { t } = useI18n()
   const router = useRouter()
   const pathname = usePathname()
 
   useEffect(() => {
+    if (!isLoading && !isAuthenticated && shouldBlockUnauthenticatedRedirect && !session) {
+      clearAuthenticatedSessionMarker()
+      router.replace(`/login?from=${encodeURIComponent(pathname || '/dashboard')}`)
+      return
+    }
+
     if (!isLoading && !isAuthenticated && !shouldBlockUnauthenticatedRedirect) {
       router.replace(`/login?from=${encodeURIComponent(pathname || '/dashboard')}`)
     }
-  }, [isAuthenticated, isLoading, pathname, router, shouldBlockUnauthenticatedRedirect])
+  }, [isAuthenticated, isLoading, pathname, router, session, shouldBlockUnauthenticatedRedirect])
 
   if (isLoading) {
+    return null
+  }
+
+  if (!isAuthenticated && shouldBlockUnauthenticatedRedirect && !session) {
     return null
   }
 
