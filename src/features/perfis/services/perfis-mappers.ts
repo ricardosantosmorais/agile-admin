@@ -33,9 +33,10 @@ export type PerfilListResponse = {
   }
 }
 
-export type PerfilPermissionNode = TreeSelectionNode & {
+export type PerfilPermissionNode = Omit<TreeSelectionNode, 'children'> & {
   label: string
   description?: string
+  children?: PerfilPermissionNode[]
 }
 
 export type PerfilFormRecord = {

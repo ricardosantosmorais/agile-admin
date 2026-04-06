@@ -281,7 +281,8 @@ export function ParameterFormPageBase<FormValues extends Record<string, string>,
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {effectiveFieldDefinitions.filter((field) => field.section === section.key).map((field) => {
                   const fieldMeta = metadata[field.key]
-                  const lookupOptions = field.lookupCollection ? mapLookupOptions(lookups[field.lookupCollection] ?? []) : []
+                  const lookupCollectionKey = field.lookupCollection
+                  const lookupOptions = lookupCollectionKey ? mapLookupOptions(lookups[lookupCollectionKey] ?? []) : []
 
                   return (
                     <div key={String(field.key)} className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
@@ -293,17 +294,17 @@ export function ParameterFormPageBase<FormValues extends Record<string, string>,
                             onChange={(nextValue) => {
                               patch(field.key, (nextValue?.id ?? '') as FormValues[keyof FormValues])
 
-                              if (!field.lookupCollection) {
+                              if (!lookupCollectionKey) {
                                 return
                               }
 
                               setLookups((currentLookups) => {
-                                const currentCollection = currentLookups[field.lookupCollection] ?? []
+                                const currentCollection = currentLookups[lookupCollectionKey] ?? []
 
                                 if (!nextValue) {
                                   return {
                                     ...currentLookups,
-                                    [field.lookupCollection]: currentCollection,
+                                    [lookupCollectionKey]: currentCollection,
                                   }
                                 }
 
@@ -312,12 +313,12 @@ export function ParameterFormPageBase<FormValues extends Record<string, string>,
                                     value: nextValue.id,
                                     label: nextValue.label,
                                   },
-                                  ...currentCollection.filter((option) => option.value !== nextValue.id),
+                                  ...currentCollection.filter((option: LookupOption) => option.value !== nextValue.id),
                                 ]
 
                                 return {
                                   ...currentLookups,
-                                  [field.lookupCollection]: nextCollection,
+                                  [lookupCollectionKey]: nextCollection,
                                 }
                               })
                             }}

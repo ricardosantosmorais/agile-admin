@@ -171,6 +171,8 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
   'configuracoes-precos-form': '/configuracoes/precos',
   'configuracoes-produtos-form': '/configuracoes/produtos',
   'configuracoes-vendedores-form': '/configuracoes/vendedores',
+  'integracao-usuarios-list': '/api-de-integracao/aplicativos',
+  'integracao-usuarios-form': '/api-de-integracao/aplicativos',
   'cadastro-parametros-list': '/configuracoes/parametros',
   'cadastro-parametros-form': '/configuracoes/parametros',
   'parametros-empresa-list': '/configuracoes/parametros',

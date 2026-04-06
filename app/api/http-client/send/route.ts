@@ -63,7 +63,12 @@ function buildMergedQueryParams(queryString: string, rows: Array<{ key: string; 
 
 function resolveEndpointPathTemplate(endpoint: string, params: URLSearchParams) {
   const normalized = endpoint.trim()
-  if (!normalized) return normalized
+  if (!normalized) {
+    return {
+      ok: true as const,
+      endpoint: normalized,
+    }
+  }
 
   const segments = normalized.split('/')
   const resolvedSegments: string[] = []

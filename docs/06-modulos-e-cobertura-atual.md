@@ -107,6 +107,9 @@ Observação:
 - HTTP Client
 - Dicionário de Dados
 
+### API de Integração
+- Aplicativos
+
 ### Relatórios
 - Relatórios v2
 
@@ -157,6 +160,11 @@ Observação:
   - status dos campos por componente (`Encontrado`, `Ignorado`, `Não disponível`);
   - ações para ignorar/remover status e editar descrição/regra de tabela e campo;
   - exportação HTML consolidada via bridge no App Router.
+- `API de Integração > Aplicativos` já possui:
+  - listagem server-side com filtros de `id`, `código`, `nome`, `email` e `ativo`;
+  - criação e edição de aplicativo com contrato do legado (`gestao_usuario`);
+  - ações para copiar `Client ID`, copiar `Secret` e gerar novo `Secret`;
+  - rota dedicada para permissões de acesso por aplicativo, no lugar do modal legado.
 
 ## Estado arquitetural da cobertura
 

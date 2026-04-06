@@ -52,6 +52,7 @@ export type CrudResource =
   | 'filiais'
   | 'canais_distribuicao'
   | 'perfis_administradores'
+  | 'integracao-aplicativos'
   | 'produtos'
   | 'promocoes'
   | 'compre_ganhe'

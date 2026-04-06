@@ -6,6 +6,7 @@ export type FeatureKey =
   | 'editorSql'
   | 'httpClient'
   | 'dicionarioDados'
+  | 'integracaoAplicativos'
   | 'produtos'
   | 'produtosPrecificadores'
   | 'produtosFiliais'
@@ -118,6 +119,10 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
   dicionarioDados: {
     label: 'Dicionário de Dados',
     matchers: ['dicionario de dados', 'dicionário de dados', 'dicionario-modulos-list', 'dicionario-list', 'tools-dictionary'],
+  },
+  integracaoAplicativos: {
+    label: 'Aplicativos',
+    matchers: ['integracao-usuarios-list', 'integracao usuarios', 'api de integracao aplicativos', 'aplicativos api'],
   },
   produtos: {
     label: 'Produtos',

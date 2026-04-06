@@ -50,6 +50,7 @@ const CRUD_OPTIONS_PATHS: Record<CrudResource, string> = {
   filiais: '/api/lookups/filiais',
   canais_distribuicao: '/api/lookups/canais_distribuicao',
   perfis_administradores: '/api/administradores/perfis',
+  'integracao-aplicativos': '/api/integracao-aplicativos',
   produtos: '/api/lookups/produtos',
   promocoes: '/api/lookups/promocoes',
   compre_ganhe: '/api/compre-e-ganhe',
