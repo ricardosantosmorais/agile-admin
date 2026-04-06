@@ -452,6 +452,36 @@ export const fakeConfigModules: ConfigModule[] = [
     ],
   },
   {
+    slug: 'entregas',
+    nome: 'Configurações de entregas',
+    descricao: 'Parâmetros de frete, checkout e comportamento de split para as entregas do tenant.',
+    campos: [
+      { label: 'Cálculo de frete', valor: 'Ativo' },
+      { label: 'Forma padrão', valor: 'Entrega expressa' },
+      { label: 'Múltiplos endereços', valor: 'Ativo' },
+    ],
+  },
+  {
+    slug: 'geral',
+    nome: 'Configurações gerais',
+    descricao: 'Parâmetros estruturais do tenant e comportamento padrão do admin.',
+    campos: [
+      { label: 'Modo e-commerce', valor: 'B2B' },
+      { label: 'URL do site', valor: 'https://tenant.exemplo.com.br' },
+      { label: 'URL de imagens', valor: 'https://cdn.exemplo.com.br' },
+    ],
+  },
+  {
+    slug: 'inicio',
+    nome: 'Configurações de início',
+    descricao: 'Contexto padrão usado na navegação inicial da loja.',
+    campos: [
+      { label: 'Cliente', valor: '123' },
+      { label: 'Filial', valor: 'Matriz - 2' },
+      { label: 'Forma de pagamento', valor: 'PIX - 801' },
+    ],
+  },
+  {
     slug: 'layout',
     nome: 'Configurações de layout',
     descricao: 'Aparência, identidade visual e blocos do painel administrativo.',

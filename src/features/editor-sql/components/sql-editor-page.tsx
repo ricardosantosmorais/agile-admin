@@ -212,8 +212,6 @@ export function SqlEditorPage() {
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0]
   const activeRows = activeTab?.result?.rows ?? EMPTY_ROWS
   const activePagination = activeTab?.result?.pagination
-  const activeSourceLabel = DATA_SOURCE_OPTIONS.find((option) => option.value === activeTab?.fonteDados)?.fallback ?? 'Fonte'
-
   useEffect(() => {
     if (savedQueriesOpen) void loadSavedQueries()
   }, [savedQueriesOpen])
@@ -384,7 +382,7 @@ export function SqlEditorPage() {
 
     return (
       <ResizableVerticalPanels
-        initialTopPercentage={36}
+        initialTopPercentage={mode === 'fullscreen' ? 36 : 26}
         topPercentage={mode === 'fullscreen' ? splitFullscreen : splitNormal}
         onTopPercentageChange={mode === 'fullscreen' ? setSplitFullscreen : setSplitNormal}
         minTopPx={220}
@@ -393,13 +391,42 @@ export function SqlEditorPage() {
         minHeightClassName={mode === 'fullscreen' ? 'min-h-0' : 'min-h-[620px]'}
         top={(
           <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-[1rem] border border-[#e8e2d7] bg-white">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#efe8dc] px-4 py-3">
-              <div className="flex min-w-0 items-center gap-2">
-                <StatusBadge tone="info">{activeSourceLabel}</StatusBadge>
-                <StatusBadge tone={activeTab.savedQueryId ? 'success' : 'neutral'}>
-                  {activeTab.savedQueryId ? 'Salva' : 'Não salva'}
-                </StatusBadge>
-                <StatusBadge tone="neutral">Ctrl/Cmd + Enter</StatusBadge>
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#efe8dc] px-3 py-2.5">
+              <div className="flex min-w-0 items-center gap-1.5 overflow-x-auto pb-1">
+                {tabs.map((tab) => (
+                  <div
+                    key={tab.id}
+                    className={[
+                      'inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-1',
+                      tab.id === activeTab.id ? 'border-slate-950 bg-slate-950 text-white' : 'border-[#e0d7c8] bg-[#fcfaf5] text-slate-700',
+                    ].join(' ')}
+                  >
+                    <button type="button" onClick={() => setActiveTabId(tab.id)} className="px-2 text-[13px] font-semibold">
+                      {tab.title}
+                      {tab.dirty ? ' *' : ''}
+                    </button>
+                    {tabs.length > 1 ? (
+                      <button
+                        type="button"
+                        onClick={() => closeTab(tab.id)}
+                        className={tab.id === activeTab.id ? 'text-white/80' : 'text-slate-500'}
+                        aria-label={t('sqlEditor.actions.closeTab', 'Fechar aba')}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    ) : null}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={createNewTab}
+                  aria-label={t('sqlEditor.actions.newTab', 'Nova aba')}
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#e0d7c8] bg-[#fcfaf5] text-slate-700 transition hover:border-slate-950 hover:text-slate-950"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="flex items-center gap-2 text-[11px] text-slate-500">
                 {activeTab.isExecuting ? (
                   <StatusBadge tone="warning">
                     <span className="inline-flex items-center gap-1.5">
@@ -408,8 +435,8 @@ export function SqlEditorPage() {
                     </span>
                   </StatusBadge>
                 ) : null}
+                <span className="shrink-0">Ctrl/Cmd + Enter</span>
               </div>
-              <div className="text-xs text-slate-500">{activeTab.title}</div>
             </div>
             <div className="min-h-0 flex-1 overflow-hidden">
               <SqlEditorMonaco
@@ -615,35 +642,8 @@ export function SqlEditorPage() {
 
       {activeTab ? (
         <SectionCard className="overflow-hidden px-0 py-0">
-          <div className="border-b border-[#ebe4d8] bg-[#faf7f1] px-4 py-3">
-            <div className="flex flex-wrap items-center gap-2">
-              {tabs.map((tab) => (
-                <div
-                  key={tab.id}
-                  className={[
-                    'inline-flex items-center gap-1 rounded-[1rem] border px-2 py-1.5',
-                    tab.id === activeTab.id ? 'border-slate-950 bg-slate-950 text-white' : 'border-[#e0d7c8] bg-white text-slate-700',
-                  ].join(' ')}
-                >
-                  <button type="button" onClick={() => setActiveTabId(tab.id)} className="px-2 text-sm font-semibold">
-                    {tab.title}
-                    {tab.dirty ? ' *' : ''}
-                  </button>
-                  {tabs.length > 1 ? (
-                    <button type="button" onClick={() => closeTab(tab.id)} className={tab.id === activeTab.id ? 'text-white/80' : 'text-slate-500'} aria-label={t('sqlEditor.actions.closeTab', 'Fechar aba')}>
-                      <X className="h-4 w-4" />
-                    </button>
-                  ) : null}
-                </div>
-              ))}
-              <ToolbarIconButton label={t('sqlEditor.actions.newTab', 'Nova aba')} onClick={createNewTab}>
-                <Plus className="h-4 w-4" />
-              </ToolbarIconButton>
-            </div>
-          </div>
-
-          <div className="px-4 py-4">
-            {renderWorkspace('calc(100vh - 210px)')}
+          <div className="px-2 py-2 sm:px-3 sm:py-3">
+            {renderWorkspace('calc(100vh - 150px)')}
           </div>
         </SectionCard>
       ) : null}

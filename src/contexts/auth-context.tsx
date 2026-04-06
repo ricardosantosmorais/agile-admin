@@ -2,7 +2,6 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { PropsWithChildren } from 'react'
-import { usePathname } from 'next/navigation'
 import { authService } from '@/src/features/auth/services/auth-service'
 import {
   clearAuthenticatedSessionMarker,
@@ -49,7 +48,6 @@ function getChallengeFallbackMessage() {
 }
 
 export function AuthProvider({ children }: PropsWithChildren) {
-  const pathname = usePathname()
   const [status, setStatus] = useState<AuthStatus>(() => (loadPendingLogin() ? 'challenge' : 'loading'))
   const [session, setSession] = useState<AuthSession | null>(null)
   const [frozenSession, setFrozenSession] = useState<AuthSession | null>(null)
@@ -101,7 +99,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
     async function bootstrap(attempt = 0) {
       try {
         const pendingLogin = loadPendingLogin()
-        const shouldSkipSessionProbeOnLogin = pathname === '/login' && !pendingLogin && !hasAuthenticatedSessionMarker()
+        const currentPathname = typeof window !== 'undefined' ? window.location.pathname : ''
+        const shouldSkipSessionProbeOnLogin = currentPathname === '/login' && !pendingLogin && !hasAuthenticatedSessionMarker()
 
         if (shouldSkipSessionProbeOnLogin) {
           applySentrySessionContext(null)
@@ -183,7 +182,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         window.clearTimeout(retryTimeoutId)
       }
     }
-  }, [applySession, pathname])
+  }, [applySession])
 
   const value = useMemo<AuthContextValue>(() => {
     const visibleSession = session ?? frozenSession

@@ -125,6 +125,7 @@ function SidebarNav({
               <Link
                 key={item.key}
                 href={item.to ?? '/'}
+                prefetch={false}
                 className={itemClassName}
                 title={!mobile && isSidebarCollapsed ? item.label : undefined}
               >
@@ -200,6 +201,7 @@ function SidebarNav({
                       <Link
                         key={child.key}
                         href={child.to ?? '/'}
+                        prefetch={false}
                         className={childClassName}
                       >
                         <ChildIcon className="h-4 w-4 shrink-0" />

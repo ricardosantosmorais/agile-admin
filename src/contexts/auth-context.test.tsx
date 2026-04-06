@@ -76,6 +76,11 @@ function FrozenSessionProbe() {
   )
 }
 
+function RerenderProbe({ tick }: { tick: number }) {
+  const { status, isAuthenticated } = useAuth()
+  return <div>{`${tick}:${status}:${isAuthenticated ? 'yes' : 'no'}`}</div>
+}
+
 describe('AuthProvider', () => {
   beforeEach(() => {
     window.localStorage.clear()
@@ -182,5 +187,36 @@ describe('AuthProvider', () => {
     })
 
     expect(window.localStorage.getItem('admin-v2-web:session-end-global')).toBeNull()
+  })
+
+  it('does not probe the session again on a parent rerender after bootstrap succeeds', async () => {
+    probeSessionMock.mockResolvedValueOnce({
+      kind: 'authenticated',
+      session: buildSession(),
+    })
+
+    const view = renderWithProviders(
+      <AuthProvider>
+        <RerenderProbe tick={1} />
+      </AuthProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('1:authenticated:yes')).toBeInTheDocument()
+    })
+
+    expect(probeSessionMock).toHaveBeenCalledTimes(1)
+
+    view.rerender(
+      <AuthProvider>
+        <RerenderProbe tick={2} />
+      </AuthProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('2:authenticated:yes')).toBeInTheDocument()
+    })
+
+    expect(probeSessionMock).toHaveBeenCalledTimes(1)
   })
 })

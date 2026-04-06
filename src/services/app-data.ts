@@ -104,6 +104,7 @@ function clearDashboardCache(tenantId: string, startDate: string, endDate: strin
 }
 
 const CLIENT_LOOKUP_CACHE_TTL_MS = 5 * 60 * 1000
+const NOTIFICATIONS_CACHE_TTL_MS = 5 * 60 * 1000
 
 type ClientLookupCacheEntry<T> = {
   createdAt: number
@@ -111,6 +112,8 @@ type ClientLookupCacheEntry<T> = {
 }
 
 const clientLookupCache = new Map<string, ClientLookupCacheEntry<ClientLookupOption[]>>()
+const notificationsCache = new Map<string, ClientLookupCacheEntry<NotificationsListResponse>>()
+const NOTIFICATIONS_STORAGE_PREFIX = 'admin-v2-web:notifications:'
 
 function getClientLookupCacheKey(resource: ClientLookupResource, query: string, page: number, perPage: number) {
   return `${resource}::${query.trim().toLowerCase()}::${page}::${perPage}`
@@ -137,6 +140,94 @@ function writeClientLookupCache(key: string, data: ClientLookupOption[]) {
   })
 }
 
+function readNotificationsCache(key: string) {
+  const entry = notificationsCache.get(key)
+  if (!entry) {
+    if (typeof window === 'undefined') {
+      return null
+    }
+
+    try {
+      const raw = window.sessionStorage.getItem(`${NOTIFICATIONS_STORAGE_PREFIX}${key}`)
+      if (!raw) {
+        return null
+      }
+
+      const parsed = JSON.parse(raw) as ClientLookupCacheEntry<NotificationsListResponse>
+      if (Date.now() - parsed.createdAt > NOTIFICATIONS_CACHE_TTL_MS) {
+        window.sessionStorage.removeItem(`${NOTIFICATIONS_STORAGE_PREFIX}${key}`)
+        return null
+      }
+
+      notificationsCache.set(key, {
+        createdAt: parsed.createdAt,
+        data: structuredClone(parsed.data),
+      })
+
+      return structuredClone(parsed.data)
+    } catch {
+      return null
+    }
+  }
+
+  if (Date.now() - entry.createdAt > NOTIFICATIONS_CACHE_TTL_MS) {
+    notificationsCache.delete(key)
+    return null
+  }
+
+  return structuredClone(entry.data)
+}
+
+function writeNotificationsCache(key: string, data: NotificationsListResponse) {
+  const entry = {
+    createdAt: Date.now(),
+    data: structuredClone(data),
+  }
+
+  notificationsCache.set(key, entry)
+
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  try {
+    window.sessionStorage.setItem(`${NOTIFICATIONS_STORAGE_PREFIX}${key}`, JSON.stringify(entry))
+  } catch {
+    // noop
+  }
+}
+
+function invalidateNotificationsCache(key?: string) {
+  if (key) {
+    notificationsCache.delete(key)
+    if (typeof window !== 'undefined') {
+      try {
+        window.sessionStorage.removeItem(`${NOTIFICATIONS_STORAGE_PREFIX}${key}`)
+      } catch {
+        // noop
+      }
+    }
+    return
+  }
+
+  notificationsCache.clear()
+
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  try {
+    for (let index = window.sessionStorage.length - 1; index >= 0; index -= 1) {
+      const storageKey = window.sessionStorage.key(index)
+      if (storageKey?.startsWith(NOTIFICATIONS_STORAGE_PREFIX)) {
+        window.sessionStorage.removeItem(storageKey)
+      }
+    }
+  } catch {
+    // noop
+  }
+}
+
 export const appData = {
   auth: {
     async login(email: string, senha?: string) {
@@ -149,13 +240,22 @@ export const appData = {
     },
   },
   shell: {
-    async getNotifications(): Promise<NotificationsListResponse> {
-      return httpClient<NotificationsListResponse>('/api/notifications', {
+    async getNotifications(tenantId?: string): Promise<NotificationsListResponse> {
+      const cacheKey = tenantId || 'default'
+      const cached = readNotificationsCache(cacheKey)
+      if (cached) {
+        return cached
+      }
+
+      const response = await httpClient<NotificationsListResponse>('/api/notifications', {
         method: 'GET',
         cache: 'no-store',
       })
+
+      writeNotificationsCache(cacheKey, response)
+      return response
     },
-    async markNotificationsAsRead(receipts: NotificationReadReceipt[]) {
+    async markNotificationsAsRead(receipts: NotificationReadReceipt[], tenantId?: string) {
       if (!receipts.length) {
         return
       }
@@ -165,6 +265,8 @@ export const appData = {
         cache: 'no-store',
         body: JSON.stringify({ receipts }),
       })
+
+      invalidateNotificationsCache(tenantId || 'default')
     },
     async getNotificationById(id: string): Promise<NotificationDetail | null> {
       try {

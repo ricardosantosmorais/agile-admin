@@ -51,7 +51,12 @@ Se a tarefa tocar arquitetura ou padroes:
 - Se um helper deixar de ser especifico de um unico modulo, extrair para o local compartilhado adequado e substituir as duplicacoes encontradas na mesma tarefa.
 - Manter mudancas pequenas, coesas e delimitadas por modulo ou infraestrutura.
 - Se a tarefa for grande, propor primeiro um plano curto com passos e arquivos.
-- Sempre validar com `lint` e, quando relevante, `build`.
+- Validacoes devem seguir cadencia pragmatica para evitar custo e latencia desnecessarios:
+  - durante exploracao, leitura de legado, analise, debugging inicial ou alinhamento de abordagem, nao rodar `lint` ou `build` por padrao;
+  - em ajustes pequenos e localizados, validar apenas no fechamento do bloco de alteracao, preferindo a menor validacao suficiente;
+  - `lint` deve ser executado no fechamento da tarefa ou do bloco principal de mudancas, nao a cada interacao;
+  - `build` deve ser executado apenas quando a natureza da mudanca justificar, por exemplo alteracoes estruturais, rotas, bundling, SSR, providers, i18n ampla ou risco real de integracao;
+  - evitar rerodar a mesma validacao duas ou mais vezes na mesma interacao sem que uma nova alteracao relevante tenha invalidado o resultado anterior.
 - Toda feature nova deve nascer com cobertura minima de testes:
   - testes unitarios para mapeadores, validadores, helpers e regras de transformacao;
   - testes de integracao de componente quando houver comportamento de UI relevante;

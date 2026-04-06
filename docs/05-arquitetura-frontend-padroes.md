@@ -1,4 +1,4 @@
-# 05 - Arquitetura Frontend e Padrões
+﻿# 05 - Arquitetura Frontend e PadrÃµes
 
 ## Providers
 Ordem atual dos providers em [../src/providers/app-providers.tsx](../src/providers/app-providers.tsx):
@@ -11,8 +11,8 @@ Ordem atual dos providers em [../src/providers/app-providers.tsx](../src/provide
 Essa ordem define:
 - idioma;
 - estado visual;
-- autenticação;
-- controle global de sessão;
+- autenticaÃ§Ã£o;
+- controle global de sessÃ£o;
 - tenant corrente.
 
 ## Shell responsiva
@@ -22,19 +22,19 @@ Base relevante:
 - [../src/components/shell/sidebar.tsx](../src/components/shell/sidebar.tsx)
 - [../src/contexts/ui-context.tsx](../src/contexts/ui-context.tsx)
 
-Padrão atual:
-- no desktop, a sidebar fica fixa na lateral e a topbar expõe o acesso rápido;
-- no mobile, o botão hambúrguer abre um drawer lateral com o menu;
-- no mobile, o campo de acesso rápido fica oculto para preservar espaço útil;
-- a topbar deve priorizar tenant, ações essenciais e legibilidade, sem quebrar o layout.
+PadrÃ£o atual:
+- no desktop, a sidebar fica fixa na lateral e a topbar expÃµe o acesso rÃ¡pido;
+- no mobile, o botÃ£o hambÃºrguer abre um drawer lateral com o menu;
+- no mobile, o campo de acesso rÃ¡pido fica oculto para preservar espaÃ§o Ãºtil;
+- a topbar deve priorizar tenant, aÃ§Ãµes essenciais e legibilidade, sem quebrar o layout.
 
-## Padrão de módulo
-Os módulos atuais tendem a seguir este desenho:
+## PadrÃ£o de mÃ³dulo
+Os mÃ³dulos atuais tendem a seguir este desenho:
 - `services/`
   - client
   - mappers
   - config
-  - helpers específicos
+  - helpers especÃ­ficos
 - `components/`
   - list page
   - form page
@@ -42,7 +42,13 @@ Os módulos atuais tendem a seguir este desenho:
   - modais
   - subcomponentes locais
 - `types/`
-  - tipos específicos quando o módulo pede
+  - tipos especÃ­ficos quando o mÃ³dulo pede
+
+Em `ConfiguraÃ§Ãµes`, o padrÃ£o atual passou a ser organizado por mÃ³dulo:
+- `src/features/configuracoes-<modulo>/components`
+- `src/features/configuracoes-<modulo>/services`
+- `src/features/configuracoes-<modulo>/types`
+- peÃ§as reutilizadas entre mÃ³dulos ficam em `src/components/form-page/* e src/lib/company-parameters-query.ts`
 
 ## Bases compartilhadas
 
@@ -57,9 +63,9 @@ Arquivos principais:
 Uso ideal:
 - CRUDs lineares usam `CrudListPage`;
 - telas operacionais complexas usam `AppDataTable` e `useCrudListController`;
-- módulos muito densos podem ter listagem própria, desde que preservem o padrão visual do v2.
+- mÃ³dulos muito densos podem ter listagem prÃ³pria, desde que preservem o padrÃ£o visual do v2.
 
-### Formulários
+### FormulÃ¡rios
 Arquivos principais:
 - [../src/components/crud-base/crud-form-page.tsx](../src/components/crud-base/crud-form-page.tsx)
 - [../src/components/crud-base/crud-form-sections.tsx](../src/components/crud-base/crud-form-sections.tsx)
@@ -67,39 +73,39 @@ Arquivos principais:
 - [../src/components/ui/section-card.tsx](../src/components/ui/section-card.tsx)
 
 Capacidades atuais:
-- seções em linha;
+- seÃ§Ãµes em linha;
 - campos condicionais;
 - lookups;
 - selects;
-- máscaras;
+- mÃ¡scaras;
 - upload;
 - editor HTML;
-- validação visual de obrigatórios;
-- ação extra no header;
-- redirect pós-save configurável.
+- validaÃ§Ã£o visual de obrigatÃ³rios;
+- aÃ§Ã£o extra no header;
+- redirect pÃ³s-save configurÃ¡vel.
 
-### Formulários tabulados e híbridos
-Nem toda tela deve ser forçada para `CrudFormPage`.
+### FormulÃ¡rios tabulados e hÃ­bridos
+Nem toda tela deve ser forÃ§ada para `CrudFormPage`.
 
 Bases relevantes:
 - [../src/features/catalog/components/tabbed-catalog-form-page.tsx](../src/features/catalog/components/tabbed-catalog-form-page.tsx)
 - [../src/components/ui/tab-button.tsx](../src/components/ui/tab-button.tsx)
 
-Casos típicos:
-- catálogo com abas;
+Casos tÃ­picos:
+- catÃ¡logo com abas;
 - produtos;
 - formas de entrega;
-- módulos operacionais com várias relações;
+- mÃ³dulos operacionais com vÃ¡rias relaÃ§Ãµes;
 - wizards, como `Produtos x Precificadores`.
 
-## Bridges e integração
+## Bridges e integraÃ§Ã£o
 Regra atual:
-- integrações com a `api-v3` passam preferencialmente por `app/api/*`;
-- integrações externas específicas também passam por bridges próprias, por exemplo:
+- integraÃ§Ãµes com a `api-v3` passam preferencialmente por `app/api/*`;
+- integraÃ§Ãµes externas especÃ­ficas tambÃ©m passam por bridges prÃ³prias, por exemplo:
   - `app/api/editor-sql/*`
   - `app/api/uploads/*`
 
-As adaptações de payload, contratos e tratamento de erro devem viver em:
+As adaptaÃ§Ãµes de payload, contratos e tratamento de erro devem viver em:
 - route handlers;
 - clients da feature;
 - mappers da feature;
@@ -116,46 +122,46 @@ Base compartilhada atual:
 - [../app/api/uploads/route.ts](../app/api/uploads/route.ts)
 
 Estado atual:
-- a base já suporta estratégia preparada para S3;
-- alguns módulos já usam bridge de upload real;
-- o desenho continua compatível com módulos que ainda dependem do fluxo legado.
+- a base jÃ¡ suporta estratÃ©gia preparada para S3;
+- alguns mÃ³dulos jÃ¡ usam bridge de upload real;
+- o desenho continua compatÃ­vel com mÃ³dulos que ainda dependem do fluxo legado.
 
 ## Editor HTML
 O editor HTML compartilhado continua baseado em Tiptap:
 - [../src/components/ui/rich-text-editor.tsx](../src/components/ui/rich-text-editor.tsx)
 
-Direção atual:
+DireÃ§Ã£o atual:
 - manter Tiptap como base;
-- evoluir toolbar e extensões quando necessário;
-- evitar trocar de biblioteca sem ganho técnico claro.
+- evoluir toolbar e extensÃµes quando necessÃ¡rio;
+- evitar trocar de biblioteca sem ganho tÃ©cnico claro.
 
 ## Editor SQL
-`Ferramentas > Editor SQL` foi tratado como página operacional própria.
+`Ferramentas > Editor SQL` foi tratado como pÃ¡gina operacional prÃ³pria.
 
 Base relevante:
 - [../src/features/editor-sql/components/sql-editor-page.tsx](../src/features/editor-sql/components/sql-editor-page.tsx)
 - [../src/features/editor-sql/components/sql-editor-monaco.tsx](../src/features/editor-sql/components/sql-editor-monaco.tsx)
 - [../src/features/editor-sql/services/sql-editor-workspace.ts](../src/features/editor-sql/services/sql-editor-workspace.ts)
 
-Padrões adotados:
+PadrÃµes adotados:
 - Monaco com model por aba;
-- persistência local do workspace no navegador;
-- múltiplas abas, fullscreen e painéis redimensionáveis;
+- persistÃªncia local do workspace no navegador;
+- mÃºltiplas abas, fullscreen e painÃ©is redimensionÃ¡veis;
 - resultado em tabela ou JSON;
-- sem dependência de backend adicional para restore local.
+- sem dependÃªncia de backend adicional para restore local.
 
 ## i18n
 Idiomas atuais:
 - `pt-BR`
 - `en-US`
 
-Estratégia:
-- textos fixos no dicionário local;
-- labels de menu vindos da API traduzidos por chave estável e fallback controlado;
-- toda string nova de UI deve entrar nos dois dicionários.
+EstratÃ©gia:
+- textos fixos no dicionÃ¡rio local;
+- labels de menu vindos da API traduzidos por chave estÃ¡vel e fallback controlado;
+- toda string nova de UI deve entrar nos dois dicionÃ¡rios.
 
 ## Observabilidade
-O projeto possui integração base com Sentry no App Router.
+O projeto possui integraÃ§Ã£o base com Sentry no App Router.
 
 Pontos de entrada:
 - `instrumentation.ts`
@@ -166,13 +172,15 @@ Pontos de entrada:
 - `src/lib/sentry.ts`
 
 Regra:
-- observabilidade deve ficar na infraestrutura da aplicação;
-- telas não devem espalhar captura manual sem necessidade;
+- observabilidade deve ficar na infraestrutura da aplicaÃ§Ã£o;
+- telas nÃ£o devem espalhar captura manual sem necessidade;
 - DSNs client-side usam `NEXT_PUBLIC_SENTRY_DSN`.
 
-## Regra prática de escolha de base
-Ao começar um módulo:
-1. verificar se é CRUD linear;
+## Regra prÃ¡tica de escolha de base
+Ao comeÃ§ar um mÃ³dulo:
+1. verificar se Ã© CRUD linear;
 2. verificar se precisa de tabs;
-3. verificar se é tela operacional densa;
-4. escolher a menor base compartilhada que resolva o problema sem esconder regra de negócio real.
+3. verificar se Ã© tela operacional densa;
+4. escolher a menor base compartilhada que resolva o problema sem esconder regra de negÃ³cio real.
+
+

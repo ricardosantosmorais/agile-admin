@@ -29,6 +29,7 @@ const lookupConfig: Record<string, { path: string; labelKeys: string[]; searchFi
   tabelas_preco: { path: 'tabelas_preco', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   formas_pagamento: { path: 'formas_pagamento', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   condicoes_pagamento: { path: 'condicoes_pagamento', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
+  formas_entrega: { path: 'formas_entrega', labelKeys: ['nome'], searchField: 'formas_entrega.nome::like', order: 'formas_entrega.nome' },
 }
 
 export async function GET(

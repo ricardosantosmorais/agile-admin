@@ -6,6 +6,7 @@ type ExternalAdminApiOptions = {
   method?: 'GET' | 'POST'
   query?: string | URLSearchParams | Record<string, string | number | boolean | null | undefined>
   body?: Record<string, string | number | boolean | null | undefined>
+  tokenOverride?: string
 }
 
 function trimTrailingSlash(value: string) {
@@ -20,7 +21,11 @@ function getBaseUrl(target: ExternalAdminApiTarget) {
   return trimTrailingSlash(process.env.ADMIN_URL_API_PAINELB2B || '')
 }
 
-function getToken(target: ExternalAdminApiTarget) {
+function getToken(target: ExternalAdminApiTarget, tokenOverride?: string) {
+  if (tokenOverride?.trim()) {
+    return tokenOverride.trim()
+  }
+
   if (target === 'agilesync') {
     return process.env.ADMIN_API_AGILESYNC_TOKEN || process.env.ADMIN_API_PAINELB2B_TOKEN || ''
   }
@@ -60,7 +65,7 @@ export async function externalAdminApiFetch(
   options: ExternalAdminApiOptions = {},
 ) {
   const baseUrl = getBaseUrl(target)
-  const token = getToken(target)
+  const token = getToken(target, options.tokenOverride)
 
   if (!baseUrl || !token) {
     const missingParts = [
@@ -72,52 +77,80 @@ export async function externalAdminApiFetch(
       ok: false,
       status: 500,
       payload: {
-        message: `Editor SQL não configurado. Ajuste ${missingParts.join(' e ')} no ambiente.`,
+        message: `API externa não configurada. Ajuste ${missingParts.join(' e ')} no ambiente.`,
       },
     }
   }
 
   const method = options.method ?? 'GET'
   const query = toSearchParams(options.query)
-  const querySuffix = query.toString() ? `?${query.toString()}` : ''
-  const url = `${baseUrl}/${path.replace(/^\/+/, '')}${querySuffix}`
+  const queryString = query.toString()
+  const normalizedPath = path.replace(/^\/+/, '')
+  const url = /^https?:\/\//i.test(normalizedPath)
+    ? `${normalizedPath}${queryString ? `${normalizedPath.includes('?') ? '&' : '?'}${queryString}` : ''}`
+    : `${baseUrl}/${normalizedPath}${queryString ? `?${queryString}` : ''}`
   const requestBody = options.body ? toSearchParams(options.body).toString() : undefined
 
-  const response = await fetch(url, {
-    method,
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Bearer ${token}`,
-      Token: token,
-      'X-API-TOKEN': token,
-      ...(requestBody ? { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } : {}),
-    },
-    body: requestBody,
-    cache: 'no-store',
-  })
+  try {
+    const response = await fetch(url, {
+      method,
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        Token: token,
+        'X-API-TOKEN': token,
+        ...(requestBody ? { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } : {}),
+      },
+      body: requestBody,
+      cache: 'no-store',
+    })
 
-  const contentType = response.headers.get('content-type') ?? ''
-  const payload = contentType.includes('application/json')
-    ? await response.json()
-    : await response.text()
+    const contentType = response.headers.get('content-type') ?? ''
+    const rawPayload = await response.text()
+    const payload = contentType.includes('application/json') && rawPayload.trim()
+      ? JSON.parse(rawPayload)
+      : rawPayload
 
-  if (!response.ok) {
+    if (!response.ok) {
+      captureOperationalServerError({
+        area: 'external-admin-api',
+        action: method.toLowerCase(),
+        path: `${target}:${path}`,
+        status: response.status,
+        payload,
+        requestMeta: {
+          target,
+          bodyKeys: options.body ? Object.keys(options.body) : undefined,
+        },
+      })
+    }
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      payload,
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Falha inesperada ao chamar a API externa.'
+
     captureOperationalServerError({
       area: 'external-admin-api',
       action: method.toLowerCase(),
       path: `${target}:${path}`,
-      status: response.status,
-      payload,
+      status: 500,
+      payload: { message },
       requestMeta: {
         target,
         bodyKeys: options.body ? Object.keys(options.body) : undefined,
       },
     })
-  }
 
-  return {
-    ok: response.ok,
-    status: response.status,
-    payload,
+    return {
+      ok: false,
+      status: 500,
+      payload: {
+        message,
+      },
+    }
   }
 }

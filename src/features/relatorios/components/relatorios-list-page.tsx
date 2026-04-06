@@ -9,17 +9,18 @@ import type { AppDataTableColumn } from '@/src/components/data-table/types'
 import { AsyncState } from '@/src/components/ui/async-state'
 import { PageHeader } from '@/src/components/ui/page-header'
 import { SectionCard } from '@/src/components/ui/section-card'
+import { AccessDeniedState } from '@/src/features/auth/components/access-denied-state'
+import { useFeatureAccess } from '@/src/features/auth/hooks/use-feature-access'
+import { relatoriosClient } from '@/src/features/relatorios/services/relatorios-client'
+import type { RelatorioListFilters, RelatorioListRecord } from '@/src/features/relatorios/services/relatorios-types'
 import { useAsyncData } from '@/src/hooks/use-async-data'
 import { useI18n } from '@/src/i18n/use-i18n'
-import { appData } from '@/src/services/app-data'
 
-type ReportFilters = {
-  codigo: string
-  grupo: string
-  nome: string
-}
-
-const DEFAULT_FILTERS: ReportFilters = {
+const DEFAULT_FILTERS: RelatorioListFilters = {
+  page: 1,
+  perPage: 15,
+  orderBy: 'codigo',
+  sort: 'asc',
   codigo: '',
   grupo: '',
   nome: '',
@@ -27,65 +28,70 @@ const DEFAULT_FILTERS: ReportFilters = {
 
 export function RelatoriosListPage() {
   const { t } = useI18n()
+  const access = useFeatureAccess('relatorios')
   const [filtersExpanded, setFiltersExpanded] = useState(false)
-  const [filters, setFilters] = useState<ReportFilters>(DEFAULT_FILTERS)
-  const [filtersDraft, setFiltersDraft] = useState<ReportFilters>(DEFAULT_FILTERS)
-  const reportsState = useAsyncData(() => appData.reports.list(), [])
-
-  const reports = useMemo(() => {
-    const termoCodigo = filters.codigo.trim().toLowerCase()
-    const termoGrupo = filters.grupo.trim().toLowerCase()
-    const termoNome = filters.nome.trim().toLowerCase()
-
-    return (reportsState.data ?? []).filter((report) => {
-      const byCodigo = !termoCodigo || report.codigo.toLowerCase().includes(termoCodigo)
-      const byGrupo = !termoGrupo || report.grupo.toLowerCase().includes(termoGrupo)
-      const byNome = !termoNome || report.nome.toLowerCase().includes(termoNome)
-      return byCodigo && byGrupo && byNome
-    })
-  }, [filters.codigo, filters.grupo, filters.nome, reportsState.data])
+  const [filters, setFilters] = useState<RelatorioListFilters>(DEFAULT_FILTERS)
+  const [filtersDraft, setFiltersDraft] = useState<RelatorioListFilters>(DEFAULT_FILTERS)
+  const reportsState = useAsyncData(() => relatoriosClient.list(filters), [filters])
+  const reports = reportsState.data?.data ?? []
 
   const columns = useMemo(() => ([
     {
       id: 'codigo',
-      label: t('relatorios.code', 'Code'),
-      thClassName: 'w-[140px]',
-      cell: (report: (typeof reports)[number]) => <span className="font-semibold text-slate-950">{report.codigo}</span>,
+      label: t('relatorios.code', 'Código'),
+      sortKey: 'codigo',
+      thClassName: 'w-[160px]',
+      cell: (report: RelatorioListRecord) => <span className="font-semibold text-slate-950">{report.codigo}</span>,
       filter: {
         kind: 'text',
         id: 'codigo',
         key: 'codigo',
-        label: t('relatorios.code', 'Code'),
+        label: t('relatorios.code', 'Código'),
       },
     },
     {
       id: 'grupo',
-      label: t('relatorios.group', 'Group'),
+      label: t('relatorios.group', 'Grupo'),
+      sortKey: 'grupo',
       visibility: 'lg',
-      cell: (report: (typeof reports)[number]) => report.grupo,
+      cell: (report: RelatorioListRecord) => report.grupo || '-',
       filter: {
         kind: 'text',
         id: 'grupo',
         key: 'grupo',
-        label: t('relatorios.group', 'Group'),
+        label: t('relatorios.group', 'Grupo'),
       },
     },
     {
       id: 'nome',
-      label: t('relatorios.name', 'Name'),
+      label: t('relatorios.name', 'Nome'),
+      sortKey: 'nome',
       tdClassName: 'font-semibold text-slate-950',
-      cell: (report: (typeof reports)[number]) => <span className="truncate">{report.nome}</span>,
+      cell: (report: RelatorioListRecord) => <span className="truncate">{report.nome}</span>,
       filter: {
         kind: 'text',
         id: 'nome',
         key: 'nome',
-        label: t('relatorios.name', 'Name'),
+        label: t('relatorios.name', 'Nome'),
       },
     },
-  ]) satisfies AppDataTableColumn<(typeof reports)[number], ReportFilters>[], [t])
+  ]) satisfies AppDataTableColumn<RelatorioListRecord, RelatorioListFilters>[], [t])
 
-  function patchDraft<K extends keyof ReportFilters>(key: K, value: ReportFilters[K]) {
-    setFiltersDraft((current) => ({ ...current, [key]: value }))
+  function patchDraft<K extends keyof RelatorioListFilters>(key: K, value: RelatorioListFilters[K]) {
+    setFiltersDraft((current) => ({ ...current, [key]: value, page: 1 }))
+  }
+
+  function toggleSort(column: string) {
+    setFilters((current) => ({
+      ...current,
+      orderBy: column as RelatorioListFilters['orderBy'],
+      sort: current.orderBy === column && current.sort === 'asc' ? 'desc' : 'asc',
+      page: 1,
+    }))
+  }
+
+  if (!access.canList) {
+    return <AccessDeniedState title={t('relatorios.title', 'Relatórios')} backHref="/dashboard" />
   }
 
   return (
@@ -93,9 +99,9 @@ export function RelatoriosListPage() {
       <PageHeader
         breadcrumbs={[
           { label: t('routes.dashboard', 'Home'), href: '/dashboard' },
-          { label: t('relatorios.title', 'Reports'), href: '/relatorios' },
+          { label: t('relatorios.title', 'Relatórios v2'), href: '/relatorios' },
         ]}
-        actions={<DataTableSectionAction label={t('common.refresh', 'Refresh')} icon={RefreshCcw} onClick={reportsState.reload} />}
+        actions={<DataTableSectionAction label={t('common.refresh', 'Atualizar')} icon={RefreshCcw} onClick={reportsState.reload} />}
       />
 
       <AsyncState isLoading={reportsState.isLoading} error={reportsState.error}>
@@ -108,13 +114,12 @@ export function RelatoriosListPage() {
                 collapsedLabel={t('filters.button', 'Filtros')}
                 expandedLabel={t('filters.hide', 'Ocultar filtros')}
               />
-              <div />
             </div>
           )}
         >
           <DataTableFiltersCard
             variant="embedded"
-            columns={columns as AppDataTableColumn<unknown, ReportFilters>[]}
+            columns={columns as AppDataTableColumn<unknown, RelatorioListFilters>[]}
             draft={filtersDraft}
             applied={filters}
             expanded={filtersExpanded}
@@ -130,8 +135,13 @@ export function RelatoriosListPage() {
           <AppDataTable
             rows={reports}
             getRowId={(report) => report.id}
-            emptyMessage={t('relatorios.empty', 'No reports found with the current filters.')}
+            emptyMessage={t('relatorios.empty', 'Nenhum relatório encontrado com os filtros atuais.')}
             columns={columns}
+            sort={{
+              activeColumn: filters.orderBy,
+              direction: filters.sort,
+              onToggle: (column) => toggleSort(String(column)),
+            }}
             mobileCard={{
               title: (report) => report.nome,
               subtitle: (report) => report.grupo,
@@ -140,12 +150,24 @@ export function RelatoriosListPage() {
             rowActions={(report) => [
               {
                 id: 'open',
-                label: t('relatorios.actions.open', 'Open report'),
+                label: t('relatorios.actions.open', 'Acessar relatório'),
                 icon: Eye,
                 href: `/relatorios/${report.id}`,
+                visible: access.canView || access.canEdit,
               },
             ]}
             actionsColumnClassName="w-[96px] whitespace-nowrap"
+            pagination={reportsState.data?.meta}
+            onPageChange={(page) => setFilters((current) => ({ ...current, page }))}
+            pageSize={{
+              value: filters.perPage,
+              options: [15, 30, 50, 100],
+              onChange: (perPage) => {
+                const next = { ...filters, perPage, page: 1 }
+                setFilters(next)
+                setFiltersDraft(next)
+              },
+            }}
           />
         </SectionCard>
       </AsyncState>

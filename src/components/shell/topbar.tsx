@@ -119,6 +119,7 @@ export function Topbar() {
   const [pendingReadReceipts, setPendingReadReceipts] = useState<NotificationReadReceipt[]>([])
   const [notificationsLoading, setNotificationsLoading] = useState(true)
   const [notificationsError, setNotificationsError] = useState('')
+  const hasLoadedNotificationsRef = useRef(false)
   const rootRef = useRef<HTMLDivElement | null>(null)
   const hasMarkedNotificationsRef = useRef(false)
   const isMarkingNotificationsRef = useRef(false)
@@ -160,6 +161,10 @@ export function Topbar() {
   }, [activePanel])
 
   useEffect(() => {
+    hasLoadedNotificationsRef.current = false
+  }, [currentTenant.id, session?.currentTenant.id, user?.id])
+
+  useEffect(() => {
     let isMounted = true
 
     async function loadNotifications() {
@@ -173,16 +178,24 @@ export function Topbar() {
         return
       }
 
+      if (activePanel !== 'notifications' && hasLoadedNotificationsRef.current) {
+        if (isMounted) {
+          setNotificationsLoading(false)
+        }
+        return
+      }
+
       setNotificationsLoading(true)
       setNotificationsError('')
 
       try {
-        const response = await appData.shell.getNotifications()
+        const response = await appData.shell.getNotifications(currentTenant.id)
 
         if (!isMounted) {
           return
         }
 
+        hasLoadedNotificationsRef.current = true
         hasMarkedNotificationsRef.current = false
         setNotifications(response.items)
         setPendingReadReceipts(response.pendingReadReceipts)
@@ -206,7 +219,7 @@ export function Topbar() {
     return () => {
       isMounted = false
     }
-  }, [currentTenant.id, session, shouldBlockUnauthenticatedRedirect])
+  }, [activePanel, currentTenant.id, session, shouldBlockUnauthenticatedRedirect])
 
   useEffect(() => {
     if (shouldBlockUnauthenticatedRedirect) {
@@ -221,7 +234,7 @@ export function Topbar() {
     hasMarkedNotificationsRef.current = true
     isMarkingNotificationsRef.current = true
 
-    void appData.shell.markNotificationsAsRead(pendingReadReceipts)
+    void appData.shell.markNotificationsAsRead(pendingReadReceipts, currentTenant.id)
       .then(() => {
         if (!isMounted) {
           return
@@ -241,7 +254,7 @@ export function Topbar() {
     return () => {
       isMounted = false
     }
-  }, [activePanel, pendingReadReceipts, shouldBlockUnauthenticatedRedirect])
+  }, [activePanel, currentTenant.id, pendingReadReceipts, shouldBlockUnauthenticatedRedirect])
 
   function togglePanel(panel: TopbarPanel) {
     setActivePanel((current) => (current === panel ? 'none' : panel))

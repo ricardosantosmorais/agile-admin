@@ -4,6 +4,8 @@ import { normalizeSearchValue } from '@/src/lib/text-normalization'
 export type FeatureKey =
   | 'pedidos'
   | 'editorSql'
+  | 'httpClient'
+  | 'dicionarioDados'
   | 'produtos'
   | 'produtosPrecificadores'
   | 'produtosFiliais'
@@ -36,8 +38,21 @@ export type FeatureKey =
   | 'segmentosClientes'
   | 'regrasCadastro'
   | 'administradores'
+  | 'perfis'
   | 'relatorios'
   | 'configuracoes'
+  | 'configuracoesClientes'
+  | 'configuracoesEntregas'
+  | 'configuracoesGeral'
+  | 'configuracoesInicio'
+  | 'configuracoesLayout'
+  | 'configuracoesAssistenteVirtual'
+  | 'configuracoesAssistenteVendasIa'
+  | 'configuracoesPedidos'
+  | 'parametros'
+  | 'configuracoesPrecos'
+  | 'configuracoesProdutos'
+  | 'configuracoesVendedores'
   | 'linhas'
   | 'cores'
   | 'banners'
@@ -95,6 +110,14 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
   editorSql: {
     label: 'Editor SQL',
     matchers: ['editor sql', 'editor-sql', 'editor-sql-form', 'editor-sql-tabed-form', 'tools-editor-sql'],
+  },
+  httpClient: {
+    label: 'HTTP Client',
+    matchers: ['http client', 'http-client', 'http-client-form', 'tools-http-client'],
+  },
+  dicionarioDados: {
+    label: 'Dicionário de Dados',
+    matchers: ['dicionario de dados', 'dicionário de dados', 'dicionario-modulos-list', 'dicionario-list', 'tools-dictionary'],
   },
   produtos: {
     label: 'Produtos',
@@ -224,6 +247,10 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
     label: 'Administradores',
     matchers: ['administrador', 'administradores'],
   },
+  perfis: {
+    label: 'Perfis',
+    matchers: ['perfil', 'perfis', 'perfis-list', 'perfis-form'],
+  },
   relatorios: {
     label: 'Relatorios',
     matchers: ['relatorio', 'relatorios'],
@@ -231,6 +258,54 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
   configuracoes: {
     label: 'Configuracoes',
     matchers: ['configuracao', 'configuracoes', 'parametro', 'parametros', 'modulo', 'modulos'],
+  },
+  configuracoesClientes: {
+    label: 'Configurações de Clientes',
+    matchers: ['configuracoes-clientes-form', 'configuracoes clientes', 'clientes configuracoes'],
+  },
+  configuracoesEntregas: {
+    label: 'Configurações de Entregas',
+    matchers: ['configuracoes-entregas-form', 'configuracoes entregas', 'entregas configuracoes'],
+  },
+  configuracoesGeral: {
+    label: 'Configurações Gerais',
+    matchers: ['configuracoes-geral-form', 'configuracoes geral', 'geral configuracoes'],
+  },
+  configuracoesInicio: {
+    label: 'Configurações de Início',
+    matchers: ['configuracoes-inicio-form', 'configuracoes inicio', 'inicio configuracoes'],
+  },
+  configuracoesLayout: {
+    label: 'Configurações de Layout',
+    matchers: ['configuracoes-layout-form', 'configuracoes layout', 'layout configuracoes'],
+  },
+  configuracoesAssistenteVirtual: {
+    label: 'Assistente Virtual',
+    matchers: ['configuracoes-ia-form', 'assistente virtual', 'configuracoes assistente virtual', 'assistente-virtual'],
+  },
+  configuracoesAssistenteVendasIa: {
+    label: 'Assistente de Vendas IA',
+    matchers: ['chatbot-empresas-list', 'assistente de vendas ia', 'assistente vendas ia', 'assistente-vendas-ia'],
+  },
+  configuracoesPedidos: {
+    label: 'Configurações de Pedidos',
+    matchers: ['configuracoes-pedidos-form', 'configuracoes pedidos', 'pedidos configuracoes'],
+  },
+  parametros: {
+    label: 'Parâmetros',
+    matchers: ['cadastro-parametros-list', 'cadastro-parametros-form', 'parametros', 'parâmetros'],
+  },
+  configuracoesPrecos: {
+    label: 'Configurações de Preços',
+    matchers: ['configuracoes-precos-form', 'configuracoes precos', 'configuracoes preços', 'precos configuracoes', 'preços configuracoes'],
+  },
+  configuracoesProdutos: {
+    label: 'Configurações de Produtos',
+    matchers: ['configuracoes-produtos-form', 'configuracoes produtos', 'produtos configuracoes'],
+  },
+  configuracoesVendedores: {
+    label: 'Configurações de Vendedores',
+    matchers: ['configuracoes-vendedores-form', 'configuracoes vendedores', 'vendedores configuracoes'],
   },
   linhas: {
     label: 'Linhas',

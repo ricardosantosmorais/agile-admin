@@ -1,12 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
+import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import {
-  createEmptyAdminForm,
   DEFAULT_ADMIN_LIST_FILTERS,
-  mapAdminDetail,
-  toAdminPayload,
 } from '@/src/features/administradores/services/administradores-mappers'
 
 export const ADMINISTRADORES_CONFIG: CrudModuleConfig = {
@@ -151,31 +148,6 @@ export const ADMINISTRADORES_CONFIG: CrudModuleConfig = {
       ],
     },
   ],
-  normalizeRecord: (record: CrudRecord) => {
-    const mapped = record.id ? mapAdminDetail(record) : createEmptyAdminForm()
-    return {
-      ...mapped,
-      ativo: mapped.ativo,
-      codigo: mapped.codigo,
-      idPerfil: mapped.idPerfil,
-      nome: mapped.nome,
-      email: mapped.email,
-      celular: mapped.celular,
-      senha: '',
-      confirmacao: '',
-    }
-  },
-  beforeSave: (record: CrudRecord) => toAdminPayload({
-    id: String(record.id || ''),
-    ativo: record.ativo === true,
-    codigo: String(record.codigo || ''),
-    idPerfil: String(record.idPerfil || ''),
-    nome: String(record.nome || ''),
-    email: String(record.email || ''),
-    celular: String(record.celular || ''),
-    senha: String(record.senha || ''),
-    confirmacao: String(record.confirmacao || ''),
-  }),
   getSaveRedirectPath: ({ isEditing, saved, form }) => {
     if (isEditing) {
       return '/administradores'
