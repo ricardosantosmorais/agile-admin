@@ -1,6 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import { KeyRound } from 'lucide-react'
+import { StatusBadge } from '@/src/components/ui/status-badge'
+import { isTruthyFlag } from '@/src/lib/boolean-utils'
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import {
   DEFAULT_ADMIN_LIST_FILTERS,
@@ -96,6 +99,23 @@ export const ADMINISTRADORES_CONFIG: CrudModuleConfig = {
   mobileTitle: (record) => String(record.nome || '-'),
   mobileSubtitle: (record) => String(record.email || '-'),
   mobileMeta: (record) => String(record.perfil || '-'),
+  renderMobileBadges: (record, { t }) => {
+    const checked = isTruthyFlag(record.ativo)
+    return (
+      <StatusBadge tone={checked ? 'success' : 'warning'}>
+        {checked ? t('common.yes', 'Yes') : t('common.no', 'No')}
+      </StatusBadge>
+    )
+  },
+  buildListRowActions: ({ record, access, t }) => [
+    {
+      id: 'password',
+      label: t('administradores.actions.password', 'Change password'),
+      icon: KeyRound,
+      href: `/administradores/${record.id}/senha`,
+      visible: access.canEdit,
+    },
+  ],
   details: [
     {
       key: 'ultimoAcesso',

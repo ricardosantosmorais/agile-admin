@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { loginWithUi } from '@/e2e/helpers/auth'
+import { waitForProtectedShell } from '@/e2e/helpers/auth'
 
 test.describe('Perfis', () => {
   test('lista perfis e salva acessos hierárquicos no formulário', async ({ page }) => {
@@ -7,7 +7,8 @@ test.describe('Perfis', () => {
 
     let postedBody: unknown = null
 
-    await loginWithUi(page)
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded', timeout: 60_000 })
+    await waitForProtectedShell(page)
 
     await page.route(/\/api\/perfis\/acessos(?:\?.*)?$/, async (route) => {
       await route.fulfill({

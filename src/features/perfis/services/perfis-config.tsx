@@ -1,7 +1,9 @@
 'use client'
 
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
+import { StatusBadge } from '@/src/components/ui/status-badge'
 import { DEFAULT_PERFIL_LIST_FILTERS } from '@/src/features/perfis/services/perfis-mappers'
+import { isTruthyFlag } from '@/src/lib/boolean-utils'
 
 export const PERFIS_CONFIG: CrudModuleConfig = {
   key: 'perfis',
@@ -77,5 +79,13 @@ export const PERFIS_CONFIG: CrudModuleConfig = {
   mobileTitle: (record) => String(record.nome || '-'),
   mobileSubtitle: (record) => String(record.codigo || '-'),
   mobileMeta: (record) => String(record.id || '-'),
+  renderMobileBadges: (record, { t }) => {
+    const checked = isTruthyFlag(record.ativo)
+    return (
+      <StatusBadge tone={checked ? 'success' : 'warning'}>
+        {checked ? t('common.yes', 'Yes') : t('common.no', 'No')}
+      </StatusBadge>
+    )
+  },
   sections: [],
 }

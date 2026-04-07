@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { loginWithUi } from '@/e2e/helpers/auth'
+import { waitForProtectedShell } from '@/e2e/helpers/auth'
 
 test.describe('Administradores', () => {
   test('lista administradores, cria um novo registro e abre a edição', async ({ page }) => {
@@ -7,7 +7,8 @@ test.describe('Administradores', () => {
 
     let postedBody: unknown = null
 
-    await loginWithUi(page)
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded', timeout: 60_000 })
+    await waitForProtectedShell(page)
 
     await page.route(/\/api\/administradores\/perfis$/, async (route) => {
       await route.fulfill({

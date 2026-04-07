@@ -1,11 +1,12 @@
 'use client'
 
 import { Pencil, Plus, RefreshCcw, Search as SearchIcon, Trash2 } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { useMemo } from 'react'
 import { AppDataTable } from '@/src/components/data-table/app-data-table'
 import { DataTableFiltersCard } from '@/src/components/data-table/data-table-filters'
 import { DataTableFilterToggleAction, DataTablePageActions, DataTableSectionAction } from '@/src/components/data-table/data-table-toolbar'
-import type { AppDataTableColumn, AppDataTableFilterConfig } from '@/src/components/data-table/types'
+import type { AppDataTableColumn, AppDataTableFilterConfig, AppDataTableRowAction } from '@/src/components/data-table/types'
 import { AsyncState } from '@/src/components/ui/async-state'
 import { ConfirmDialog } from '@/src/components/ui/confirm-dialog'
 import { PageHeader } from '@/src/components/ui/page-header'
@@ -89,6 +90,30 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
     return <AccessDeniedState title={t(config.listTitleKey, config.listTitle)} backHref="/dashboard" />
   }
 
+  function buildDefaultRowActions(record: CrudListRecord): AppDataTableRowAction<CrudListRecord>[] {
+    return [
+      {
+        id: 'edit',
+        label: access.canEdit ? t('simpleCrud.actions.edit', 'Edit') : t('simpleCrud.actions.view', 'View'),
+        icon: access.canEdit ? Pencil : SearchIcon,
+        href: `${config.routeBase}/${record.id}/editar`,
+        visible: access.canEdit || access.canView,
+      },
+      {
+        id: 'delete',
+        label: t('simpleCrud.actions.delete', 'Delete'),
+        icon: Trash2,
+        onClick: () => controller.setConfirmDeleteIds([record.id]),
+        tone: 'danger',
+        visible: access.canDelete,
+      },
+    ]
+  }
+
+  const mobileBadges = config.renderMobileBadges
+    ? (record: CrudListRecord): ReactNode => config.renderMobileBadges?.(record, { t })
+    : undefined
+
   return (
     <div className="space-y-5">
       <PageHeader
@@ -149,17 +174,24 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
             emptyMessage={t('simpleCrud.empty', 'No records found with the current filters.')}
             columns={columns}
             sort={{ activeColumn: controller.filters.orderBy, direction: controller.filters.sort, onToggle: controller.tableState.toggleSort }}
-            rowActions={(record) => [
-              { id: 'edit', label: access.canEdit ? t('simpleCrud.actions.edit', 'Edit') : t('simpleCrud.actions.view', 'View'), icon: access.canEdit ? Pencil : SearchIcon, href: `${config.routeBase}/${record.id}/editar`, visible: access.canEdit || access.canView },
-              { id: 'delete', label: t('simpleCrud.actions.delete', 'Delete'), icon: Trash2, onClick: () => controller.setConfirmDeleteIds([record.id]), tone: 'danger', visible: access.canDelete },
-            ]}
+            rowActions={(record) => {
+              const defaults = buildDefaultRowActions(record)
+              const extras = config.buildListRowActions?.({
+                record,
+                access,
+                t,
+                refreshList: controller.refreshList,
+                openDeleteConfirm: (ids) => controller.setConfirmDeleteIds(ids),
+              }) ?? []
+              return [...defaults, ...extras]
+            }}
             actionsColumnClassName={config.actionsColumnClassName}
             selectable
             selectedIds={controller.tableState.selectedIds}
             allSelected={controller.tableState.allSelected}
             onToggleSelect={controller.tableState.toggleSelection}
             onToggleSelectAll={controller.tableState.toggleSelectAll}
-            mobileCard={{ title: config.mobileTitle, subtitle: config.mobileSubtitle, meta: config.mobileMeta }}
+            mobileCard={{ title: config.mobileTitle, subtitle: config.mobileSubtitle, meta: config.mobileMeta, badges: mobileBadges }}
             renderExpandedRow={config.details?.length ? (record) => (
               <div className="grid gap-3 rounded-[1.1rem] border border-[#ebe4d8] bg-white p-4 md:grid-cols-2 xl:grid-cols-3">
                 {config.details?.map((detail) => (
@@ -196,6 +228,7 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
         onClose={() => controller.setConfirmDeleteIds(null)}
         onConfirm={() => void controller.handleDelete(controller.confirmDeleteIds ?? [])}
       />
+      {config.renderListBottom?.({ t }) ?? null}
     </div>
   )
 }

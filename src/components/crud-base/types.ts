@@ -2,8 +2,10 @@
 
 import type { InputHTMLAttributes } from 'react'
 import type { AppDataTableFilterConfig } from '@/src/components/data-table/types'
+import type { AppDataTableRowAction } from '@/src/components/data-table/types'
 import type { FeatureKey } from '@/src/features/auth/services/permissions'
 import type { LookupOption } from '@/src/components/ui/lookup-select'
+import type { TranslationParams } from '@/src/i18n/types'
 
 export type CrudResource =
   | 'produtos_precificadores'
@@ -221,6 +223,19 @@ export type CrudModuleConfig = {
   beforeSave?: (record: CrudRecord) => CrudRecord
   getSaveRedirectPath?: (context: { id?: string; isEditing: boolean; saved: CrudRecord[]; form: CrudRecord }) => string
   renderHeaderActions?: (context: { id?: string; isEditing: boolean; readOnly: boolean }) => React.ReactNode
+  buildListRowActions?: (context: {
+    record: CrudListRecord
+    access: { canView: boolean; canEdit: boolean; canDelete: boolean; canCreate: boolean; canList: boolean; canOpen: boolean }
+    t: (key: string, fallback?: string, values?: TranslationParams) => string
+    refreshList: () => void
+    openDeleteConfirm: (ids: string[]) => void
+  }) => AppDataTableRowAction<CrudListRecord>[]
+  renderMobileBadges?: (record: CrudListRecord, context: {
+    t: (key: string, fallback?: string, values?: TranslationParams) => string
+  }) => React.ReactNode
+  renderListBottom?: (context: {
+    t: (key: string, fallback?: string, values?: TranslationParams) => string
+  }) => React.ReactNode
 }
 
 export type CrudDataClient = {
