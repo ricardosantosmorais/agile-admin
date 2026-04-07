@@ -198,7 +198,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
       </div>
 
       <div className="hidden md:block">
-        <div className="min-w-0 overflow-hidden">
+        <div className="min-w-0 overflow-x-auto">
           <table className="w-full table-auto border-separate border-spacing-0">
             <thead>
               <tr className="text-left text-sm text-slate-500">
@@ -275,7 +275,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                           const visibilityClasses = getVisibilityClasses(column.visibility)
 
                           return (
-                            <td key={`${rowId}-${column.id}`} className={`overflow-hidden border-b border-[#f0eadf] px-3 py-4 align-middle ${visibilityClasses.td} ${column.tdClassName ?? ''}`.trim()}>
+                            <td key={`${rowId}-${column.id}`} className={`border-b border-[#f0eadf] px-3 py-4 align-middle ${visibilityClasses.td} ${column.tdClassName ?? ''}`.trim()}>
                               <div className="min-w-0 overflow-hidden">
                                 {column.cell(item)}
                               </div>

@@ -89,8 +89,8 @@ export function mapAplicativoIntegracaoListResponse(payload: unknown): Aplicativ
 
   return {
     data: asArray<Record<string, unknown>>(record.data).map((item) => ({
-      id: asString(item.id),
-      codigo: asString(item.codigo),
+      id: asString(item.id || item.codigo || item.login),
+      codigo: asString(item.codigo || item.login || item.id),
       nome: asString(item.nome, '-'),
       email: asString(item.email),
       ativo: asBoolean(item.ativo),

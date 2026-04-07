@@ -50,6 +50,28 @@ describe('integracao-aplicativos-mappers', () => {
     })
   })
 
+  it('usa fallback de id quando a API retorna apenas codigo/login', () => {
+    const response = mapAplicativoIntegracaoListResponse({
+      data: [
+        {
+          id: '',
+          codigo: '0978132632607096',
+          nome: 'App sem id',
+          email: 'app@empresa.com.br',
+          ativo: 1,
+          login: 'client-fallback',
+          senha: 'secret',
+        },
+      ],
+      meta: {},
+    })
+
+    expect(response.data[0]).toMatchObject({
+      id: '0978132632607096',
+      codigo: '0978132632607096',
+    })
+  })
+
   it('mapeia detalhe do aplicativo', () => {
     expect(mapAplicativoIntegracaoDetail({
       id: '55',
