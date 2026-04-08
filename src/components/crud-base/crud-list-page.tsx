@@ -57,7 +57,7 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
   const { session } = useAuth()
   const tenantUrl = session?.currentTenant.url ?? null
   const assetsBucketUrl = session?.currentTenant.assetsBucketUrl ?? null
-  const controller = useCrudListController(config, client, access.canDelete)
+  const controller = useCrudListController(config, client, access.canDelete, config.canSelectRow)
 
   const columns = useMemo(() => config.columns.map((column) => ({
     id: column.id,
@@ -105,7 +105,7 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
         icon: Trash2,
         onClick: () => controller.setConfirmDeleteIds([record.id]),
         tone: 'danger',
-        visible: access.canDelete,
+        visible: access.canDelete && (config.canDeleteRow ? config.canDeleteRow(record) : true),
       },
     ]
   }
@@ -187,6 +187,7 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
             }}
             actionsColumnClassName={config.actionsColumnClassName}
             selectable
+            isRowSelectable={config.canSelectRow}
             selectedIds={controller.tableState.selectedIds}
             allSelected={controller.tableState.allSelected}
             onToggleSelect={controller.tableState.toggleSelection}

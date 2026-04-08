@@ -14,6 +14,13 @@
 - Fases
 - Sequenciais
 
+### Manutenção
+- Campos de formulários
+- Termos de pesquisa
+- Restrição x Produtos
+- Exceções x Produtos
+- Logs
+
 ### Pessoas
 - Clientes
 - Supervisores
@@ -165,6 +172,52 @@ Observação:
   - criação e edição de aplicativo com contrato do legado (`gestao_usuario`);
   - ações para copiar `Client ID`, copiar `Secret` e gerar novo `Secret`;
   - rota dedicada para permissões de acesso por aplicativo, no lugar do modal legado.
+- `Manutenção > Termos de pesquisa` já possui:
+  - listagem server-side com filtros por `id`, `termos`, `resultado` e `ativo`;
+  - criação e edição com os campos `ativo`, `termos` e `resultado`;
+  - bridge dedicada via `app/api/termos-pesquisa` sem fallback para `/legacy/...`.
+- `Manutenção > Campos de formulários` já possui:
+  - listagem server-side com filtros por `id`, `id_formulario`, `codigo`, `titulo`, `tipo`, `protegido` e `ativo`;
+  - criação e edição com reaproveitamento da base CRUD, incluindo serialização para campos opcionais e dependentes do tipo do campo;
+  - bridges dedicadas via `app/api/formularios-campos` e `app/api/formularios`, sem fallback para `/legacy/...`.
+- `Manutenção > Logs` já possui:
+  - listagem server-side com filtros por `id_registro`, `módulo`, `usuário`, período e `ação`;
+  - modal de detalhe por registro com dados do evento e snapshots JSON anterior/novo;
+  - bridge dedicada via `app/api/logs` sem fallback para `/legacy/...`.
+- `Manutenção > Processamento de Imagens` já possui:
+  - listagem server-side com filtros por `id`, `usuário`, período e `status`;
+  - upload de arquivo ZIP para criação de processo do tipo `imagens`;
+  - ações de cancelar/reprocessar processo e modal de detalhe com logs;
+  - bridges dedicadas via `app/api/processos-imagens` sem fallback para `/legacy/...`.
+- `Manutenção > Templates de E-mails` já possui:
+  - listagem server-side com filtros por `id`, `código`, `título` e `ativo`;
+  - formulário em abas com `Dados gerais` e `Editor`;
+  - editor avançado HTML/Twig/PHP com:
+    - conversão entre modelos;
+    - painel de variáveis por tipo (`emails_payloads`) com inserção por clique/drag;
+    - histórico de versões (`emails_templates_historico`) com recarga de conteúdo no editor;
+    - pré-visualização (`emails_templates/preview`) com fallback local simplificado;
+  - normalização de payload de escrita para booleans e campos opcionais;
+  - bridges dedicadas via `app/api/emails-templates` (CRUD + `payload` + `preview`) sem fallback para `/legacy/...`.
+- `Manutenção > Importar Planilha` já possui:
+  - listagem server-side com filtros por `id`, `usuário`, período e `status`;
+  - upload de arquivo XLS/XLSX com suporte a arquivos grandes via multipart/chunks;
+  - ações de iniciar, cancelar e reprocessar processo, com modal de detalhe e logs;
+  - bridges dedicadas via `app/api/processos-arquivos` sem fallback para `/legacy/...`.
+  - subfluxo de mapeamento de colunas permanece como próximo incremento da mesma feature.
+- `Manutenção > Restrição x Produtos` já possui:
+  - listagem server-side com filtros por busca geral, `perfil` e `ativo`;
+  - detalhe expansível por registro para visualização rápida de alvo e produtos afetados;
+  - wizard próprio inspirado em `Produtos x Precificadores`, com etapas para público-alvo, produtos, regra, condições e revisão;
+  - gravação em lote pela bridge com manutenção de `id_pai` e exclusão de dependentes removidos;
+  - bridges dedicadas via `app/api/restricoes-produtos` sem fallback para `/legacy/...`.
+
+- `Manutenção > Exceções x Produtos` já possui:
+  - listagem server-side com filtros por busca geral e `ativo`;
+  - detalhe expansível por registro para visualização rápida de alvo, produtos e período de pai + filhos;
+  - wizard próprio inspirado em `Produtos x Precificadores`, com etapas para público-alvo, produtos, regra, condições e revisão;
+  - gravação em lote pela bridge com manutenção de `id_pai` e exclusão de dependentes removidos;
+  - bridges dedicadas via `app/api/excecoes-produtos` sem fallback para `/legacy/...`.
 
 ## Estado arquitetural da cobertura
 
@@ -207,6 +260,7 @@ Continuam como páginas próprias, com mais regra de negócio:
 - formas de entrega
 - produtos x tabelas de preço
 - produtos x precificadores
+- restrição x produtos
 - pedidos
 - editor SQL
 - relatórios v2

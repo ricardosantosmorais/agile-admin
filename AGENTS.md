@@ -5,6 +5,7 @@
 Este arquivo define os acordos de trabalho para agentes Codex neste repositorio.
 
 O `admin-v2-web` e o frontend moderno do novo Admin v2. Ele substitui gradualmente partes do legado em `C:\Projetos\admin`, mantendo a mesma base de produto, mas com outra arquitetura:
+
 - Next.js App Router;
 - bridges em `app/api/*`;
 - autenticacao, tenant e sessao tratados no frontend;
@@ -21,23 +22,28 @@ Ler nesta ordem:
 4. Documentos de modulo relevantes em `docs/`
 
 Documento operacional adicional:
+
 - `AGENTS.md`
 
 Para tarefas de migracao do legado:
+
 - consultar tambem `C:\Projetos\admin\docs`
 - e analisar a implementacao real em `C:\Projetos\admin` antes de decidir estrutura ou comportamento
 
 Se a tarefa tocar autenticacao, sessao, tenant, acesso ou expiracao:
+
 - ler `docs/03-autenticacao-sessao-multiempresa.md`
 - ler `docs/04-acesso-menu-navegacao.md`
 - ler `docs/adr/ADR-003-sessao-expiracao-multiabas.md`
 
 Se a tarefa tocar arquitetura ou padroes:
+
 - ler `docs/05-arquitetura-frontend-padroes.md`
 - ler `docs/adr/ADR-005-bases-compartilhadas-crud.md`
 
 ## 3) Procedimento padrao (golden workflow)
 
+- existe um repositorio para base de conhecimento em C:\Projetos\knowledge que deve ser consultado sempre for solicitado uma implementação, correção, ajuste ou qualquer outra coisa que ele ache relevante, visando obter melhores práticas de mercado, exemplos de implementação e dúvidas no geral.
 - Localizar de 1 a 3 exemplos similares no proprio v2 antes de implementar.
 - Quando a tarefa for migracao, comparar sempre com o legado:
   - listagem;
@@ -116,7 +122,7 @@ Se a tarefa tocar arquitetura ou padroes:
   - `useCrudListController`;
   - `AppDataTable`;
   - `TabbedCatalogFormPage`
-  ja resolvem o problema.
+    ja resolvem o problema.
 - Antes de forcar uma tela em base generica, verificar se isso nao vai esconder regra de negocio real.
 
 ### 4.4 Formularios

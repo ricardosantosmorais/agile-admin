@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
+  asArray,
   asRecord,
   generateClientId,
   generateSecret,
@@ -15,6 +16,18 @@ function mapOrderBy(value: string) {
   }
 
   return 'nome'
+}
+
+function normalizeRow(item: Record<string, unknown>) {
+  return {
+    ...item,
+    id: item.id == null ? '' : String(item.id),
+    codigo: item.codigo == null ? '' : String(item.codigo),
+    nome: item.nome == null ? '' : String(item.nome),
+    email: item.email == null ? '' : String(item.email),
+    login: item.login == null ? '' : String(item.login),
+    senha: item.senha == null ? '' : String(item.senha),
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -55,8 +68,12 @@ export async function GET(request: NextRequest) {
     )
   }
 
+  const payloadRecord = asRecord(result.payload)
+  const data = asArray<Record<string, unknown>>(payloadRecord.data).map(normalizeRow)
+
   return NextResponse.json({
-    ...asRecord(result.payload),
+    ...payloadRecord,
+    data,
     meta: mapMeta(result.payload),
   })
 }
@@ -132,4 +149,3 @@ export async function DELETE(request: NextRequest) {
 
   return NextResponse.json({ success: true })
 }
-

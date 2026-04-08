@@ -100,8 +100,7 @@ export const integracaoAplicativosClient = {
   async savePermissoes(id: string, rows: Array<{
     tabelaNome: string
     verboGet: boolean
-    verboPost: boolean
-    verboPut: boolean
+    verboSalvar: boolean
     verboDelete: boolean
   }>) {
     await httpClient(`/api/integracao-aplicativos/${id}/permissoes`, {

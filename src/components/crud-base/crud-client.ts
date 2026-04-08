@@ -4,6 +4,8 @@ import { httpClient } from '@/src/services/http/http-client'
 import type { CrudDataClient, CrudListFilters, CrudListResponse, CrudOption, CrudRecord, CrudResource } from '@/src/components/crud-base/types'
 
 const CRUD_OPTIONS_PATHS: Record<CrudResource, string> = {
+  formularios: '/api/formularios',
+  formularios_campos: '/api/formularios-campos',
   produtos_precificadores: '/api/produtos-x-precificadores',
   tributos: '/api/tributos',
   tributos_partilha: '/api/tributos-partilha',
@@ -13,6 +15,7 @@ const CRUD_OPTIONS_PATHS: Record<CrudResource, string> = {
   condicoes_pagamento: '/api/lookups/condicoes_pagamento',
   limites_credito: '/api/limites-credito',
   grupos_filiais: '/api/grupos-filiais',
+  termos_pesquisa: '/api/termos-pesquisa',
   sequenciais: '/api/sequenciais',
   'implantacao/fases': '/api/fases',
   formas_entrega: '/api/formas-entrega',
@@ -31,6 +34,7 @@ const CRUD_OPTIONS_PATHS: Record<CrudResource, string> = {
   cores: '/api/cores',
   areas_banner: '/api/areas-banner',
   emails: '/api/emails',
+  emails_templates: '/api/emails-templates',
   paginas: '/api/paginas',
   areas_pagina: '/api/areas-paginas',
   usuarios: '/api/usuarios',
@@ -259,9 +263,10 @@ export function createCrudClient(basePath: string): CrudDataClient {
     },
     async listOptions(resource: CrudResource) {
       const basePath = CRUD_OPTIONS_PATHS[resource]
+      const orderBy = resource === 'formularios' ? 'titulo' : 'nome'
       const query = basePath.startsWith('/api/lookups/')
         ? '?page=1&perPage=1000&q='
-        : '?page=1&perPage=1000&orderBy=nome&sort=asc'
+        : `?page=1&perPage=1000&orderBy=${orderBy}&sort=asc`
       const cacheKey = getLookupCacheKey(resource, '', 1, 1000)
       const cached = readLookupCache(cacheKey)
       if (cached) {

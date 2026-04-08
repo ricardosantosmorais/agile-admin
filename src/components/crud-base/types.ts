@@ -8,6 +8,8 @@ import type { LookupOption } from '@/src/components/ui/lookup-select'
 import type { TranslationParams } from '@/src/i18n/types'
 
 export type CrudResource =
+  | 'formularios'
+  | 'formularios_campos'
   | 'produtos_precificadores'
   | 'tributos'
   | 'tributos_partilha'
@@ -17,6 +19,7 @@ export type CrudResource =
   | 'condicoes_pagamento'
   | 'limites_credito'
   | 'grupos_filiais'
+  | 'termos_pesquisa'
   | 'sequenciais'
   | 'implantacao/fases'
   | 'formas_entrega'
@@ -34,6 +37,7 @@ export type CrudResource =
   | 'cores'
   | 'areas_banner'
   | 'emails'
+  | 'emails_templates'
   | 'paginas'
   | 'areas_pagina'
   | 'usuarios'
@@ -230,6 +234,8 @@ export type CrudModuleConfig = {
     refreshList: () => void
     openDeleteConfirm: (ids: string[]) => void
   }) => AppDataTableRowAction<CrudListRecord>[]
+  canDeleteRow?: (record: CrudListRecord) => boolean
+  canSelectRow?: (record: CrudListRecord) => boolean
   renderMobileBadges?: (record: CrudListRecord, context: {
     t: (key: string, fallback?: string, values?: TranslationParams) => string
   }) => React.ReactNode

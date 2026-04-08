@@ -22,6 +22,17 @@ type CatalogTab = {
   label: string
   icon: ReactNode
   sectionIds?: string[]
+  renderToolbar?: (context: {
+    id?: string
+    form: CrudRecord
+    config: CrudModuleConfig
+    isEditing: boolean
+    optionsMap: Record<string, CrudOption[]>
+    readOnly: boolean
+    refreshRecord: () => Promise<void>
+    onFeedback: (message: string | null) => void
+    patch: (key: string, value: unknown) => void
+  }) => ReactNode
   render?: (context: {
     id?: string
     form: CrudRecord
@@ -262,10 +273,23 @@ export function TabbedCatalogFormPage({
         <form id={formId} className="space-y-5" onSubmit={(event) => void handleSubmit(event)}>
           {visibleTabs.length > 1 ? (
             <SectionCard>
-              <div className="flex flex-wrap gap-2">
-                {visibleTabs.map((tab) => (
-                  <TabButton key={tab.key} active={tab.key === currentTab?.key} icon={tab.icon} label={tab.label} onClick={() => setActiveTab(tab.key)} />
-                ))}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap gap-2">
+                  {visibleTabs.map((tab) => (
+                    <TabButton key={tab.key} active={tab.key === currentTab?.key} icon={tab.icon} label={tab.label} onClick={() => setActiveTab(tab.key)} />
+                  ))}
+                </div>
+                {currentTab?.renderToolbar ? currentTab.renderToolbar({
+                  id,
+                  form,
+                  config,
+                  isEditing,
+                  optionsMap,
+                  readOnly,
+                  refreshRecord,
+                  onFeedback: setFeedback,
+                  patch,
+                }) : null}
               </div>
             </SectionCard>
           ) : null}

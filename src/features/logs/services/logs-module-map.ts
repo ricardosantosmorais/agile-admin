@@ -1,0 +1,116 @@
+﻿export type LogModuleOption = {
+  value: string
+  label: string
+}
+
+const LEGACY_LOG_MODULES: LogModuleOption[] = [
+  { value: 'ADM', label: 'Administrador' },
+  { value: 'PER', label: 'Perfil' },
+  { value: 'BAN', label: 'Banner' },
+  { value: 'COL', label: 'Coleção' },
+  { value: 'BAU', label: 'Banner Universo' },
+  { value: 'ARE', label: 'Área de Atuação' },
+  { value: 'ABA', label: 'Área de Banner' },
+  { value: 'APA', label: 'Área de Página' },
+  { value: 'ARQ', label: 'Arquivo' },
+  { value: 'CAM', label: 'Campanha' },
+  { value: 'CDI', label: 'Canal de Distribuição' },
+  { value: 'CLI', label: 'Cliente' },
+  { value: 'CPG', label: 'Condição de Pagamento' },
+  { value: 'COT', label: 'Contato' },
+  { value: 'CON', label: 'Conversor de Pagamento' },
+  { value: 'COR', label: 'Cor' },
+  { value: 'CUP', label: 'Cupom de Desconto' },
+  { value: 'DEP', label: 'Departamento' },
+  { value: 'EMA', label: 'E-mail' },
+  { value: 'ETE', label: 'E-mail Template' },
+  { value: 'EMP', label: 'Empresa' },
+  { value: 'FIL', label: 'Filial' },
+  { value: 'FEN', label: 'Forma de Entrega' },
+  { value: 'RFE', label: 'Forma de Entrega Regra' },
+  { value: 'FEC', label: 'Forma de Entrega CEP' },
+  { value: 'FPG', label: 'Forma de Pagamento' },
+  { value: 'FOR', label: 'Fornecedor' },
+  { value: 'FUN', label: 'Funcionalidade' },
+  { value: 'GPA', label: 'Gateway de Pagamento' },
+  { value: 'GRA', label: 'Grade' },
+  { value: 'GRV', label: 'Grade Valor' },
+  { value: 'GRU', label: 'Grupo' },
+  { value: 'GRF', label: 'Grupo Filial' },
+  { value: 'GPR', label: 'Grupo Promoção' },
+  { value: 'GRR', label: 'Grupo Relatório' },
+  { value: 'IAT', label: 'Implantação Atividade' },
+  { value: 'IDA', label: 'Implantação Dado' },
+  { value: 'IFA', label: 'Implantação Fase' },
+  { value: 'IHI', label: 'Implantação Histórico' },
+  { value: 'ITA', label: 'Implantação Tarefa' },
+  { value: 'LIN', label: 'Linha' },
+  { value: 'LIS', label: 'Lista' },
+  { value: 'MAR', label: 'Marca' },
+  { value: 'NOT', label: 'Notificação' },
+  { value: 'PAG', label: 'Página' },
+  { value: 'PED', label: 'Pedido' },
+  { value: 'POR', label: 'Portos' },
+  { value: 'PRA', label: 'Praça' },
+  { value: 'PRO', label: 'Produto' },
+  { value: 'PRM', label: 'Promoção' },
+  { value: 'RED', label: 'Rede' },
+  { value: 'REC', label: 'Regra de Cadastro' },
+  { value: 'ROT', label: 'Rota' },
+  { value: 'SEG', label: 'Segmento' },
+  { value: 'SUP', label: 'Supervisor' },
+  { value: 'TAP', label: 'Tabela de Preço' },
+  { value: 'TPE', label: 'Termo de Pesquisa' },
+  { value: 'TRA', label: 'Transportadora' },
+  { value: 'TRI', label: 'Tributo' },
+  { value: 'URL', label: 'URL' },
+  { value: 'USU', label: 'Usuário' },
+  { value: 'VEN', label: 'Vendedor' },
+  { value: 'LCR', label: 'Limite de Crédito' },
+  { value: 'TRP', label: 'Tributos x Partilha' },
+  { value: 'PRF', label: 'Produtos x Filiais' },
+  { value: 'PTP', label: 'Produtos x Tabela de Preços' },
+  { value: 'PLO', label: 'Pedidos Logs' },
+  { value: 'PST', label: 'Pedidos Status' },
+  { value: 'PEN', label: 'Pedidos Entrega' },
+  { value: 'FOC', label: 'Campos de Formulário' },
+  { value: 'FOU', label: 'Fornecedor Universo' },
+  { value: 'MAU', label: 'Marca Universo' },
+  { value: 'NOU', label: 'Notificação Universo' },
+  { value: 'DEU', label: 'Departamento Universo' },
+  { value: 'PXP', label: 'Produto Precificador' },
+  { value: 'FRC', label: 'Campos de Formulário' },
+  { value: 'EPA', label: 'Empresa Parâmetro' },
+  { value: 'FRM', label: 'Formulários' },
+  { value: 'COC', label: 'Campos de Componentes' },
+  { value: 'NOP', label: 'Notificações do Painel' },
+  { value: 'NOE', label: 'Notificações x Empresas' },
+  { value: 'NTU', label: 'Notificações x Usuários' },
+  { value: 'COM', label: 'Componentes' },
+  { value: 'BRI', label: 'Brindes' },
+  { value: 'PRI', label: 'Imagem de Produto' },
+  { value: 'BPR', label: 'Brindes x Produtos' },
+  { value: 'BRE', label: 'Brindes x Regras' },
+  { value: 'PEM', label: 'Produto x Embalagem' },
+  { value: 'COP', label: 'Coleção x Produto' },
+  { value: 'TAF', label: 'Tabela de Preço x Filial' },
+  { value: 'CAP', label: 'Campanha x Produto' },
+  { value: 'LIP', label: 'Lista x Produto' },
+  { value: 'BEX', label: 'Brinde x Exceção' },
+  { value: 'BRS', label: 'Brinde x Restrição' },
+]
+
+const MODULE_LABEL_BY_CODE = new Map(LEGACY_LOG_MODULES.map((item) => [item.value, item.label]))
+
+export const LOG_MODULE_OPTIONS = LEGACY_LOG_MODULES.slice().sort((left, right) => left.label.localeCompare(right.label, 'pt-BR'))
+
+export function getLogModuleLabel(code: string) {
+  const normalizedCode = code.trim().toUpperCase()
+
+  if (!normalizedCode) {
+    return ''
+  }
+
+  return MODULE_LABEL_BY_CODE.get(normalizedCode) ?? ''
+}
+

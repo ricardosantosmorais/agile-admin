@@ -50,6 +50,7 @@ type AppDataTableProps<TItem, TColumn extends string = string, TFilters = never>
   onToggleExpandedRow?: (id: string) => void
   renderExpandedRow?: (item: TItem) => ReactNode
   selectable?: boolean
+  isRowSelectable?: (item: TItem) => boolean
   selectedIds?: string[]
   allSelected?: boolean
   onToggleSelect?: (id: string) => void
@@ -135,6 +136,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
   onToggleExpandedRow,
   renderExpandedRow,
   selectable = false,
+  isRowSelectable,
   selectedIds = [],
   allSelected = false,
   onToggleSelect,
@@ -144,6 +146,11 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
   pageSize,
 }: AppDataTableProps<TItem, TColumn, TFilters>) {
   const { t } = useI18n()
+  const selectableRows = selectable && isRowSelectable
+    ? rows.filter((item) => isRowSelectable(item))
+    : rows
+  const hasSelectableRows = selectableRows.length > 0
+
   return (
     <div className="space-y-4">
       <div className="space-y-4 md:hidden">
@@ -208,6 +215,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                       type="checkbox"
                       checked={allSelected}
                       onChange={onToggleSelectAll}
+                      disabled={!hasSelectableRows}
                       className="h-4 w-4 rounded border-[#d8ccb7] text-slate-950 focus:ring-[#efe7d7]"
                     />
                   </th>
@@ -250,12 +258,14 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                       <tr className="align-top">
                         {selectable ? (
                           <td className="border-b border-[#f0eadf] px-3 py-4">
+                            {isRowSelectable && !isRowSelectable(item) ? null : (
                             <input
                               type="checkbox"
                               checked={selectedIds.includes(rowId)}
                               onChange={() => onToggleSelect?.(rowId)}
                               className="h-4 w-4 rounded border-[#d8ccb7] text-slate-950 focus:ring-[#efe7d7]"
                             />
+                            )}
                           </td>
                         ) : null}
                         {renderExpandedRow ? (
@@ -275,7 +285,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                           const visibilityClasses = getVisibilityClasses(column.visibility)
 
                           return (
-                            <td key={`${rowId}-${column.id}`} className={`border-b border-[#f0eadf] px-3 py-4 align-middle ${visibilityClasses.td} ${column.tdClassName ?? ''}`.trim()}>
+                            <td key={`${rowId}-${column.id}`} className={`overflow-hidden border-b border-[#f0eadf] px-3 py-4 align-middle ${visibilityClasses.td} ${column.tdClassName ?? ''}`.trim()}>
                               <div className="min-w-0 overflow-hidden">
                                 {column.cell(item)}
                               </div>

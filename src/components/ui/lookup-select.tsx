@@ -1,7 +1,7 @@
 'use client'
 
 import { Check, ChevronDown, LoaderCircle, Search } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useI18n } from '@/src/i18n/use-i18n'
 
@@ -35,10 +35,13 @@ export function LookupSelect<TOption extends LookupOption>({
   const [isLoading, setIsLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
+  const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const triggerRef = useRef<HTMLButtonElement | null>(null)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
   const listRef = useRef<HTMLDivElement | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const listboxId = useId()
   const [dropdownStyle, setDropdownStyle] = useState<{
     top?: number
     bottom?: number
@@ -61,6 +64,7 @@ export function LookupSelect<TOption extends LookupOption>({
 
   useEffect(() => {
     if (!open) {
+      setHighlightedIndex(-1)
       return
     }
 
@@ -71,6 +75,7 @@ export function LookupSelect<TOption extends LookupOption>({
         setOptions(result)
         setPage(1)
         setHasMore(result.length >= pageSize)
+        setHighlightedIndex(result.length ? 0 : -1)
       } finally {
         setIsLoading(false)
       }
@@ -129,6 +134,7 @@ export function LookupSelect<TOption extends LookupOption>({
       setOptions((current) => [...current, ...result])
       setPage(nextPage)
       setHasMore(result.length >= pageSize)
+      setHighlightedIndex((current) => (current >= 0 ? current : result.length ? 0 : -1))
     } finally {
       setIsLoading(false)
     }
@@ -152,8 +158,98 @@ export function LookupSelect<TOption extends LookupOption>({
     setOptions([])
     setPage(1)
     setHasMore(true)
+    setHighlightedIndex(-1)
     onChange(nextValue)
   }
+
+  function moveHighlight(direction: 1 | -1) {
+    if (!options.length) {
+      return
+    }
+
+    setHighlightedIndex((current) => {
+      if (current < 0) {
+        return direction > 0 ? 0 : options.length - 1
+      }
+
+      const nextIndex = current + direction
+      if (nextIndex < 0) {
+        return options.length - 1
+      }
+
+      if (nextIndex >= options.length) {
+        return 0
+      }
+
+      return nextIndex
+    })
+  }
+
+  function handleTriggerKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+    if (disabled) {
+      return
+    }
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      setOpen(true)
+      return
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      setOpen((current) => !current)
+    }
+  }
+
+  function handleInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      moveHighlight(1)
+      return
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      moveHighlight(-1)
+      return
+    }
+
+    if (event.key === 'Home') {
+      event.preventDefault()
+      setHighlightedIndex(options.length ? 0 : -1)
+      return
+    }
+
+    if (event.key === 'End') {
+      event.preventDefault()
+      setHighlightedIndex(options.length ? options.length - 1 : -1)
+      return
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      if (highlightedIndex >= 0 && options[highlightedIndex]) {
+        commitSelection(options[highlightedIndex])
+      }
+      return
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      setOpen(false)
+      triggerRef.current?.focus()
+    }
+  }
+
+  useEffect(() => {
+    if (!open || highlightedIndex < 0) {
+      return
+    }
+
+    const activeOption = listRef.current?.querySelector<HTMLElement>(`[data-option-index="${highlightedIndex}"]`)
+    activeOption?.scrollIntoView({ block: 'nearest' })
+  }, [highlightedIndex, open])
 
   return (
     <div ref={containerRef} className="relative">
@@ -162,6 +258,10 @@ export function LookupSelect<TOption extends LookupOption>({
         type="button"
         disabled={disabled}
         onClick={() => setOpen((current) => !current)}
+        onKeyDown={handleTriggerKeyDown}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={open ? listboxId : undefined}
         className="flex w-full items-center justify-between gap-3 rounded-[1rem] border border-[#e6dfd3] bg-white px-3.5 py-3 text-left text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
       >
         <span className="min-w-0 truncate">{value?.label || `${t('clientes.form.general.select', 'Select')} ${label.toLowerCase()}`}</span>
@@ -178,15 +278,24 @@ export function LookupSelect<TOption extends LookupOption>({
               <div className="flex items-center gap-2 rounded-[0.95rem] border border-[#ebe4d8] bg-[#fcfaf5] px-3 py-2.5">
                 <Search className="h-4 w-4 text-slate-400" />
                 <input
+                  ref={inputRef}
                   autoFocus
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
+                  onKeyDown={handleInputKeyDown}
+                  role="combobox"
+                  aria-expanded={open}
+                  aria-controls={listboxId}
+                  aria-autocomplete="list"
+                  aria-activedescendant={highlightedIndex >= 0 ? `${listboxId}-option-${highlightedIndex}` : undefined}
                   className="w-full border-none bg-transparent text-sm outline-none placeholder:text-slate-400"
                   placeholder={t('common.searchFor', 'Search {{label}}', { label: label.toLowerCase() })}
                 />
               </div>
 
               <div
+                id={listboxId}
+                role="listbox"
                 ref={listRef}
                 onScroll={handleScroll}
                 style={{ maxHeight: Math.max(dropdownStyle.maxHeight - 72, 112) }}
@@ -215,16 +324,26 @@ export function LookupSelect<TOption extends LookupOption>({
                 ) : options.length ? (
                   options.map((option) => {
                     const isSelected = option.id === value?.id
+                    const optionIndex = options.findIndex((item) => item.id === option.id)
+                    const isHighlighted = optionIndex === highlightedIndex
                     return (
                       <button
+                        id={`${listboxId}-option-${optionIndex}`}
                         key={option.id || option.label}
                         type="button"
+                        role="option"
+                        aria-selected={isSelected}
+                        data-option-index={optionIndex}
+                        onMouseEnter={() => setHighlightedIndex(optionIndex)}
                         onPointerDown={(event) => {
                           event.preventDefault()
                           event.stopPropagation()
                           commitSelection(option)
                         }}
-                        className="flex w-full items-start justify-between gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm transition hover:bg-[#fcfaf5]"
+                        className={[
+                          'flex w-full items-start justify-between gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm transition hover:bg-[#fcfaf5]',
+                          isHighlighted ? 'bg-[#fcfaf5]' : '',
+                        ].join(' ')}
                       >
                         <div className="min-w-0">
                           <p className="truncate font-medium text-slate-900">{option.label}</p>

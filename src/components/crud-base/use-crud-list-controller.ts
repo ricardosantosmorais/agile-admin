@@ -5,7 +5,12 @@ import { readSessionState, writeSessionState } from '@/src/components/data-table
 import { useDataTableState } from '@/src/components/data-table/use-data-table-state'
 import type { CrudDataClient, CrudListFilters, CrudListResponse, CrudModuleConfig } from '@/src/components/crud-base/types'
 
-export function useCrudListController(config: CrudModuleConfig, client: CrudDataClient, canDelete: boolean) {
+export function useCrudListController(
+  config: CrudModuleConfig,
+  client: CrudDataClient,
+  canDelete: boolean,
+  canSelectRow?: (record: CrudListResponse['data'][number]) => boolean,
+) {
   const storageKey = `${config.key}-list-state`
   const persistedState = useMemo(() => {
     const parsed = readSessionState<{ filters?: CrudListFilters; filtersDraft?: CrudListFilters; filtersExpanded?: boolean }>(storageKey)
@@ -30,10 +35,14 @@ export function useCrudListController(config: CrudModuleConfig, client: CrudData
 
   const rows = response?.data ?? []
   const meta = response?.meta
+  const selectableRowIds = canSelectRow
+    ? rows.filter((row) => canSelectRow(row)).map((row) => row.id)
+    : undefined
 
   const tableState = useDataTableState({
     rows,
     getRowId: (record) => record.id,
+    selectableRowIds,
     filters,
     setFilters,
     setFiltersDraft,

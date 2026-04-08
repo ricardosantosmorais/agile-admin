@@ -50,11 +50,12 @@ describe('integracao-aplicativos-mappers', () => {
     })
   })
 
-  it('usa fallback de id quando a API retorna apenas codigo/login', () => {
+  it('mapeia id a partir de id_usuario quando o retorno usa esse campo', () => {
     const response = mapAplicativoIntegracaoListResponse({
       data: [
         {
           id: '',
+          id_usuario: '55',
           codigo: '0978132632607096',
           nome: 'App sem id',
           email: 'app@empresa.com.br',
@@ -67,7 +68,7 @@ describe('integracao-aplicativos-mappers', () => {
     })
 
     expect(response.data[0]).toMatchObject({
-      id: '0978132632607096',
+      id: '55',
       codigo: '0978132632607096',
     })
   })
