@@ -25,6 +25,7 @@ import {
   HandHelping,
   Headset,
   History,
+  RefreshCcw,
   IdCard,
   Image,
   LayoutDashboard,
@@ -102,6 +103,8 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
   'pedidos-list': '/pedidos',
   'produtos-list': '/produtos',
   'produtos-precificadores-list': '/produtos-x-precificadores',
+  'restricoes-produtos-list': '/restricoes-produtos',
+  'excecoes-produtos-list': '/excecoes-produtos',
   'produtos-filial-list': '/produtos-x-filiais',
   'tributos-list': '/tributos',
   'tributos-partilha-list': '/tributos-partilha',
@@ -123,6 +126,7 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
   'notificacoes-list': '/notificacoes-app',
   'areas-banner-list': '/areas-banner',
   'emails-list': '/emails',
+  'emails-templates-list': '/templates-de-emails',
   'paginas-list': '/paginas',
   'areas-pagina-list': '/areas-paginas',
   'colecoes-list': '/colecoes',
@@ -137,6 +141,12 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
   'filiais-list': '/filiais',
   'canais-distribuicao-list': '/canais-de-distribuicao',
   'grupos-filiais-list': '/grupos-de-filiais',
+  'termos-pesquisa-list': '/termos-de-pesquisa',
+  'logs-list': '/logs',
+  'formularios-list': '/formularios',
+  'formularios-campos-list': '/formularios',
+  'processos-imagens-list': '/processamento-de-imagens',
+  'processos-arquivos-list': '/importar-planilha',
   'fases-list': '/fases',
   'sequenciais-list': '/sequenciais',
   'limites-credito-list': '/limites-de-credito',
@@ -178,6 +188,10 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
   'parametros-empresa-list': '/configuracoes/parametros',
   'chatbot-empresas-list': '/configuracoes/assistente-vendas-ia',
   'notificacoes-painel-list': '/legacy/notificacoes-painel-list',
+}
+
+const IMPLEMENTED_CLICK_ROUTES: Record<string, string> = {
+  'renew-cache': '/renovar-cache',
 }
 
 const ROOT_MENU: LegacyRootDefinition[] = [
@@ -296,6 +310,7 @@ const FA_ICON_MAP: Array<{ matcher: RegExp; icon: LucideIcon }> = [
   { matcher: /fa-list/, icon: List },
   { matcher: /fa-user$/, icon: Users2 },
   { matcher: /fa-briefcase/, icon: BriefcaseBusiness },
+  { matcher: /fa-sync|fa-redo|fa-refresh/, icon: RefreshCcw },
 ]
 
 const ICON_MAP: Array<{ matcher: RegExp; icon: LucideIcon }> = [
@@ -370,6 +385,11 @@ function resolvePermissionRoute(permission: AuthPermission): RouteTarget {
 
   if (permission.clique === 'logout') {
     return { action: 'logout' }
+  }
+
+  const normalizedClick = normalizeSearchValue(permission.clique || '')
+  if (normalizedClick && IMPLEMENTED_CLICK_ROUTES[normalizedClick]) {
+    return { to: IMPLEMENTED_CLICK_ROUTES[normalizedClick] }
   }
 
   if (permission.componente) {

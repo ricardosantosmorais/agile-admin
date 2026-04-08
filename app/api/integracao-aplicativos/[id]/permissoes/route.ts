@@ -25,7 +25,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
         id_perfil: 4,
       },
     }),
-    serverApiFetch('dicionarios_tabelas?perpage=1000&order=nome&integra=1', {
+    serverApiFetch('dicionarios_tabelas?perpage=1000&order=nome', {
       method: 'GET',
       token: resolved.context.token,
       tenantId: resolved.context.tenantId,
@@ -35,7 +35,6 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
       query: {
         id_usuario: id,
         perpage: 1000,
-        id_empresa: resolved.context.tenantCodigo,
       },
     }),
   ])
@@ -72,14 +71,14 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
   )
 
   const rows = asArray<Record<string, unknown>>(asRecord(tabelasResult.payload).data)
+    .filter((item) => asBoolean(item.integra))
     .map((item) => {
       const tabelaNome = asString(item.nome)
       const permission = permissionsByTable.get(tabelaNome)
       return {
         tabelaNome,
         verboGet: asBoolean(permission?.verbo_get),
-        verboPost: asBoolean(permission?.verbo_post),
-        verboPut: asBoolean(permission?.verbo_put),
+        verboSalvar: asBoolean(permission?.verbo_post) || asBoolean(permission?.verbo_put),
         verboDelete: asBoolean(permission?.verbo_delete),
       }
     })
@@ -110,8 +109,8 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
           id_usuario: id,
           tabela_nome: asString(item.tabelaNome).trim(),
           verbo_get: asBoolean(item.verboGet) ? 1 : 0,
-          verbo_post: asBoolean(item.verboPost) ? 1 : 0,
-          verbo_put: asBoolean(item.verboPut) ? 1 : 0,
+          verbo_post: asBoolean(item.verboSalvar) ? 1 : 0,
+          verbo_put: asBoolean(item.verboSalvar) ? 1 : 0,
           verbo_delete: asBoolean(item.verboDelete) ? 1 : 0,
         }))
     : []

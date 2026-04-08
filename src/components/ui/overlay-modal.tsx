@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
+import { useDialogA11y } from '@/src/components/ui/dialog-a11y'
 
 type OverlayModalProps = {
   open: boolean
@@ -28,6 +29,8 @@ export function OverlayModal({
   bodyClassName = '',
   bodyScrollable = true,
 }: OverlayModalProps) {
+  const { dialogRef, titleId } = useDialogA11y({ open, onClose })
+
   useEffect(() => {
     if (!open || typeof document === 'undefined') {
       return
@@ -51,11 +54,16 @@ export function OverlayModal({
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
         className={`relative z-[210] flex max-h-[calc(100vh-2rem)] w-full ${maxWidthClassName} flex-col overflow-hidden rounded-[1.6rem] border border-[#e6dfd3] bg-white p-5 shadow-[0_32px_90px_rgba(15,23,42,0.28)]`}
         onClick={(event) => event.stopPropagation()}
       >
         <div className={`mb-5 flex items-center justify-between gap-4 ${headerClassName}`.trim()}>
-          <h2 className="text-lg font-black tracking-tight text-slate-950">{title}</h2>
+          <h2 id={titleId} className="text-lg font-black tracking-tight text-slate-950">{title}</h2>
           <div className="flex items-center gap-3">
             {headerActions}
             <button

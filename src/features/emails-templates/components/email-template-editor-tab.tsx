@@ -1,0 +1,479 @@
+'use client'
+
+import { History, Loader2 } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { AsyncState } from '@/src/components/ui/async-state'
+import { OverlayModal } from '@/src/components/ui/overlay-modal'
+import { ResizableHorizontalPanels } from '@/src/components/ui/resizable-horizontal-panels'
+import { SectionCard } from '@/src/components/ui/section-card'
+import { StatusBadge } from '@/src/components/ui/status-badge'
+import type { CrudRecord } from '@/src/components/crud-base/types'
+import { EmailTemplateMonaco, type EmailTemplateMonacoHandle } from '@/src/features/emails-templates/components/email-template-monaco'
+import { EmailTemplateVariableTree, collectVariablePaths } from '@/src/features/emails-templates/components/email-template-variable-tree'
+import { emailsTemplatesClient } from '@/src/features/emails-templates/services/emails-templates-client'
+import { emailsTemplatesEditorClient } from '@/src/features/emails-templates/services/emails-templates-editor-client'
+import { normalizeEmailTemplateRecord } from '@/src/features/emails-templates/services/emails-templates-normalizer'
+import {
+  buildVariableToken,
+  convertPhpToTwig,
+  inferTemplateModel,
+  renderTwigPreviewFallback,
+} from '@/src/features/emails-templates/services/emails-templates-template-converter'
+import { validateEmailTemplateMarkup } from '@/src/features/emails-templates/services/emails-templates-validator'
+import { useI18n } from '@/src/i18n/use-i18n'
+import { formatDateTime } from '@/src/lib/date-time'
+
+type TemplateModel = 'twig' | 'php'
+
+type HistoryRow = {
+  id: string
+  data?: string | null
+  html?: string | null
+  usuario?: {
+    nome?: string | null
+  } | null
+}
+
+export type EmailTemplateEditorToolbarApi = {
+  model: TemplateModel
+  payloadLoading: boolean
+  previewLoading: boolean
+  hasTemplateId: boolean
+  refreshVariables: () => Promise<void>
+  validationRunning: boolean
+  openHistory: () => Promise<void>
+  openPreview: () => Promise<void>
+  validateTemplate: () => void
+}
+
+type EmailTemplateEditorTabProps = {
+  form: CrudRecord
+  readOnly: boolean
+  patch: (key: string, value: unknown) => void
+  onFeedback: (message: string | null) => void
+  onToolbarApiChange?: (api: EmailTemplateEditorToolbarApi | null) => void
+}
+
+function normalizeModel(value: unknown): TemplateModel {
+  return String(value || '').toLowerCase() === 'php' ? 'php' : 'twig'
+}
+
+function WorkspaceLoadingState({ message }: { message: string }) {
+  return (
+    <div className="flex h-full min-h-0 flex-col rounded-[1rem] border border-dashed border-[#e7decf] bg-[#fcfaf5] px-4 py-4">
+      <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        {message}
+      </div>
+      <div className="mt-4 space-y-3">
+        <div className="h-11 animate-pulse rounded-[0.95rem] bg-[#efe8dc]" />
+        <div className="h-11 animate-pulse rounded-[0.95rem] bg-[#f5f1e8]" />
+        <div className="h-11 animate-pulse rounded-[0.95rem] bg-[#efe8dc]" />
+      </div>
+    </div>
+  )
+}
+
+function VariablesPanel({
+  payloadLoading,
+  variablePaths,
+  payload,
+  model,
+  readOnly,
+  onInsertToken,
+}: {
+  payloadLoading: boolean
+  variablePaths: string[]
+  payload: unknown
+  model: TemplateModel
+  readOnly: boolean
+  onInsertToken: (token: string) => void
+}) {
+  const { t } = useI18n()
+
+  return (
+    <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-[1rem] bg-white">
+      <div className="border-b border-[#efe8dc] bg-[#fcfaf5] px-4 py-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-600">
+              {t('maintenance.emailTemplates.editor.availableVariables', 'Available variables')}
+            </h4>
+            <p className="mt-1 text-xs leading-5 text-slate-500">
+              {t('maintenance.emailTemplates.editor.insertHint', 'Click or drag a variable to insert it at cursor position.')}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <StatusBadge tone={payloadLoading ? 'warning' : 'neutral'}>
+              {payloadLoading ? t('common.loading', 'Loading...') : `${variablePaths.length}`}
+            </StatusBadge>
+          </div>
+        </div>
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-hidden bg-[#f8f4ec]">
+        {payloadLoading ? (
+          <WorkspaceLoadingState message={t('maintenance.emailTemplates.editor.loadingVariables', 'Carregando variáveis disponíveis...')} />
+        ) : (
+          <div className="email-template-variable-scroll h-full overflow-auto px-2 pb-2 pt-2">
+            <EmailTemplateVariableTree
+              payload={payload}
+              buildToken={(path) => buildVariableToken(path, model)}
+              onInsertToken={onInsertToken}
+              disabled={readOnly}
+              rootLabel={t('maintenance.emailTemplates.editor.payloadRoot', 'payload')}
+              emptyMessage={t('maintenance.emailTemplates.editor.emptyVariables', 'No variables available for selected template type.')}
+              initialExpandDepth={1}
+              className="h-full max-h-none pr-3"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export function EmailTemplateEditorTab({
+  form,
+  readOnly,
+  patch,
+  onFeedback,
+  onToolbarApiChange,
+}: EmailTemplateEditorTabProps) {
+  const { t } = useI18n()
+  const editorRef = useRef<EmailTemplateMonacoHandle | null>(null)
+  const [leftPanelPercentage, setLeftPanelPercentage] = useState(31)
+  const [payload, setPayload] = useState<unknown>(null)
+  const [payloadLoading, setPayloadLoading] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewLoading, setPreviewLoading] = useState(false)
+  const [previewHtml, setPreviewHtml] = useState('')
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [historyRows, setHistoryRows] = useState<HistoryRow[]>([])
+  const [historyError, setHistoryError] = useState('')
+  const [validationRunning, setValidationRunning] = useState(false)
+  const htmlRecoveryAttemptedRef = useRef(false)
+
+  const model = normalizeModel(form.modelo)
+  const html = String(form.html || '')
+  const type = String(form.tipo || '').trim()
+  const templateId = String(form.id || '').trim()
+  const isPhpModel = model === 'php'
+  const variablePaths = useMemo(() => collectVariablePaths(payload), [payload])
+
+  useEffect(() => {
+    if (form.modelo == null || String(form.modelo).trim() === '') {
+      patch('modelo', 'twig')
+    }
+  }, [form.modelo, patch])
+
+  useEffect(() => {
+    if (!templateId || html.trim() || htmlRecoveryAttemptedRef.current) {
+      return
+    }
+
+    htmlRecoveryAttemptedRef.current = true
+
+    void emailsTemplatesClient.getById(templateId).then((record) => {
+      const normalized = normalizeEmailTemplateRecord(record)
+      const recoveredHtml = String(normalized.html || '')
+
+      if (!recoveredHtml.trim()) {
+        return
+      }
+
+      patch('html', recoveredHtml)
+
+      if (!String(form.modelo || '').trim() && String(normalized.modelo || '').trim()) {
+        patch('modelo', normalized.modelo)
+      }
+    }).catch(() => {
+      htmlRecoveryAttemptedRef.current = false
+    })
+  }, [form.modelo, html, patch, templateId])
+
+  const loadPayload = useCallback(async () => {
+    if (!type) {
+      setPayload(null)
+      return
+    }
+
+    setPayloadLoading(true)
+    try {
+      const response = await emailsTemplatesEditorClient.getPayloadExample(type)
+      setPayload(response)
+    } catch (error) {
+      setPayload(null)
+      onFeedback(error instanceof Error ? error.message : t('maintenance.emailTemplates.editor.payloadLoadError', 'Could not load variables for selected template type.'))
+    } finally {
+      setPayloadLoading(false)
+    }
+  }, [onFeedback, t, type])
+
+  useEffect(() => {
+    void loadPayload()
+  }, [loadPayload])
+
+  const validateTemplate = useCallback(() => {
+    setValidationRunning(true)
+    const issues = validateEmailTemplateMarkup(html)
+    editorRef.current?.setValidationIssues(issues)
+
+    if (issues.length) {
+      onFeedback(
+        t('maintenance.emailTemplates.editor.validationError', 'Validação encontrou {{count}} problema(s) no template.', {
+          count: String(issues.length),
+        }),
+      )
+    } else {
+      onFeedback(t('maintenance.emailTemplates.editor.validationSuccess', 'Nenhum problema estrutural encontrado no template.'))
+    }
+
+    setValidationRunning(false)
+  }, [html, onFeedback, t])
+
+  const openPreview = useCallback(async () => {
+    setPreviewOpen(true)
+    setPreviewLoading(true)
+
+    const templateForPreview = model === 'php' ? convertPhpToTwig(html) : html
+    const payloadForPreview = payload ?? {}
+
+    try {
+      const rendered = await emailsTemplatesEditorClient.preview({
+        template: templateForPreview,
+        payload: payloadForPreview,
+      })
+
+      setPreviewHtml(rendered)
+    } catch (error) {
+      const fallback = renderTwigPreviewFallback(templateForPreview, payloadForPreview)
+      setPreviewHtml(fallback)
+      onFeedback(error instanceof Error ? error.message : t('maintenance.emailTemplates.editor.previewFallbackNotice', 'Preview rendered in simplified mode due to endpoint failure.'))
+    } finally {
+      setPreviewLoading(false)
+    }
+  }, [html, model, onFeedback, payload, t])
+
+  const openHistory = useCallback(async () => {
+    if (!templateId) {
+      return
+    }
+
+    setHistoryOpen(true)
+    setHistoryLoading(true)
+    setHistoryError('')
+
+    try {
+      const rows = await emailsTemplatesEditorClient.getHistory(templateId)
+      setHistoryRows(rows)
+    } catch (error) {
+      setHistoryRows([])
+      const message = error instanceof Error ? error.message : t('maintenance.emailTemplates.editor.historyLoadError', 'Could not load template history.')
+      setHistoryError(message)
+      onFeedback(message)
+    } finally {
+      setHistoryLoading(false)
+    }
+  }, [onFeedback, t, templateId])
+
+  useEffect(() => {
+    if (!onToolbarApiChange) {
+      return
+    }
+
+    onToolbarApiChange({
+      model,
+      payloadLoading,
+      previewLoading,
+      hasTemplateId: Boolean(templateId),
+      refreshVariables: loadPayload,
+      validationRunning,
+      openHistory,
+      openPreview,
+      validateTemplate,
+    })
+
+    return () => {
+      onToolbarApiChange(null)
+    }
+  }, [
+    loadPayload,
+    model,
+    onToolbarApiChange,
+    openHistory,
+    openPreview,
+    payloadLoading,
+    previewLoading,
+    templateId,
+    validateTemplate,
+    validationRunning,
+  ])
+
+  return (
+    <SectionCard className="overflow-hidden px-0 py-0">
+      <style jsx>{`
+        :global(.email-template-variable-scroll) {
+          scrollbar-width: thin;
+          scrollbar-color: #d7cfbf transparent;
+        }
+
+        :global(.email-template-variable-scroll::-webkit-scrollbar) {
+          width: 7px;
+        }
+
+        :global(.email-template-variable-scroll::-webkit-scrollbar-track) {
+          background: transparent;
+        }
+
+        :global(.email-template-variable-scroll::-webkit-scrollbar-thumb) {
+          background: #d7cfbf;
+          border-radius: 999px;
+        }
+      `}</style>
+
+      <div className="px-1 py-1 sm:px-1.5 sm:py-1.5">
+        <div className="lg:hidden">
+          <div className="flex min-h-[620px] flex-col overflow-hidden rounded-[1rem] bg-white">
+            <EmailTemplateMonaco
+              ref={editorRef}
+              value={html}
+              language={isPhpModel ? 'php' : 'html'}
+              variables={variablePaths}
+              onChange={(value) => patch('html', value)}
+              height="100%"
+            />
+          </div>
+        </div>
+
+        <div className="hidden lg:block">
+          <ResizableHorizontalPanels
+            leftPercentage={leftPanelPercentage}
+            onLeftPercentageChange={setLeftPanelPercentage}
+            minLeftPx={280}
+            minRightPx={420}
+            minHeightClassName="min-h-[620px]"
+            left={(
+              <VariablesPanel
+                payloadLoading={payloadLoading}
+                variablePaths={variablePaths}
+                payload={payload}
+                model={model}
+                readOnly={readOnly}
+                onInsertToken={(token) => editorRef.current?.insertTextAtCursor(token)}
+              />
+            )}
+            right={(
+              <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-[1rem] bg-white">
+                <div className="flex min-h-0 flex-1 overflow-hidden p-0">
+                  <EmailTemplateMonaco
+                    ref={editorRef}
+                    value={html}
+                    language={isPhpModel ? 'php' : 'html'}
+                    variables={variablePaths}
+                    onChange={(value) => patch('html', value)}
+                    height="100%"
+                  />
+                </div>
+              </div>
+            )}
+          />
+        </div>
+      </div>
+
+      <OverlayModal
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        title={t('maintenance.emailTemplates.editor.historyTitle', 'Template history')}
+        maxWidthClassName="max-w-5xl"
+        bodyScrollable={false}
+        headerActions={historyRows.length ? <StatusBadge tone="info">{historyRows.length}</StatusBadge> : null}
+      >
+        <AsyncState isLoading={historyLoading} error={historyError}>
+          <SectionCard className="overflow-hidden px-0 py-0">
+            <div className="border-b border-[#efe8dc] bg-[#fcfaf5] px-4 py-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-slate-600">
+                  {t('maintenance.emailTemplates.editor.history', 'Template history')}
+                </p>
+                <StatusBadge tone="neutral">
+                  <span className="inline-flex items-center gap-1.5">
+                    <History className="h-3.5 w-3.5" />
+                    {historyRows.length}
+                  </span>
+                </StatusBadge>
+              </div>
+            </div>
+            <div className="max-h-[65vh] overflow-auto">
+              <table className="min-w-full border-collapse text-left text-sm">
+                <thead className="sticky top-0 z-[1] bg-[#f8f4ec] text-slate-700">
+                  <tr>
+                    <th className="px-4 py-3 text-[13px] font-semibold">ID</th>
+                    <th className="px-4 py-3 text-[13px] font-semibold">{t('maintenance.emailTemplates.editor.historyUser', 'User')}</th>
+                    <th className="px-4 py-3 text-[13px] font-semibold">{t('maintenance.emailTemplates.editor.historyDate', 'Date')}</th>
+                    <th className="px-4 py-3 text-right text-[13px] font-semibold">{t('common.actions', 'Actions')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historyRows.length ? historyRows.map((row) => (
+                    <tr key={row.id} className="border-t border-[#f0ebe2] align-top">
+                      <td className="px-4 py-3 text-slate-700">
+                        <span className="inline-flex rounded-full bg-[#f6f1e8] px-2.5 py-1 text-xs font-semibold text-slate-600">
+                          #{row.id}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-700">{row.usuario?.nome || '-'}</td>
+                      <td className="px-4 py-3 text-slate-700">{row.data ? formatDateTime(row.data) : '-'}</td>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-2 rounded-full border border-[#e6dfd3] bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-900 hover:text-slate-950"
+                          onClick={() => {
+                            const nextHtml = String(row.html || '')
+                            patch('modelo', inferTemplateModel(nextHtml))
+                            patch('html', nextHtml)
+                            setHistoryOpen(false)
+                          }}
+                        >
+                          {t('maintenance.emailTemplates.editor.loadVersion', 'Load version')}
+                        </button>
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-10 text-center text-sm text-slate-500">
+                        {t('maintenance.emailTemplates.editor.emptyHistory', 'No history available for this template.')}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </SectionCard>
+        </AsyncState>
+      </OverlayModal>
+
+      <OverlayModal
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        title={t('maintenance.emailTemplates.editor.previewTitle', 'Email preview')}
+        maxWidthClassName="max-w-[95vw]"
+      >
+        <AsyncState
+          isLoading={previewLoading}
+          loadingTitle={t('maintenance.emailTemplates.editor.previewLoadingTitle', 'Carregando pré-visualização')}
+          loadingDescription={t('maintenance.emailTemplates.editor.previewLoading', 'Renderizando template...')}
+        >
+          <div className="overflow-hidden rounded-[1.2rem] border border-[#e6dfd3] bg-[#fcfaf5] p-2">
+            <iframe
+              title={t('maintenance.emailTemplates.editor.previewFrameTitle', 'Template preview')}
+              srcDoc={previewHtml}
+              className="h-[70vh] w-full rounded-[0.95rem] border border-[#e6dfd3] bg-white"
+            />
+          </div>
+        </AsyncState>
+      </OverlayModal>
+    </SectionCard>
+  )
+}

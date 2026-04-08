@@ -1,11 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ArrowLeft, Loader2, Save } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { AsyncState } from '@/src/components/ui/async-state'
 import { PageHeader } from '@/src/components/ui/page-header'
-import { PageToast } from '@/src/components/ui/page-toast'
 import { SectionCard } from '@/src/components/ui/section-card'
 import { AccessDeniedState } from '@/src/features/auth/components/access-denied-state'
 import { useFeatureAccess } from '@/src/features/auth/hooks/use-feature-access'
@@ -14,17 +14,17 @@ import type { AplicativoIntegracaoPermissaoRecord } from '@/src/features/integra
 import { useI18n } from '@/src/i18n/use-i18n'
 import { useRouteParams } from '@/src/next/route-context'
 
-type VerbKey = 'verboGet' | 'verboPost' | 'verboPut' | 'verboDelete'
+type VerbKey = 'verboGet' | 'verboSalvar' | 'verboDelete'
 
 const VERB_COLUMNS: Array<{ key: VerbKey; label: string }> = [
   { key: 'verboGet', label: 'GET' },
-  { key: 'verboPost', label: 'POST' },
-  { key: 'verboPut', label: 'PUT' },
+  { key: 'verboSalvar', label: 'Salvar (POST/PUT)' },
   { key: 'verboDelete', label: 'DELETE' },
 ]
 
 export function AplicativoPermissoesPage({ id }: { id?: string }) {
   const { t } = useI18n()
+  const router = useRouter()
   const routeParams = useRouteParams<{ id?: string }>()
   const resolvedId = id ?? routeParams.id ?? ''
   const access = useFeatureAccess('integracaoAplicativos')
@@ -37,7 +37,6 @@ export function AplicativoPermissoesPage({ id }: { id?: string }) {
   const [search, setSearch] = useState('')
   const [usuarioNome, setUsuarioNome] = useState('')
   const [rows, setRows] = useState<AplicativoIntegracaoPermissaoRecord[]>([])
-  const [toast, setToast] = useState<{ tone: 'success' | 'error'; message: string } | null>(null)
 
   useEffect(() => {
     let active = true
@@ -53,7 +52,7 @@ export function AplicativoPermissoesPage({ id }: { id?: string }) {
         setRows(response.rows)
       } catch (loadError) {
         if (!active) return
-        setError(loadError instanceof Error ? loadError.message : t('integrationApps.permissions.loadError', 'Não foi possível carregar as permissões do aplicativo.'))
+        setError(loadError instanceof Error ? loadError.message : t('integrationApps.permissions.loadError', 'Nao foi possivel carregar as permissoes do aplicativo.'))
       } finally {
         if (active) {
           setLoading(false)
@@ -73,7 +72,7 @@ export function AplicativoPermissoesPage({ id }: { id?: string }) {
   }, [rows, search])
 
   if (!canOpen) {
-    return <AccessDeniedState title={t('integrationApps.permissions.title', 'Permissões de acesso')} backHref="/api-de-integracao/aplicativos" />
+    return <AccessDeniedState title={t('integrationApps.permissions.title', 'Permissoes de acesso')} backHref="/api-de-integracao/aplicativos" />
   }
 
   function setAllForColumn(verb: VerbKey, value: boolean) {
@@ -90,12 +89,13 @@ export function AplicativoPermissoesPage({ id }: { id?: string }) {
     try {
       setSaving(true)
       await integracaoAplicativosClient.savePermissoes(resolvedId, rows)
-      setToast({ tone: 'success', message: t('integrationApps.permissions.saveSuccess', 'Permissões salvas com sucesso.') })
+      router.push('/api-de-integracao/aplicativos')
     } catch (saveError) {
-      setToast({
-        tone: 'error',
-        message: saveError instanceof Error ? saveError.message : t('integrationApps.permissions.saveError', 'Não foi possível salvar as permissões.'),
-      })
+      setError(
+        saveError instanceof Error
+          ? saveError.message
+          : t('integrationApps.permissions.saveError', 'Nao foi possivel salvar as permissoes.'),
+      )
     } finally {
       setSaving(false)
     }
@@ -105,10 +105,10 @@ export function AplicativoPermissoesPage({ id }: { id?: string }) {
     <div className="space-y-5">
       <PageHeader
         breadcrumbs={[
-          { label: t('routes.dashboard', 'Início'), href: '/dashboard' },
-          { label: t('menuKeys.api-de-integracao', 'API de Integração') },
+          { label: t('routes.dashboard', 'Inicio'), href: '/dashboard' },
+          { label: t('menuKeys.api-de-integracao', 'API de Integracao') },
           { label: t('integrationApps.title', 'Aplicativos'), href: '/api-de-integracao/aplicativos' },
-          { label: t('integrationApps.permissions.title', 'Permissões de acesso') },
+          { label: t('integrationApps.permissions.title', 'Permissoes de acesso') },
         ]}
         actions={(
           <div className="flex flex-wrap gap-2">
@@ -136,7 +136,7 @@ export function AplicativoPermissoesPage({ id }: { id?: string }) {
 
       <AsyncState isLoading={loading} error={error}>
         <SectionCard
-          title={t('integrationApps.permissions.title', 'Permissões de acesso')}
+          title={t('integrationApps.permissions.title', 'Permissoes de acesso')}
           description={
             usuarioNome
               ? `${t('integrationApps.permissions.userLabel', 'Aplicativo')}: ${usuarioNome}`
@@ -144,24 +144,39 @@ export function AplicativoPermissoesPage({ id }: { id?: string }) {
           }
         >
           <div className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-xl border border-[#e8dece] bg-[#fcf7ef] px-4 py-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Rotas</p>
+                <p className="mt-1 text-lg font-black text-slate-900">{rows.length}</p>
+              </div>
+              <div className="rounded-xl border border-[#e8dece] bg-[#fcf7ef] px-4 py-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Exibidas</p>
+                <p className="mt-1 text-lg font-black text-slate-900">{filteredRows.length}</p>
+              </div>
+              <div className="rounded-xl border border-[#e8dece] bg-[#fcf7ef] px-4 py-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Com acesso GET</p>
+                <p className="mt-1 text-lg font-black text-slate-900">{rows.filter((row) => row.verboGet).length}</p>
+              </div>
+            </div>
+
             <input
               type="text"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder={t('integrationApps.permissions.searchPlaceholder', 'Buscar rota/tabela')}
-              className="w-full rounded-[0.85rem] border border-[#e5dccf] bg-white px-3 py-2 text-sm"
+              className="w-full rounded-[0.9rem] border border-[#e5dccf] bg-white px-3.5 py-2.5 text-sm"
             />
 
-            <div className="overflow-x-auto rounded-[1rem] border border-[#ece3d6] bg-white">
+            <div className="overflow-hidden rounded-[1rem] border border-[#ece3d6] bg-white">
               <table className="min-w-full text-left text-sm">
-                <thead className="bg-[#f8f4ec] text-xs uppercase text-slate-600">
+                <thead className="bg-[#f8f4ec] text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
                   <tr>
-                    <th className="px-3 py-2">{t('integrationApps.permissions.routeColumn', 'Rota')}</th>
+                    <th className="px-4 py-3">{t('integrationApps.permissions.routeColumn', 'Rota')}</th>
                     {VERB_COLUMNS.map((column) => {
                       const allChecked = rows.length > 0 && rows.every((row) => row[column.key])
                       return (
-                        <th key={column.key} className="px-3 py-2 text-center">
-                          <label className="inline-flex items-center gap-2">
+                        <th key={column.key} className="px-4 py-3 text-center">
+                          <label className="inline-flex items-center gap-2 whitespace-nowrap">
                             <input
                               type="checkbox"
                               checked={allChecked}
@@ -179,10 +194,10 @@ export function AplicativoPermissoesPage({ id }: { id?: string }) {
                   {filteredRows.length ? filteredRows.map((row) => {
                     const rowIndex = rows.findIndex((item) => item.tabelaNome === row.tabelaNome)
                     return (
-                      <tr key={row.tabelaNome} className="border-t border-[#efe8dc]">
-                        <td className="px-3 py-2 font-semibold text-slate-900">{row.tabelaNome}</td>
+                      <tr key={row.tabelaNome} className="border-t border-[#efe8dc] transition hover:bg-[#fdf9f2]">
+                        <td className="px-4 py-3.5 font-mono text-[13px] font-semibold text-slate-900">{row.tabelaNome}</td>
                         {VERB_COLUMNS.map((column) => (
-                          <td key={column.key} className="px-3 py-2 text-center">
+                          <td key={column.key} className="px-4 py-3.5 text-center">
                             <input
                               type="checkbox"
                               checked={row[column.key]}
@@ -195,7 +210,7 @@ export function AplicativoPermissoesPage({ id }: { id?: string }) {
                     )
                   }) : (
                     <tr>
-                      <td colSpan={VERB_COLUMNS.length + 1} className="px-4 py-8 text-center text-sm text-slate-500">
+                      <td colSpan={VERB_COLUMNS.length + 1} className="px-4 py-10 text-center text-sm text-slate-500">
                         {t('integrationApps.permissions.empty', 'Nenhuma rota encontrada para o filtro informado.')}
                       </td>
                     </tr>
@@ -206,9 +221,6 @@ export function AplicativoPermissoesPage({ id }: { id?: string }) {
           </div>
         </SectionCard>
       </AsyncState>
-
-      {toast ? <PageToast tone={toast.tone} message={toast.message} onClose={() => setToast(null)} /> : null}
     </div>
   )
 }
-

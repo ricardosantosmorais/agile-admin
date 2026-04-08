@@ -1,7 +1,7 @@
 'use client'
 
 import { Check, ChevronDown, Search, X } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useI18n } from '@/src/i18n/use-i18n'
 
@@ -31,9 +31,12 @@ export function MultiLookupSelect({
   const { t } = useI18n()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const triggerRef = useRef<HTMLButtonElement | null>(null)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
+  const listRef = useRef<HTMLDivElement | null>(null)
+  const listboxId = useId()
   const [dropdownStyle, setDropdownStyle] = useState<{
     top?: number
     bottom?: number
@@ -59,11 +62,21 @@ export function MultiLookupSelect({
     })
   }, [options, query])
 
+  function closeDropdown() {
+    setOpen(false)
+    setHighlightedIndex(-1)
+  }
+
+  function openDropdown() {
+    setOpen(true)
+    setHighlightedIndex(filteredOptions.length ? 0 : -1)
+  }
+
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
       const target = event.target as Node
       if (!containerRef.current?.contains(target) && !dropdownRef.current?.contains(target)) {
-        setOpen(false)
+        closeDropdown()
       }
     }
 
@@ -72,9 +85,7 @@ export function MultiLookupSelect({
   }, [])
 
   useEffect(() => {
-    if (!open) {
-      return
-    }
+    if (!open) return
 
     function updateDropdownPosition() {
       const rect = triggerRef.current?.getBoundingClientRect()
@@ -117,13 +128,116 @@ export function MultiLookupSelect({
     onChange([...values, optionId])
   }
 
+  function moveHighlight(direction: 1 | -1) {
+    if (!filteredOptions.length) {
+      return
+    }
+
+    setHighlightedIndex((current) => {
+      if (current < 0) {
+        return direction > 0 ? 0 : filteredOptions.length - 1
+      }
+
+      const nextIndex = current + direction
+      if (nextIndex < 0) {
+        return filteredOptions.length - 1
+      }
+
+      if (nextIndex >= filteredOptions.length) {
+        return 0
+      }
+
+      return nextIndex
+    })
+  }
+
+  function handleTriggerKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+    if (disabled) {
+      return
+    }
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      openDropdown()
+      return
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      if (open) {
+        closeDropdown()
+      } else {
+        openDropdown()
+      }
+    }
+  }
+
+  function handleInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      moveHighlight(1)
+      return
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      moveHighlight(-1)
+      return
+    }
+
+    if (event.key === 'Home') {
+      event.preventDefault()
+      setHighlightedIndex(filteredOptions.length ? 0 : -1)
+      return
+    }
+
+    if (event.key === 'End') {
+      event.preventDefault()
+      setHighlightedIndex(filteredOptions.length ? filteredOptions.length - 1 : -1)
+      return
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
+        toggleValue(filteredOptions[highlightedIndex].id)
+      }
+      return
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      closeDropdown()
+      triggerRef.current?.focus()
+    }
+  }
+
+  useEffect(() => {
+    if (!open || highlightedIndex < 0) {
+      return
+    }
+
+    const activeOption = listRef.current?.querySelector<HTMLElement>(`[data-option-index="${highlightedIndex}"]`)
+    activeOption?.scrollIntoView({ block: 'nearest' })
+  }, [highlightedIndex, open])
+
   return (
     <div ref={containerRef} className="relative">
       <button
         ref={triggerRef}
         type="button"
         disabled={disabled}
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => {
+          if (open) {
+            closeDropdown()
+          } else {
+            openDropdown()
+          }
+        }}
+        onKeyDown={handleTriggerKeyDown}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={open ? listboxId : undefined}
         className="flex min-h-[46px] w-full items-center justify-between gap-3 rounded-[1rem] border border-[#e6dfd3] bg-white px-3.5 py-2.5 text-left text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
       >
         <div className="min-w-0 flex-1">
@@ -161,7 +275,21 @@ export function MultiLookupSelect({
                 <input
                   autoFocus
                   value={query}
-                  onChange={(event) => setQuery(event.target.value)}
+                  onChange={(event) => {
+                    const nextQuery = event.target.value
+                    setQuery(nextQuery)
+                    const nextFilteredOptions = options.filter((option) => {
+                      const haystack = `${option.label} ${option.description ?? ''}`.toLowerCase()
+                      return haystack.includes(nextQuery.trim().toLowerCase())
+                    })
+                    setHighlightedIndex(nextFilteredOptions.length ? 0 : -1)
+                  }}
+                  onKeyDown={handleInputKeyDown}
+                  role="combobox"
+                  aria-expanded={open}
+                  aria-controls={listboxId}
+                  aria-autocomplete="list"
+                  aria-activedescendant={highlightedIndex >= 0 ? `${listboxId}-option-${highlightedIndex}` : undefined}
                   className="w-full border-none bg-transparent text-sm outline-none placeholder:text-slate-400"
                   placeholder={t('common.searchFor', 'Search {{label}}', { label: label.toLowerCase() })}
                 />
@@ -172,13 +300,20 @@ export function MultiLookupSelect({
                 ) : null}
               </div>
 
-              <div style={{ maxHeight: Math.max(dropdownStyle.maxHeight - 72, 132) }} className="mt-3 overflow-y-auto">
+              <div
+                id={listboxId}
+                role="listbox"
+                ref={listRef}
+                style={{ maxHeight: Math.max(dropdownStyle.maxHeight - 72, 132) }}
+                className="mt-3 overflow-y-auto"
+              >
                 <button
                   type="button"
                   onPointerDown={(event) => {
                     event.preventDefault()
                     event.stopPropagation()
                     onChange([])
+                    setHighlightedIndex(filteredOptions.length ? 0 : -1)
                   }}
                   className="flex w-full items-center gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm text-slate-600 transition hover:bg-[#fcfaf5]"
                 >
@@ -189,16 +324,26 @@ export function MultiLookupSelect({
                 {filteredOptions.length ? (
                   filteredOptions.map((option) => {
                     const isSelected = values.includes(option.id)
+                    const optionIndex = filteredOptions.findIndex((item) => item.id === option.id)
+                    const isHighlighted = optionIndex === highlightedIndex
                     return (
                       <button
+                        id={`${listboxId}-option-${optionIndex}`}
                         key={option.id}
                         type="button"
+                        role="option"
+                        aria-selected={isSelected}
+                        data-option-index={optionIndex}
+                        onMouseEnter={() => setHighlightedIndex(optionIndex)}
                         onPointerDown={(event) => {
                           event.preventDefault()
                           event.stopPropagation()
                           toggleValue(option.id)
                         }}
-                        className="flex w-full items-start justify-between gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm transition hover:bg-[#fcfaf5]"
+                        className={[
+                          'flex w-full items-start justify-between gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm transition hover:bg-[#fcfaf5]',
+                          isHighlighted ? 'bg-[#fcfaf5]' : '',
+                        ].join(' ')}
                       >
                         <div className="min-w-0">
                           <p className="truncate font-medium text-slate-900">{option.label}</p>

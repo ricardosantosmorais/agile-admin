@@ -34,6 +34,11 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     return NextResponse.json({ message: 'Aplicativo não encontrado.' }, { status: 404 })
   }
 
-  return NextResponse.json(item)
+  return NextResponse.json({
+    ...item,
+    id: item.id == null ? '' : String(item.id),
+    codigo: item.codigo == null ? '' : String(item.codigo),
+    nome: item.nome == null ? '' : String(item.nome),
+    email: item.email == null ? '' : String(item.email),
+  })
 }
-

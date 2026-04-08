@@ -1,4 +1,4 @@
-import type { AuthPermission, AuthSession } from '@/src/features/auth/types/auth'
+﻿import type { AuthPermission, AuthSession } from '@/src/features/auth/types/auth'
 import { normalizeSearchValue } from '@/src/lib/text-normalization'
 
 export type FeatureKey =
@@ -9,6 +9,8 @@ export type FeatureKey =
   | 'integracaoAplicativos'
   | 'produtos'
   | 'produtosPrecificadores'
+  | 'restricoesProdutos'
+  | 'excecoesProdutos'
   | 'produtosFiliais'
   | 'tributos'
   | 'tributosPartilha'
@@ -20,6 +22,12 @@ export type FeatureKey =
   | 'filiais'
   | 'canaisDistribuicao'
   | 'gruposFiliais'
+  | 'formularios'
+  | 'termosPesquisa'
+  | 'renovarCache'
+  | 'processamentoImagens'
+  | 'importarPlanilha'
+  | 'logsManutencao'
   | 'fases'
   | 'sequenciais'
   | 'dashboard'
@@ -65,6 +73,7 @@ export type FeatureKey =
   | 'compreJunto'
   | 'cuponsDesconto'
   | 'notificacoesApp'
+  | 'templatesEmails'
   | 'areasBanner'
   | 'emails'
   | 'paginas'
@@ -90,6 +99,7 @@ export type FeatureAction =
 type FeatureConfig = {
   label: string
   matchers: string[]
+  allowOpenWithoutAction?: boolean
 }
 
 type FeatureAccess = {
@@ -131,6 +141,14 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
   produtosPrecificadores: {
     label: 'Produtos x Precificadores',
     matchers: ['produtos x precificadores', 'produto x precificadores', 'produtos-precificadores', 'produtos_precificadores', 'precificadores produtos'],
+  },
+  restricoesProdutos: {
+    label: 'Restrição x Produtos',
+    matchers: ['restricao x produtos', 'restrição x produtos', 'restricoes-produtos', 'restricoes_produtos', 'restricao produtos', 'restrição produtos'],
+  },
+  excecoesProdutos: {
+    label: 'Exceções x Produtos',
+    matchers: ['excecao x produtos', 'exceção x produtos', 'excecoes-produtos', 'excecoes_produtos', 'excecao produtos', 'exceção produtos'],
   },
   produtosFiliais: {
     label: 'Produtos x Filiais',
@@ -175,6 +193,31 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
   gruposFiliais: {
     label: 'Grupos de Filiais',
     matchers: ['grupo de filiais', 'grupos de filiais', 'grupo filial', 'grupos filial', 'grupos-filiais', 'grupos_filiais'],
+  },
+  formularios: {
+    label: 'Formularios',
+    matchers: ['formularios-list', 'formularios-campos-list', 'formularios', 'formulario', 'campos de formularios', 'campos de formulários'],
+  },
+  termosPesquisa: {
+    label: 'Termos de Pesquisa',
+    matchers: ['termos de pesquisa', 'termo de pesquisa', 'termos-pesquisa', 'termos_pesquisa'],
+  },
+  renovarCache: {
+    label: 'Renovar Cache',
+    matchers: ['renew-cache', 'renovar cache'],
+    allowOpenWithoutAction: true,
+  },
+  processamentoImagens: {
+    label: 'Processamento de Imagens',
+    matchers: ['processos-imagens-list', 'processamento de imagens', 'processos imagens'],
+  },
+  importarPlanilha: {
+    label: 'Importar Planilha',
+    matchers: ['processos-arquivos-list', 'importar planilha', 'processos arquivos', 'importacao planilha'],
+  },
+  logsManutencao: {
+    label: 'Logs',
+    matchers: ['logs-list', 'manutencao logs', 'manutenção logs'],
   },
   fases: {
     label: 'Fases',
@@ -356,6 +399,10 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
     label: 'Notificacoes App',
     matchers: ['notificacoes app', 'notificacoes-app', 'notificacoes_list', 'notificacoes-list', 'notificacao app'],
   },
+  templatesEmails: {
+    label: 'Templates de E-mails',
+    matchers: ['emails-templates-list', 'templates de e-mails', 'template de e-mail', 'email template'],
+  },
   areasBanner: {
     label: 'Areas de Banner',
     matchers: ['area de banner', 'areas de banner', 'areas-banner', 'areas_banner'],
@@ -510,7 +557,7 @@ export function getFeatureAccess(session: AuthSession | null, featureKey: Featur
   const canDelete = hasActionPermission(family, feature, 'deletar')
   const canLogs = hasActionPermission(family, feature, 'logs')
   const canUnblockClient = hasActionPermission(family, feature, 'desbloquear_cliente')
-  const canOpen = family.length > 0 && (canList || canCreate || canEdit || canView)
+  const canOpen = family.length > 0 && (canList || canCreate || canEdit || canView || feature.allowOpenWithoutAction === true)
 
   return {
     canOpen,
@@ -527,3 +574,4 @@ export function getFeatureAccess(session: AuthSession | null, featureKey: Featur
 export function getFeatureLabel(featureKey: FeatureKey) {
   return featureConfigs[featureKey].label
 }
+

@@ -11,6 +11,7 @@ type SortableFilters<TOrder extends string> = {
 type UseDataTableStateParams<TItem, TFilters extends SortableFilters<TOrder>, TOrder extends string> = {
   rows: TItem[]
   getRowId: (item: TItem) => string
+  selectableRowIds?: string[]
   filters: TFilters
   setFilters: React.Dispatch<React.SetStateAction<TFilters>>
   setFiltersDraft: React.Dispatch<React.SetStateAction<TFilters>>
@@ -19,6 +20,7 @@ type UseDataTableStateParams<TItem, TFilters extends SortableFilters<TOrder>, TO
 export function useDataTableState<TItem, TFilters extends SortableFilters<TOrder>, TOrder extends string>({
   rows,
   getRowId,
+  selectableRowIds,
   filters,
   setFilters,
   setFiltersDraft,
@@ -27,21 +29,29 @@ export function useDataTableState<TItem, TFilters extends SortableFilters<TOrder
   const [expandedRowIds, setExpandedRowIds] = useState<string[]>([])
 
   const rowIds = useMemo(() => rows.map((item) => getRowId(item)), [rows, getRowId])
-  const allSelected = rowIds.length > 0 && rowIds.every((id) => selectedIds.includes(id))
+  const effectiveSelectableRowIds = useMemo(
+    () => selectableRowIds ?? rowIds,
+    [rowIds, selectableRowIds],
+  )
+  const allSelected = effectiveSelectableRowIds.length > 0 && effectiveSelectableRowIds.every((id) => selectedIds.includes(id))
 
   const clearSelection = useCallback(() => {
     setSelectedIds([])
   }, [])
 
   const toggleSelection = useCallback((id: string) => {
+    if (!effectiveSelectableRowIds.includes(id)) {
+      return
+    }
+
     setSelectedIds((current) =>
       current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
     )
-  }, [])
+  }, [effectiveSelectableRowIds])
 
   const toggleSelectAll = useCallback(() => {
-    setSelectedIds(allSelected ? [] : rowIds)
-  }, [allSelected, rowIds])
+    setSelectedIds(allSelected ? [] : effectiveSelectableRowIds)
+  }, [allSelected, effectiveSelectableRowIds])
 
   const toggleExpandedRow = useCallback((id: string) => {
     setExpandedRowIds((current) =>

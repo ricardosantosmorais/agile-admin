@@ -47,8 +47,7 @@ export type AplicativoIntegracaoFormRecord = {
 export type AplicativoIntegracaoPermissaoRecord = {
   tabelaNome: string
   verboGet: boolean
-  verboPost: boolean
-  verboPut: boolean
+  verboSalvar: boolean
   verboDelete: boolean
 }
 
@@ -89,8 +88,8 @@ export function mapAplicativoIntegracaoListResponse(payload: unknown): Aplicativ
 
   return {
     data: asArray<Record<string, unknown>>(record.data).map((item) => ({
-      id: asString(item.id || item.codigo || item.login),
-      codigo: asString(item.codigo || item.login || item.id),
+      id: asString(item.id || item.id_usuario || item.idUsuario),
+      codigo: asString(item.codigo),
       nome: asString(item.nome, '-'),
       email: asString(item.email),
       ativo: asBoolean(item.ativo),
@@ -133,8 +132,7 @@ export function mapAplicativoIntegracaoPermissoesResponse(payload: unknown): Apl
     rows: asArray<Record<string, unknown>>(record.rows).map((row) => ({
       tabelaNome: asString(row.tabelaNome),
       verboGet: asBoolean(row.verboGet),
-      verboPost: asBoolean(row.verboPost),
-      verboPut: asBoolean(row.verboPut),
+      verboSalvar: asBoolean(row.verboSalvar) || asBoolean(row.verboPost) || asBoolean(row.verboPut),
       verboDelete: asBoolean(row.verboDelete),
     })),
   }

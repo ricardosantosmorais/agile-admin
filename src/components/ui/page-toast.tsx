@@ -6,11 +6,18 @@ import { AlertCircle, CheckCircle2, X } from 'lucide-react'
 type PageToastProps = {
   message: string | null
   tone?: 'success' | 'error'
+  variant?: 'success' | 'danger'
   onClose: () => void
   durationMs?: number
 }
 
-export function PageToast({ message, tone = 'error', onClose, durationMs = 4500 }: PageToastProps) {
+export function PageToast({
+  message,
+  tone,
+  variant,
+  onClose,
+  durationMs = 4500,
+}: PageToastProps) {
   useEffect(() => {
     if (!message) {
       return
@@ -24,7 +31,8 @@ export function PageToast({ message, tone = 'error', onClose, durationMs = 4500 
     return null
   }
 
-  const isError = tone === 'error'
+  const resolvedTone = tone ?? (variant === 'success' ? 'success' : 'error')
+  const isError = resolvedTone === 'error'
 
   return (
     <div className="pointer-events-none fixed left-1/2 top-[5.5rem] z-[160] w-full max-w-3xl -translate-x-1/2 px-4">
