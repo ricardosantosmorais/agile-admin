@@ -50,7 +50,7 @@ export function OverlayModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center overflow-y-auto bg-[rgba(15,23,42,0.72)] p-4 backdrop-blur-md"
+      className="fixed inset-0 z-[200] flex items-center justify-center overflow-y-auto bg-[rgba(2,6,23,0.72)] p-4 backdrop-blur-md"
       onClick={onClose}
     >
       <div
@@ -59,24 +59,28 @@ export function OverlayModal({
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className={`relative z-[210] flex max-h-[calc(100vh-2rem)] w-full ${maxWidthClassName} flex-col overflow-hidden rounded-[1.6rem] border border-[#e6dfd3] bg-white p-5 shadow-[0_32px_90px_rgba(15,23,42,0.28)]`}
+        className={`app-shell-card-modern relative z-[210] flex max-h-[calc(100vh-2rem)] w-full ${maxWidthClassName} flex-col overflow-hidden rounded-[1.6rem] p-5 shadow-[0_32px_90px_rgba(15,23,42,0.28)]`}
         onClick={(event) => event.stopPropagation()}
       >
         <div className={`mb-5 flex items-center justify-between gap-4 ${headerClassName}`.trim()}>
-          <h2 id={titleId} className="text-lg font-black tracking-tight text-slate-950">{title}</h2>
+          <h2 id={titleId} className="text-lg font-black tracking-tight text-[color:var(--app-text)]">{title}</h2>
           <div className="flex items-center gap-3">
             {headerActions}
             <button
               type="button"
               onClick={onClose}
               aria-label="Fechar modal"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e6dfd3] text-slate-600"
+              data-dialog-close="true"
+              className="app-button-secondary inline-flex h-10 w-10 items-center justify-center rounded-full text-[color:var(--app-muted)] shadow-[0_8px_16px_rgba(15,23,42,0.05)]"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
         </div>
-        <div className={`min-h-0 flex-1 ${bodyScrollable ? 'overflow-y-auto pr-1' : 'overflow-hidden'} ${bodyClassName}`.trim()}>
+        <div
+          data-dialog-body="true"
+          className={`min-h-0 flex-1 ${bodyScrollable ? 'overflow-y-auto pr-1' : 'overflow-hidden'} ${bodyClassName}`.trim()}
+        >
           {children}
         </div>
       </div>

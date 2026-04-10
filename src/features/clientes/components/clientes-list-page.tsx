@@ -71,7 +71,7 @@ export function ClientesListPage() {
   const columns: AppDataTableColumn<ClientListItem, ClientListFilters>[] = [
     {
       id: 'codigo',
-      label: t('clientes.columns.codigo', 'Codigo'),
+      label: t('clientes.columns.codigo', 'Código'),
       sortKey: 'codigo',
       cell: (client) => <div className="truncate">{client.codigo || '-'}</div>,
       thClassName: 'w-[84px]',
@@ -80,7 +80,7 @@ export function ClientesListPage() {
         id: 'codigo',
         kind: 'text',
         key: 'codigo',
-        label: t('clientes.columns.codigo', 'Codigo'),
+        label: t('clientes.columns.codigo', 'Código'),
       },
     },
     {
@@ -99,24 +99,24 @@ export function ClientesListPage() {
     },
     {
       id: 'nome',
-      label: t('clientes.columns.nomeRazaoSocial', 'Nome / Razao social'),
+      label: t('clientes.columns.nomeRazaoSocial', 'Nome / Razão social'),
       sortKey: 'razao_social',
       cell: (client) => (
         <div className="min-w-0 max-w-full">
           <p className="truncate text-sm font-semibold text-slate-950">{client.nomeRazaoSocial || '-'}</p>
-          <p className="mt-1 truncate text-xs text-slate-500">{client.inscricaoEstadual || t('clientes.details.noStateRegistration', 'Sem inscricao estadual')}</p>
+          <p className="mt-1 truncate text-xs text-slate-500">{client.inscricaoEstadual || t('clientes.details.noStateRegistration', 'Sem inscrição estadual')}</p>
         </div>
       ),
       filter: {
         id: 'nomeRazaoSocial',
         kind: 'text',
         key: 'nomeRazaoSocial',
-        label: t('clientes.columns.nomeRazaoSocial', 'Nome / Razao social'),
+        label: t('clientes.columns.nomeRazaoSocial', 'Nome / Razão social'),
       },
     },
     {
       id: 'ultimoPedido',
-      label: t('clientes.columns.ultimoPedido', 'Ultimo pedido'),
+      label: t('clientes.columns.ultimoPedido', 'Último pedido'),
       sortKey: 'ultimo_pedido',
       cell: (client) => (client.ultimoPedido ? formatDate(client.ultimoPedido) : '-'),
       visibility: '2xl',
@@ -125,7 +125,7 @@ export function ClientesListPage() {
       filter: {
         id: 'ultimoPedido',
         kind: 'date-range',
-        label: t('clientes.columns.ultimoPedido', 'Ultimo pedido'),
+        label: t('clientes.columns.ultimoPedido', 'Último pedido'),
         fromKey: 'ultimoPedidoFrom',
         toKey: 'ultimoPedidoTo',
       },
@@ -146,7 +146,7 @@ export function ClientesListPage() {
         label: t('clientes.columns.ativo', 'Ativo'),
         options: [
           { value: '1', label: t('clientes.status.yes', 'Sim') },
-          { value: '0', label: t('clientes.status.no', 'Nao') },
+          { value: '0', label: t('clientes.status.no', 'Não') },
         ],
       },
     },
@@ -156,7 +156,7 @@ export function ClientesListPage() {
     {
       id: 'dataAtivacao',
       kind: 'date-range',
-      label: t('clientes.columns.dataAtivacao', 'Data de ativacao'),
+      label: t('clientes.columns.dataAtivacao', 'Data de ativação'),
       fromKey: 'dataAtivacaoFrom',
       toKey: 'dataAtivacaoTo',
     },
@@ -188,7 +188,7 @@ export function ClientesListPage() {
       },
       {
         id: 'linked-users',
-        label: t('clientes.actions.linkedUsers', 'Usuarios vinculados'),
+        label: t('clientes.actions.linkedUsers', 'Usuários vinculados'),
         icon: Users,
         onClick: () => void openLinkedUsers(client),
         visible: access.canView,
@@ -390,17 +390,17 @@ export function ClientesListPage() {
 
       <ConfirmDialog
         open={Boolean(confirmState)}
-        title={confirmState?.kind === 'delete-users-link' ? t('clientes.modals.removeLinkedUserTitle', 'Remover usuario vinculado?') : t('clientes.modals.deleteClientTitle', 'Excluir cliente?')}
+        title={confirmState?.kind === 'delete-users-link' ? t('clientes.modals.removeLinkedUserTitle', 'Remover usuário vinculado?') : t('clientes.modals.deleteClientTitle', 'Excluir cliente?')}
         description={
           confirmState?.kind === 'delete-users-link'
-            ? t('clientes.modals.removeLinkedUserDescription', 'Essa acao remove o vinculo entre o usuario e o cliente.')
+            ? t('clientes.modals.removeLinkedUserDescription', 'Essa ação remove o vínculo entre o usuário e o cliente.')
             : confirmState?.kind === 'delete-client'
               ? confirmState.ids.length > 1
-                ? t('clientes.modals.deleteClientDescriptionMany', 'Os clientes selecionados serao excluidos. Essa acao nao pode ser desfeita.')
-                : t('clientes.modals.deleteClientDescriptionSingle', 'O cliente selecionado sera excluido. Essa acao nao pode ser desfeita.')
+                ? t('clientes.modals.deleteClientDescriptionMany', 'Os clientes selecionados serão excluídos. Essa ação não pode ser desfeita.')
+                : t('clientes.modals.deleteClientDescriptionSingle', 'O cliente selecionado será excluído. Essa ação não pode ser desfeita.')
               : ''
         }
-        confirmLabel={t('clientes.actions.confirmDelete', 'Confirmar exclusao')}
+        confirmLabel={t('clientes.actions.confirmDelete', 'Confirmar exclus?o')}
         cancelLabel={t('common.cancel')}
         onClose={() => setConfirmState(null)}
         onConfirm={() => void handleConfirmAction()}

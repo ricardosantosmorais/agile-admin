@@ -143,7 +143,7 @@ export function VendedorFormPage({ id: forcedId }: { id?: string }) {
                 {t('common.save', 'Save')}
               </button>
             ) : null}
-            <Link href="/vendedores" className="inline-flex items-center rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-slate-700">{t('common.back', 'Back')}</Link>
+          <Link href="/vendedores" className="app-button-secondary inline-flex items-center rounded-full px-4 py-3 text-sm font-semibold">{t('common.back', 'Back')}</Link>
           </div>
         }
       />
@@ -281,7 +281,7 @@ export function VendedorFormPage({ id: forcedId }: { id?: string }) {
                 {t('common.save', 'Save')}
               </button>
             ) : null}
-            <Link href="/vendedores" className="inline-flex items-center rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold text-slate-700">
+              <Link href="/vendedores" className="app-button-secondary inline-flex items-center rounded-full px-5 py-3 text-sm font-semibold">
               {t('common.cancel', 'Cancel')}
             </Link>
           </div>

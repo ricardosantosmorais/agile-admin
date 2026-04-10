@@ -1,5 +1,3 @@
-'use client'
-
 import { ParamsBridge } from '@/src/next/params-bridge'
 import { SupervisorFormPage } from '@/src/features/supervisores/components/supervisor-form-page'
 

@@ -1,5 +1,3 @@
-'use client'
-
 import { httpClient } from '@/src/services/http/http-client'
 
 export type OptionItem = {

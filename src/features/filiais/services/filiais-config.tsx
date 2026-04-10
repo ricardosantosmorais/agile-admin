@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 import { BRAZILIAN_STATES } from '@/src/lib/brazil'
 import { cepMask, cnpjMask, currencyMask, parseCurrencyInput, phoneMask } from '@/src/lib/input-masks'
@@ -26,7 +24,7 @@ export const FILIAIS_CONFIG: CrudModuleConfig = {
     { id: 'id', labelKey: 'simpleCrud.fields.id', label: 'ID', sortKey: 'id', thClassName: 'w-[180px]', filter: { kind: 'text', key: 'id' } },
     { id: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Código', sortKey: 'codigo', thClassName: 'w-[140px]', filter: { kind: 'text', key: 'codigo' } },
     { id: 'cnpj', labelKey: 'basicRegistrations.branches.fields.document', label: 'CNPJ', sortKey: 'cnpj', thClassName: 'w-[170px]', render: (record) => cnpjMask(String(record.cnpj || '')), filter: { kind: 'text', key: 'cnpj' } },
-    { id: 'nome_fantasia', labelKey: 'basicRegistrations.branches.fields.tradeName', label: 'Nome fantasia', sortKey: 'nome_fantasia', tdClassName: 'font-semibold text-slate-950', render: (record) => String(record.nome_fantasia || '-'), filter: { kind: 'text', key: 'nome_fantasia::like' } },
+    { id: 'nome_fantasia', labelKey: 'basicRegistrations.branches.fields.tradeName', label: 'Nome fantasia', sortKey: 'nome_fantasia', tdClassName: 'font-semibold text-[color:var(--app-text)]', render: (record) => String(record.nome_fantasia || '-'), filter: { kind: 'text', key: 'nome_fantasia::like' } },
     { id: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', sortKey: 'ativo', thClassName: 'w-[100px]', valueKey: 'ativo', filter: { kind: 'select', key: 'ativo', options: [{ value: '1', label: 'Sim' }, { value: '0', label: 'Não' }] } },
   ],
   mobileTitle: (record) => String(record.nome_fantasia || '-'),

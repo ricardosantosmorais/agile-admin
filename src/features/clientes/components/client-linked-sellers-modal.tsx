@@ -35,18 +35,18 @@ export function ClientLinkedSellersModal({
             sellers.map((seller) => (
               <div
                 key={seller.idVendedor}
-                className="rounded-[1.1rem] border border-[#ece5d9] bg-[#fcfaf5] px-4 py-3"
+                className="app-pane-muted rounded-[1.1rem] border px-4 py-3"
               >
                 <div className="flex flex-col gap-1">
-                  <p className="text-sm font-semibold text-slate-950">{seller.nome || '-'}</p>
-                  <p className="text-xs text-slate-500">{t('clientes.modals.sellerCode', 'Codigo: {{value}}', { value: seller.codigo || '-' })}</p>
-                  <p className="text-xs text-slate-500">{t('clientes.modals.sellerEmail', 'E-mail: {{value}}', { value: seller.email || '-' })}</p>
-                  <p className="text-xs text-slate-500">{t('clientes.modals.sellerPhone', 'Telefone: {{value}}', { value: seller.telefone || seller.celular || '-' })}</p>
+                  <p className="text-sm font-semibold text-[var(--app-text)]">{seller.nome || '-'}</p>
+                  <p className="text-xs text-[var(--app-muted)]">{t('clientes.modals.sellerCode', 'Codigo: {{value}}', { value: seller.codigo || '-' })}</p>
+                  <p className="text-xs text-[var(--app-muted)]">{t('clientes.modals.sellerEmail', 'E-mail: {{value}}', { value: seller.email || '-' })}</p>
+                  <p className="text-xs text-[var(--app-muted)]">{t('clientes.modals.sellerPhone', 'Telefone: {{value}}', { value: seller.telefone || seller.celular || '-' })}</p>
                 </div>
               </div>
             ))
           ) : (
-            <div className="rounded-[1rem] border border-dashed border-[#e6dfd3] px-4 py-6 text-center text-sm text-slate-500">
+            <div className="rounded-[1rem] border border-dashed border-[var(--app-border)] px-4 py-6 text-center text-sm text-[var(--app-muted)]">
               {t('clientes.modals.linkedSellersEmpty', 'Nenhum vendedor vinculado encontrado.')}
             </div>
           )}

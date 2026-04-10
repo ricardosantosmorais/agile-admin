@@ -1,5 +1,3 @@
-'use client'
-
 import { createCrudClient } from '@/src/components/crud-base/crud-client'
 import type { CrudRecord } from '@/src/components/crud-base/types'
 import { httpClient } from '@/src/services/http/http-client'

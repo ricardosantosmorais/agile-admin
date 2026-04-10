@@ -1,5 +1,3 @@
-'use client'
-
 import { httpClient } from '@/src/services/http/http-client'
 import { loadCrudLookupOptions } from '@/src/components/crud-base/crud-client'
 import type { CrudListFilters, CrudListResponse } from '@/src/components/crud-base/types'

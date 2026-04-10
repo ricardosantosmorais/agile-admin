@@ -6,11 +6,11 @@ type StatusBadgeProps = {
 }
 
 const tones = {
-  success: 'bg-emerald-100 text-emerald-700',
-  warning: 'bg-amber-100 text-amber-700',
-  danger: 'bg-rose-100 text-rose-700',
-  neutral: 'bg-slate-100 text-slate-700',
-  info: 'bg-sky-100 text-sky-700',
+  success: 'app-badge app-badge-success',
+  warning: 'app-badge app-badge-warning',
+  danger: 'app-badge app-badge-danger',
+  neutral: 'app-badge app-badge-neutral',
+  info: 'app-badge app-badge-info',
 }
 
 export function StatusBadge({ children, tone = 'neutral' }: StatusBadgeProps) {

@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudDataClient, CrudRecord } from '@/src/components/crud-base/types'
 import { integracaoAplicativosClient } from '@/src/features/integracao-aplicativos/services/integracao-aplicativos-client'
 import type { AplicativoIntegracaoListFilters } from '@/src/features/integracao-aplicativos/services/integracao-aplicativos-mappers'

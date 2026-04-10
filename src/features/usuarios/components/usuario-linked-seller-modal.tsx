@@ -41,18 +41,18 @@ export function UsuarioLinkedSellerModal({
       >
         <AsyncState isLoading={isLoading} error={error}>
           {seller ? (
-            <div className="flex flex-col gap-3 rounded-[1.1rem] border border-[#ece5d9] bg-[#fcfaf5] px-4 py-3 md:flex-row md:items-center md:justify-between">
+            <div className="app-pane-muted flex flex-col gap-3 rounded-[1.1rem] border px-4 py-3 md:flex-row md:items-center md:justify-between">
               <div className="space-y-1">
-                <p className="text-sm font-semibold text-slate-950">{seller.nome || '-'}</p>
-                <p className="text-xs text-slate-500">{t('usuarios.modals.clientCode', 'Código')}: {seller.codigo || '-'}</p>
-                <p className="text-xs text-slate-500">{t('usuarios.modals.clientActivation', 'Ativação')}: {seller.codigoAtivacao || '-'}</p>
-                <p className="text-xs text-slate-500">{t('usuarios.modals.document', 'CPF/CNPJ')}: {seller.cnpjCpf || '-'}</p>
+                <p className="text-sm font-semibold text-[var(--app-text)]">{seller.nome || '-'}</p>
+                <p className="text-xs text-[var(--app-muted)]">{t('usuarios.modals.clientCode', 'Código')}: {seller.codigo || '-'}</p>
+                <p className="text-xs text-[var(--app-muted)]">{t('usuarios.modals.clientActivation', 'Ativação')}: {seller.codigoAtivacao || '-'}</p>
+                <p className="text-xs text-[var(--app-muted)]">{t('usuarios.modals.document', 'CPF/CNPJ')}: {seller.cnpjCpf || '-'}</p>
               </div>
               {canDelete ? (
                 <button
                   type="button"
                   onClick={() => setConfirmOpen(true)}
-                  className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-700"
+                  className="app-button-danger inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
                 >
                   <Trash2 className="h-4 w-4" />
                   {t('common.remove', 'Remover')}
@@ -60,7 +60,7 @@ export function UsuarioLinkedSellerModal({
               ) : null}
             </div>
           ) : (
-            <div className="rounded-[1rem] border border-dashed border-[#e6dfd3] px-4 py-6 text-center text-sm text-slate-500">
+            <div className="rounded-[1rem] border border-dashed border-[var(--app-border)] px-4 py-6 text-center text-sm text-[var(--app-muted)]">
               {t('usuarios.modals.linkedSellerEmpty', 'Não existe vendedor associado ao usuário.')}
             </div>
           )}

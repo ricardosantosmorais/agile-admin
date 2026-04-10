@@ -40,9 +40,9 @@ export function SelectableDataTable<TItem>({
   }
 
   return (
-    <div className="overflow-x-auto rounded-[1.4rem] border border-[#ebe4d8]">
+    <div className="app-table-shell overflow-x-auto rounded-[1.4rem]">
       <table className="min-w-full border-collapse text-left text-sm">
-        <thead className="bg-[#f8f4ec] text-slate-700">
+        <thead className="app-table-muted text-slate-700">
           <tr>
             <th className="w-14 px-4 py-3">
               <input
@@ -67,7 +67,7 @@ export function SelectableDataTable<TItem>({
             items.map((item) => {
               const rowId = getRowId(item)
               return (
-                <tr key={rowId} className="border-t border-[#f0ebe2]">
+                <tr key={rowId} className="app-table-row-hover border-t border-line/60">
                   <td className="px-4 py-4">
                     <input
                       type="checkbox"

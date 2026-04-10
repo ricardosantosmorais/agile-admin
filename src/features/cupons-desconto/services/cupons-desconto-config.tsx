@@ -1,8 +1,6 @@
-'use client'
-
 import { StatusBadge } from '@/src/components/ui/status-badge'
 import { FormField } from '@/src/components/ui/form-field'
-import { inputClasses } from '@/src/components/ui/input-styles'
+import { InputWithAffix } from '@/src/components/ui/input-with-affix'
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 import { currencyMask } from '@/src/lib/input-masks'
 import {
@@ -94,33 +92,26 @@ function CouponValueRangeFilter({
   patchDraft: <K extends string>(key: K, value: Record<string, string | number>[K]) => void
 }) {
   const { t } = useI18n()
-  const inputClassName = inputClasses()
 
   return (
     <FormField label={t('marketing.coupons.fields.value', 'Valor')}>
       <div className="grid gap-2 sm:grid-cols-2">
-        <div className="flex overflow-hidden rounded-[0.9rem] border border-[#e6dfd3] bg-white">
-          <span className="inline-flex items-center border-r border-[#e6dfd3] bg-[#fcfaf5] px-3 text-sm font-semibold text-slate-600">R$</span>
-          <input
-            type="text"
-            value={String(draft['valor::ge'] || '')}
-            onChange={(event) => patchDraft('valor::ge', currencyMask(event.target.value))}
-            className={`${inputClassName} rounded-none border-0 shadow-none focus:ring-0`}
-            inputMode="decimal"
-            placeholder={t('common.from', 'From')}
-          />
-        </div>
-        <div className="flex overflow-hidden rounded-[0.9rem] border border-[#e6dfd3] bg-white">
-          <span className="inline-flex items-center border-r border-[#e6dfd3] bg-[#fcfaf5] px-3 text-sm font-semibold text-slate-600">R$</span>
-          <input
-            type="text"
-            value={String(draft['valor::le'] || '')}
-            onChange={(event) => patchDraft('valor::le', currencyMask(event.target.value))}
-            className={`${inputClassName} rounded-none border-0 shadow-none focus:ring-0`}
-            inputMode="decimal"
-            placeholder={t('common.to', 'To')}
-          />
-        </div>
+        <InputWithAffix
+          type="text"
+          prefix="R$"
+          value={String(draft['valor::ge'] || '')}
+          onChange={(event) => patchDraft('valor::ge', currencyMask(event.target.value))}
+          inputMode="decimal"
+          placeholder={t('common.from', 'From')}
+        />
+        <InputWithAffix
+          type="text"
+          prefix="R$"
+          value={String(draft['valor::le'] || '')}
+          onChange={(event) => patchDraft('valor::le', currencyMask(event.target.value))}
+          inputMode="decimal"
+          placeholder={t('common.to', 'To')}
+        />
       </div>
     </FormField>
   )

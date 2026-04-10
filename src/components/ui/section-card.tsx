@@ -13,7 +13,7 @@ export function SectionCard({ title, description, action, children, className = 
   const hasHeader = Boolean(title || description || action)
 
   return (
-    <section className={`min-w-0 rounded-[1.1rem] border border-[#e8e2d7] bg-white px-5 py-5 shadow-[0_10px_24px_rgba(15,23,42,0.04)] md:px-6 md:py-6 ${className}`.trim()}>
+    <section className={`app-card-modern min-w-0 rounded-[1.1rem] px-5 py-5 md:px-6 md:py-6 ${className}`.trim()}>
       {hasHeader ? (
         hasCopy ? (
           <div className="mb-5 flex flex-col gap-1.5 md:flex-row md:items-start md:justify-between">

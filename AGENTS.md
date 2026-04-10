@@ -43,7 +43,12 @@ Se a tarefa tocar arquitetura ou padroes:
 
 ## 3) Procedimento padrao (golden workflow)
 
-- existe um repositorio para base de conhecimento em C:\Projetos\knowledge que deve ser consultado sempre for solicitado uma implementação, correção, ajuste ou qualquer outra coisa que ele ache relevante, visando obter melhores práticas de mercado, exemplos de implementação e dúvidas no geral.
+- Antes de sugerir arquitetura ou implementar algo:
+  - consulte `C:\Projetos\knowledge\repos_index.md`
+  - abra de 1 a 2 fichas realmente relevantes em `C:\Projetos\knowledge\index\`
+  - use `C:\Projetos\knowledge\repos\...` como biblioteca de referencia para arquitetura, patterns e caminhos de leitura
+  - nao copiar implementacoes diretamente sem adaptar ao contexto deste repositorio
+  - se nao houver ficha util no `knowledge`, seguir com a analise local do repo e, quando fizer sentido, registrar a lacuna para futura curadoria no `knowledge`
 - Localizar de 1 a 3 exemplos similares no proprio v2 antes de implementar.
 - Quando a tarefa for migracao, comparar sempre com o legado:
   - listagem;
@@ -53,6 +58,8 @@ Se a tarefa tocar arquitetura ou padroes:
   - regras de permissao;
   - validacoes e payloads.
 - Reaproveitar padroes existentes. Nao introduzir nova base sem necessidade real.
+- Antes de alterar componente compartilhado, mapear explicitamente quais modulos e telas dependem dele e tratar a mudanca como alteracao de alto impacto.
+- Em ajustes visuais, preferir evolucao incremental sobre reestilizacao ampla. Nao trocar a linguagem visual inteira de uma vez sem validar o efeito nos shareds e nos dois temas.
 - Funcoes genericas de mascara, formatacao, normalizacao, parsing e utilitarios de exibicao nao devem ficar declaradas dentro de telas, tabs, pages ou configs quando puderem ser compartilhadas. Antes de criar helper local, verificar `src/lib/*`, `src/components/*` e services compartilhados existentes.
 - Se um helper deixar de ser especifico de um unico modulo, extrair para o local compartilhado adequado e substituir as duplicacoes encontradas na mesma tarefa.
 - Manter mudancas pequenas, coesas e delimitadas por modulo ou infraestrutura.
@@ -71,8 +78,10 @@ Se a tarefa tocar arquitetura ou padroes:
 - Se um teste relevante falhar por limitacao do sandbox local da ferramenta, por exemplo `spawn EPERM` ao executar `vitest`, `vite`, `esbuild` ou Playwright, rerodar a validacao fora do sandbox na mesma tarefa. Nao tratar esse tipo de falha como impeditivo funcional sem antes validar fora do sandbox.
 - Se a infraestrutura de testes ainda nao existir para um ponto especifico, isso deve ser declarado explicitamente e o gap deve entrar na documentacao tecnica ou no backlog da feature.
 - Atualizar a documentacao em `docs/` quando houver mudanca real de comportamento, padrao, arquitetura ou fluxo.
+- Ao mexer em tema, dark mode ou componentes compartilhados, validar pelo menos um fluxo real de listagem e um de formulario apos a alteracao; nao assumir que a mudanca ficou correta apenas por inspecao local do componente.
 - Toda string nova visivel ao usuario deve entrar no i18n. Nao deixar texto hardcoded quando a tela ja usa traducao.
 - Todo texto em portugues deve usar portugues do Brasil, com acentuacao e pontuacao corretas.
+- Em tarefas de higiene textual ou encoding, evitar varreduras agressivas e regravacoes em massa. Corrigir de forma cirurgica, arquivo a arquivo, preservando codigo, comentarios e operadores.
 - Ao criar ou ajustar rotas protegidas, considerar tambem:
   - sessao;
   - tenant;
@@ -97,6 +106,12 @@ Se a tarefa tocar arquitetura ou padroes:
 - Respeitar boundaries entre `client` e `server`.
 - Nao chamar funcoes client-side a partir de paginas server-side.
 - Quando uma tela precisar de comportamento client-side, explicitar isso corretamente.
+- `use client` nao deve ser usado por inercia. So manter a diretiva em arquivos que realmente usem hooks/client APIs, estado interativo, browser APIs, providers client ou componentes que dependam de props/funcoes nao serializaveis.
+- Antes de remover `use client`, verificar se o arquivo:
+  - instancia clients locais de CRUD;
+  - usa `createCrudClient`, hooks React, `next/navigation`, `window`, `document`, `navigator`, `localStorage` ou `sessionStorage`;
+  - e consumido como fronteira client por componentes de formulario, listagem, tabs, modais ou bridges de params.
+- Nao converter mecanicamente wrappers e paginas para server component sem confirmar que a cadeia inteira continua compativel com `CrudFormPage`, `CrudListPage`, `TabbedCatalogFormPage`, `EntityPasswordPage` e modulos operacionais similares.
 
 ### 4.2 Bridges e backend
 
@@ -137,6 +152,10 @@ Se a tarefa tocar arquitetura ou padroes:
 - Campos booleanos devem preferir os componentes atuais, nao checkbox cru, quando a tela ja estiver no novo padrao.
 - Campos de imagem devem usar o componente compartilhado de upload.
 - Campos HTML devem usar o editor compartilhado.
+- Ao ajustar formulario compartilhado ou shell de formulario, validar o estado do botao `Salvar`:
+  - desabilitado sem dirty state;
+  - habilitado ao editar;
+  - contraste visivel em light e dark.
 
 ### 4.5 Listagens
 
@@ -154,6 +173,7 @@ Se a tarefa tocar arquitetura ou padroes:
   - ordenacao;
   - renderizacao responsiva.
 - Nao deixar textos quebrados, truncados ou com codificacao corrompida na tabela.
+- Ao mexer em tabela, filtros, hover de linha, checkbox, paginacao ou acoes de relacao, validar light e dark para evitar fundos claros, bordas perdidas ou estados sem contraste.
 
 ### 4.6 I18n
 
@@ -209,6 +229,8 @@ Se a tarefa tocar arquitetura ou padroes:
   - E2E do fluxo feliz principal.
 - Ao corrigir bug real, adicionar teste que cubra o caso corrigido sempre que tecnicamente viavel.
 - Nao considerar a feature fechada se a tela entrou sem plano de cobertura.
+- Para componentes compartilhados de alto impacto, preferir pelo menos um teste de componente que proteja o comportamento ajustado, mesmo quando o E2E do modulo ainda nao existir.
+- Se o E2E falhar por permissao, credencial, tenant ou dado operacional do ambiente, registrar isso explicitamente e complementar a cobertura com teste unitario ou de componente do fluxo alterado.
 
 ### 4.10 Acessibilidade
 
@@ -248,11 +270,20 @@ Se a tarefa tocar arquitetura ou padroes:
   - desktop;
   - mobile.
 - Nao considerar uma tela visualmente validada se ela so foi conferida em um idioma ou em um breakpoint.
+- Alteracao visual em shared deve preservar:
+  - contraste e legibilidade em light e dark;
+  - diferencia clara entre estado ativo, hover, disabled e loading;
+  - superficies semanticas consistentes entre card, tabela, modal, editor e dropdown.
+- Nao introduzir ou espalhar classes com cor hardcoded quando houver token, classe semantica ou componente base equivalente.
+- Se um ajuste visual piorar separacao entre fundo, card e controle, desfazer e voltar para uma evolucao mais contida.
 
 ### 4.15 Checklist de revisao antes de concluir
 
 - verificar i18n em PT e EN;
 - verificar se nao houve regressao de encoding nos arquivos alterados, especialmente dicionarios, docs, menus e labels;
+- verificar light e dark nos componentes e telas tocados, incluindo hover, focus, disabled, loading, vazio e erro;
+- verificar se nao foi removido ou adicionado `use client` sem necessidade real;
+- verificar se shared alterado nao quebrou telas dependentes, ao menos por uma passada funcional nos fluxos mais representativos;
 - verificar responsividade basica;
 - verificar estados de loading, vazio e erro;
 - verificar permissao de listar, criar, editar e excluir quando houver;

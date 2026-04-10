@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 import {
   normalizeCurrency,
@@ -80,7 +78,7 @@ export const CONDICOES_PAGAMENTO_CONFIG: CrudModuleConfig = {
   columns: [
     { id: 'id', labelKey: 'simpleCrud.fields.id', label: 'ID', sortKey: 'id', thClassName: 'w-[180px]', filter: { kind: 'text', key: 'id' } },
     { id: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Código', sortKey: 'codigo', thClassName: 'w-[140px]', filter: { kind: 'text', key: 'codigo::like' } },
-    { id: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', sortKey: 'nome', tdClassName: 'font-semibold text-slate-950', filter: { kind: 'text', key: 'nome::like' } },
+    { id: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', sortKey: 'nome', tdClassName: 'font-semibold text-[color:var(--app-text)]', filter: { kind: 'text', key: 'nome::like' } },
     { id: 'prazo_medio', labelKey: 'financial.paymentTerms.fields.averageTerm', label: 'Prazo médio', sortKey: 'prazo_medio' },
     { id: 'parcelas', labelKey: 'financial.paymentTerms.fields.installments', label: 'Parcelas', sortKey: 'parcelas', thClassName: 'w-[120px]' },
     { id: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', sortKey: 'ativo', thClassName: 'w-[100px]', valueKey: 'ativo', filter: { kind: 'select', key: 'ativo', options: [{ value: '1', label: 'Sim' }, { value: '0', label: 'Não' }] } },

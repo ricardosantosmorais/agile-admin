@@ -3,6 +3,7 @@
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { FormField } from '@/src/components/ui/form-field'
+import { inputClasses } from '@/src/components/ui/input-styles'
 import { SectionCard } from '@/src/components/ui/section-card'
 import { TooltipIconButton } from '@/src/components/ui/tooltip-icon-button'
 import type { CrudRecord } from '@/src/components/crud-base/types'
@@ -89,7 +90,11 @@ export function ProdutoGradesTab({
     <SectionCard
       title={t('catalog.produtos.tabs.grades.dynamicTitle', 'Grades dinâmicas')}
       action={!readOnly ? (
-        <button type="button" onClick={() => updateSelections([...selections, { id_grade: '', id_valor: '' }])} className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-slate-700">
+        <button
+          type="button"
+          onClick={() => updateSelections([...selections, { id_grade: '', id_valor: '' }])}
+          className="app-button-secondary inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold"
+        >
           <Plus className="h-4 w-4" />
           {t('catalog.produtos.tabs.grades.add', 'Adicionar grade')}
         </button>
@@ -100,10 +105,15 @@ export function ProdutoGradesTab({
           const selectedGrade = grades.find((grade) => grade.id === selection.id_grade)
           const values = Array.isArray(selectedGrade?.valores) ? selectedGrade.valores : []
           return (
-            <div key={`${selection.id_grade}-${selection.id_valor}-${index}`} className="rounded-[1.1rem] border border-line bg-[#fcfaf5] p-4">
+            <div key={`${selection.id_grade}-${selection.id_valor}-${index}`} className="app-pane rounded-[1.1rem] border border-[color:var(--app-card-border)] p-4">
               <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
                 <FormField label={`${t('catalog.produtos.tabs.grades.label', 'Grade')} ${index + 1}`}>
-                  <select value={selection.id_grade} onChange={(event) => updateSelection(index, 'id_grade', event.target.value)} disabled={readOnly} className="h-[46px] w-full rounded-[1rem] border border-[#e6dfd3] bg-white px-3.5 text-sm text-slate-900">
+                  <select
+                    value={selection.id_grade}
+                    onChange={(event) => updateSelection(index, 'id_grade', event.target.value)}
+                    disabled={readOnly}
+                    className={inputClasses()}
+                  >
                     <option value="">{t('common.select', 'Selecione')}</option>
                     {grades.map((grade) => (
                       <option key={grade.id} value={grade.id}>{grade.nome || grade.id}</option>
@@ -111,7 +121,12 @@ export function ProdutoGradesTab({
                   </select>
                 </FormField>
                 <FormField label={`${t('catalog.grades.values.value', 'Valor')} ${index + 1}`}>
-                  <select value={selection.id_valor} onChange={(event) => updateSelection(index, 'id_valor', event.target.value)} disabled={readOnly || !selection.id_grade} className="h-[46px] w-full rounded-[1rem] border border-[#e6dfd3] bg-white px-3.5 text-sm text-slate-900">
+                  <select
+                    value={selection.id_valor}
+                    onChange={(event) => updateSelection(index, 'id_valor', event.target.value)}
+                    disabled={readOnly || !selection.id_grade}
+                    className={inputClasses()}
+                  >
                     <option value="">{t('common.select', 'Selecione')}</option>
                     {values.map((value) => (
                       <option key={value.id} value={value.id}>{value.valor || value.id}</option>
@@ -127,7 +142,7 @@ export function ProdutoGradesTab({
                           const next = selections.filter((_, currentIndex) => currentIndex !== index)
                           updateSelections(next.length > 0 ? next : [{ id_grade: '', id_valor: '' }])
                         }}
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-700"
+                        className="app-button-danger inline-flex h-11 w-11 items-center justify-center rounded-full p-0"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

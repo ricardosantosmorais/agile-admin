@@ -1,5 +1,3 @@
-﻿'use client'
-
 import { httpClient } from '@/src/services/http/http-client'
 import { buildDirtyConfiguracoesPrecosPayload, normalizeConfiguracoesPrecosRecord } from '@/src/features/configuracoes-precos/services/configuracoes-precos-mappers'
 import type { ConfiguracoesPrecosFormValues, ConfiguracoesPrecosRecord } from '@/src/features/configuracoes-precos/types/configuracoes-precos'

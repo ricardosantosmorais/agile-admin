@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 import { formatCpfCnpj, formatDate } from '@/src/lib/formatters'
 import { mapSupervisorDetail, toSupervisorPayload } from '@/src/features/supervisores/services/supervisores-form'

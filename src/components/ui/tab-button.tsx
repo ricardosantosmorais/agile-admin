@@ -16,7 +16,7 @@ export function TabButton({ active, label, icon, onClick }: TabButtonProps) {
       onClick={onClick}
       className={[
         'inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition',
-        active ? 'bg-slate-950 text-white' : 'border border-[#e6dfd3] bg-white text-slate-700',
+        active ? 'app-pill-tab-active' : 'app-pill-tab',
       ].join(' ')}
     >
       {icon}

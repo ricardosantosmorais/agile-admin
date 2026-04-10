@@ -80,7 +80,7 @@ export function useClientesListController({ canDelete }: UseClientesListControll
 
         setState({
           isLoading: false,
-          error: error instanceof Error ? error : new Error('Nao foi possivel carregar os clientes.'),
+          error: error instanceof Error ? error : new Error('Não foi possível carregar os clientes.'),
         })
       }
     }
@@ -142,7 +142,7 @@ export function useClientesListController({ canDelete }: UseClientesListControll
     try {
       setLinkedUsers(await appData.clients.getLinkedUsers(client.id))
     } catch (error) {
-      setModalError(error instanceof Error ? error.message : 'Nao foi possivel carregar os usuarios vinculados.')
+      setModalError(error instanceof Error ? error.message : 'Não foi possível carregar os usuários vinculados.')
     } finally {
       setModalLoading(false)
     }
@@ -157,7 +157,7 @@ export function useClientesListController({ canDelete }: UseClientesListControll
     try {
       setLinkedSellers(await appData.clients.getLinkedSellers(client.id))
     } catch (error) {
-      setModalError(error instanceof Error ? error.message : 'Nao foi possivel carregar os vendedores vinculados.')
+      setModalError(error instanceof Error ? error.message : 'Não foi possível carregar os vendedores vinculados.')
     } finally {
       setModalLoading(false)
     }
@@ -180,7 +180,7 @@ export function useClientesListController({ canDelete }: UseClientesListControll
       await appData.clients.unlinkUser(clientId, userId)
       setLinkedUsers((current) => current.filter((item) => item.idUsuario !== userId))
     } catch (error) {
-      setModalError(error instanceof Error ? error.message : 'Nao foi possivel remover o usuario vinculado.')
+      setModalError(error instanceof Error ? error.message : 'Não foi possível remover o usuário vinculado.')
     }
   }
 
@@ -192,7 +192,7 @@ export function useClientesListController({ canDelete }: UseClientesListControll
     } catch (error) {
       setState({
         isLoading: false,
-        error: error instanceof Error ? error : new Error('Nao foi possivel excluir o cliente.'),
+        error: error instanceof Error ? error : new Error('Não foi possível excluir o cliente.'),
       })
     }
   }
@@ -216,7 +216,7 @@ export function useClientesListController({ canDelete }: UseClientesListControll
       setUnlockDescription('')
       refreshList()
     } catch (error) {
-      setModalError(error instanceof Error ? error.message : 'Nao foi possivel desbloquear o cliente.')
+      setModalError(error instanceof Error ? error.message : 'Não foi possível desbloquear o cliente.')
     } finally {
       setModalLoading(false)
     }

@@ -75,8 +75,8 @@ function getVisibilityClasses(visibility: AppDataTableBreakpoint | undefined) {
 
 function actionButtonClasses(tone: AppDataTableRowAction<unknown>['tone']) {
   return tone === 'danger'
-    ? 'border border-rose-200 bg-white text-rose-700'
-    : 'border border-[#e6dfd3] bg-white text-slate-700 transition hover:border-[#cfc3ad] hover:text-slate-950'
+    ? 'app-button-danger'
+    : 'app-button-secondary transition'
 }
 
 function DataTableActions<TItem>({
@@ -162,7 +162,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
             return (
               <div
                 key={rowId}
-                className="rounded-[1.4rem] border border-[#ebe4d8] bg-white p-4 shadow-[0_8px_30px_rgba(15,23,42,0.04)]"
+                className="app-card-modern rounded-[1.4rem] p-4"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
@@ -178,7 +178,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                     <button
                       type="button"
                       onClick={() => onToggleExpandedRow?.(rowId)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#e6dfd3] text-slate-600"
+                      className="app-button-secondary inline-flex h-9 w-9 items-center justify-center rounded-full text-[color:var(--app-muted)]"
                     >
                       <ChevronDown className={['h-4 w-4 transition', isExpanded ? 'rotate-180' : ''].join(' ')} />
                     </button>
@@ -198,19 +198,19 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
             )
           })
         ) : (
-          <div className="rounded-[1rem] border border-dashed border-[#e6dfd3] px-4 py-6 text-center text-sm text-slate-500">
+          <div className="app-pane-muted rounded-[1rem] border border-dashed px-4 py-6 text-center text-sm text-slate-500">
             {emptyMessage}
           </div>
         )}
       </div>
 
       <div className="hidden md:block">
-        <div className="min-w-0 overflow-x-auto">
+        <div className="app-table-shell min-w-0 overflow-x-auto rounded-[1.25rem]">
           <table className="w-full table-auto border-separate border-spacing-0">
             <thead>
-              <tr className="text-left text-sm text-slate-500">
+              <tr className="app-table-muted text-left text-sm text-slate-500">
                 {selectable ? (
-                  <th className="w-12 border-b border-[#ece5d9] px-3 py-3">
+                  <th className="w-12 border-b border-line/50 px-3 py-3">
                     <input
                       type="checkbox"
                       checked={allSelected}
@@ -220,12 +220,12 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                     />
                   </th>
                 ) : null}
-                {renderExpandedRow ? <th className="w-12 border-b border-[#ece5d9] px-3 py-3" /> : null}
+                {renderExpandedRow ? <th className="w-12 border-b border-line/70 px-3 py-3" /> : null}
                 {columns.map((column) => {
                   const visibilityClasses = getVisibilityClasses(column.visibility)
 
                   return (
-                    <th key={column.id} className={`overflow-hidden whitespace-nowrap border-b border-[#ece5d9] px-3 py-3 ${visibilityClasses.th} ${column.thClassName ?? ''}`.trim()}>
+                  <th key={column.id} className={`overflow-hidden whitespace-nowrap border-b border-line/50 px-3 py-3 ${visibilityClasses.th} ${column.thClassName ?? ''}`.trim()}>
                       {column.header ?? (column.sortKey && sort && column.label ? (
                         <SortableHeader
                           label={column.label}
@@ -241,7 +241,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                   )
                 })}
                 {rowActions ? (
-                  <th className={`overflow-hidden whitespace-nowrap border-b border-[#ece5d9] px-3 py-3 ${actionsColumnClassName}`.trim()}>
+                  <th className={`overflow-hidden whitespace-nowrap border-b border-line/50 px-3 py-3 ${actionsColumnClassName}`.trim()}>
                     {actionsLabel}
                   </th>
                 ) : null}
@@ -257,7 +257,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                     <Fragment key={rowId}>
                       <tr className="align-top">
                         {selectable ? (
-                          <td className="border-b border-[#f0eadf] px-3 py-4">
+                          <td className="border-b border-line/40 px-3 py-4">
                             {isRowSelectable && !isRowSelectable(item) ? null : (
                             <input
                               type="checkbox"
@@ -269,11 +269,11 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                           </td>
                         ) : null}
                         {renderExpandedRow ? (
-                          <td className="border-b border-[#f0eadf] px-3 py-4">
+                          <td className="border-b border-line/40 px-3 py-4">
                             <button
                               type="button"
                               onClick={() => onToggleExpandedRow?.(rowId)}
-                              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#e6dfd3] text-slate-600"
+                              className="app-button-secondary inline-flex h-9 w-9 items-center justify-center rounded-full text-[color:var(--app-muted)]"
                             >
                               <ChevronDown
                                 className={['h-4 w-4 transition', isExpanded ? 'rotate-180' : ''].join(' ')}
@@ -285,7 +285,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                           const visibilityClasses = getVisibilityClasses(column.visibility)
 
                           return (
-                            <td key={`${rowId}-${column.id}`} className={`overflow-hidden border-b border-[#f0eadf] px-3 py-4 align-middle ${visibilityClasses.td} ${column.tdClassName ?? ''}`.trim()}>
+                            <td key={`${rowId}-${column.id}`} className={`overflow-hidden border-b border-line/40 px-3 py-4 align-middle ${visibilityClasses.td} ${column.tdClassName ?? ''}`.trim()}>
                               <div className="min-w-0 overflow-hidden">
                                 {column.cell(item)}
                               </div>
@@ -293,7 +293,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                           )
                         })}
                         {rowActions ? (
-                          <td className={`border-b border-[#f0eadf] px-3 py-4 ${actionsColumnClassName}`.trim()}>
+                          <td className={`border-b border-line/40 px-3 py-4 ${actionsColumnClassName}`.trim()}>
                             <DataTableActions item={item} actions={rowActions(item)} />
                           </td>
                         ) : null}
@@ -302,7 +302,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                         <tr>
                           <td
                             colSpan={columns.length + (selectable ? 1 : 0) + 1 + (rowActions ? 1 : 0)}
-                            className="border-b border-[#f0eadf] bg-[#fcfaf5] px-3 py-4"
+                            className="app-table-row-expanded border-b border-line/40 px-3 py-4"
                           >
                             {renderExpandedRow(item)}
                           </td>
@@ -327,7 +327,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
       </div>
 
       {pagination && onPageChange ? (
-        <div className="mt-4 flex flex-col gap-3 rounded-[1.1rem] border border-[#ece5d9] bg-[#fcfaf5] px-4 py-3 text-sm text-slate-600 md:flex-row md:items-center md:justify-between">
+        <div className="app-pane-muted mt-4 flex flex-col gap-3 rounded-[1.1rem] px-4 py-3 text-sm text-slate-600 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
             <div>
               {t('table.showingResults', 'Exibindo {{from}} a {{to}} de {{total}} registros', {
@@ -342,7 +342,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                 <select
                   value={String(pageSize.value)}
                   onChange={(event) => pageSize.onChange(Number(event.target.value))}
-                  className="h-10 rounded-full border border-[#e6dfd3] bg-white px-4 text-sm font-semibold text-slate-900 outline-none transition focus:border-slate-950 focus:ring-4 focus:ring-[#efe7d7]"
+                  className="app-button-secondary h-10 rounded-full px-4 text-sm font-semibold outline-none transition focus:ring-4 focus:ring-[#efe7d7]"
                 >
                   {pageSize.options.map((option) => (
                     <option key={option} value={option}>
@@ -358,11 +358,11 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
               type="button"
               onClick={() => onPageChange(Math.max(1, pagination.page - 1))}
               disabled={pagination.page <= 1}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e6dfd3] bg-white text-slate-700 disabled:cursor-not-allowed disabled:opacity-45"
+              className="app-button-secondary inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 disabled:cursor-not-allowed disabled:opacity-45"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <div className="rounded-full border border-[#e6dfd3] bg-white px-4 py-2 font-semibold text-slate-900">
+            <div className="app-control rounded-full px-4 py-2 font-semibold text-slate-900">
               {t('table.pageOf', 'Pagina {{page}} de {{pages}}', {
                 page: pagination.page,
                 pages: pagination.pages || 1,
@@ -372,7 +372,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
               type="button"
               onClick={() => onPageChange(Math.min(pagination.pages || pagination.page, pagination.page + 1))}
               disabled={pagination.page >= (pagination.pages || 1)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e6dfd3] bg-white text-slate-700 disabled:cursor-not-allowed disabled:opacity-45"
+              className="app-button-secondary inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 disabled:cursor-not-allowed disabled:opacity-45"
             >
               <ChevronRight className="h-4 w-4" />
             </button>

@@ -1,6 +1,4 @@
-﻿'use client'
-
-import type { CrudFieldOption, CrudModuleConfig } from '@/src/components/crud-base/types'
+﻿import type { CrudFieldOption, CrudModuleConfig } from '@/src/components/crud-base/types'
 import { normalizeEmailTemplateRecord } from '@/src/features/emails-templates/services/emails-templates-normalizer'
 
 const EMAIL_TEMPLATE_TYPE_OPTIONS: CrudFieldOption[] = [

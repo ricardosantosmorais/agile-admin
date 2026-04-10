@@ -23,20 +23,24 @@ type StatCardProps = {
 
 const toneStyles = {
   emerald: {
-    badge: 'bg-emerald-50 text-emerald-700',
-    icon: 'bg-emerald-50 text-emerald-600',
+    badge: 'app-badge app-badge-success',
+    icon: 'app-stat-card-icon app-stat-card-icon-emerald',
+    accent: 'app-stat-card-accent app-stat-card-accent-emerald',
   },
   sky: {
-    badge: 'bg-sky-50 text-sky-700',
-    icon: 'bg-sky-50 text-sky-600',
+    badge: 'app-badge app-badge-info',
+    icon: 'app-stat-card-icon app-stat-card-icon-sky',
+    accent: 'app-stat-card-accent app-stat-card-accent-sky',
   },
   amber: {
-    badge: 'bg-amber-50 text-amber-700',
-    icon: 'bg-amber-50 text-amber-600',
+    badge: 'app-badge app-badge-warning',
+    icon: 'app-stat-card-icon app-stat-card-icon-amber',
+    accent: 'app-stat-card-accent app-stat-card-accent-amber',
   },
   rose: {
-    badge: 'bg-rose-50 text-rose-700',
-    icon: 'bg-rose-50 text-rose-600',
+    badge: 'app-badge app-badge-danger',
+    icon: 'app-stat-card-icon app-stat-card-icon-rose',
+    accent: 'app-stat-card-accent app-stat-card-accent-rose',
   },
 }
 
@@ -72,11 +76,13 @@ export function StatCard({
     : translateDashboardMetricDescription(description, t)
 
   return (
-    <article className="rounded-[1.3rem] border border-[#e8e2d7] bg-white px-3.5 py-3.5 shadow-[0_10px_24px_rgba(15,23,42,0.045)]">
+    <article className="app-stat-card relative overflow-hidden rounded-[1.3rem] px-3.5 py-3.5">
+      <div className={toneStyles[tone].accent} aria-hidden="true" />
+
       <div className="flex items-start justify-between gap-2.5">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">{translatedLabel}</p>
-          <strong className="mt-2 block text-[1.7rem] font-black tracking-tight text-slate-950">
+          <strong className="mt-2 block text-[1.7rem] font-black tracking-tight text-[color:var(--app-text)]">
             {formatValue(value, type)}
           </strong>
         </div>
@@ -86,7 +92,7 @@ export function StatCard({
         </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-2.5 border-t border-[#f0ebe1] pt-2.5">
+      <div className="mt-3 flex items-center justify-between gap-2.5 border-t border-line/70 pt-2.5">
         <span className="text-[11px] leading-4 text-slate-500">
           {translatedDescription ?? t('dashboard.metricDescriptions.previousPeriod', 'Comparativo com o periodo anterior.')}
         </span>

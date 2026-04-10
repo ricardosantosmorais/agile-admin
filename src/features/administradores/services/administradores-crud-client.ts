@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudDataClient, CrudOption, CrudRecord } from '@/src/components/crud-base/types'
 import { administradoresClient } from '@/src/features/administradores/services/administradores-client'
 import type { AdminListFilters } from '@/src/features/administradores/services/administradores-mappers'

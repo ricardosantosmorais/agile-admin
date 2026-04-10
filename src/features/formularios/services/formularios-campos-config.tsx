@@ -1,5 +1,3 @@
-ï»¿'use client'
-
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 
 const FORM_FIELD_TYPE_OPTIONS = [
@@ -11,10 +9,10 @@ const FORM_FIELD_TYPE_OPTIONS = [
   { value: 'cpf', labelKey: 'maintenance.formFields.options.type.cpf', label: 'CPF' },
   { value: 'data', labelKey: 'maintenance.formFields.options.type.date', label: 'Data' },
   { value: 'email', labelKey: 'maintenance.formFields.options.type.email', label: 'E-mail' },
-  { value: 'numero', labelKey: 'maintenance.formFields.options.type.number', label: 'NÃºmero' },
+  { value: 'numero', labelKey: 'maintenance.formFields.options.type.number', label: 'Número' },
   { value: 'seletor', labelKey: 'maintenance.formFields.options.type.selector', label: 'Seletor' },
   { value: 'senha', labelKey: 'maintenance.formFields.options.type.password', label: 'Senha' },
-  { value: 'sim_nao', labelKey: 'maintenance.formFields.options.type.yesNo', label: 'Sim/NÃ£o' },
+  { value: 'sim_nao', labelKey: 'maintenance.formFields.options.type.yesNo', label: 'Sim/Não' },
   { value: 'telefone', labelKey: 'maintenance.formFields.options.type.phone', label: 'Telefone' },
   { value: 'texto', labelKey: 'maintenance.formFields.options.type.text', label: 'Texto' },
   { value: 'valor', labelKey: 'maintenance.formFields.options.type.value', label: 'Valor' },
@@ -98,15 +96,15 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
   routeBase: '/formularios',
   featureKey: 'formularios',
   listTitleKey: 'maintenance.formFields.title',
-  listTitle: 'Campos de FormulÃ¡rios',
+  listTitle: 'Campos de Formulários',
   listDescriptionKey: 'maintenance.formFields.listDescription',
-  listDescription: 'Listagem com formulÃ¡rio, cÃ³digo, tÃ­tulo, tipo e status do campo.',
+  listDescription: 'Listagem com formulário, código, título, tipo e status do campo.',
   formTitleKey: 'maintenance.formFields.formTitle',
-  formTitle: 'Campo de FormulÃ¡rio',
+  formTitle: 'Campo de Formulário',
   breadcrumbSectionKey: 'routes.manutencao',
-  breadcrumbSection: 'ManutenÃ§Ã£o',
+  breadcrumbSection: 'Manutenção',
   breadcrumbModuleKey: 'routes.formularios',
-  breadcrumbModule: 'Campos de FormulÃ¡rios',
+  breadcrumbModule: 'Campos de Formulários',
   defaultFilters: {
     page: 1,
     perPage: 15,
@@ -121,9 +119,9 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
   },
   columns: [
     { id: 'id', labelKey: 'simpleCrud.fields.id', label: 'ID', sortKey: 'id', thClassName: 'w-[100px]', filter: { kind: 'text', key: 'id', inputMode: 'numeric' } },
-    { id: 'id_formulario', labelKey: 'maintenance.formFields.fields.formId', label: 'FormulÃ¡rio (ID)', sortKey: 'id_formulario', thClassName: 'w-[160px]', filter: { kind: 'text', key: 'id_formulario', inputMode: 'numeric' } },
-    { id: 'codigo', labelKey: 'maintenance.formFields.fields.code', label: 'CÃ³digo', sortKey: 'codigo', thClassName: 'w-[180px]', filter: { kind: 'text', key: 'codigo' } },
-    { id: 'titulo', labelKey: 'maintenance.formFields.fields.title', label: 'TÃ­tulo', sortKey: 'titulo', tdClassName: 'font-semibold text-slate-950', filter: { kind: 'text', key: 'titulo::like' } },
+    { id: 'id_formulario', labelKey: 'maintenance.formFields.fields.formId', label: 'Formulário (ID)', sortKey: 'id_formulario', thClassName: 'w-[160px]', filter: { kind: 'text', key: 'id_formulario', inputMode: 'numeric' } },
+    { id: 'codigo', labelKey: 'maintenance.formFields.fields.code', label: 'Código', sortKey: 'codigo', thClassName: 'w-[180px]', filter: { kind: 'text', key: 'codigo' } },
+    { id: 'titulo', labelKey: 'maintenance.formFields.fields.title', label: 'Título', sortKey: 'titulo', tdClassName: 'font-semibold text-slate-950', filter: { kind: 'text', key: 'titulo::like' } },
     {
       id: 'tipo',
       labelKey: 'maintenance.formFields.fields.type',
@@ -148,7 +146,7 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
         key: 'protegido',
         options: [
           { value: '1', labelKey: 'common.yes', label: 'Sim' },
-          { value: '0', labelKey: 'common.no', label: 'NÃ£o' },
+          { value: '0', labelKey: 'common.no', label: 'Não' },
         ],
       },
     },
@@ -164,7 +162,7 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
         key: 'ativo',
         options: [
           { value: '1', labelKey: 'common.yes', label: 'Sim' },
-          { value: '0', labelKey: 'common.no', label: 'NÃ£o' },
+          { value: '0', labelKey: 'common.no', label: 'Não' },
         ],
       },
     },
@@ -180,12 +178,12 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
       layout: 'rows',
       fields: [
         { key: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', type: 'toggle', defaultValue: true },
-        { key: 'obrigatorio', labelKey: 'maintenance.formFields.fields.required', label: 'ObrigatÃ³rio', type: 'toggle', defaultValue: true },
+        { key: 'obrigatorio', labelKey: 'maintenance.formFields.fields.required', label: 'Obrigatório', type: 'toggle', defaultValue: true },
         { key: 'quebra_linha', labelKey: 'maintenance.formFields.fields.lineBreak', label: 'Quebra de linha', type: 'toggle', defaultValue: false },
         {
           key: 'id_formulario',
           labelKey: 'maintenance.formFields.fields.form',
-          label: 'FormulÃ¡rio',
+          label: 'Formulário',
           type: 'select',
           required: true,
           optionsResource: 'formularios',
@@ -193,7 +191,7 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
         {
           key: 'codigo',
           labelKey: 'maintenance.formFields.fields.code',
-          label: 'CÃ³digo',
+          label: 'Código',
           type: 'text',
           maxLength: 32,
           disabled: ({ form }) => isProtectedField(form),
@@ -207,7 +205,7 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
           maxLength: 255,
           disabled: ({ form }) => isProtectedField(form),
         },
-        { key: 'titulo', labelKey: 'maintenance.formFields.fields.title', label: 'TÃ­tulo', type: 'text', required: true, maxLength: 255 },
+        { key: 'titulo', labelKey: 'maintenance.formFields.fields.title', label: 'Título', type: 'text', required: true, maxLength: 255 },
         {
           key: 'nome2',
           labelKey: 'maintenance.formFields.fields.complementaryName',
@@ -219,7 +217,7 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
         {
           key: 'titulo2',
           labelKey: 'maintenance.formFields.fields.complementaryTitle',
-          label: 'TÃ­tulo complementar',
+          label: 'Título complementar',
           type: 'text',
           maxLength: 255,
           disabled: ({ form }) => isProtectedField(form),
@@ -227,7 +225,7 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
         {
           key: 'campo_igual',
           labelKey: 'maintenance.formFields.fields.validationField',
-          label: 'Campo de validaÃ§Ã£o',
+          label: 'Campo de validação',
           type: 'text',
           maxLength: 255,
           disabled: ({ form }) => isProtectedField(form),
@@ -235,7 +233,7 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
         {
           key: 'mensagem_validacao',
           labelKey: 'maintenance.formFields.fields.validationMessage',
-          label: 'Mensagem de validaÃ§Ã£o',
+          label: 'Mensagem de validação',
           type: 'text',
           maxLength: 255,
           disabled: ({ form }) => isProtectedField(form),
@@ -243,7 +241,7 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
         {
           key: 'evento_change',
           labelKey: 'maintenance.formFields.fields.validationEvent',
-          label: 'Evento de validaÃ§Ã£o',
+          label: 'Evento de validação',
           type: 'text',
           maxLength: 255,
           disabled: ({ form }) => isProtectedField(form),
@@ -256,11 +254,11 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
           maxLength: 255,
           disabled: ({ form }) => isProtectedField(form),
         },
-        { key: 'instrucoes', labelKey: 'maintenance.formFields.fields.instructions', label: 'InstruÃ§Ãµes', type: 'textarea', rows: 4 },
+        { key: 'instrucoes', labelKey: 'maintenance.formFields.fields.instructions', label: 'Instruções', type: 'textarea', rows: 4 },
         {
           key: 'valor',
           labelKey: 'maintenance.formFields.fields.defaultValue',
-          label: 'Valor padrÃ£o',
+          label: 'Valor padrão',
           type: 'text',
           maxLength: 255,
           disabled: ({ form }) => isProtectedField(form),
@@ -287,7 +285,7 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
         {
           key: 'json_seletor',
           labelKey: 'maintenance.formFields.fields.selectorJson',
-          label: 'OpÃ§Ãµes (JSON)',
+          label: 'Opções (JSON)',
           type: 'textarea',
           rows: 4,
           hidden: ({ form }) => String(form.tipo || '') !== 'seletor' || String(form.tipo_seletor || '') !== 'personalizado',
@@ -309,7 +307,7 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
         {
           key: 'mascara',
           labelKey: 'maintenance.formFields.fields.mask',
-          label: 'MÃ¡scara',
+          label: 'Máscara',
           type: 'text',
           maxLength: 255,
           hidden: ({ form }) => String(form.tipo || '') !== 'texto',
@@ -318,7 +316,7 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
         {
           key: 'minimo',
           labelKey: 'maintenance.formFields.fields.minimum',
-          label: 'MÃ­nimo',
+          label: 'Mínimo',
           type: 'number',
           hidden: ({ form }) => String(form.tipo || '') !== 'numero',
           disabled: ({ form }) => isProtectedField(form),
@@ -326,12 +324,12 @@ export const FORMULARIOS_CAMPOS_CONFIG: CrudModuleConfig = {
         {
           key: 'maximo',
           labelKey: 'maintenance.formFields.fields.maximum',
-          label: 'MÃ¡ximo',
+          label: 'Máximo',
           type: 'number',
           hidden: ({ form }) => String(form.tipo || '') !== 'numero',
           disabled: ({ form }) => isProtectedField(form),
         },
-        { key: 'posicao', labelKey: 'maintenance.formFields.fields.position', label: 'PosiÃ§Ã£o', type: 'number', required: true },
+        { key: 'posicao', labelKey: 'maintenance.formFields.fields.position', label: 'Posição', type: 'number', required: true },
       ],
     },
   ],

@@ -1,5 +1,3 @@
-'use client'
-
 export type SessionClientPhase = 'active' | 'warning' | 'ended'
 
 const SESSION_CLIENT_PHASE_KEY = 'admin-v2-web:session-client-phase'

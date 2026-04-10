@@ -39,7 +39,7 @@ export function ClientUnlockModal({
     <OverlayModal open={open} title={title} onClose={onClose}>
       <div className="space-y-4">
         <label className="flex flex-col gap-2">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('clientes.modals.justification', 'Justificativa')}</span>
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">{t('clientes.modals.justification', 'Justificativa')}</span>
           <textarea
             value={description}
             onChange={(event) => onChangeDescription(event.target.value)}
@@ -48,7 +48,7 @@ export function ClientUnlockModal({
           />
         </label>
         {error ? (
-          <div className="rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <div className="app-error-panel rounded-[1rem] px-4 py-3 text-sm">
             {error}
           </div>
         ) : null}
@@ -56,7 +56,7 @@ export function ClientUnlockModal({
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center gap-2 rounded-full border border-[#e1d8c8] bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+            className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold"
           >
             {t('common.cancel')}
           </button>
@@ -64,7 +64,7 @@ export function ClientUnlockModal({
             type="button"
             onClick={onConfirm}
             disabled={isLoading}
-            className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+            className="app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
           >
             {t('clientes.modals.confirm', 'Confirmar')}
           </button>

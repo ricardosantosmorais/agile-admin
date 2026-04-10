@@ -238,7 +238,7 @@ export function DataTableFiltersCard<TFilters>({
     }
 
     return (
-      <section className="rounded-[1.1rem] border border-[#e8e2d7] bg-white px-4 py-3 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+      <section className="app-card-modern rounded-[1.1rem] px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
             {title ? <h2 className="text-sm font-bold tracking-tight text-slate-950">{title}</h2> : null}
@@ -253,7 +253,7 @@ export function DataTableFiltersCard<TFilters>({
           <button
             type="button"
             onClick={onToggleExpanded}
-            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#e6dfd3] bg-[#fcfaf5] px-3 py-2 text-xs font-semibold text-slate-700"
+            className="app-button-secondary inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold"
           >
             {t('filters.expand', 'Expandir')}
             <ChevronDown className="h-4 w-4 transition" />
@@ -267,8 +267,8 @@ export function DataTableFiltersCard<TFilters>({
     <section
       className={
         variant === 'embedded'
-          ? 'border-b border-[#ece5d9] pb-5'
-          : 'rounded-[1.1rem] border border-[#e8e2d7] bg-white px-5 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.04)]'
+          ? 'pb-5'
+          : 'app-card-modern rounded-[1.1rem] px-5 py-4'
       }
     >
       <div className="space-y-3">
@@ -281,7 +281,7 @@ export function DataTableFiltersCard<TFilters>({
             <button
               type="button"
               onClick={onToggleExpanded}
-              className="inline-flex items-center gap-2 rounded-full border border-[#e6dfd3] bg-[#fcfaf5] px-3.5 py-2 text-xs font-semibold text-slate-700"
+              className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-xs font-semibold"
             >
               {t('filters.collapse', 'Recolher')}
               <ChevronDown className="h-4 w-4 rotate-180 transition" />
@@ -290,7 +290,7 @@ export function DataTableFiltersCard<TFilters>({
         ) : null}
 
         {variant === 'card' ? (
-          <div className="flex flex-col gap-1.5 rounded-[1rem] border border-dashed border-[#e6dfd3] bg-[#fcfaf5] px-3.5 py-2.5 text-sm text-slate-600">
+          <div className="app-pane-muted flex flex-col gap-1.5 rounded-[1rem] border border-dashed px-3.5 py-2.5 text-sm text-slate-600">
             <div className="flex items-center gap-2 font-semibold text-slate-900">
               <SearchIcon className="h-4 w-4 text-slate-500" />
               {summary || emptySummaryLabel || t('filters.noneApplied', 'Sem filtros aplicados')}
@@ -299,7 +299,7 @@ export function DataTableFiltersCard<TFilters>({
           </div>
         ) : null}
 
-        <div className="space-y-3 rounded-[1.1rem] border border-[#ece5d9] bg-[#fcfaf5] p-3.5">
+        <div className="app-pane-muted space-y-3 rounded-[1.1rem] p-3.5">
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {filters.map((filter) => (
               <div
@@ -315,14 +315,14 @@ export function DataTableFiltersCard<TFilters>({
             <button
               type="button"
               onClick={handleClear}
-              className="inline-flex items-center gap-2 rounded-full border border-[#e1d8c8] bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-700"
+              className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3.5 py-2.5 text-sm font-semibold"
             >
               {t('filters.clear', 'Limpar')}
             </button>
             <button
               type="button"
               onClick={handleApply}
-              className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-3.5 py-2.5 text-sm font-semibold text-white"
+              className="app-button-primary inline-flex items-center gap-2 rounded-full px-3.5 py-2.5 text-sm font-semibold"
             >
               <SearchIcon className="h-4 w-4" />
               {t('filters.apply', 'Aplicar filtros')}

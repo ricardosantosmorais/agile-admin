@@ -1,5 +1,3 @@
-'use client'
-
 import { normalizeLogDetail, normalizeLogsListResponse } from '@/src/features/logs/services/logs-mappers'
 import type { LogDetailRecord, LogsListFilters, LogsListResponse } from '@/src/features/logs/services/logs-types'
 import { httpClient } from '@/src/services/http/http-client'

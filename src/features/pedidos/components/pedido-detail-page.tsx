@@ -63,7 +63,7 @@ const DELIVERY_STATUS_OPTIONS = [
 
 function InfoRow({ label, value }: { label: string; value: ReactNode }) {
   return (
-    <div className="grid gap-2 py-3 sm:grid-cols-[220px,1fr] sm:items-start">
+    <div className="app-divider-soft grid gap-2 border-b py-3 last:border-b-0 sm:grid-cols-[220px,1fr] sm:items-start">
       <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
         {label}
       </div>
@@ -76,21 +76,29 @@ function InfoRow({ label, value }: { label: string; value: ReactNode }) {
 
 function MetricCard({ icon, label, value, helper, tone = 'slate' }: MetricCardProps) {
   const toneClasses = {
-    slate: 'border-slate-200 bg-slate-50/80 text-slate-700',
-    emerald: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-    sky: 'border-sky-200 bg-sky-50 text-sky-700',
-    amber: 'border-amber-200 bg-amber-50 text-amber-700',
+    slate: 'app-stat-card-icon text-slate-300',
+    emerald: 'app-stat-card-icon app-stat-card-icon-emerald',
+    sky: 'app-stat-card-icon app-stat-card-icon-sky',
+    amber: 'app-stat-card-icon app-stat-card-icon-amber',
+  }
+
+  const accentClasses = {
+    slate: 'app-stat-card-accent app-stat-card-accent-sky',
+    emerald: 'app-stat-card-accent app-stat-card-accent-emerald',
+    sky: 'app-stat-card-accent app-stat-card-accent-sky',
+    amber: 'app-stat-card-accent app-stat-card-accent-amber',
   }
 
   return (
-    <div className="rounded-[1.25rem] border border-[#e8e2d7] bg-white px-5 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+    <div className="app-stat-card relative overflow-hidden rounded-[1.25rem] px-5 py-4">
+      <div className={accentClasses[tone]} aria-hidden="true" />
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
-          <div className="mt-2 text-lg font-bold tracking-tight text-slate-950">{value}</div>
+          <div className="mt-2 text-lg font-bold tracking-tight text-[color:var(--app-text)]">{value}</div>
           {helper ? <div className="mt-2 text-sm text-slate-500">{helper}</div> : null}
         </div>
-        <div className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl border ${toneClasses[tone]}`}>
+        <div className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl ${toneClasses[tone]}`}>
           {icon}
         </div>
       </div>
@@ -112,9 +120,9 @@ function DetailSectionCard({
   className?: string
 }) {
   return (
-    <SectionCard className={className}>
+    <SectionCard className={['app-pane', className].filter(Boolean).join(' ')}>
       <div className="mb-5 flex items-start gap-3">
-        <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[#e8e2d7] bg-slate-50 text-slate-700">
+        <div className="app-stat-card-icon app-stat-card-icon-sky inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl">
           {icon}
         </div>
         <div className="min-w-0">
@@ -122,7 +130,9 @@ function DetailSectionCard({
           <p className="mt-0.5 text-[11px] leading-5 text-slate-500">{description}</p>
         </div>
       </div>
-      {children}
+      <div className="app-divider-soft border-t pt-5">
+        {children}
+      </div>
     </SectionCard>
   )
 }
@@ -214,7 +224,7 @@ function ProductThumb({ product, assetsBucketUrl }: { product: RecordLike | null
     <img
       src={currentSrc}
       alt={String(product?.nome || 'Produto')}
-      className="h-16 w-16 rounded-2xl border border-[#efe8dc] bg-white p-1 object-contain"
+      className="app-pane h-16 w-16 rounded-2xl p-1 object-contain"
       onError={() => {
         if (currentIndex < images.length - 1) setCurrentIndex((value) => value + 1)
       }}
@@ -329,13 +339,13 @@ export function PedidoDetailPage() {
         actions={(
           <div className="flex flex-wrap items-center justify-end gap-3">
             {access.canEdit && detail?.canApprovePayment ? (
-              <button type="button" onClick={() => pedidoActions.openApprove(detail.id)} className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700">
+              <button type="button" onClick={() => pedidoActions.openApprove(detail.id)} className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-emerald-300">
                 <CheckCircle2 className="h-4 w-4" />
                 {t('orders.actions.approve', 'Aprovar pagamento')}
               </button>
             ) : null}
             {access.canEdit && detail?.canCancel ? (
-              <button type="button" onClick={() => pedidoActions.openCancel(detail.id)} className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700">
+              <button type="button" onClick={() => pedidoActions.openCancel(detail.id)} className="app-button-danger inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold">
                 <Ban className="h-4 w-4" />
                 {t('orders.actions.cancel', 'Cancelar pedido')}
               </button>
@@ -348,7 +358,7 @@ export function PedidoDetailPage() {
       <AsyncState isLoading={detailState.isLoading} error={detailState.error}>
         {detail ? (
           <>
-            {detail.hasCorte ? <div className="rounded-[1.25rem] border border-amber-200 bg-amber-50 px-5 py-3 text-sm font-semibold text-amber-700">{t('orders.feedback.hasCut', 'Pedido com corte de produtos.')}</div> : null}
+            {detail.hasCorte ? <div className="app-warning-panel rounded-[1.25rem] px-5 py-3 text-sm font-semibold">{t('orders.feedback.hasCut', 'Pedido com corte de produtos.')}</div> : null}
 
             <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
               <MetricCard
@@ -401,7 +411,7 @@ export function PedidoDetailPage() {
                 title={t('orders.sections.info', 'Informações')}
                 description={t('orders.sectionDescriptions.info', 'Contexto comercial, identificação e observações do pedido.')}
               >
-                <div className="divide-y divide-[#efe8dc]">
+                <div className="app-divider-soft border-t">
                   <InfoRow label={t('orders.fields.id', 'ID')} value={detail.id} />
                   <InfoRow label={t('orders.fields.transaction', 'Transação')} value={toStringValue(detail.id_transacao)} />
                   <InfoRow label={t('common.code', 'Código')} value={toStringValue(detail.codigo)} />
@@ -431,12 +441,12 @@ export function PedidoDetailPage() {
                     </div>
                   )} />
                 </div>
-                <div className="mt-5 space-y-3 border-t border-[#efe8dc] pt-5">
+                <div className="app-divider-soft mt-5 space-y-3 border-t pt-5">
                   <label htmlFor="pedido-observacoes-internas" className="text-sm font-semibold text-slate-700">{t('orders.fields.internalNotes', 'Observações internas')}</label>
-                  <textarea id="pedido-observacoes-internas" value={internalNotes} onChange={(event) => setInternalNotes(event.target.value)} rows={5} className="w-full rounded-[1.1rem] border border-[#e6dfd3] px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400" />
+                  <textarea id="pedido-observacoes-internas" value={internalNotes} onChange={(event) => setInternalNotes(event.target.value)} rows={5} className="app-control w-full rounded-[1.1rem] px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400" />
                   {access.canEdit ? (
                     <div className="flex justify-end">
-                      <button type="button" onClick={() => void handleSaveInternalNotes()} disabled={isSavingInternalNotes} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
+                      <button type="button" onClick={() => void handleSaveInternalNotes()} disabled={isSavingInternalNotes} className="app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60">
                         {isSavingInternalNotes ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                         {isSavingInternalNotes ? t('common.loading', 'Carregando...') : t('common.save', 'Salvar')}
                       </button>
@@ -451,21 +461,21 @@ export function PedidoDetailPage() {
                 description={t('orders.sectionDescriptions.values', 'Comparativo entre o valor solicitado no checkout e o valor efetivamente atendido.')}
               >
                 <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm">
+                  <table className="app-divider-soft min-w-full border-t text-sm">
                     <thead>
-                      <tr className="border-b border-[#efe8dc] text-left text-slate-500">
+                      <tr className="app-divider-soft border-b text-left text-slate-500">
                         <th className="py-3 pr-4" />
                         <th className="py-3 pr-4 text-right">{t('orders.fields.requested', 'Solicitado')}</th>
                         <th className="py-3 text-right">{t('orders.fields.servedValue', 'Atendido')}</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#efe8dc]">
-                      <tr><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.productsValue', 'Produtos')}</td><td className="py-3 pr-4 text-right">{formatCurrencyValue(detail.valor_produtos)}</td><td className="py-3 text-right">{formatCurrencyValue(detail.valor_produtos_atendido_ajustado)}</td></tr>
-                      <tr><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.automaticCoupon', 'Cupom desconto automático')}</td><td className="py-3 pr-4 text-right">- {formatCurrencyValue(detail.valor_cupom_automatico)}</td><td className="py-3 text-right">- {formatCurrencyValue(detail.valor_cupom_automatico)}</td></tr>
-                      <tr><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.discountCoupon', 'Cupom desconto')}{detail.cupom_desconto && toRecord(detail.cupom_desconto)?.codigo ? ` (${String(toRecord(detail.cupom_desconto)?.codigo)})` : ''}</td><td className="py-3 pr-4 text-right">- {formatCurrencyValue(detail.valor_cupom_desconto)}</td><td className="py-3 text-right">- {formatCurrencyValue(detail.valor_cupom_desconto)}</td></tr>
-                      <tr><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.variableWeight', 'Peso variável')}</td><td className="py-3 pr-4 text-right">+ {formatCurrencyValue(detail.valor_variacao)}</td><td className="py-3 text-right">+ {formatCurrencyValue(detail.valor_variacao)}</td></tr>
-                      <tr><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.freight', 'Frete')}</td><td className="py-3 pr-4 text-right">+ {formatCurrencyValue(detail.valor_frete)}</td><td className="py-3 text-right">+ {formatCurrencyValue(detail.valor_frete)}</td></tr>
-                      <tr><td className="py-3 pr-4 font-semibold text-slate-900">{t('orders.fields.total', 'Total')}</td><td className="py-3 pr-4 text-right font-semibold text-slate-900">{formatCurrencyValue(detail.valor_total)}</td><td className="py-3 text-right font-semibold text-slate-900">{formatCurrencyValue(detail.valor_total_atendido_ajustado)}</td></tr>
+                    <tbody>
+                      <tr className="app-divider-soft border-b last:border-b-0"><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.productsValue', 'Produtos')}</td><td className="py-3 pr-4 text-right">{formatCurrencyValue(detail.valor_produtos)}</td><td className="py-3 text-right">{formatCurrencyValue(detail.valor_produtos_atendido_ajustado)}</td></tr>
+                      <tr className="app-divider-soft border-b last:border-b-0"><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.automaticCoupon', 'Cupom desconto automático')}</td><td className="py-3 pr-4 text-right">- {formatCurrencyValue(detail.valor_cupom_automatico)}</td><td className="py-3 text-right">- {formatCurrencyValue(detail.valor_cupom_automatico)}</td></tr>
+                      <tr className="app-divider-soft border-b last:border-b-0"><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.discountCoupon', 'Cupom desconto')}{detail.cupom_desconto && toRecord(detail.cupom_desconto)?.codigo ? ` (${String(toRecord(detail.cupom_desconto)?.codigo)})` : ''}</td><td className="py-3 pr-4 text-right">- {formatCurrencyValue(detail.valor_cupom_desconto)}</td><td className="py-3 text-right">- {formatCurrencyValue(detail.valor_cupom_desconto)}</td></tr>
+                      <tr className="app-divider-soft border-b last:border-b-0"><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.variableWeight', 'Peso variável')}</td><td className="py-3 pr-4 text-right">+ {formatCurrencyValue(detail.valor_variacao)}</td><td className="py-3 text-right">+ {formatCurrencyValue(detail.valor_variacao)}</td></tr>
+                      <tr className="app-divider-soft border-b last:border-b-0"><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.freight', 'Frete')}</td><td className="py-3 pr-4 text-right">+ {formatCurrencyValue(detail.valor_frete)}</td><td className="py-3 text-right">+ {formatCurrencyValue(detail.valor_frete)}</td></tr>
+                      <tr className="app-divider-soft border-b-0"><td className="py-3 pr-4 font-semibold text-slate-900">{t('orders.fields.total', 'Total')}</td><td className="py-3 pr-4 text-right font-semibold text-slate-900">{formatCurrencyValue(detail.valor_total)}</td><td className="py-3 text-right font-semibold text-slate-900">{formatCurrencyValue(detail.valor_total_atendido_ajustado)}</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -480,7 +490,7 @@ export function PedidoDetailPage() {
                 title={t('orders.sections.payment', 'Pagamento')}
                 description={t('orders.sectionDescriptions.payment', 'Forma, condição, parcelas e dados transacionais do pagamento.')}
               >
-                <div className="divide-y divide-[#efe8dc]">
+                  <div className="app-divider-soft border-t">
                   <InfoRow label={t('orders.fields.paymentMethod', 'Forma de pagamento')} value={resolvePagamentoNome(detail)} />
                   <InfoRow label={t('orders.fields.paymentTerm', 'Prazo de pagamento')} value={resolveCondicaoNome(detail)} />
                   <InfoRow label={t('orders.fields.amount', 'Valor')} value={formatCurrencyValue(pagamento?.valor)} />
@@ -509,7 +519,7 @@ export function PedidoDetailPage() {
                 title={t('orders.sections.customer', 'Cliente')}
                 description={t('orders.sectionDescriptions.customer', 'Dados cadastrais, contato e perfil comercial do cliente vinculado ao pedido.')}
               >
-                <div className="divide-y divide-[#efe8dc]">
+                <div className="app-divider-soft border-t">
                   <InfoRow label={t('orders.fields.id', 'ID')} value={toStringValue(cliente?.id)} />
                   <InfoRow label={t('orders.fields.customerCode', 'Código do cliente')} value={toStringValue(cliente?.codigo)} />
                   <InfoRow label={t('orders.fields.active', 'Ativo')} value={<StatusBadge tone={resolveBooleanTone(cliente?.ativo === true)}>{cliente?.ativo === true ? t('common.yes', 'Sim') : t('common.no', 'Não')}</StatusBadge>} />
@@ -539,7 +549,7 @@ export function PedidoDetailPage() {
                 title={t('orders.sections.delivery', 'Entrega')}
                 description={t('orders.sectionDescriptions.delivery', 'Resumo logístico, endereço de entrega e atualização operacional do envio.')}
               >
-                <div className="divide-y divide-[#efe8dc]">
+                <div className="app-divider-soft border-t">
                   <InfoRow label={t('orders.fields.deliveryMethod', 'Forma de entrega')} value={resolveFormaEntrega(detail)} />
                   <InfoRow label={t('orders.fields.pickupBranch', 'Filial de retirada')} value={resolveEntityLabel(detail.filial_retira, ['nome_fantasia', 'nome'])} />
                   <InfoRow label={t('orders.fields.transportCompany', 'Transportadora')} value={resolveEntityLabel(entrega?.transportadora, ['nome_fantasia', 'nome'])} />
@@ -570,32 +580,32 @@ export function PedidoDetailPage() {
                   <InfoRow label={t('orders.fields.shippingReturnLog', 'Log retorno cotação')} value={entrega?.retorno_cotacao ? <button type="button" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700" onClick={() => setJsonModal({ title: t('orders.fields.shippingReturnLog', 'Log retorno cotação'), content: String(entrega.retorno_cotacao) })}><Eye className="h-4 w-4" />{t('orders.actions.viewJson', 'Ver JSON')}</button> : '-'} />
                 </div>
                 {access.canEdit && entrega ? (
-                  <div className="mt-5 space-y-4 border-t border-[#efe8dc] pt-5">
+                  <div className="app-divider-soft mt-5 space-y-4 border-t pt-5">
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="space-y-2">
                         <label htmlFor="pedido-entrega-status" className="text-sm font-semibold text-slate-700">{t('orders.fields.deliveryStatus', 'Status da entrega')}</label>
-                        <select id="pedido-entrega-status" value={deliveryForm.status} onChange={(event) => setDeliveryForm((current) => ({ ...current, status: event.target.value }))} className="w-full rounded-[1.1rem] border border-[#e6dfd3] px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400">
+                        <select id="pedido-entrega-status" value={deliveryForm.status} onChange={(event) => setDeliveryForm((current) => ({ ...current, status: event.target.value }))} className="app-control w-full rounded-[1.1rem] px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400">
                           {DELIVERY_STATUS_OPTIONS.map((option) => <option key={option.value} value={option.value}>{t(option.labelKey, option.fallback)}</option>)}
                         </select>
                       </div>
                       <div className="space-y-2">
                         <label htmlFor="pedido-entrega-rastreamento" className="text-sm font-semibold text-slate-700">{t('orders.fields.trackingLink', 'Link de rastreamento')}</label>
-                        <input id="pedido-entrega-rastreamento" value={deliveryForm.rastreamento} onChange={(event) => setDeliveryForm((current) => ({ ...current, rastreamento: event.target.value }))} className="w-full rounded-[1.1rem] border border-[#e6dfd3] px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400" />
+                        <input id="pedido-entrega-rastreamento" value={deliveryForm.rastreamento} onChange={(event) => setDeliveryForm((current) => ({ ...current, rastreamento: event.target.value }))} className="app-control w-full rounded-[1.1rem] px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400" />
                       </div>
                       <div className="space-y-2">
                         <label htmlFor="pedido-entrega-codigo" className="text-sm font-semibold text-slate-700">{t('orders.fields.trackingCode', 'Código de rastreamento')}</label>
-                        <input id="pedido-entrega-codigo" value={deliveryForm.codigo} onChange={(event) => setDeliveryForm((current) => ({ ...current, codigo: event.target.value }))} className="w-full rounded-[1.1rem] border border-[#e6dfd3] px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400" />
+                        <input id="pedido-entrega-codigo" value={deliveryForm.codigo} onChange={(event) => setDeliveryForm((current) => ({ ...current, codigo: event.target.value }))} className="app-control w-full rounded-[1.1rem] px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400" />
                       </div>
                       <div className="space-y-2">
                         <label htmlFor="pedido-entrega-prazo" className="text-sm font-semibold text-slate-700">{t('orders.fields.deliveryForecast', 'Previsão de entrega')}</label>
-                        <div className="flex items-center rounded-[1.1rem] border border-[#e6dfd3] pr-4 focus-within:border-slate-400">
+                        <div className="app-control flex items-center rounded-[1.1rem] pr-4 focus-within:border-slate-400">
                           <input id="pedido-entrega-prazo" type="number" min="0" value={deliveryForm.prazo} onChange={(event) => setDeliveryForm((current) => ({ ...current, prazo: event.target.value }))} className="w-full rounded-[1.1rem] px-4 py-3 text-sm text-slate-900 outline-none" />
                           <span className="text-sm font-semibold text-slate-500">{t('orders.fields.days', 'dias')}</span>
                         </div>
                       </div>
                     </div>
                     <div className="flex justify-end">
-                      <button type="button" onClick={() => void handleSaveDelivery()} disabled={isSavingDelivery} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
+                      <button type="button" onClick={() => void handleSaveDelivery()} disabled={isSavingDelivery} className="app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60">
                         {isSavingDelivery ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                         {isSavingDelivery ? t('common.loading', 'Carregando...') : t('common.save', 'Salvar')}
                       </button>
@@ -609,7 +619,7 @@ export function PedidoDetailPage() {
                 title={t('orders.sections.billing', 'Cobrança')}
                 description={t('orders.sectionDescriptions.billing', 'Endereço de cobrança carregado do cadastro do cliente.')}
               >
-                <div className="divide-y divide-[#efe8dc]">
+                  <div className="app-divider-soft border-t">
                   <InfoRow label={t('orders.fields.address', 'Endereço')} value={toStringValue(cliente?.endereco)} />
                   <InfoRow label={t('orders.fields.number', 'Número')} value={toStringValue(cliente?.numero)} />
                   <InfoRow label={t('orders.fields.complement', 'Complemento')} value={toStringValue(cliente?.complemento)} />
@@ -631,9 +641,9 @@ export function PedidoDetailPage() {
               description={t('orders.sectionDescriptions.products', 'Itens do pedido com embalagem, corte, cupons, tabela e valores atendidos.')}
             >
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-[#efe8dc] text-sm">
+                <table className="app-divider-soft min-w-full border-t text-sm">
                   <thead>
-                    <tr className="text-left text-slate-500">
+                    <tr className="app-divider-soft border-b text-left text-slate-500">
                       <th className="py-3 pr-4" />
                       <th className="py-3 pr-4 text-center">{t('orders.fields.productId', 'ID')}</th>
                       <th className="py-3 pr-4 text-center">{t('orders.fields.productCode', 'Código')}</th>
@@ -645,7 +655,7 @@ export function PedidoDetailPage() {
                       <th className="py-3 text-right">{t('orders.fields.subtotal', 'Subtotal')}</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#f1ecdf]">
+                  <tbody>
                     {produtos.map((item, index) => {
                       const produto = toRecord(item.produto)
                       const embalagem = toRecord(item.embalagem)
@@ -655,7 +665,7 @@ export function PedidoDetailPage() {
                       const hasTotalCut = detail.status !== 'cancelado' && quantidadeAtendida < quantidadeSolicitada && quantidadeAtendida <= 0
                       const hasPartialCut = detail.status !== 'cancelado' && quantidadeAtendida < quantidadeSolicitada && quantidadeAtendida > 0
                       return (
-                        <tr key={`${detail.id}-produto-${index}`}>
+                        <tr key={`${detail.id}-produto-${index}`} className="app-divider-soft border-b last:border-b-0">
                           <td className="py-3 pr-4 align-middle"><ProductThumb product={produto} assetsBucketUrl={currentTenant.assetsBucketUrl} /></td>
                           <td className="py-3 pr-4 text-center align-middle">{toStringValue(produto?.id)}</td>
                           <td className="py-3 pr-4 text-center align-middle">{toStringValue(produto?.codigo)}</td>
@@ -700,12 +710,12 @@ export function PedidoDetailPage() {
             >
                 <div className="space-y-3">
                   {eventos.length ? eventos.map((evento, index) => (
-                    <div key={`${detail.id}-evento-${index}`} className="relative flex items-start gap-4 rounded-2xl border border-[#efe8dc] bg-slate-50/70 px-4 py-4">
+                    <div key={`${detail.id}-evento-${index}`} className="app-pane-muted relative flex items-start gap-4 rounded-2xl border px-4 py-4">
                       <div className="relative flex flex-col items-center">
-                        <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700">
+                        <div className="app-stat-card-icon app-stat-card-icon-sky inline-flex h-10 w-10 items-center justify-center rounded-2xl">
                           <History className="h-4 w-4" />
                         </div>
-                        {index < eventos.length - 1 ? <span className="mt-2 h-full min-h-8 w-px bg-slate-200" /> : null}
+                        {index < eventos.length - 1 ? <span className="mt-2 h-full min-h-8 w-px bg-line/60" /> : null}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -730,7 +740,7 @@ export function PedidoDetailPage() {
                 title={t('orders.sections.details', 'Detalhes')}
                 description={t('orders.sectionDescriptions.details', 'Metadados do pedido, rastreabilidade, contexto do usuário e integração.')}
               >
-                <div className="divide-y divide-[#efe8dc]">
+                <div className="app-divider-soft border-t">
                   <InfoRow label={t('orders.fields.createdAt', 'Data de criação')} value={detail.created_at ? formatDateTime(String(detail.created_at)) : '-'} />
                   <InfoRow label={t('orders.fields.updatedAt', 'Última atualização')} value={detail.updated_at ? formatDateTime(String(detail.updated_at)) : '-'} />
                   <InfoRow label={t('orders.fields.userName', 'Nome usuário')} value={toStringValue(usuario?.nome)} />
@@ -760,9 +770,9 @@ export function PedidoDetailPage() {
                 description={t('orders.sectionDescriptions.logs', 'Histórico técnico e operacional com acesso rápido aos payloads registrados.')}
               >
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-[#efe8dc] text-sm">
+                  <table className="app-divider-soft min-w-full border-t text-sm">
                     <thead>
-                      <tr className="text-left text-slate-500">
+                      <tr className="app-divider-soft border-b text-left text-slate-500">
                         <th className="py-3 pr-4">{t('common.code', 'Código')}</th>
                         <th className="py-3 pr-4">{t('orders.fields.logType', 'Tipo')}</th>
                         <th className="py-3 pr-4">{t('orders.fields.date', 'Data')}</th>
@@ -770,17 +780,17 @@ export function PedidoDetailPage() {
                         <th className="py-3 text-right">{t('common.actions', 'Ações')}</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#f1ecdf]">
+                    <tbody>
                       {logs.length ? logs.map((log, index) => {
                         const jsonContent = typeof log.json === 'string' ? log.json : log.json && typeof log.json === 'object' ? JSON.stringify(log.json, null, 2) : ''
                         return (
-                          <tr key={`${detail.id}-log-${index}`}>
+                          <tr key={`${detail.id}-log-${index}`} className="app-divider-soft border-b last:border-b-0">
                             <td className="py-3 pr-4 align-top">{toStringValue(log.codigo)}</td>
                             <td className="py-3 pr-4 align-top">{humanizeEnum(log.tipo)}</td>
                             <td className="py-3 pr-4 align-top">{log.data ? formatDateTime(String(log.data)) : '-'}</td>
                             <td className="py-3 pr-4 align-top">{toStringValue(log.descricao)}</td>
                             <td className="py-3 text-right align-top">
-                              {jsonContent ? <button type="button" onClick={() => setJsonModal({ title: t('orders.fields.logJson', 'JSON do log de pedido'), content: jsonContent })} className="inline-flex items-center gap-2 rounded-full border border-[#e6dfd3] px-3 py-2 text-sm font-semibold text-slate-700"><Eye className="h-4 w-4" />{t('orders.actions.viewJson', 'Ver JSON')}</button> : null}
+                              {jsonContent ? <button type="button" onClick={() => setJsonModal({ title: t('orders.fields.logJson', 'JSON do log de pedido'), content: jsonContent })} className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-slate-700"><Eye className="h-4 w-4" />{t('orders.actions.viewJson', 'Ver JSON')}</button> : null}
                             </td>
                           </tr>
                         )
@@ -798,7 +808,7 @@ export function PedidoDetailPage() {
       <OverlayModal open={Boolean(jsonModal)} title={jsonModal?.title || t('orders.fields.logJson', 'JSON do log de pedido')} onClose={() => setJsonModal(null)} maxWidthClassName="max-w-4xl">
         <div className="space-y-4">
           <div className="flex justify-end">
-            <button type="button" onClick={() => void handleCopyJson()} className="inline-flex items-center gap-2 rounded-full border border-[#e6dfd3] px-4 py-2.5 text-sm font-semibold text-slate-700">
+            <button type="button" onClick={() => void handleCopyJson()} className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-slate-700">
               <Copy className="h-4 w-4" />
               {t('orders.actions.copyJson', 'Copiar JSON')}
             </button>

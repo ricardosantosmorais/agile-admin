@@ -34,7 +34,7 @@ export function CrudModal({
           type="button"
           onClick={onClose}
           disabled={isSaving}
-          className="rounded-full border border-[#e6dfd3] bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="app-button-secondary inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
         >
           {t('common.cancel', 'Cancel')}
         </button>
@@ -42,7 +42,7 @@ export function CrudModal({
           type="button"
           onClick={onConfirm}
           disabled={isSaving || confirmDisabled}
-          className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+          className="app-button-primary inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {isSaving ? t('common.loading', 'Loading...') : t('common.save', 'Save')}

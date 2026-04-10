@@ -1,5 +1,3 @@
-'use client'
-
 import { phoneMask } from '@/src/lib/input-masks'
 
 export type AdminListFilters = {

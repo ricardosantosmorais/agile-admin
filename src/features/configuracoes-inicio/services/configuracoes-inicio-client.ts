@@ -1,5 +1,3 @@
-﻿'use client'
-
 import { httpClient } from '@/src/services/http/http-client'
 import { buildDirtyConfiguracoesInicioPayload, normalizeConfiguracoesInicioRecord } from '@/src/features/configuracoes-inicio/services/configuracoes-inicio-mappers'
 import type { ConfiguracoesInicioFormValues, ConfiguracoesInicioRecord } from '@/src/features/configuracoes-inicio/types/configuracoes-inicio'

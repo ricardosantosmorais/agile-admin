@@ -63,7 +63,7 @@ export function VendedoresListPage() {
         }
         if (column.id === 'ativo' || column.id === 'bloqueado') {
           const checked = record[column.id] === true || record[column.id] === 1 || record[column.id] === '1'
-          return <StatusBadge tone={checked ? 'success' : 'warning'}>{checked ? t('common.yes', 'Yes') : t('common.no', 'No')}</StatusBadge>
+          return <StatusBadge tone={checked ? 'success' : 'warning'}>{checked ? t('common.yes', 'Sim') : t('common.no', 'N?o')}</StatusBadge>
         }
         const value = column.valueKey ? record[column.valueKey] : record[column.id]
         return <span className="truncate">{String(value ?? '-')}</span>
@@ -81,7 +81,7 @@ export function VendedoresListPage() {
       const users = await getVendedorLinkedUsers(record.id)
       setLinkedUsers(users)
     } catch (error) {
-      setLinkedUsersError(error instanceof Error ? error.message : t('people.sellers.modals.loadLinkedUsersError', 'Could not load linked users.'))
+      setLinkedUsersError(error instanceof Error ? error.message : t('people.sellers.modals.loadLinkedUsersError', 'N?o foi poss?vel carregar os usu?rios vinculados.'))
     } finally {
       setLinkedUsersLoading(false)
     }
@@ -95,23 +95,23 @@ export function VendedoresListPage() {
       setLinkedUsers(users)
       controller.refreshList()
     } catch (error) {
-      setLinkedUsersError(error instanceof Error ? error.message : t('people.sellers.modals.unlinkError', 'Could not unlink the user.'))
+      setLinkedUsersError(error instanceof Error ? error.message : t('people.sellers.modals.unlinkError', 'N?o foi poss?vel desvincular o usu?rio.'))
     }
   }
 
   if (!access.canList) {
-    return <AccessDeniedState title={t('people.sellers.title', 'Sellers')} backHref="/dashboard" />
+    return <AccessDeniedState title={t('people.sellers.title', 'Vendedores')} backHref="/dashboard" />
   }
 
   return (
     <div className="space-y-5">
       <PageHeader
         breadcrumbs={[
-          { label: t('routes.dashboard', 'Home'), href: '/dashboard' },
-          { label: t('routes.people', 'People') },
-          { label: t('people.sellers.title', 'Sellers'), href: '/vendedores' },
+          { label: t('routes.dashboard', 'In?cio'), href: '/dashboard' },
+          { label: t('routes.people', 'Pessoas') },
+          { label: t('people.sellers.title', 'Vendedores'), href: '/vendedores' },
         ]}
-        actions={<DataTableSectionAction label={t('common.refresh', 'Refresh')} icon={RefreshCcw} onClick={controller.refreshList} />}
+        actions={<DataTableSectionAction label={t('common.refresh', 'Atualizar')} icon={RefreshCcw} onClick={controller.refreshList} />}
       />
 
       <AsyncState isLoading={controller.isLoading} error={controller.error?.message}>
@@ -126,7 +126,7 @@ export function VendedoresListPage() {
               />
               <DataTablePageActions
                 actions={[
-                  access.canCreate ? { label: t('common.new', 'New'), icon: Plus, href: '/vendedores/novo', tone: 'primary' } : null,
+                  access.canCreate ? { label: t('common.new', 'Novo'), icon: Plus, href: '/vendedores/novo', tone: 'primary' } : null,
                 ]}
               />
             </div>
@@ -146,13 +146,13 @@ export function VendedoresListPage() {
           <AppDataTable<CrudListRecord, string, CrudListFilters>
             rows={controller.rows}
             getRowId={(record) => record.id}
-            emptyMessage={t('simpleCrud.empty', 'No records found with the current filters.')}
+            emptyMessage={t('simpleCrud.empty', 'Nenhum registro encontrado com os filtros atuais.')}
             columns={columns}
             sort={{ activeColumn: controller.filters.orderBy, direction: controller.filters.sort, onToggle: controller.tableState.toggleSort }}
             rowActions={(record) => [
-              { id: 'edit', label: access.canEdit ? t('simpleCrud.actions.edit', 'Edit') : t('simpleCrud.actions.view', 'View'), icon: access.canEdit ? Pencil : SearchIcon, href: `/vendedores/${record.id}/editar`, visible: access.canEdit || access.canView },
-              { id: 'users', label: t('people.sellers.actions.linkedUsers', 'Linked users'), icon: Users, onClick: () => void openLinkedUsers(record), visible: access.canEdit || access.canView },
-              { id: 'delete', label: t('simpleCrud.actions.delete', 'Delete'), icon: Trash2, onClick: () => controller.setConfirmDeleteIds([record.id]), tone: 'danger', visible: access.canDelete },
+              { id: 'edit', label: access.canEdit ? t('simpleCrud.actions.edit', 'Editar') : t('simpleCrud.actions.view', 'Visualizar'), icon: access.canEdit ? Pencil : SearchIcon, href: `/vendedores/${record.id}/editar`, visible: access.canEdit || access.canView },
+              { id: 'users', label: t('people.sellers.actions.linkedUsers', 'Usu?rios vinculados'), icon: Users, onClick: () => void openLinkedUsers(record), visible: access.canEdit || access.canView },
+              { id: 'delete', label: t('simpleCrud.actions.delete', 'Excluir'), icon: Trash2, onClick: () => controller.setConfirmDeleteIds([record.id]), tone: 'danger', visible: access.canDelete },
             ]}
             selectable
             selectedIds={controller.tableState.selectedIds}
@@ -161,7 +161,7 @@ export function VendedoresListPage() {
             onToggleSelectAll={controller.tableState.toggleSelectAll}
             mobileCard={{ title: VENDEDORES_CONFIG.mobileTitle, subtitle: VENDEDORES_CONFIG.mobileSubtitle, meta: VENDEDORES_CONFIG.mobileMeta }}
             renderExpandedRow={VENDEDORES_CONFIG.details?.length ? (record) => (
-              <div className="grid gap-3 rounded-[1.1rem] border border-[#ebe4d8] bg-white p-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="app-pane grid gap-3 rounded-[1.1rem] border p-4 md:grid-cols-2 xl:grid-cols-3">
                 {VENDEDORES_CONFIG.details?.map((detail) => (
                   <div key={detail.key} className="text-sm text-slate-600">
                     <span className="font-semibold text-slate-900">{t(detail.labelKey, detail.label)}:</span> {detail.render(record)}
@@ -201,8 +201,8 @@ export function VendedoresListPage() {
 
       <ConfirmDialog
         open={Boolean(confirmUnlinkUserId)}
-        title={t('people.sellers.modals.unlinkConfirmTitle', 'Remover usuário vinculado?')}
-        description={t('people.sellers.modals.unlinkConfirmDescription', 'Essa ação remove o vínculo entre o usuário e o vendedor.')}
+        title={t('people.sellers.modals.unlinkConfirmTitle', 'Remover usu?rio vinculado?')}
+        description={t('people.sellers.modals.unlinkConfirmDescription', 'Essa a??o remove o v?nculo entre o usu?rio e o vendedor.')}
         confirmLabel={t('common.remove', 'Remover')}
         cancelLabel={t('common.cancel', 'Cancelar')}
         onClose={() => setConfirmUnlinkUserId(null)}
@@ -217,10 +217,10 @@ export function VendedoresListPage() {
         open={Boolean(controller.confirmDeleteIds?.length)}
         title={t('simpleCrud.confirmDeleteTitle', 'Delete record?')}
         description={controller.confirmDeleteIds && controller.confirmDeleteIds.length > 1
-          ? t('simpleCrud.confirmDeleteMany', 'The selected records will be deleted. This action cannot be undone.')
-          : t('simpleCrud.confirmDeleteSingle', 'The selected record will be deleted. This action cannot be undone.')}
-        confirmLabel={t('simpleCrud.actions.delete', 'Delete')}
-        cancelLabel={t('common.cancel', 'Cancel')}
+          ? t('simpleCrud.confirmDeleteMany', 'Os registros selecionados ser?o exclu?dos. Esta a??o n?o pode ser desfeita.')
+          : t('simpleCrud.confirmDeleteSingle', 'O registro selecionado ser? exclu?do. Esta a??o n?o pode ser desfeita.')}
+        confirmLabel={t('simpleCrud.actions.delete', 'Excluir')}
+        cancelLabel={t('common.cancel', 'Cancelar')}
         onClose={() => controller.setConfirmDeleteIds(null)}
         onConfirm={() => void controller.handleDelete(controller.confirmDeleteIds ?? [])}
       />

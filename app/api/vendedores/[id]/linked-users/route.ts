@@ -30,6 +30,46 @@ function extractFirstRecord(payload: unknown) {
   return null
 }
 
+async function loadVendedorRecord(id: string, session: NonNullable<Awaited<ReturnType<typeof readAuthSession>>>) {
+  const detailResult = await serverApiFetch(`vendedores/${id}`, {
+    method: 'GET',
+    token: session.token,
+    tenantId: session.currentTenantId,
+  })
+
+  if (detailResult.ok) {
+    return {
+      result: detailResult,
+      record: extractFirstRecord(detailResult.payload),
+    }
+  }
+
+  if (detailResult.status !== 404) {
+    return {
+      result: detailResult,
+      record: null,
+    }
+  }
+
+  const params = new URLSearchParams({
+    page: '1',
+    perpage: '1',
+    order: 'id',
+    sort: 'asc',
+    id,
+  })
+  const listResult = await serverApiFetch(`vendedores?${params.toString()}`, {
+    method: 'GET',
+    token: session.token,
+    tenantId: session.currentTenantId,
+  })
+
+  return {
+    result: listResult,
+    record: listResult.ok ? extractFirstRecord(listResult.payload) : null,
+  }
+}
+
 export async function GET(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const session = await readAuthSession()
   if (!session) {
@@ -37,18 +77,13 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
   }
 
   const { id } = await context.params
-  const vendedorResult = await serverApiFetch(`vendedores/${id}`, {
-    method: 'GET',
-    token: session.token,
-    tenantId: session.currentTenantId,
-  })
+  const { result: vendedorResult, record: vendedor } = await loadVendedorRecord(id, session)
 
   if (!vendedorResult.ok) {
     return NextResponse.json({ message: getErrorMessage(vendedorResult.payload, 'Nao foi possivel carregar o vendedor.') }, { status: vendedorResult.status || 400 })
   }
 
-  const vendedor = extractFirstRecord(vendedorResult.payload)
-  const userId = vendedor && typeof vendedor.id_usuario === 'string' ? vendedor.id_usuario : ''
+  const userId = vendedor && vendedor.id_usuario != null ? String(vendedor.id_usuario).trim() : ''
   if (!userId) {
     return NextResponse.json([])
   }
@@ -60,6 +95,10 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
   })
 
   if (!usuarioResult.ok) {
+    if (usuarioResult.status === 404) {
+      return NextResponse.json([])
+    }
+
     return NextResponse.json({ message: getErrorMessage(usuarioResult.payload, 'Nao foi possivel carregar os usuarios vinculados.') }, { status: usuarioResult.status || 400 })
   }
 
@@ -85,17 +124,12 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
   const { id } = await context.params
   const body = await request.json() as { userId?: string }
 
-  const vendedorResult = await serverApiFetch(`vendedores/${id}`, {
-    method: 'GET',
-    token: session.token,
-    tenantId: session.currentTenantId,
-  })
+  const { result: vendedorResult, record: vendedor } = await loadVendedorRecord(id, session)
 
   if (!vendedorResult.ok) {
     return NextResponse.json({ message: getErrorMessage(vendedorResult.payload, 'Nao foi possivel carregar o vendedor.') }, { status: vendedorResult.status || 400 })
   }
 
-  const vendedor = extractFirstRecord(vendedorResult.payload)
   if (!vendedor) {
     return NextResponse.json({ message: 'Vendedor nao encontrado.' }, { status: 404 })
   }
@@ -109,7 +143,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
   delete payload.updated_at
   delete payload.deleted_at
 
-  if (body.userId && String(vendedor.id_usuario || '') !== body.userId) {
+  if (body.userId && String(vendedor.id_usuario || '').trim() !== body.userId) {
     return NextResponse.json({ message: 'Usuario vinculado nao confere com o vendedor informado.' }, { status: 400 })
   }
 

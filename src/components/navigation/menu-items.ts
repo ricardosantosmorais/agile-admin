@@ -1,5 +1,3 @@
-'use client'
-
 import type { LucideIcon } from 'lucide-react'
 import {
   BadgePercent,
@@ -183,6 +181,7 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
   'configuracoes-vendedores-form': '/configuracoes/vendedores',
   'integracao-usuarios-list': '/api-de-integracao/aplicativos',
   'integracao-usuarios-form': '/api-de-integracao/aplicativos',
+  'integracao-atendimento-form': '/integracoes/atendimento',
   'cadastro-parametros-list': '/configuracoes/parametros',
   'cadastro-parametros-form': '/configuracoes/parametros',
   'parametros-empresa-list': '/configuracoes/parametros',

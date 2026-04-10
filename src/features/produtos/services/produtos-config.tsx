@@ -1,5 +1,3 @@
-'use client'
-
 import { StatusBadge } from '@/src/components/ui/status-badge'
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import { loadCatalogLookupOptions } from '@/src/features/catalog/services/catalog-lookups'

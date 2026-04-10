@@ -1,5 +1,3 @@
-'use client'
-
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'

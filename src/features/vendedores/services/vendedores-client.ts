@@ -1,5 +1,3 @@
-'use client'
-
 import { createCrudClient } from '@/src/components/crud-base/crud-client'
 import type { LookupOption } from '@/src/components/ui/lookup-select'
 import { httpClient } from '@/src/services/http/http-client'

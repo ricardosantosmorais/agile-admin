@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import { DEFAULT_USUARIOS_LIST_FILTERS } from '@/src/features/usuarios/services/usuarios-mappers'
 

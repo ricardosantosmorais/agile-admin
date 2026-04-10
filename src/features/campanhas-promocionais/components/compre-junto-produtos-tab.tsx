@@ -6,6 +6,7 @@ import { BooleanChoice } from '@/src/components/ui/boolean-choice'
 import { ConfirmDialog } from '@/src/components/ui/confirm-dialog'
 import { CrudModal } from '@/src/components/ui/crud-modal'
 import { FormField } from '@/src/components/ui/form-field'
+import { InputWithAffix } from '@/src/components/ui/input-with-affix'
 import { LookupSelect, type LookupOption } from '@/src/components/ui/lookup-select'
 import { StatusBadge } from '@/src/components/ui/status-badge'
 import { TooltipIconButton } from '@/src/components/ui/tooltip-icon-button'
@@ -145,7 +146,7 @@ export function CompreJuntoProdutosTab({
                     setSelectedIds([item.id_produto])
                     setConfirmOpen(true)
                   }}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-700"
+                  className="app-button-danger inline-flex h-9 w-9 items-center justify-center rounded-full p-0"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -166,7 +167,7 @@ export function CompreJuntoProdutosTab({
         onConfirm={() => void handleSave()}
       >
         <div className="grid gap-4 md:grid-cols-2">
-          {feedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{feedback}</div> : null}
+          {feedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{feedback}</div> : null}
 
           <FormField label={t('marketing.buyTogether.products.fields.main', 'Principal')}>
             <BooleanChoice value={draft.principal} onChange={(value) => setDraft((current) => ({ ...current, principal: value }))} trueLabel={t('common.yes', 'Sim')} falseLabel={t('common.no', 'Não')} />
@@ -195,27 +196,21 @@ export function CompreJuntoProdutosTab({
 
           <FormField label={t('marketing.buyTogether.products.fields.value', 'Valor')}>
             {draft.tipo === 'percentual' ? (
-              <div className="flex overflow-hidden rounded-[0.9rem] border border-[#e6dfd3] bg-white">
-                <input
-                  value={draft.valor}
-                  onChange={(event) => setDraft((current) => ({ ...current, valor: decimalMask(event.target.value) }))}
-                  className={`${inputClasses()} rounded-none border-0 shadow-none focus:ring-0`}
-                  inputMode="decimal"
-                  placeholder="0,00"
-                />
-                <span className="inline-flex items-center border-l border-[#e6dfd3] bg-[#fcfaf5] px-3 text-sm font-semibold text-slate-600">%</span>
-              </div>
+              <InputWithAffix
+                value={draft.valor}
+                onChange={(event) => setDraft((current) => ({ ...current, valor: decimalMask(event.target.value) }))}
+                suffix="%"
+                inputMode="decimal"
+                placeholder="0,00"
+              />
             ) : draft.tipo === 'valor_fixo' ? (
-              <div className="flex overflow-hidden rounded-[0.9rem] border border-[#e6dfd3] bg-white">
-                <span className="inline-flex items-center border-r border-[#e6dfd3] bg-[#fcfaf5] px-3 text-sm font-semibold text-slate-600">R$</span>
-                <input
-                  value={draft.valor}
-                  onChange={(event) => setDraft((current) => ({ ...current, valor: currencyMask(event.target.value) }))}
-                  className={`${inputClasses()} rounded-none border-0 shadow-none focus:ring-0`}
-                  inputMode="decimal"
-                  placeholder="0,00"
-                />
-              </div>
+              <InputWithAffix
+                value={draft.valor}
+                onChange={(event) => setDraft((current) => ({ ...current, valor: currencyMask(event.target.value) }))}
+                prefix="R$"
+                inputMode="decimal"
+                placeholder="0,00"
+              />
             ) : (
               <input
                 value={draft.valor}

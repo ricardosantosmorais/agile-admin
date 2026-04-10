@@ -64,7 +64,7 @@ export function PageHeader({ title, actions, breadcrumbs }: PageHeaderProps) {
   }
 
   return (
-    <div className="rounded-[1.45rem] border border-[#ebe6d8] bg-white px-5 py-3.5 shadow-[0_16px_40px_rgba(15,23,42,0.06)] md:px-6">
+    <div className="app-shell-card-modern rounded-[1.45rem] px-5 py-3.5 md:px-6">
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <nav className="flex min-w-0 flex-wrap items-center gap-1.5 text-[13px] leading-5">
           {breadcrumbItems.map((item, index) => {

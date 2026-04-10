@@ -67,21 +67,29 @@ async function loadLookup(resource: LookupResource, query: string, page: number,
 
 function ListMetricCard({ label, value, helper, icon, tone = 'slate' }: ListMetricCardProps) {
   const toneClasses = {
-    slate: 'border-slate-200 bg-slate-50/80 text-slate-700',
-    emerald: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-    amber: 'border-amber-200 bg-amber-50 text-amber-700',
-    sky: 'border-sky-200 bg-sky-50 text-sky-700',
+    slate: 'app-stat-card-icon text-slate-300',
+    emerald: 'app-stat-card-icon app-stat-card-icon-emerald',
+    amber: 'app-stat-card-icon app-stat-card-icon-amber',
+    sky: 'app-stat-card-icon app-stat-card-icon-sky',
+  }
+
+  const accentClasses = {
+    slate: 'app-stat-card-accent app-stat-card-accent-sky',
+    emerald: 'app-stat-card-accent app-stat-card-accent-emerald',
+    amber: 'app-stat-card-accent app-stat-card-accent-amber',
+    sky: 'app-stat-card-accent app-stat-card-accent-sky',
   }
 
   return (
-    <div className="rounded-[1.2rem] border border-[#e8e2d7] bg-white px-5 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+    <div className="app-stat-card relative overflow-hidden rounded-[1.2rem] px-5 py-4">
+      <div className={accentClasses[tone]} aria-hidden="true" />
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
-          <div className="mt-2 text-lg font-bold tracking-tight text-slate-950">{value}</div>
+          <div className="mt-2 text-lg font-bold tracking-tight text-[color:var(--app-text)]">{value}</div>
           {helper ? <p className="mt-1 text-sm text-slate-500">{helper}</p> : null}
         </div>
-        <div className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl border ${toneClasses[tone]}`}>
+        <div className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl ${toneClasses[tone]}`}>
           {icon}
         </div>
       </div>

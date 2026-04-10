@@ -1,5 +1,3 @@
-'use client'
-
 export type CatalogLookupOption = {
   id: string
   label: string

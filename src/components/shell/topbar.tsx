@@ -60,7 +60,7 @@ function IconTooltipButton({
         type="button"
         onClick={onClick}
         className={[
-          'flex h-10 w-10 items-center justify-center rounded-2xl border border-[#e7e0d1] bg-white text-slate-600 transition hover:border-accent/20 hover:text-accent',
+          'app-button-secondary flex h-10 w-10 items-center justify-center rounded-2xl text-[color:var(--app-muted)] transition hover:border-accent/20 hover:text-accent',
           className,
         ].join(' ')}
         aria-label={label}
@@ -206,7 +206,7 @@ export function Topbar() {
 
         setNotifications([])
         setPendingReadReceipts([])
-        setNotificationsError(error instanceof Error ? error.message : 'Nao foi possivel carregar as notificacoes.')
+        setNotificationsError(error instanceof Error ? error.message : 'Não foi possível carregar as notificações.')
       } finally {
         if (isMounted) {
           setNotificationsLoading(false)
@@ -265,13 +265,13 @@ export function Topbar() {
 
   return (
     <>
-      <header ref={rootRef} className="relative z-[1] rounded-[1.45rem] border border-[#ebe6d8] bg-white px-3 py-3 shadow-[0_16px_40px_rgba(15,23,42,0.06)] lg:px-3.5">
+      <header ref={rootRef} className="app-shell-card-modern relative z-[1] rounded-[1.45rem] px-3 py-3 lg:px-3.5">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex min-w-0 items-start gap-2.5 lg:items-center xl:flex-1">
             <button
               type="button"
               onClick={toggleSidebar}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#e7e0d1] bg-white text-slate-600 transition hover:border-accent/20 hover:text-accent"
+              className="app-button-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-[color:var(--app-muted)] transition hover:border-accent/20 hover:text-accent"
               aria-label={t('shell.toggleSidebar')}
             >
               <Menu className="h-4 w-4" />
@@ -281,7 +281,7 @@ export function Topbar() {
               <button
                 type="button"
                 onClick={() => togglePanel('tenant')}
-                className="flex h-10 w-full items-center justify-between rounded-2xl border border-[#e7e0d1] bg-[#fdfcf8] px-3 text-left transition hover:border-accent/20"
+                className="app-control-muted flex h-10 w-full items-center justify-between rounded-2xl px-3 text-left transition hover:border-accent/20"
               >
                 <p className="truncate pr-3 text-[13px] font-semibold text-slate-900">
                   {getTenantOptionLabel(currentTenant.nome, currentTenant.id, user?.master ?? false)}
@@ -290,9 +290,9 @@ export function Topbar() {
               </button>
 
               {activePanel === 'tenant' ? (
-                <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-full overflow-hidden rounded-[1.5rem] border border-line bg-white p-2 shadow-2xl">
+                <div className="app-shell-card-modern absolute right-0 top-[calc(100%+0.5rem)] z-50 w-full overflow-hidden rounded-[1.5rem] p-2 shadow-2xl">
                   <div className="px-2 pb-2">
-                    <div className="flex items-center gap-2 rounded-2xl border border-[#e7e0d1] bg-[#fdfcf8] px-3 py-2">
+                    <div className="app-control-muted flex items-center gap-2 rounded-2xl px-3 py-2">
                       <Search className="h-4 w-4 text-slate-400" />
                       <input
                         value={tenantSearchTerm}
@@ -323,7 +323,7 @@ export function Topbar() {
                           }}
                           className={[
                             'flex w-full items-center justify-between gap-3 rounded-2xl px-3 py-3 text-left text-sm transition',
-                            isActive ? 'bg-[#edf8f3] text-accent' : 'hover:bg-surface',
+                            isActive ? 'app-nav-group-active' : 'app-nav-hover',
                           ].join(' ')}
                         >
                           <div className="min-w-0">
@@ -346,7 +346,7 @@ export function Topbar() {
             </div>
 
             <div className="relative hidden min-w-0 flex-1 lg:block xl:max-w-[420px]">
-              <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-[#e7e0d1] bg-[#fdfcf8] px-3.5 py-2.5">
+              <div className="app-control-muted flex min-w-0 items-center gap-3 rounded-2xl px-3.5 py-2.5">
                 <Search className="h-4 w-4 shrink-0 text-slate-400" />
                 <input
                   value={searchTerm}
@@ -361,7 +361,7 @@ export function Topbar() {
               </div>
 
               {activePanel === 'search' ? (
-                <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-50 overflow-hidden rounded-[1.5rem] border border-line bg-white p-2 shadow-2xl">
+                <div className="app-shell-card-modern absolute left-0 right-0 top-[calc(100%+0.5rem)] z-50 overflow-hidden rounded-[1.5rem] p-2 shadow-2xl">
                   <div className="max-h-[360px] overflow-y-auto">
                     {filteredQuickAccessItems.length ? (
                       filteredQuickAccessItems.map((item) => {
@@ -435,7 +435,7 @@ export function Topbar() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap xl:ml-4 xl:shrink-0">
-            <div className="flex items-center overflow-hidden rounded-2xl border border-[#e7e0d1] bg-white p-1">
+            <div className="app-control flex items-center overflow-hidden rounded-2xl p-1">
               {SUPPORTED_LOCALES.map((supportedLocale) => (
                 <button
                   key={supportedLocale}
@@ -480,9 +480,9 @@ export function Topbar() {
               <button
                 type="button"
                 onClick={() => togglePanel('user')}
-                className="flex h-10 items-center gap-2 rounded-2xl border border-[#e7e0d1] bg-white px-2 text-left text-slate-900 transition hover:border-accent/20 sm:px-3"
+                className="app-control flex h-10 items-center gap-2 rounded-2xl px-2 text-left text-[color:var(--app-text)] transition hover:border-accent/20 sm:px-3"
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#eff7f3] text-[13px] font-extrabold text-accent">
+                <div className="app-accent-panel flex h-8 w-8 items-center justify-center rounded-xl text-[13px] font-extrabold text-accent">
                   {user?.avatarFallback ?? 'U'}
                 </div>
                 <div className="hidden min-w-0 xl:block">
@@ -493,7 +493,7 @@ export function Topbar() {
               </button>
 
               {activePanel === 'history' ? (
-                <div className="absolute right-[7.5rem] top-12 z-50 w-[320px] rounded-[1.5rem] border border-line bg-white p-4 shadow-2xl">
+                <div className="app-shell-card-modern absolute right-[7.5rem] top-12 z-50 w-[320px] rounded-[1.5rem] p-4 shadow-2xl">
                   <div className="mb-3 flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accentSoft text-accent">
                       <History className="h-4 w-4" />
@@ -518,7 +518,7 @@ export function Topbar() {
               ) : null}
 
               {activePanel === 'user' ? (
-                <div className="absolute right-0 top-12 z-50 w-[min(92vw,360px)] rounded-[1.5rem] border border-line bg-white p-4 shadow-2xl">
+                <div className="app-shell-card-modern absolute right-0 top-12 z-50 w-[min(92vw,360px)] rounded-[1.5rem] p-4 shadow-2xl">
                   <div className="rounded-[1.25rem] bg-slate-950 px-4 py-4 text-white">
                     <p className="text-base font-bold">{user?.nome}</p>
                     <p className="mt-1 text-sm text-slate-300">{user?.email}</p>
@@ -587,7 +587,7 @@ export function Topbar() {
           onClick={() => setActivePanel('none')}
         >
           <div
-            className="w-full max-w-[420px] rounded-[2rem] border border-line bg-white p-5 shadow-2xl"
+            className="app-shell-card-modern w-full max-w-[420px] rounded-[2rem] p-5 shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between gap-3">

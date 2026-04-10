@@ -1,5 +1,3 @@
-'use client'
-
 import { createCrudClient } from '@/src/components/crud-base/crud-client'
 import type { BannerUrlRecord, BannerUniverseRecord } from '@/src/features/banners/types/banners-relations'
 import { httpClient } from '@/src/services/http/http-client'

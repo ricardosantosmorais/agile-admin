@@ -23,6 +23,8 @@ function getRowId(item: CondicaoPagamentoFilialRecord) {
   return `${item.id_condicao_pagamento}:${item.id_filial}`
 }
 
+const feedbackClasses = 'app-error-panel rounded-[1rem] px-4 py-3 text-sm'
+
 export function CondicoesPagamentoFiliaisTab({
   condicaoPagamentoId,
   items,
@@ -111,7 +113,7 @@ export function CondicoesPagamentoFiliaisTab({
         onConfirm={() => void handleCreate()}
         isSaving={isSaving}
       >
-        {feedback ? <div className="rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{feedback}</div> : null}
+        {feedback ? <div className={feedbackClasses}>{feedback}</div> : null}
         <FormField label={t('financial.common.branch', 'Filial')}>
           <LookupSelect
             label={t('financial.common.branch', 'Filial')}

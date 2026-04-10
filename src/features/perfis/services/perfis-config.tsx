@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import { StatusBadge } from '@/src/components/ui/status-badge'
 import { DEFAULT_PERFIL_LIST_FILTERS } from '@/src/features/perfis/services/perfis-mappers'

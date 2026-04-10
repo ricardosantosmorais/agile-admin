@@ -1,5 +1,3 @@
-ï»¿'use client'
-
 import { FileSearch, Lock } from 'lucide-react'
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 
@@ -65,15 +63,15 @@ export const FORMULARIOS_CONFIG: CrudModuleConfig = {
   routeBase: '/formularios',
   featureKey: 'formularios',
   listTitleKey: 'maintenance.forms.title',
-  listTitle: 'FormulÃ¡rios',
+  listTitle: 'Formulários',
   listDescriptionKey: 'maintenance.forms.listDescription',
-  listDescription: 'Listagem com cÃ³digo, nome e status ativo do formulÃ¡rio.',
+  listDescription: 'Listagem com código, nome e status ativo do formulário.',
   formTitleKey: 'maintenance.forms.formTitle',
-  formTitle: 'FormulÃ¡rio',
+  formTitle: 'Formulário',
   breadcrumbSectionKey: 'routes.manutencao',
-  breadcrumbSection: 'ManutenÃ§Ã£o',
+  breadcrumbSection: 'Manutenção',
   breadcrumbModuleKey: 'routes.formularios',
-  breadcrumbModule: 'FormulÃ¡rios',
+  breadcrumbModule: 'Formulários',
   defaultFilters: {
     page: 1,
     perPage: 15,
@@ -87,7 +85,7 @@ export const FORMULARIOS_CONFIG: CrudModuleConfig = {
   listEmbed: 'url',
   columns: [
     { id: 'id', labelKey: 'simpleCrud.fields.id', label: 'ID', sortKey: 'id', thClassName: 'w-[90px]', filter: { kind: 'text', key: 'id', inputMode: 'numeric' } },
-    { id: 'codigo', labelKey: 'maintenance.forms.fields.code', label: 'CÃ³digo', sortKey: 'codigo', thClassName: 'w-[180px]', filter: { kind: 'text', key: 'codigo' } },
+    { id: 'codigo', labelKey: 'maintenance.forms.fields.code', label: 'Código', sortKey: 'codigo', thClassName: 'w-[180px]', filter: { kind: 'text', key: 'codigo' } },
     {
       id: 'titulo',
       labelKey: 'maintenance.forms.fields.title',
@@ -134,7 +132,7 @@ export const FORMULARIOS_CONFIG: CrudModuleConfig = {
         key: 'ativo',
         options: [
           { value: '1', labelKey: 'common.yes', label: 'Sim' },
-          { value: '0', labelKey: 'common.no', label: 'NÃ£o' },
+          { value: '0', labelKey: 'common.no', label: 'Não' },
         ],
       },
     },
@@ -150,13 +148,13 @@ export const FORMULARIOS_CONFIG: CrudModuleConfig = {
       layout: 'rows',
       fields: [
         { key: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', type: 'toggle', defaultValue: true },
-        { key: 'menu', labelKey: 'maintenance.forms.fields.userMenu', label: 'Menu do UsuÃ¡rio', type: 'toggle', defaultValue: false, disabled: ({ form }) => isProtectedForm(form) },
-        { key: 'codigo', labelKey: 'maintenance.forms.fields.code', label: 'CÃ³digo', type: 'text', maxLength: 32, disabled: ({ form }) => isProtectedForm(form) },
-        { key: 'titulo', labelKey: 'maintenance.forms.fields.title', label: 'TÃ­tulo', type: 'text', required: true, maxLength: 255 },
-        { key: 'icone', labelKey: 'maintenance.forms.fields.icon', label: 'Ãcone', type: 'text', maxLength: 255 },
+        { key: 'menu', labelKey: 'maintenance.forms.fields.userMenu', label: 'Menu do Usuário', type: 'toggle', defaultValue: false, disabled: ({ form }) => isProtectedForm(form) },
+        { key: 'codigo', labelKey: 'maintenance.forms.fields.code', label: 'Código', type: 'text', maxLength: 32, disabled: ({ form }) => isProtectedForm(form) },
+        { key: 'titulo', labelKey: 'maintenance.forms.fields.title', label: 'Título', type: 'text', required: true, maxLength: 255 },
+        { key: 'icone', labelKey: 'maintenance.forms.fields.icon', label: 'Ícone', type: 'text', maxLength: 255 },
         { key: 'mensagem_alerta', labelKey: 'maintenance.forms.fields.alertMessage', label: 'Mensagem de alerta', type: 'text', maxLength: 255 },
-        { key: 'mensagem_confirmacao', labelKey: 'maintenance.forms.fields.confirmationMessage', label: 'Mensagem de confirmaÃ§Ã£o', type: 'text', maxLength: 255 },
-        { key: 'instrucoes', labelKey: 'maintenance.forms.fields.instructions', label: 'InstruÃ§Ãµes', type: 'textarea', rows: 5 },
+        { key: 'mensagem_confirmacao', labelKey: 'maintenance.forms.fields.confirmationMessage', label: 'Mensagem de confirmação', type: 'text', maxLength: 255 },
+        { key: 'instrucoes', labelKey: 'maintenance.forms.fields.instructions', label: 'Instruções', type: 'textarea', rows: 5 },
       ],
     },
   ],

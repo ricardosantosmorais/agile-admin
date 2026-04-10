@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { CrudListPage } from '@/src/components/crud-base/crud-list-page'
 import { formulariosClient } from '@/src/features/formularios/services/formularios-client'

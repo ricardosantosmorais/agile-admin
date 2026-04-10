@@ -49,7 +49,7 @@ export function VendedorCanaisTab({
 
   async function handleCreate() {
     if (!draft.canal) {
-      setModalFeedback(t('people.sellers.channels.validation.channel', 'Select the distribution channel to include.'))
+      setModalFeedback(t('people.sellers.channels.validation.channel', 'Selecione o canal de distribui??o para incluir.'))
       return
     }
 
@@ -62,7 +62,7 @@ export function VendedorCanaisTab({
       onError(null)
       closeModal()
     } catch (error) {
-      setModalFeedback(error instanceof Error ? error.message : t('people.sellers.channels.saveError', 'Could not link the distribution channel.'))
+      setModalFeedback(error instanceof Error ? error.message : t('people.sellers.channels.saveError', 'N?o foi poss?vel vincular o canal de distribui??o.'))
     }
   }
 
@@ -74,14 +74,14 @@ export function VendedorCanaisTab({
       await onRefresh()
       onError(null)
     } catch (error) {
-      onError(error instanceof Error ? error.message : t('people.sellers.channels.deleteError', 'Could not remove the selected channels.'))
+      onError(error instanceof Error ? error.message : t('people.sellers.channels.deleteError', 'N?o foi poss?vel remover os canais selecionados.'))
     }
   }
 
   return (
     <>
       <SectionCard
-        title={t('people.sellers.tabs.channels', 'Distribution channels')}
+        title={t('people.sellers.tabs.channels', 'Canais de distribui??o')}
         action={!readOnly ? (
           <RelationActions
             hasSelection={selectedIds.length > 0}
@@ -102,11 +102,11 @@ export function VendedorCanaisTab({
           emptyMessage={t('people.sellers.channels.empty', 'There are no distribution channels linked to this seller yet.')}
           columns={[
             {
-              header: t('people.sellers.fields.distributionChannel', 'Distribution channel'),
+              header: t('people.sellers.fields.distributionChannel', 'Canal de distribui??o'),
               render: (item) => item.canal_distribuicao?.nome || item.id_canal_distribuicao,
             },
             {
-              header: t('people.sellers.fields.creditLimit', 'Credit limit'),
+              header: t('people.sellers.fields.creditLimit', 'Limite de cr?dito'),
               headerClassName: 'w-[180px]',
               render: (item) => formatNullableCurrency(item.limite_credito),
             },
@@ -114,19 +114,19 @@ export function VendedorCanaisTab({
         />
       </SectionCard>
 
-      <CrudModal open={modalOpen} title={t('people.sellers.channels.includeTitle', 'Include distribution channel')} onClose={closeModal} onConfirm={() => void handleCreate()}>
+      <CrudModal open={modalOpen} title={t('people.sellers.channels.includeTitle', 'Incluir canal de distribui??o')} onClose={closeModal} onConfirm={() => void handleCreate()}>
         <div className="grid gap-4 md:grid-cols-2">
-          {modalFeedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{modalFeedback}</div> : null}
-          <Field label={t('people.sellers.fields.distributionChannel', 'Distribution channel')}>
+          {modalFeedback ? <div className="app-error-panel md:col-span-2 rounded-[1rem] px-4 py-3 text-sm">{modalFeedback}</div> : null}
+          <Field label={t('people.sellers.fields.distributionChannel', 'Canal de distribui??o')}>
             <LookupSelect
-              label={t('people.sellers.fields.distributionChannel', 'Distribution channel')}
+              label={t('people.sellers.fields.distributionChannel', 'Canal de distribui??o')}
               value={draft.canal}
               onChange={(value) => setDraft((current) => ({ ...current, canal: value }))}
               loadOptions={(query, page, perPage) => loadVendedorLookup('canais_distribuicao', query, page, perPage)}
               disabled={readOnly}
             />
           </Field>
-          <Field label={t('people.sellers.fields.creditLimit', 'Credit limit')}>
+          <Field label={t('people.sellers.fields.creditLimit', 'Limite de cr?dito')}>
             <input
               value={draft.limiteCredito}
               onChange={(event) => setDraft((current) => ({ ...current, limiteCredito: currencyMask(event.target.value) }))}
@@ -141,9 +141,9 @@ export function VendedorCanaisTab({
 
       <ConfirmDialog
         open={confirmOpen}
-        title={t('people.sellers.channels.deleteTitle', 'Delete linked channels')}
-        description={t('people.sellers.channels.deleteDescription', 'The selected channels will be removed from this seller.')}
-        confirmLabel={t('common.delete', 'Delete')}
+        title={t('people.sellers.channels.deleteTitle', 'Excluir canais vinculados')}
+        description={t('people.sellers.channels.deleteDescription', 'Os canais selecionados ser?o removidos deste vendedor.')}
+        confirmLabel={t('common.delete', 'Excluir')}
         onClose={() => setConfirmOpen(false)}
         onConfirm={() => void handleDelete()}
       />

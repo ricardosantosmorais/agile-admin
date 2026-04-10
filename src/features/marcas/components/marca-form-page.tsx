@@ -17,7 +17,7 @@ export function MarcaFormPage({ id }: { id?: string }) {
       config={MARCAS_CONFIG}
       client={marcasClient}
       id={id}
-      formEmbed="universos.canal_distribuicao,universos.filial,universos.grupo,universos.rede,universos.segmento,universos.tabela_preco"
+      formEmbed="url,universos.canal_distribuicao,universos.filial,universos.grupo,universos.rede,universos.segmento,universos.tabela_preco"
       tabs={[
         {
           key: 'general',

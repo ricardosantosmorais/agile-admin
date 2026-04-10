@@ -20,10 +20,10 @@ export function CurrencyInput({
 }: CurrencyInputProps) {
   return (
     <div
-      className="flex overflow-hidden rounded-[0.9rem] border border-[#e6dfd3] bg-white"
+      className="app-control flex overflow-hidden rounded-[0.9rem]"
       onClick={(event) => event.stopPropagation()}
     >
-      <span className="inline-flex items-center border-r border-[#e6dfd3] bg-[#fcfaf5] px-3 text-sm font-semibold text-slate-600">
+      <span className="app-control-muted inline-flex items-center border-r border-[color:var(--app-control-border)] px-3 text-sm font-semibold text-[color:var(--app-muted)]">
         {prefix}
       </span>
       <div className="min-w-0 flex-1 [&>input]:rounded-none [&>input]:border-0 [&>input]:shadow-none [&>input]:focus:ring-0">

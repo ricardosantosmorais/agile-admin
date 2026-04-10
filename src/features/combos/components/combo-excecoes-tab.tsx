@@ -337,7 +337,11 @@ export function ComboExcecoesTab({
             render: (item) => !readOnly ? (
               <div className="flex items-center gap-2">
                 <TooltipIconButton label={t('simpleCrud.actions.edit', 'Editar')}>
-                  <button type="button" onClick={() => openEditModal(item)} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#e6dfd3] bg-white text-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => openEditModal(item)}
+                    className="app-button-secondary inline-flex h-9 w-9 items-center justify-center rounded-full p-0"
+                  >
                     <Pencil className="h-4 w-4" />
                   </button>
                 </TooltipIconButton>
@@ -348,7 +352,7 @@ export function ComboExcecoesTab({
                       setSelectedIds([item.id])
                       setConfirmOpen(true)
                     }}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-700"
+                    className="app-button-danger inline-flex h-9 w-9 items-center justify-center rounded-full p-0"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -368,7 +372,7 @@ export function ComboExcecoesTab({
         onConfirm={() => void handleSave()}
       >
         <div className="grid gap-4 md:grid-cols-2">
-          {modalFeedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{modalFeedback}</div> : null}
+          {modalFeedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{modalFeedback}</div> : null}
 
           <FormField label={t('marketing.combos.tabs.common.type', 'Tipo')}>
             <select

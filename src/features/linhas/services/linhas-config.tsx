@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 
 export const LINHAS_CONFIG: CrudModuleConfig = {

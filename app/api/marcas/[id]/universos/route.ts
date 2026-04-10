@@ -38,6 +38,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
   return NextResponse.json(result.payload)
 }
 
+
 export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const session = await readAuthSession()
   if (!session) return NextResponse.json({ message: 'Sessao expirada.' }, { status: 401 })

@@ -15,19 +15,19 @@ export function ClienteAdicionaisTab({ formularios }: ClienteAdicionaisTabProps)
     <SectionCard title={t('clientes.form.additional.title', 'Additional data')}>
       <div className="space-y-4">
         {formularios.map((formulario) => (
-          <div key={`${formulario.id}-${formulario.title}`} className="rounded-[1.3rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
-            <h3 className="text-base font-black tracking-tight text-slate-950">{formulario.title}</h3>
-            <p className="mb-4 text-sm text-slate-500">{formulario.date || '-'}</p>
+          <div key={`${formulario.id}-${formulario.title}`} className="app-pane-muted rounded-[1.3rem] border p-4">
+            <h3 className="text-base font-black tracking-tight text-[var(--app-text)]">{formulario.title}</h3>
+            <p className="mb-4 text-sm text-[var(--app-muted)]">{formulario.date || '-'}</p>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {formulario.fields.map((field) => (
-                <div key={`${formulario.id}-${field.label}`} className="rounded-[1rem] border border-white bg-white px-4 py-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{field.label}</p>
+                <div key={`${formulario.id}-${field.label}`} className="app-pane rounded-[1rem] border px-4 py-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">{field.label}</p>
                   {field.type === 'arquivo' && field.fileUrl ? (
                     <a href={field.fileUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex text-sm font-semibold text-accent">
                       {t('clientes.form.additional.viewFile', 'View file')}
                     </a>
                   ) : (
-                    <p className="mt-2 text-sm text-slate-700">{field.value || '-'}</p>
+                    <p className="mt-2 text-sm text-[var(--app-text)]">{field.value || '-'}</p>
                   )}
                 </div>
               ))}

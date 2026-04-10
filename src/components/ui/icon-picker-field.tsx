@@ -113,20 +113,20 @@ export function IconPickerField({
     <>
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-[1rem] border border-[#e6dfd3] bg-white">
+          <div className="app-pane flex h-12 w-12 items-center justify-center overflow-hidden rounded-[1rem] border border-[color:var(--app-card-border)]">
             {isImageValue(value) ? (
               <img src={value} alt="" className="h-full w-full object-cover" />
             ) : currentOption ? (
-              <IconPreview icon={currentOption.icon} className="h-5 w-5 text-slate-700" />
+              <IconPreview icon={currentOption.icon} className="h-5 w-5 text-[color:var(--app-text)]" />
             ) : (
-              <ImageIcon className="h-5 w-5 text-slate-300" />
+              <ImageIcon className="h-5 w-5 text-[color:var(--app-muted)]" />
             )}
           </div>
           <button
             type="button"
             disabled={disabled}
             onClick={() => setOpen(true)}
-            className="inline-flex items-center rounded-full border border-[#e6dfd3] bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="app-button-secondary inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
           >
             {t('catalog.fields.selectIcon', 'Selecionar ícone')}
           </button>
@@ -155,7 +155,7 @@ export function IconPickerField({
             />
           </div>
 
-          <div className="grid max-h-[340px] grid-cols-3 gap-3 overflow-y-auto rounded-[1rem] border border-[#ece5d9] bg-[#fcfaf5] p-3 md:grid-cols-5 xl:grid-cols-6">
+          <div className="app-pane-muted grid max-h-[340px] grid-cols-3 gap-3 overflow-y-auto rounded-[1rem] border border-[color:var(--app-card-border)] p-3 md:grid-cols-5 xl:grid-cols-6">
             {filteredOptions.map((option) => (
               <button
                 key={option.key}
@@ -166,7 +166,9 @@ export function IconPickerField({
                 }}
                 className={[
                   'flex min-h-[84px] flex-col items-center justify-center gap-2 rounded-[0.9rem] border px-2 py-3 text-center text-xs transition',
-                  value === option.key ? 'border-slate-900 bg-slate-900 text-white' : 'border-[#e6dfd3] bg-white text-slate-700 hover:border-slate-300',
+                  value === option.key
+                    ? 'app-button-primary border-transparent text-white'
+                    : 'app-pane border-[color:var(--app-card-border)] text-[color:var(--app-text)] hover:border-[color:var(--app-control-border-strong)]',
                 ].join(' ')}
               >
                 <IconPreview icon={option.icon} className="h-5 w-5" />
@@ -188,7 +190,7 @@ export function IconPickerField({
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="inline-flex items-center rounded-full border border-[#e6dfd3] bg-white px-4 py-2.5 text-sm font-semibold text-slate-700"
+              className="app-button-secondary inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
             >
               {t('common.close', 'Fechar')}
             </button>

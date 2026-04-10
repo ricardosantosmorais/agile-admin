@@ -32,7 +32,7 @@ export function VendedorLinkedUsersModal({
   return (
     <OverlayModal
       open={open}
-      title={vendedorNome ? `${t('people.sellers.modals.linkedUsersTitle', 'Linked users')} - ${vendedorNome}` : t('people.sellers.modals.linkedUsersTitle', 'Linked users')}
+      title={vendedorNome ? `${t('people.sellers.modals.linkedUsersTitle', 'Usu?rios vinculados')} - ${vendedorNome}` : t('people.sellers.modals.linkedUsersTitle', 'Usu?rios vinculados')}
       onClose={onClose}
     >
       <AsyncState isLoading={isLoading} error={error}>
@@ -40,26 +40,26 @@ export function VendedorLinkedUsersModal({
           {users.length ? users.map((user) => (
             <div
               key={user.idUsuario}
-              className="flex flex-col gap-3 rounded-[1.1rem] border border-[#ece5d9] bg-[#fcfaf5] px-4 py-3 md:flex-row md:items-center md:justify-between"
+              className="app-pane-muted flex flex-col gap-3 rounded-[1.1rem] border px-4 py-3 md:flex-row md:items-center md:justify-between"
             >
               <div>
-                <p className="text-sm font-semibold text-slate-950">{user.email || '-'}</p>
-                <p className="mt-1 text-xs text-slate-500">{user.nome || '-'}</p>
+                <p className="text-sm font-semibold text-[var(--app-text)]">{user.email || '-'}</p>
+                <p className="mt-1 text-xs text-[var(--app-muted)]">{user.nome || '-'}</p>
               </div>
               {canDelete ? (
                 <button
                   type="button"
                   onClick={() => onRemove(user.idUsuario)}
-                  className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-700"
+                  className="app-button-danger inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
                 >
                   <Trash2 className="h-4 w-4" />
-                  {t('common.remove', 'Remove')}
+                  {t('common.remove', 'Remover')}
                 </button>
               ) : null}
             </div>
           )) : (
-            <div className="rounded-[1rem] border border-dashed border-[#e6dfd3] px-4 py-6 text-center text-sm text-slate-500">
-              {t('people.sellers.modals.linkedUsersEmpty', 'There are no users linked to this seller.')}
+            <div className="rounded-[1rem] border border-dashed border-[var(--app-border)] px-4 py-6 text-center text-sm text-[var(--app-muted)]">
+              {t('people.sellers.modals.linkedUsersEmpty', 'N?o h? usu?rios vinculados a este vendedor.')}
             </div>
           )}
         </div>

@@ -5,6 +5,7 @@ import { ConfirmDialog } from '@/src/components/ui/confirm-dialog'
 import { CrudModal } from '@/src/components/ui/crud-modal'
 import { CurrencyInput } from '@/src/components/ui/currency-input'
 import { FormField } from '@/src/components/ui/form-field'
+import { inputClasses } from '@/src/components/ui/input-styles'
 import { StatusBadge } from '@/src/components/ui/status-badge'
 import { ClienteRelationSection } from '@/src/features/clientes/components/cliente-relation-section'
 import { CatalogLookupSelect } from '@/src/features/catalog/components/catalog-lookup-select'
@@ -226,7 +227,7 @@ export function ProdutoFiliaisTab({
                 <button
                   type="button"
                   onClick={() => openEdit(item)}
-                  className="inline-flex items-center rounded-full border border-line bg-white px-3 py-1.5 text-sm font-semibold text-slate-700"
+                  className="app-button-secondary inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold"
                 >
                   {t('simpleCrud.actions.edit', 'Editar')}
                 </button>
@@ -240,7 +241,7 @@ export function ProdutoFiliaisTab({
                 <button
                   type="button"
                   onClick={() => setConfirmOpen(true)}
-                  className="inline-flex items-center rounded-full border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-700"
+                  className="app-button-danger inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
                 >
                   {t('common.delete', 'Excluir')}
                 </button>
@@ -248,7 +249,7 @@ export function ProdutoFiliaisTab({
               <button
                 type="button"
                 onClick={openCreate}
-                className="inline-flex items-center rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-slate-700"
+                className="app-button-primary inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
               >
                 {t('common.new', 'Novo')}
               </button>
@@ -265,7 +266,7 @@ export function ProdutoFiliaisTab({
       >
         <div className="grid gap-4 md:grid-cols-2">
           {modalFeedback ? (
-            <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            <div className="md:col-span-2 rounded-[1rem] border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
               {modalFeedback}
             </div>
           ) : null}
@@ -301,7 +302,7 @@ export function ProdutoFiliaisTab({
               type="number"
               value={draft.estoqueDisponivel}
               onChange={(event) => setDraft((current) => ({ ...current, estoqueDisponivel: event.target.value }))}
-              className="h-[46px] w-full rounded-[1rem] border border-[#e6dfd3] bg-white px-3.5 text-sm text-slate-900"
+              className={inputClasses()}
             />
           </FormField>
           <FormField label={t('priceStock.productBranches.fields.price', 'Preço')}>
@@ -314,7 +315,7 @@ export function ProdutoFiliaisTab({
             <select
               value={draft.status}
               onChange={(event) => setDraft((current) => ({ ...current, status: event.target.value }))}
-              className="h-[46px] w-full rounded-[1rem] border border-[#e6dfd3] bg-white px-3.5 text-sm text-slate-900"
+              className={inputClasses()}
             >
               <option value="disponivel">Disponível</option>
               <option value="indisponivel">Indisponível</option>
@@ -326,7 +327,7 @@ export function ProdutoFiliaisTab({
             <select
               value={draft.ativo ? '1' : '0'}
               onChange={(event) => setDraft((current) => ({ ...current, ativo: event.target.value === '1' }))}
-              className="h-[46px] w-full rounded-[1rem] border border-[#e6dfd3] bg-white px-3.5 text-sm text-slate-900"
+              className={inputClasses()}
             >
               <option value="1">Sim</option>
               <option value="0">Não</option>

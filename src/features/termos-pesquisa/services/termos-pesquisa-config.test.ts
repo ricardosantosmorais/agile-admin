@@ -11,8 +11,8 @@ describe('termos pesquisa config', () => {
 
   it('trims terms and result before save', () => {
     const payload = TERMOS_PESQUISA_CONFIG.beforeSave?.({
-      termos: '  piso, porcelanato  ',
-      resultado: '  piso porcelanato  ',
+      termos: ' ?? piso, porcelanato ?? ',
+      resultado: ' ?? piso porcelanato ?? ',
     })
 
     expect(payload).toEqual({

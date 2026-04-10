@@ -52,6 +52,10 @@ const OCCURRENCIAS: FormaPagamentoOcorrencia[] = [
   'todos',
 ]
 
+const editActionButtonClasses = 'app-button-secondary inline-flex h-9 w-9 items-center justify-center rounded-full'
+const deleteActionButtonClasses = 'app-button-danger inline-flex h-9 w-9 items-center justify-center rounded-full'
+const feedbackClasses = 'app-error-panel md:col-span-2 rounded-[1rem] px-4 py-3 text-sm'
+
 function initialDraft(): Draft {
   return {
     ocorrencia: 'canal_distribuicao',
@@ -282,12 +286,12 @@ export function FormaPagamentoOcorrenciasTab({
             render: (item) => !readOnly ? (
               <div className="flex items-center gap-2">
                 <TooltipIconButton label={t('simpleCrud.actions.edit', 'Editar')}>
-                  <button type="button" onClick={() => openEditModal(item)} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#e6dfd3] bg-white text-slate-700">
+                  <button type="button" onClick={() => openEditModal(item)} className={editActionButtonClasses}>
                     <Pencil className="h-4 w-4" />
                   </button>
                 </TooltipIconButton>
                 <TooltipIconButton label={t('simpleCrud.actions.delete', 'Excluir')}>
-                  <button type="button" onClick={() => { setSelectedIds([item.id]); setConfirmOpen(true) }} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-700">
+                  <button type="button" onClick={() => { setSelectedIds([item.id]); setConfirmOpen(true) }} className={deleteActionButtonClasses}>
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </TooltipIconButton>
@@ -299,7 +303,7 @@ export function FormaPagamentoOcorrenciasTab({
 
       <CrudModal open={modalOpen} title={editingItem ? t('financial.paymentMethods.messages.editOccurrenceTitle', 'Editar registro') : t('financial.paymentMethods.messages.createOccurrenceTitle', 'Novo registro')} onClose={closeModal} onConfirm={() => void handleSave()} isSaving={isSaving}>
         <div className="grid gap-4 md:grid-cols-2">
-          {feedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{feedback}</div> : null}
+          {feedback ? <div className={feedbackClasses}>{feedback}</div> : null}
           <FormField label={t('financial.paymentMethods.fields.type', 'Tipo')}>
             <select value={draft.ocorrencia} onChange={(event) => setDraft({ ...initialDraft(), ocorrencia: event.target.value as FormaPagamentoOcorrencia })} className={inputClasses()} disabled={readOnly}>
               {OCCURRENCIAS.map((item) => <option key={item} value={item}>{occurrenceLabel(item, t)}</option>)}

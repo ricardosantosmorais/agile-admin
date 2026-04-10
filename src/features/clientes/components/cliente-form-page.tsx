@@ -160,14 +160,14 @@ export function ClienteFormPage() {
         actions={
           <div className="flex flex-wrap gap-2">
             {!readOnly && !isFooterVisible ? (
-              <button type="submit" form={formId} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white">
+              <button type="submit" form={formId} className="app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold">
                 <Save className="h-4 w-4" />
                 {t('clientes.form.save', 'Save')}
               </button>
             ) : null}
             <Link
               href="/clientes"
-              className="inline-flex items-center rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+              className="app-button-secondary inline-flex items-center rounded-full px-4 py-3 text-sm font-semibold text-slate-700"
             >
               {t('clientes.form.back', 'Back')}
             </Link>
@@ -249,12 +249,12 @@ export function ClienteFormPage() {
 
             <div ref={footerRef} className="flex flex-wrap justify-center gap-3">
               {!readOnly ? (
-                <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white">
+                <button type="submit" className="app-button-primary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold">
                   <Save className="h-4 w-4" />
                   {t('clientes.form.save', 'Save')}
                 </button>
               ) : null}
-              <Link href="/clientes" className="inline-flex items-center rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold text-slate-700">
+              <Link href="/clientes" className="app-button-secondary inline-flex items-center rounded-full px-5 py-3 text-sm font-semibold text-slate-700">
                 {t('clientes.form.cancel', 'Cancel')}
               </Link>
             </div>

@@ -133,8 +133,8 @@ export function usePedidoActions(onSuccess: () => void | Promise<void>) {
                 }}
                 rows={5}
                 className={[
-                  'w-full rounded-[1.1rem] border px-4 py-3 text-sm text-slate-900 outline-none transition',
-                  cancelReasonError ? 'border-rose-300 focus:border-rose-500' : 'border-[#e6dfd3] focus:border-slate-400',
+                  'app-control w-full rounded-[1.1rem] px-4 py-3 text-sm text-slate-900 outline-none transition',
+                  cancelReasonError ? 'border-rose-400 focus:border-rose-500' : 'focus:border-slate-400',
                 ].join(' ')}
                 placeholder={t('orders.actions.cancelPlaceholder', 'Descreva o motivo do cancelamento.')}
               />
@@ -149,7 +149,7 @@ export function usePedidoActions(onSuccess: () => void | Promise<void>) {
                 type="button"
                 onClick={closeCancel}
                 disabled={isSubmitting}
-                className="rounded-full border border-[#e6dfd3] bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="app-button-secondary rounded-full px-4 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {t('common.cancel', 'Cancelar')}
               </button>
@@ -157,7 +157,7 @@ export function usePedidoActions(onSuccess: () => void | Promise<void>) {
                 type="button"
                 onClick={() => void handleCancel()}
                 disabled={isSubmitting}
-                className="inline-flex items-center gap-2 rounded-full bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="app-button-danger inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {isSubmitting ? t('common.loading', 'Carregando...') : t('orders.actions.cancel', 'Cancelar pedido')}

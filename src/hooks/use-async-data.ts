@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useEffect, useReducer, useRef, useState, type DependencyList } from 'react'
 
 type AsyncState<T> = {

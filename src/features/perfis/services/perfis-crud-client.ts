@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudDataClient, CrudRecord } from '@/src/components/crud-base/types'
 import { perfisClient } from '@/src/features/perfis/services/perfis-client'
 import type { PerfilListFilters } from '@/src/features/perfis/services/perfis-mappers'

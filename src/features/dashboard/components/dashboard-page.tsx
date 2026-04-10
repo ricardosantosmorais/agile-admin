@@ -82,9 +82,9 @@ function formatWeekday(dateString: string | undefined, locale: string) {
 function SectionSkeleton({ lines = 3, chart = false }: { lines?: number; chart?: boolean }) {
   return (
     <div className="space-y-3">
-      {chart ? <div className="h-56 animate-pulse rounded-[1rem] bg-[#f4efe6]" /> : null}
+      {chart ? <div className="app-pane-muted h-56 animate-pulse rounded-[1rem]" /> : null}
       {Array.from({ length: lines }).map((_, index) => (
-        <div key={index} className="h-10 animate-pulse rounded-[1rem] bg-[#f4efe6]" />
+        <div key={index} className="app-pane-muted h-10 animate-pulse rounded-[1rem]" />
       ))}
     </div>
   )
@@ -150,7 +150,7 @@ function ResponsiveChart({ children }: { children: ReactNode }) {
 
 function ChartEmptyState({ title, message = 'Nao ha informacoes suficientes neste periodo para montar este grafico.' }: { title: string; message?: string }) {
   return (
-    <div className="flex h-full min-h-[220px] items-center justify-center rounded-[1rem] border border-dashed border-[#d8d0c3] bg-[#fcfbf8] px-6 text-center">
+    <div className="app-pane-muted flex h-full min-h-[220px] items-center justify-center rounded-[1rem] border border-dashed px-6 text-center">
       <div className="max-w-[280px] space-y-2">
         <p className="text-sm font-semibold text-slate-700">{title}</p>
         <p className="text-sm leading-6 text-slate-500">{message}</p>
@@ -180,7 +180,7 @@ function CustomTooltip({
   }
 
   return (
-    <div className="rounded-[1rem] border border-[#e8e2d7] bg-white px-3 py-2.5 text-[12px] text-slate-700 shadow-xl">
+    <div className="app-card-modern rounded-[1rem] px-3 py-2.5 text-[12px] text-slate-700 shadow-xl">
       {content.map((line) => (
         <div key={line}>{line}</div>
       ))}
@@ -200,12 +200,12 @@ function LightTable({
   return (
     <div
       className={[
-        'rounded-[1rem] border border-[#ece6db] bg-[#fcfbf8]',
+        'app-table-shell rounded-[1rem]',
         disableScroll ? 'overflow-visible' : 'overflow-x-auto',
       ].join(' ')}
     >
       <table className="min-w-full text-left text-[12px]">
-        <thead className="border-b border-[#ece6db] bg-[#f4efe6] text-slate-500">
+        <thead className="app-table-muted border-b border-line/70 text-slate-500">
           <tr>
             {columns.map((column) => (
               <th
@@ -222,7 +222,7 @@ function LightTable({
         </thead>
         <tbody>
           {rows.map((row, index) => (
-            <tr key={index} className="border-t border-[#f0ebe1] text-slate-700">
+            <tr key={index} className="border-t border-line/60 text-slate-700">
               {columns.map((column) => (
                 <td
                   key={column.key}
@@ -373,7 +373,7 @@ export function DashboardPage() {
             <button
               type="button"
               onClick={refreshSnapshot}
-              className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-white px-3.5 text-[13px] font-semibold text-slate-700 transition hover:border-accent/20 hover:text-accent"
+              className="app-button-secondary inline-flex h-10 items-center gap-2 rounded-full px-3.5 text-[13px] font-semibold text-slate-700 transition hover:border-accent/20 hover:text-accent"
             >
               <RefreshCw className="h-4 w-4" />
               {t('dashboard.refresh', 'Atualizar dados')}
@@ -395,7 +395,7 @@ export function DashboardPage() {
         {snapshot ? (
           <>
             {error && initialLoaded ? (
-              <div className="rounded-[1rem] border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-sm text-amber-800">
+              <div className="app-warning-panel rounded-[1rem] px-3.5 py-2.5 text-sm">
                 {error}
               </div>
             ) : null}
@@ -421,7 +421,7 @@ export function DashboardPage() {
               <SectionCard title={t('dashboard.customersIndicatorsTitle', 'Indicadores de clientes')} description={t('dashboard.customersIndicatorsDescription', 'Indicadores complementares do tenant no periodo selecionado.')}>
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4">
                   {snapshot.customerMetrics.map((metric) => (
-                    <div key={metric.label} className="rounded-[1rem] border border-[#eee7dc] bg-[#fbfaf6] px-3.5 py-3">
+                    <div key={metric.label} className="app-pane-muted rounded-[1rem] px-3.5 py-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">{translateDashboardMetricLabel(metric.label, t)}</p>
                       <strong className="mt-2 block text-[1.55rem] font-black tracking-tight text-slate-950">
                         {metric.type === 'currency'
@@ -494,7 +494,7 @@ export function DashboardPage() {
                 <SectionCard title={t('dashboard.monitoringTitle', 'Monitoramento do periodo')} description={t('dashboard.monitoringDescription', 'Alertas operacionais e sinais de atencao do tenant ativo.')}>
                   <div className="space-y-2">
                     {snapshot.monitoringAlerts.map((alert) => (
-                      <div key={alert} className="rounded-[0.95rem] border border-[#eee7dc] bg-[#fbfaf6] px-3 py-2.5">
+                      <div key={alert} className="app-pane-muted rounded-[0.95rem] px-3 py-2.5">
                         <p className="text-[12px] leading-5 text-slate-700">{alert}</p>
                       </div>
                     ))}
@@ -711,7 +711,7 @@ export function DashboardPage() {
                 </SectionCard>
 
                 <SectionCard title={t('dashboard.revenuePerHourTitle', 'Receita por hora')} description={t('dashboard.revenuePerHourDescription', 'Horarios com maior volume de vendas, destacando o horario comercial.')}>
-                  <div className="mb-2.5 rounded-[0.95rem] border border-[#eee7dc] bg-[#fbfaf6] px-3 py-2.5 text-[11px] text-slate-600">
+                  <div className="app-pane-muted mb-2.5 rounded-[0.95rem] px-3 py-2.5 text-[11px] text-slate-600">
                     {t('dashboard.revenuePerHourNote', 'Horario comercial (08h as 18h): acompanhamento da distribuicao de receita ao longo do dia.')}
                   </div>
                   <ChartFrame>
@@ -758,7 +758,7 @@ export function DashboardPage() {
             >
               <div className="grid gap-4 xl:grid-cols-2">
                 <SectionCard title={t('dashboard.rebuyRateTitle', 'Taxa de recompra')} description={t('dashboard.rebuyRateDescription', 'Clientes do periodo que voltaram a comprar em 30, 60 e 90 dias.')}>
-                  <div className="mb-2.5 flex items-center justify-between rounded-[0.95rem] border border-[#eee7dc] bg-[#fbfaf6] px-3 py-2.5 text-[11px] text-slate-600">
+                  <div className="app-pane-muted mb-2.5 flex items-center justify-between rounded-[0.95rem] px-3 py-2.5 text-[11px] text-slate-600">
                     <span>{t('dashboard.fixedBaseLabel', 'Base fixa: total de clientes que compraram no periodo')}</span>
                     <StatusBadge tone="info">{formatNumber(Number(coorteRows[2]?.clientes ?? 0))} {t('dashboard.customersUnit', 'clientes')}</StatusBadge>
                   </div>

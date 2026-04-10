@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 
 type GrupoClienteRelationItem = {
