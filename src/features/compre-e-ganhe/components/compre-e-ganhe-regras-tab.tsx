@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { ConfirmDialog } from '@/src/components/ui/confirm-dialog'
 import { CrudModal } from '@/src/components/ui/crud-modal'
 import { FormField } from '@/src/components/ui/form-field'
+import { InputWithAffix } from '@/src/components/ui/input-with-affix'
 import { LookupSelect, type LookupOption } from '@/src/components/ui/lookup-select'
 import { TooltipIconButton } from '@/src/components/ui/tooltip-icon-button'
 import { loadCrudLookupOptions } from '@/src/components/crud-base/crud-client'
@@ -199,7 +200,7 @@ export function CompreEGanheRegrasTab({ brindeId, readOnly, onError }: { brindeI
             headerClassName: 'w-[72px]',
             render: (item) => !readOnly ? (
               <TooltipIconButton label={t('simpleCrud.actions.delete', 'Excluir')}>
-                <button type="button" onClick={() => { setSelectedIds([item.id]); setConfirmOpen(true) }} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-700">
+                <button type="button" onClick={() => { setSelectedIds([item.id]); setConfirmOpen(true) }} className="app-button-danger inline-flex h-9 w-9 items-center justify-center rounded-full p-0">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </TooltipIconButton>
@@ -210,7 +211,7 @@ export function CompreEGanheRegrasTab({ brindeId, readOnly, onError }: { brindeI
 
       <CrudModal open={modalOpen} title={t('marketing.buyAndGet.rules.createTitle', 'Nova regra')} onClose={() => { setDraft(initialDraft()); setPackageOptions([]); setFeedback(null); setModalOpen(false) }} onConfirm={() => void handleSave()}>
         <div className="grid gap-4 md:grid-cols-2">
-          {feedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{feedback}</div> : null}
+          {feedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{feedback}</div> : null}
           <FormField label={t('marketing.buyAndGet.rules.fields.code', 'Codigo da regra')}>
             <input value={draft.id_regra} onChange={(event) => setDraft((current) => ({ ...current, id_regra: event.target.value }))} className={inputClasses()} />
           </FormField>
@@ -247,16 +248,10 @@ export function CompreEGanheRegrasTab({ brindeId, readOnly, onError }: { brindeI
             </FormField>
           ) : null}
           <FormField label={t('marketing.buyAndGet.rules.fields.minOrder', 'Pedido minimo')}>
-            <div className="flex overflow-hidden rounded-[0.9rem] border border-[#e6dfd3] bg-white">
-              <span className="inline-flex items-center border-r border-[#e6dfd3] bg-[#fcfaf5] px-3 text-sm font-semibold text-slate-600">R$</span>
-              <input value={draft.pedido_minimo} onChange={(event) => setDraft((current) => ({ ...current, pedido_minimo: currencyMask(event.target.value) }))} className={`${inputClasses()} rounded-none border-0 shadow-none focus:ring-0`} inputMode="decimal" />
-            </div>
+            <InputWithAffix value={draft.pedido_minimo} onChange={(event) => setDraft((current) => ({ ...current, pedido_minimo: currencyMask(event.target.value) }))} prefix="R$" inputMode="decimal" />
           </FormField>
           <FormField label={t('marketing.buyAndGet.rules.fields.maxOrder', 'Pedido maximo')}>
-            <div className="flex overflow-hidden rounded-[0.9rem] border border-[#e6dfd3] bg-white">
-              <span className="inline-flex items-center border-r border-[#e6dfd3] bg-[#fcfaf5] px-3 text-sm font-semibold text-slate-600">R$</span>
-              <input value={draft.pedido_maximo} onChange={(event) => setDraft((current) => ({ ...current, pedido_maximo: currencyMask(event.target.value) }))} className={`${inputClasses()} rounded-none border-0 shadow-none focus:ring-0`} inputMode="decimal" />
-            </div>
+            <InputWithAffix value={draft.pedido_maximo} onChange={(event) => setDraft((current) => ({ ...current, pedido_maximo: currencyMask(event.target.value) }))} prefix="R$" inputMode="decimal" />
           </FormField>
         </div>
       </CrudModal>

@@ -96,7 +96,7 @@ export function ProdutosPrecificadoresListPage() {
                 const showChildBadge = controller.filters.incluirDependentes === '1' && isChild
                 return (
                   <div className="flex items-center gap-2">
-                    <span className="truncate text-sm text-slate-600">{rowId}</span>
+                    <span className="truncate text-sm text-[color:var(--app-muted)]">{rowId}</span>
                     {showChildBadge ? <StatusBadge tone="warning">Dependente</StatusBadge> : null}
                   </div>
                 )

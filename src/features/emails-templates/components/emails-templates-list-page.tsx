@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { CrudListPage } from '@/src/components/crud-base/crud-list-page'
 import { emailsTemplatesClient } from '@/src/features/emails-templates/services/emails-templates-client'

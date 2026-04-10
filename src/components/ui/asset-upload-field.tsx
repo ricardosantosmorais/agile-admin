@@ -82,22 +82,26 @@ export function AssetUploadField({
       <div
         {...getRootProps()}
         className={[
-          'rounded-[1.35rem] border-2 border-dashed bg-white p-5 transition',
-          isDragReject ? 'border-rose-300 bg-rose-50' : isDragActive ? 'border-emerald-400 bg-emerald-50/50' : 'border-[#2bc48a] bg-[#fffdf9]',
+          'app-pane rounded-[1.35rem] border-2 border-dashed p-5 transition',
+          isDragReject
+            ? 'border-rose-400/70 bg-rose-500/8'
+            : isDragActive
+              ? 'border-emerald-400 bg-emerald-500/8'
+              : 'border-emerald-400/90 bg-transparent',
           disabled || isUploading ? 'opacity-70' : 'cursor-pointer',
         ].join(' ')}
       >
         <input {...getInputProps()} />
         <div className="grid gap-5 lg:grid-cols-[minmax(0,320px)_1fr]">
-          <div className="overflow-hidden rounded-[1rem] border border-[#ebe3d7] bg-[#f8f5ef]">
+          <div className="app-pane-muted overflow-hidden rounded-[1rem] border border-[color:var(--app-card-border)]">
             {hasAsset && isImage ? (
-              <div className="relative h-[11rem] w-full bg-white">
+              <div className="app-pane relative h-[11rem] w-full">
                 <Image src={previewValue} alt="" fill className="object-contain object-center p-3" unoptimized />
               </div>
             ) : (
-              <div className="flex h-[11rem] w-full flex-col items-center justify-center gap-2 px-4 text-center text-slate-500">
-                {isImage ? <ImagePlus className="h-9 w-9 text-slate-300" /> : <FileText className="h-9 w-9 text-slate-300" />}
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+              <div className="flex h-[11rem] w-full flex-col items-center justify-center gap-2 px-4 text-center text-[color:var(--app-muted)]">
+                {isImage ? <ImagePlus className="h-9 w-9 text-[color:var(--app-muted)]/70" /> : <FileText className="h-9 w-9 text-[color:var(--app-muted)]/70" />}
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--app-muted)]">
                   {isImage ? t('common.noImage', 'Sem imagem') : t('uploads.noFile', 'Sem arquivo')}
                 </span>
               </div>
@@ -106,15 +110,15 @@ export function AssetUploadField({
 
           <div className="flex min-h-[11rem] flex-col justify-between gap-4">
             <div className="space-y-3 text-center lg:text-left">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#eefaf4] text-[#17a36b] lg:mx-0">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/12 text-emerald-300 lg:mx-0">
                 {isUploading ? <LoaderCircle className="h-6 w-6 animate-spin" /> : <UploadCloud className="h-6 w-6" />}
               </div>
               <div className="space-y-1.5">
-                <h3 className="text-[1.15rem] font-semibold tracking-tight text-slate-950">
+                <h3 className="text-[1.15rem] font-semibold tracking-tight text-[color:var(--app-text)]">
                   {isDragActive ? t('uploads.dropNow', 'Solte o arquivo para enviar') : resolvedTitle}
                 </h3>
-                <p className="max-w-2xl text-sm leading-6 text-slate-500">{resolvedDescription}</p>
-                <p className="text-sm text-slate-500">
+                <p className="max-w-2xl text-sm leading-6 text-[color:var(--app-muted)]">{resolvedDescription}</p>
+                <p className="text-sm text-[color:var(--app-muted)]">
                   {resolvedFormatsLabel}
                   {maxSizeLabel ? ` • ${maxSizeLabel}` : ''}
                 </p>
@@ -130,7 +134,7 @@ export function AssetUploadField({
                   event.stopPropagation()
                   open()
                 }}
-                className="inline-flex h-11 items-center gap-2 rounded-full bg-slate-950 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="app-button-primary inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isUploading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}
                 {isUploading ? t('common.loading', 'Carregando...') : t('uploads.chooseFile', 'Escolher arquivo')}
@@ -145,7 +149,7 @@ export function AssetUploadField({
                   setUploadError(null)
                   onChange('')
                 }}
-                className="inline-flex h-11 items-center gap-2 rounded-full border border-rose-200 bg-white px-4 text-sm font-semibold text-rose-600 disabled:cursor-not-allowed disabled:opacity-60"
+                className="app-button-danger inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Trash2 className="h-4 w-4" />
                 {t('common.clear', 'Limpar')}
@@ -156,7 +160,7 @@ export function AssetUploadField({
       </div>
 
       {uploadError ? (
-        <div className="flex items-center gap-2 rounded-[0.9rem] border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+        <div className="flex items-center gap-2 rounded-[0.9rem] border border-rose-400/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
           <AlertCircle className="h-4 w-4 shrink-0" />
           {uploadError}
         </div>

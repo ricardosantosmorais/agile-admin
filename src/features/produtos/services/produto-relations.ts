@@ -1,5 +1,3 @@
-'use client'
-
 export type ProdutoFilialRow = {
   id_produto: string
   id_filial: string

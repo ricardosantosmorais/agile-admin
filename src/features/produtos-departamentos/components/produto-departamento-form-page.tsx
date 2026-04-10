@@ -212,7 +212,7 @@ export function ProdutoDepartamentoFormPage() {
           { label: t('catalog.produtosDepartamentos.title', 'Produtos x Departamentos'), href: '/produtos-departamentos' },
           { label: t('routes.novo', 'Novo') },
         ]}
-        actions={<Link href="/produtos-departamentos" className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold text-slate-700"><ArrowLeft className="h-4 w-4" />{t('common.back', 'Voltar')}</Link>}
+        actions={<Link href="/produtos-departamentos" className="app-button-secondary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"><ArrowLeft className="h-4 w-4" />{t('common.back', 'Voltar')}</Link>}
       />
 
       <AsyncState isLoading={isLoading} error={error || undefined}>
@@ -220,38 +220,38 @@ export function ProdutoDepartamentoFormPage() {
 
         <SectionCard>
           <div className="grid gap-5 xl:grid-cols-[1fr_1fr]">
-            <section className="space-y-3 rounded-[1rem] border border-[#ece5d9] bg-[#fcfaf5] p-4">
+            <section className="app-pane-muted space-y-3 rounded-[1rem] border border-[color:var(--app-card-border)] p-4">
               <div className="space-y-3">
-                <h2 className="text-sm font-bold text-slate-950">Produtos</h2>
+                <h2 className="text-sm font-bold text-[color:var(--app-text)]">Produtos</h2>
                 <input
                   value={productQuery}
                   onChange={(event) => setProductQuery(event.target.value)}
                   placeholder="Buscar por ID, codigo ou nome"
                   className={inputClasses()}
                 />
-                <label className="flex items-center gap-2 text-sm text-slate-700">
+                <label className="flex items-center gap-2 text-sm text-[color:var(--app-text)]">
                   <input
                     type="checkbox"
                     checked={onlyWithoutDepartment}
                     onChange={(event) => setOnlyWithoutDepartment(event.target.checked)}
-                    className="h-4 w-4 rounded border-[#d8ccb7]"
+                    className="h-4 w-4 rounded border-[color:var(--app-control-border)]"
                   />
                   Exibir apenas produtos sem relacionamento
                 </label>
               </div>
 
-              <div className="max-h-[420px] overflow-y-auto rounded-[1rem] border border-[#ece5d9] bg-white">
+              <div className="app-pane max-h-[420px] overflow-y-auto rounded-[1rem] border border-[color:var(--app-card-border)]">
                 {products.map((product) => (
-                  <label key={product.id} className="flex items-center gap-3 border-b border-[#f2ece2] px-4 py-3 text-sm text-slate-700 last:border-b-0">
+                  <label key={product.id} className="flex items-center gap-3 border-b border-[color:var(--app-border)] px-4 py-3 text-sm text-[color:var(--app-text)] last:border-b-0">
                     <input
                       type="checkbox"
                       checked={selectedProductIds.includes(product.id)}
                       onChange={() => toggleProduct(product.id)}
-                      className="h-4 w-4 rounded border-[#d8ccb7]"
+                      className="h-4 w-4 rounded border-[color:var(--app-control-border)]"
                     />
                     <div className="min-w-0">
-                      <div className="truncate font-semibold text-slate-950">{product.id} - {product.nome || '-'}</div>
-                      <div className="text-xs text-slate-500">Codigo: {product.codigo || '--'}</div>
+                      <div className="truncate font-semibold text-[color:var(--app-text)]">{product.id} - {product.nome || '-'}</div>
+                      <div className="text-xs text-[color:var(--app-muted)]">Codigo: {product.codigo || '--'}</div>
                     </div>
                   </label>
                 ))}
@@ -259,7 +259,7 @@ export function ProdutoDepartamentoFormPage() {
 
               {productPage < productMeta.pages ? (
                 <div className="flex justify-center">
-                  <button type="button" onClick={() => void loadProducts(productPage + 1, true)} className="inline-flex h-10 items-center gap-2 rounded-full border border-[#e6dfd3] bg-white px-4 text-sm font-semibold text-slate-700">
+                  <button type="button" onClick={() => void loadProducts(productPage + 1, true)} className="app-button-secondary inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold">
                     <Plus className="h-4 w-4" />
                     Carregar mais produtos
                   </button>
@@ -267,9 +267,9 @@ export function ProdutoDepartamentoFormPage() {
               ) : null}
             </section>
 
-            <section className="space-y-3 rounded-[1rem] border border-[#ece5d9] bg-[#fcfaf5] p-4">
+            <section className="app-pane-muted space-y-3 rounded-[1rem] border border-[color:var(--app-card-border)] p-4">
               <div className="space-y-3">
-                <h2 className="text-sm font-bold text-slate-950">Departamentos</h2>
+                <h2 className="text-sm font-bold text-[color:var(--app-text)]">Departamentos</h2>
                 <input
                   value={departmentQuery}
                   onChange={(event) => setDepartmentQuery(event.target.value)}
@@ -287,17 +287,17 @@ export function ProdutoDepartamentoFormPage() {
           </div>
 
           <div className="mt-5 flex justify-center">
-            <button type="button" onClick={addRelations} className="inline-flex h-11 items-center gap-2 rounded-full bg-slate-950 px-5 text-sm font-semibold text-white">
+            <button type="button" onClick={addRelations} className="app-button-primary inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold">
               <Plus className="h-4 w-4" />
               Adicionar relacionamentos
             </button>
           </div>
 
-          <div className="mt-5 rounded-[1rem] border border-[#ece5d9] bg-[#fcfaf5] p-4">
+          <div className="app-pane-muted mt-5 rounded-[1rem] border border-[color:var(--app-card-border)] p-4">
             <div className="mb-4 flex items-center justify-between gap-3">
-              <h2 className="text-sm font-bold text-slate-950">Relacionamentos pendentes</h2>
+              <h2 className="text-sm font-bold text-[color:var(--app-text)]">Relacionamentos pendentes</h2>
               {selectedPendingIds.length ? (
-                <button type="button" onClick={() => setConfirmOpen(true)} className="inline-flex h-10 items-center gap-2 rounded-full border border-rose-200 bg-white px-4 text-sm font-semibold text-rose-600">
+                <button type="button" onClick={() => setConfirmOpen(true)} className="app-button-danger inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold">
                   <Trash2 className="h-4 w-4" />
                   Excluir selecionados
                 </button>
@@ -307,22 +307,22 @@ export function ProdutoDepartamentoFormPage() {
             <div className="space-y-2">
               {pending.length ? (
                 pending.map((relation) => (
-                  <div key={relation.id} className="grid items-center gap-3 rounded-[0.95rem] border border-[#ece5d9] bg-white px-4 py-3 md:grid-cols-[auto_minmax(0,2fr)_minmax(0,1.4fr)_auto]">
+                  <div key={relation.id} className="app-pane grid items-center gap-3 rounded-[0.95rem] border border-[color:var(--app-card-border)] px-4 py-3 md:grid-cols-[auto_minmax(0,2fr)_minmax(0,1.4fr)_auto]">
                     <input
                       type="checkbox"
                       checked={selectedPendingIds.includes(relation.id)}
                       onChange={() => setSelectedPendingIds((current) => current.includes(relation.id) ? current.filter((item) => item !== relation.id) : [...current, relation.id])}
-                      className="h-4 w-4 rounded border-[#d8ccb7]"
+                      className="h-4 w-4 rounded border-[color:var(--app-control-border)]"
                     />
-                    <div className="min-w-0 truncate text-sm font-semibold text-slate-950">{relation.produto}</div>
-                    <div className="min-w-0 truncate text-sm text-slate-700">{relation.departamento}</div>
-                    <button type="button" onClick={() => removePending([relation.id])} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 text-rose-600">
+                    <div className="min-w-0 truncate text-sm font-semibold text-[color:var(--app-text)]">{relation.produto}</div>
+                    <div className="min-w-0 truncate text-sm text-[color:var(--app-text)]">{relation.departamento}</div>
+                    <button type="button" onClick={() => removePending([relation.id])} className="app-button-danger inline-flex h-9 w-9 items-center justify-center rounded-full p-0">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 ))
               ) : (
-                <div className="rounded-[1rem] border border-dashed border-[#e6dfd3] px-4 py-6 text-sm text-slate-500">
+                <div className="app-pane rounded-[1rem] border border-dashed border-[color:var(--app-card-border)] px-4 py-6 text-sm text-[color:var(--app-muted)]">
                   Nenhum relacionamento selecionado.
                 </div>
               )}
@@ -330,11 +330,11 @@ export function ProdutoDepartamentoFormPage() {
           </div>
 
           <div className="mt-5 flex justify-center gap-2.5">
-            <button type="button" onClick={() => void saveRelations()} disabled={isSaving} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4.5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">
+            <button type="button" onClick={() => void saveRelations()} disabled={isSaving} className="app-button-primary inline-flex items-center gap-2 rounded-full px-4.5 py-2.5 text-sm font-semibold disabled:opacity-60">
               <Save className="h-4 w-4" />
               {isSaving ? t('common.loading', 'Salvando...') : t('common.save', 'Salvar')}
             </button>
-            <Link href="/produtos-departamentos" className="inline-flex items-center rounded-full border border-line bg-white px-4.5 py-2.5 text-sm font-semibold text-slate-700">
+            <Link href="/produtos-departamentos" className="app-button-secondary inline-flex items-center rounded-full px-4.5 py-2.5 text-sm font-semibold">
               {t('common.cancel', 'Cancelar')}
             </Link>
           </div>

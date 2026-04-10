@@ -79,7 +79,7 @@ export function ResizableVerticalPanels({
   return (
     <div
       ref={containerRef}
-      className={`flex ${minHeightClassName} flex-col overflow-hidden rounded-[1.2rem] border border-[#e6dfd3] bg-[#f6f2e9] ${className}`.trim()}
+      className={`app-pane-muted flex ${minHeightClassName} flex-col overflow-hidden rounded-[1.2rem] ${className}`.trim()}
       style={{ height }}
     >
       <div className="min-h-0 overflow-hidden" style={{ flexBasis: `${resolvedTopPercentage}%` }}>
@@ -95,13 +95,13 @@ export function ResizableVerticalPanels({
           setIsDragging(true)
         }}
         className={[
-          'group relative flex h-4 cursor-row-resize items-center justify-center bg-[#f6f2e9]',
-          isDragging ? 'before:bg-slate-950' : 'before:bg-[#d7cfbf]',
+          'group relative flex h-4 cursor-row-resize items-center justify-center bg-[color:var(--app-control-muted-bg)]',
+          isDragging ? 'before:bg-slate-950' : 'before:bg-[color:var(--app-control-border)]',
           'before:h-[2px] before:w-full before:rounded-full before:content-[\'\']',
         ].join(' ')}
       >
-        <span className="absolute inline-flex h-2.5 w-14 items-center justify-center rounded-full border border-[#d7cfbf] bg-white shadow-sm">
-          <span className="h-1 w-6 rounded-full bg-[#c4baa7]" />
+        <span className="app-control absolute inline-flex h-2.5 w-14 items-center justify-center rounded-full shadow-sm">
+          <span className="h-1 w-6 rounded-full bg-[color:var(--app-control-border)]" />
         </span>
       </div>
 

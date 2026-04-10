@@ -143,7 +143,7 @@ export function CompreEGanheProdutosTab({ brindeId, readOnly, onError }: { brind
             headerClassName: 'w-[72px]',
             render: (item) => !readOnly ? (
               <TooltipIconButton label={t('simpleCrud.actions.delete', 'Excluir')}>
-                <button type="button" onClick={() => { setSelectedIds([item.id]); setConfirmOpen(true) }} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-700">
+                <button type="button" onClick={() => { setSelectedIds([item.id]); setConfirmOpen(true) }} className="app-button-danger inline-flex h-9 w-9 items-center justify-center rounded-full p-0">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </TooltipIconButton>
@@ -154,7 +154,7 @@ export function CompreEGanheProdutosTab({ brindeId, readOnly, onError }: { brind
 
       <CrudModal open={modalOpen} title={t('marketing.buyAndGet.products.createTitle', 'Novo produto')} onClose={() => { setDraft(initialDraft()); setPackageOptions([]); setFeedback(null); setModalOpen(false) }} onConfirm={() => void handleSave()}>
         <div className="grid gap-4 md:grid-cols-2">
-          {feedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{feedback}</div> : null}
+          {feedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{feedback}</div> : null}
           <FormField label={t('marketing.buyAndGet.products.fields.ruleCode', 'Codigo da regra')}>
             <input value={draft.id_regra} onChange={(event) => setDraft((current) => ({ ...current, id_regra: event.target.value }))} className={inputClasses()} />
           </FormField>

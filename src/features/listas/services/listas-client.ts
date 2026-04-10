@@ -1,5 +1,3 @@
-'use client'
-
 import { createCrudClient } from '@/src/components/crud-base/crud-client'
 import { httpClient } from '@/src/services/http/http-client'
 import type { CatalogProductRelation } from '@/src/features/catalog/types/catalog-relations'

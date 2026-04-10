@@ -15,9 +15,9 @@ export function InputWithAffix({
   ...props
 }: InputWithAffixProps) {
   return (
-    <div className="flex w-full overflow-hidden rounded-[0.9rem] border border-[#e6dfd3] bg-white">
+    <div className="app-control flex w-full overflow-hidden rounded-[0.9rem]">
       {prefix ? (
-        <span className="inline-flex items-center border-r border-[#e6dfd3] bg-[#fcfaf5] px-3 text-sm font-semibold text-slate-600">
+        <span className="app-control-muted inline-flex items-center border-r border-[color:var(--app-control-border)] px-3 text-sm font-semibold text-[color:var(--app-muted)]">
           {prefix}
         </span>
       ) : null}
@@ -30,7 +30,7 @@ export function InputWithAffix({
         ].join(' ').trim()}
       />
       {suffix ? (
-        <span className="inline-flex items-center border-l border-[#e6dfd3] bg-[#fcfaf5] px-3 text-sm font-semibold text-slate-600">
+        <span className="app-control-muted inline-flex items-center border-l border-[color:var(--app-control-border)] px-3 text-sm font-semibold text-[color:var(--app-muted)]">
           {suffix}
         </span>
       ) : null}

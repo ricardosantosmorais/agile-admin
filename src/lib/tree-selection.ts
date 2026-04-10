@@ -1,5 +1,3 @@
-'use client'
-
 export type TreeSelectionNode = {
   id: string
   children?: TreeSelectionNode[]

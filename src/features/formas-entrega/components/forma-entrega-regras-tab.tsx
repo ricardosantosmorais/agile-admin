@@ -46,6 +46,8 @@ const defaultFilters: FormaEntregaRegrasFilters = {
   prazoTo: '',
 }
 
+const feedbackClasses = 'app-error-panel md:col-span-2 rounded-[1rem] px-4 py-3 text-sm'
+
 function regraTypeLabel(type: string, t: ReturnType<typeof useI18n>['t']) {
   switch (type) {
     case 'cep':
@@ -244,7 +246,7 @@ export function FormaEntregaRegrasTab({
       sortKey: 'nome',
       cell: (item) => (
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-slate-950">{formatFormaEntregaRuleSummary(item)}</p>
+          <p className="truncate text-sm font-semibold text-[color:var(--app-text)]">{formatFormaEntregaRuleSummary(item)}</p>
         </div>
       ),
       filter: {
@@ -557,7 +559,7 @@ export function FormaEntregaRegrasTab({
             subtitle: (item) => regraTypeLabel(item.tipo, t),
             meta: (item) => `${t('logistics.deliveryMethods.ruleFields.freightValue', 'Valor do frete')}: ${formatCurrencyDisplay(item.valor)}`,
             badges: (item) => (
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-[color:var(--app-muted)]">
                 {t('logistics.deliveryMethods.ruleFields.leadTime', 'Prazo')}: {item.prazo ? String(item.prazo) : '0'}
               </span>
             ),
@@ -580,7 +582,7 @@ export function FormaEntregaRegrasTab({
         isSaving={isSaving}
       >
         <div className="grid gap-4 md:grid-cols-2">
-          {feedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{feedback}</div> : null}
+          {feedback ? <div className={feedbackClasses}>{feedback}</div> : null}
 
           <FormField label={t('logistics.deliveryMethods.ruleFields.name', 'Nome da regra')} className="md:col-span-2">
             <input value={draft.nome} onChange={(event) => setDraft((current) => ({ ...current, nome: event.target.value }))} className={inputClasses()} />

@@ -1,4 +1,4 @@
-import type { DashboardSnapshot } from '@/src/lib/fake-data'
+import type { DashboardSnapshot } from '@/src/features/dashboard/types/dashboard'
 import { asArray, asNumber, asRecord, asString } from '@/src/lib/api-payload'
 import type { ApiRecord } from '@/src/lib/api-payload'
 

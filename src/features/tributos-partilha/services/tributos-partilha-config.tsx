@@ -1,5 +1,3 @@
-'use client'
-
 import { loadCrudLookupOptions } from '@/src/components/crud-base/crud-client'
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 import { StatusBadge } from '@/src/components/ui/status-badge'
@@ -42,7 +40,7 @@ export const TRIBUTOS_PARTILHA_CONFIG: CrudModuleConfig = {
       labelKey: 'priceStock.taxesSharing.fields.product',
       label: 'Produto',
       sortKey: 'id_produto',
-      tdClassName: 'font-semibold text-slate-950',
+      tdClassName: 'font-semibold text-[color:var(--app-text)]',
       render: (record) => String((record.produto as { nome?: unknown } | null)?.nome || record.id_produto || '-'),
       filter: {
         kind: 'lookup',

@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudRecord } from '@/src/components/crud-base/types'
 import type { LookupOption } from '@/src/components/ui/lookup-select'
 

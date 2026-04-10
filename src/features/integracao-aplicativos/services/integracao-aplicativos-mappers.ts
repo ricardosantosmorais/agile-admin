@@ -1,5 +1,3 @@
-'use client'
-
 import { asArray, asBoolean, asNumber, asRecord, asString } from '@/src/lib/api-payload'
 
 export type AplicativoIntegracaoListFilters = {

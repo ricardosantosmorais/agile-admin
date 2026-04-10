@@ -4,7 +4,6 @@ import { createContext, useContext, useMemo, useState } from 'react'
 import type { PropsWithChildren } from 'react'
 import { useAuth } from '@/src/features/auth/hooks/use-auth'
 import type { AuthTenant } from '@/src/features/auth/types/auth'
-import { fakeTenants } from '@/src/lib/fake-data'
 
 type TenantContextValue = {
   tenants: AuthTenant[]
@@ -14,25 +13,31 @@ type TenantContextValue = {
 }
 
 const TenantContext = createContext<TenantContextValue | undefined>(undefined)
+const EMPTY_TENANT: AuthTenant = { id: '', nome: '', codigo: '', status: '' }
 
 export function TenantProvider({ children }: PropsWithChildren) {
   const { session, switchTenant: switchAuthTenant } = useAuth()
   const [isSwitchingTenant, setIsSwitchingTenant] = useState(false)
 
-  const value = useMemo<TenantContextValue>(() => ({
-    tenants: session?.tenants.length ? session.tenants : fakeTenants,
-    currentTenant: session?.currentTenant ?? fakeTenants[0],
-    isSwitchingTenant,
-    switchTenant: async (tenantId: string) => {
-      setIsSwitchingTenant(true)
+  const value = useMemo<TenantContextValue>(() => {
+    const tenants = session?.tenants ?? []
+    const currentTenant = session?.currentTenant ?? tenants[0] ?? EMPTY_TENANT
 
-      try {
-        await switchAuthTenant(tenantId)
-      } finally {
-        setIsSwitchingTenant(false)
-      }
-    },
-  }), [isSwitchingTenant, session, switchAuthTenant])
+    return {
+      tenants,
+      currentTenant,
+      isSwitchingTenant,
+      switchTenant: async (tenantId: string) => {
+        setIsSwitchingTenant(true)
+
+        try {
+          await switchAuthTenant(tenantId)
+        } finally {
+          setIsSwitchingTenant(false)
+        }
+      },
+    }
+  }, [isSwitchingTenant, session, switchAuthTenant])
 
   return <TenantContext.Provider value={value}>{children}</TenantContext.Provider>
 }

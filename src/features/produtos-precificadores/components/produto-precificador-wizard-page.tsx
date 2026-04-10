@@ -101,6 +101,19 @@ type CriterionEditorProps<TType extends string> = {
 }
 
 const STEP_IDS: StepId[] = ['audience', 'products', 'rule', 'conditions', 'review']
+const textClasses = 'text-[color:var(--app-text)]'
+const mutedTextClasses = 'text-[color:var(--app-muted)]'
+const secondaryButtonClasses = 'app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold'
+const secondaryButtonLargeClasses = 'app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold'
+const primaryButtonLargeClasses = 'app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold disabled:opacity-70'
+const dangerButtonClasses = 'app-button-danger inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold'
+const paneClasses = 'app-pane-muted rounded-[1rem] px-4 py-4'
+const dashedPaneClasses = 'app-pane-muted flex min-h-14 items-center rounded-[1rem] border-dashed px-4 py-3 text-sm text-[color:var(--app-muted)]'
+const labelClasses = 'text-sm font-semibold text-[color:var(--app-text)]'
+const headingClasses = 'font-semibold text-[color:var(--app-text)]'
+const summaryTextClasses = 'text-sm text-[color:var(--app-muted)]'
+const summaryStrongClasses = 'font-semibold text-[color:var(--app-text)]'
+const errorTextClasses = 'text-[color:#be123c] dark:text-[#f9a8b4]'
 
 function createAudienceCriterion(index: number): ProdutoPrecificadorAudienceCriterion {
   return { id: `aud-${Date.now()}-${index}`, type: 'todos', values: [] }
@@ -144,15 +157,15 @@ function RequiredLabel({ label }: { label: string }) {
   return (
     <span>
       {label}
-      <span className="ml-1 text-rose-500">*</span>
+      <span className={`ml-1 ${errorTextClasses}`}>*</span>
     </span>
   )
 }
 
 function renderInputClass(invalid = false) {
   return [
-    'w-full rounded-[1rem] bg-white px-3.5 py-3 text-sm text-slate-900',
-    invalid ? 'border border-rose-300 ring-2 ring-rose-100' : 'border border-[#e6dfd3]',
+    'app-control w-full rounded-[1rem] px-3.5 py-3 text-sm text-[color:var(--app-text)]',
+    invalid ? 'border-rose-300 ring-2 ring-rose-100' : '',
   ].join(' ')
 }
 
@@ -245,13 +258,13 @@ function CriterionEditor<TType extends string>({
       <div className="space-y-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-slate-950">{title}</h2>
-            <p className="mt-1 text-sm text-slate-500">{description}</p>
+            <h2 className={`text-lg ${headingClasses}`}>{title}</h2>
+            <p className={`mt-1 text-sm ${mutedTextClasses}`}>{description}</p>
           </div>
           <button
             type="button"
             onClick={onAdd}
-            className="inline-flex items-center gap-2 rounded-full border border-[#e6dfd3] bg-white px-4 py-2 text-sm font-semibold text-slate-700"
+            className={secondaryButtonClasses}
           >
             <Plus className="h-4 w-4" />
             {t('common.add', 'Adicionar')}
@@ -272,17 +285,17 @@ function CriterionEditor<TType extends string>({
             return (
               <div
                 key={item.id}
-                className={['rounded-[1.25rem] border bg-[#fffdf9] p-4', selectionError ? 'border-rose-300' : 'border-[#e9e1d5]'].join(' ')}
+                className={['app-pane-muted rounded-[1.25rem] p-4', selectionError ? 'border-rose-300' : ''].join(' ')}
               >
                 <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-                  <div className="text-sm font-semibold text-slate-900">
+                  <div className={labelClasses}>
                     {criterionLabel} {index + 1}
                   </div>
                   {items.length > 1 ? (
                     <button
                       type="button"
                       onClick={() => onRemove(item.id)}
-                      className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-3 py-2 text-sm font-semibold text-rose-600"
+                      className={dangerButtonClasses}
                     >
                       <Trash2 className="h-4 w-4" />
                       {t('common.remove', 'Remover')}
@@ -292,12 +305,12 @@ function CriterionEditor<TType extends string>({
 
                 <div className="grid items-start gap-x-4 gap-y-2 xl:grid-cols-[340px_minmax(0,1fr)]">
                   <div className="grid content-start gap-2 self-start">
-                    <label className="flex min-h-5 items-end text-sm font-semibold text-slate-900">Tipo do critério</label>
+                    <label className={`flex min-h-5 items-end ${labelClasses}`}>Tipo do critério</label>
                     <div className="min-h-14">
                       <select
                         value={item.type}
                         onChange={(event) => onTypeChange(item.id, event.target.value as TType)}
-                        className="w-full rounded-[1rem] border border-[#e6dfd3] bg-white px-3.5 py-3 text-sm text-slate-900"
+                        className={renderInputClass(false)}
                       >
                         {typeOptions.map((option) => (
                           <option key={option.value} value={option.value}>
@@ -312,7 +325,7 @@ function CriterionEditor<TType extends string>({
                     <label
                       className={[
                         'flex min-h-5 items-end text-sm font-semibold',
-                        item.type === ('todos' as TType) ? 'invisible text-transparent' : 'text-slate-900',
+                        item.type === ('todos' as TType) ? 'invisible text-transparent' : textClasses,
                       ].join(' ')}
                     >
                       {meta.label}
@@ -358,7 +371,7 @@ function CriterionEditor<TType extends string>({
 
                         {canUsePackaging && packagingOptions.length > 0 ? (
                           <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-900">Embalagem</label>
+                            <label className={labelClasses}>Embalagem</label>
                             <select
                               value={item.packaging?.id ?? ''}
                               onChange={(event) => {
@@ -378,11 +391,11 @@ function CriterionEditor<TType extends string>({
                         ) : null}
 
                         {selectionError ? (
-                          <p className="text-xs text-rose-600">Selecione ao menos uma opção neste critério.</p>
+                          <p className={`text-xs ${errorTextClasses}`}>Selecione ao menos uma opção neste critério.</p>
                         ) : null}
                       </>
                     ) : (
-                      <div className="flex min-h-14 items-center rounded-[1rem] border border-dashed border-[#e6dfd3] bg-[#fcfaf5] px-4 py-3 text-sm text-slate-500">
+                      <div className={dashedPaneClasses}>
                         Este bloco aplica a todos. Nenhuma seleção adicional é necessária.
                       </div>
                     )}
@@ -392,13 +405,13 @@ function CriterionEditor<TType extends string>({
                         {item.values.map((value) => (
                           <span
                             key={value.id}
-                            className="inline-flex items-center gap-2 rounded-full bg-[#f4efe6] px-3 py-1.5 text-xs font-medium text-slate-700"
+                            className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
                           >
                             {value.label}
                             <button
                               type="button"
                               onClick={() => onValuesChange(item.id, item.values.filter((selected) => selected.id !== value.id))}
-                              className="text-slate-500 transition hover:text-slate-700"
+                              className="text-[color:var(--app-muted)] transition hover:text-[color:var(--app-text)]"
                             >
                               ×
                             </button>
@@ -419,9 +432,9 @@ function CriterionEditor<TType extends string>({
 
 function InfoCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-[1rem] border border-[#e8e2d7] bg-white px-4 py-4">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
-      <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{value}</p>
+    <div className={paneClasses}>
+      <p className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${mutedTextClasses}`}>{label}</p>
+      <p className={`mt-2 text-3xl font-semibold tracking-tight ${textClasses}`}>{value}</p>
     </div>
   )
 }
@@ -745,7 +758,7 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
           <div className="flex flex-wrap gap-2">
             <Link
               href="/produtos-x-precificadores"
-              className="inline-flex items-center gap-2 rounded-full border border-[#e6dfd3] bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+              className={secondaryButtonLargeClasses}
             >
               <ArrowLeft className="h-4 w-4" />
               {t('common.back', 'Voltar')}
@@ -755,7 +768,7 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
                 type="button"
                 onClick={() => void handleSave()}
                 disabled={isSaving}
-                className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white disabled:opacity-70"
+                className={primaryButtonLargeClasses}
               >
                 {isSaving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 {t('common.save', 'Salvar')}
@@ -775,11 +788,11 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
         <SectionCard>
           <div className="space-y-5">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              <p className={`text-xs font-semibold uppercase tracking-[0.2em] ${mutedTextClasses}`}>
                 {t('priceStock.productPricers.actions.creationAssistant', 'Assistente de criação')}
               </p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{pageTitle}</h1>
-              <p className="mt-2 max-w-3xl text-sm text-slate-500">
+              <h1 className={`mt-2 text-3xl font-semibold tracking-tight ${textClasses}`}>{pageTitle}</h1>
+              <p className={`mt-2 max-w-3xl text-sm ${mutedTextClasses}`}>
                 Configure público, produtos, regra e condições em etapas sequenciais antes de salvar o lote.
               </p>
             </div>
@@ -859,65 +872,65 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
 
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900"><RequiredLabel label="Nome" /></label>
+                  <label className={labelClasses}><RequiredLabel label="Nome" /></label>
                   <input value={draft.general.nome} onChange={(event) => patchGeneral('nome', event.target.value)} className={renderInputClass(ruleErrors.nome)} />
-                  {ruleErrors.nome ? <p className="text-xs text-rose-600">Preencha o nome da regra.</p> : null}
+                  {ruleErrors.nome ? <p className={`text-xs ${errorTextClasses}`}>Preencha o nome da regra.</p> : null}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">Código</label>
+                  <label className={labelClasses}>Código</label>
                   <input value={draft.general.codigo} onChange={(event) => patchGeneral('codigo', event.target.value)} className={renderInputClass(false)} />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900"><RequiredLabel label="Tipo" /></label>
+                  <label className={labelClasses}><RequiredLabel label="Tipo" /></label>
                   <select value={draft.general.tipo} onChange={(event) => patchGeneral('tipo', event.target.value)} className={renderInputClass(ruleErrors.tipo)}>
                     <option value="">Selecione</option>
                     {PRODUTO_PRECIFICADOR_TYPE_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>{option.label}</option>
                     ))}
                   </select>
-                  {ruleErrors.tipo ? <p className="text-xs text-rose-600">Selecione o tipo da regra.</p> : null}
+                  {ruleErrors.tipo ? <p className={`text-xs ${errorTextClasses}`}>Selecione o tipo da regra.</p> : null}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900"><RequiredLabel label="Origem" /></label>
+                  <label className={labelClasses}><RequiredLabel label="Origem" /></label>
                   <select value={draft.general.origem} onChange={(event) => patchGeneral('origem', event.target.value)} className={renderInputClass(ruleErrors.origem)}>
                     <option value="">Selecione</option>
                     {PRODUTO_PRECIFICADOR_ORIGIN_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>{option.label}</option>
                     ))}
                   </select>
-                  {ruleErrors.origem ? <p className="text-xs text-rose-600">Selecione a origem da regra.</p> : null}
+                  {ruleErrors.origem ? <p className={`text-xs ${errorTextClasses}`}>Selecione a origem da regra.</p> : null}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900"><RequiredLabel label="Perfil" /></label>
+                  <label className={labelClasses}><RequiredLabel label="Perfil" /></label>
                   <select value={draft.general.perfil} onChange={(event) => patchGeneral('perfil', event.target.value)} className={renderInputClass(ruleErrors.perfil)}>
                     <option value="">Selecione</option>
                     {PRODUTO_PRECIFICADOR_PROFILE_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>{option.label}</option>
                     ))}
                   </select>
-                  {ruleErrors.perfil ? <p className="text-xs text-rose-600">Selecione o perfil da regra.</p> : null}
+                  {ruleErrors.perfil ? <p className={`text-xs ${errorTextClasses}`}>Selecione o perfil da regra.</p> : null}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">Índice</label>
+                  <label className={labelClasses}>Índice</label>
                   <input value={draft.general.indice} onChange={(event) => patchGeneral('indice', event.target.value.replace(/\D+/g, ''))} className={renderInputClass(false)} />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">Posição</label>
+                  <label className={labelClasses}>Posição</label>
                   <input value={draft.general.posicao} onChange={(event) => patchGeneral('posicao', event.target.value.replace(/\D+/g, ''))} className={renderInputClass(false)} />
                 </div>
               </div>
 
-              <div className="rounded-[1.1rem] border border-[#e8e2d7] bg-[#fcfaf5] p-4">
+              <div className="app-pane-muted rounded-[1.1rem] p-4">
                 <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-950">Definições de preço</h3>
-                    <p className="mt-1 text-sm text-slate-500">O comportamento dos campos segue o tipo da regra, como no legado.</p>
+                    <h3 className={labelClasses}>Definições de preço</h3>
+                    <p className={`mt-1 text-sm ${mutedTextClasses}`}>O comportamento dos campos segue o tipo da regra, como no legado.</p>
                   </div>
                   <button
                     type="button"
@@ -925,7 +938,7 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
                       ...current,
                       definitions: [...current.definitions, createDefinition(current.definitions.length + 1)],
                     }))}
-                    className="inline-flex items-center gap-2 rounded-full border border-[#e6dfd3] bg-white px-4 py-2 text-sm font-semibold text-slate-700"
+                    className={secondaryButtonClasses}
                   >
                     <Plus className="h-4 w-4" />
                     Adicionar definição
@@ -934,11 +947,11 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
 
                 <div className="space-y-4">
                   {draft.definitions.map((currentDefinition, definitionIndex) => (
-                    <div key={currentDefinition.id} className="rounded-[1rem] border border-[#e6dfd3] bg-white p-4">
+                    <div key={currentDefinition.id} className="app-control-muted rounded-[1rem] p-4">
                       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                         <div>
-                          <h4 className="text-sm font-semibold text-slate-950">Definição {definitionIndex + 1}</h4>
-                          <p className="mt-1 text-sm text-slate-500">Cada definição adicional amplia o cruzamento final do lote.</p>
+                          <h4 className={labelClasses}>Definição {definitionIndex + 1}</h4>
+                          <p className={`mt-1 text-sm ${mutedTextClasses}`}>Cada definição adicional amplia o cruzamento final do lote.</p>
                         </div>
                         {draft.definitions.length > 1 && definitionIndex > 0 ? (
                           <button
@@ -947,7 +960,7 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
                               ...current,
                               definitions: current.definitions.filter((item) => item.id !== currentDefinition.id),
                             }))}
-                            className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-3 py-2 text-sm font-semibold text-rose-600"
+                            className={dangerButtonClasses}
                           >
                             <Trash2 className="h-4 w-4" />
                             Remover
@@ -960,7 +973,7 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
                           <>
                             <ToggleCard label="Último preço" checked={currentDefinition.ultimo_preco} onChange={(value) => patchDefinition(currentDefinition.id, { ultimo_preco: value })} />
                             <div className="space-y-2 xl:col-span-3">
-                              <label className="text-sm font-semibold text-slate-900">Preço</label>
+                              <label className={labelClasses}>Preço</label>
                               <InputWithAffix prefix="R$" value={currentDefinition.preco} onChange={(event) => patchDefinition(currentDefinition.id, { preco: currencyMask(event.target.value) })} />
                             </div>
                           </>
@@ -969,11 +982,11 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
                         {definitionMode === 'absolute' ? (
                           <>
                             <div className="space-y-2">
-                              <label className="text-sm font-semibold text-slate-900">Desconto</label>
+                              <label className={labelClasses}>Desconto</label>
                               <InputWithAffix prefix="R$" value={currentDefinition.desconto} onChange={(event) => patchDefinition(currentDefinition.id, { desconto: currencyMask(event.target.value) })} />
                             </div>
                             <div className="space-y-2">
-                              <label className="text-sm font-semibold text-slate-900">Acréscimo</label>
+                              <label className={labelClasses}>Acréscimo</label>
                               <InputWithAffix prefix="R$" value={currentDefinition.acrescimo} onChange={(event) => patchDefinition(currentDefinition.id, { acrescimo: currencyMask(event.target.value) })} />
                             </div>
                           </>
@@ -982,30 +995,30 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
                         {definitionMode === 'percent' ? (
                           <>
                             <div className="space-y-2">
-                              <label className="text-sm font-semibold text-slate-900">Desconto</label>
+                              <label className={labelClasses}>Desconto</label>
                               <InputWithAffix suffix="%" value={currentDefinition.desconto} onChange={(event) => patchDefinition(currentDefinition.id, { desconto: decimalMask(event.target.value) })} />
                             </div>
                             <div className="space-y-2">
-                              <label className="text-sm font-semibold text-slate-900">Acréscimo</label>
+                              <label className={labelClasses}>Acréscimo</label>
                               <InputWithAffix suffix="%" value={currentDefinition.acrescimo} onChange={(event) => patchDefinition(currentDefinition.id, { acrescimo: decimalMask(event.target.value) })} />
                             </div>
                           </>
                         ) : null}
 
                         <div className="space-y-2">
-                          <label className="text-sm font-semibold text-slate-900">Pedido mínimo</label>
+                          <label className={labelClasses}>Pedido mínimo</label>
                           <InputWithAffix prefix="R$" value={currentDefinition.pedido_minimo} onChange={(event) => patchDefinition(currentDefinition.id, { pedido_minimo: currencyMask(event.target.value) })} />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-semibold text-slate-900">Pedido máximo</label>
+                          <label className={labelClasses}>Pedido máximo</label>
                           <InputWithAffix prefix="R$" value={currentDefinition.pedido_maximo} onChange={(event) => patchDefinition(currentDefinition.id, { pedido_maximo: currencyMask(event.target.value) })} />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-semibold text-slate-900">Itens por pedido de</label>
+                          <label className={labelClasses}>Itens por pedido de</label>
                           <input value={currentDefinition.itens_pedido_de} onChange={(event) => patchDefinition(currentDefinition.id, { itens_pedido_de: event.target.value.replace(/\D+/g, '') })} className={renderInputClass(false)} />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-semibold text-slate-900">Itens por pedido até</label>
+                          <label className={labelClasses}>Itens por pedido até</label>
                           <input value={currentDefinition.itens_pedido_ate} onChange={(event) => patchDefinition(currentDefinition.id, { itens_pedido_ate: event.target.value.replace(/\D+/g, '') })} className={renderInputClass(false)} />
                         </div>
                       </div>
@@ -1021,20 +1034,20 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
           <SectionCard title="Condições e validade" description="Defina vigência, forma de pagamento, condição de pagamento, forma de entrega e prazo médio quando aplicável.">
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-900">Data inicial</label>
+                <label className={labelClasses}>Data inicial</label>
                 <input type="datetime-local" value={draft.conditions.data_inicio} onChange={(event) => patchConditions('data_inicio', event.target.value)} className={renderInputClass(false)} />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-900">Data final</label>
+                <label className={labelClasses}>Data final</label>
                 <input type="datetime-local" value={draft.conditions.data_fim} onChange={(event) => patchConditions('data_fim', event.target.value)} className={renderInputClass(false)} />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-900">Prazo médio</label>
+                <label className={labelClasses}>Prazo médio</label>
                 <input value={draft.conditions.prazo_medio} onChange={(event) => patchConditions('prazo_medio', event.target.value.replace(/\D+/g, ''))} className={renderInputClass(false)} />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-900">Forma de pagamento</label>
+                <label className={labelClasses}>Forma de pagamento</label>
                 <LookupSelect
                   label="Forma de pagamento"
                   value={draft.conditions.forma_pagamento_lookup}
@@ -1051,7 +1064,7 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-900">Condição de pagamento</label>
+                <label className={labelClasses}>Condição de pagamento</label>
                 <LookupSelect
                   label="Condição de pagamento"
                   value={draft.conditions.condicao_pagamento_lookup}
@@ -1068,7 +1081,7 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-900">Forma de entrega</label>
+                <label className={labelClasses}>Forma de entrega</label>
                 <input
                   value={draft.conditions.id_forma_entrega}
                   onChange={(event) => patchConditions('id_forma_entrega', event.target.value)}
@@ -1093,47 +1106,47 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
 
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-950">Público alvo</h3>
+                    <h3 className={`text-xl ${headingClasses}`}>Público alvo</h3>
                     <div className="mt-3 space-y-3">
                       {audienceSummary.map((item) => (
-                        <div key={item.label} className="rounded-[1rem] border border-[#e8e2d7] bg-[#fcfaf5] px-4 py-4">
-                          <p className="text-sm font-semibold text-slate-950">{item.label}</p>
-                          <p className="mt-2 text-sm text-slate-600">Tipo: <span className="font-semibold text-slate-900">{item.type}</span></p>
-                          <p className="mt-1 text-sm text-slate-600">Seleção: <span className="font-semibold text-slate-900">{item.values}</span></p>
+                        <div key={item.label} className={paneClasses}>
+                          <p className={labelClasses}>{item.label}</p>
+                          <p className={`mt-2 ${summaryTextClasses}`}>Tipo: <span className={summaryStrongClasses}>{item.type}</span></p>
+                          <p className={`mt-1 ${summaryTextClasses}`}>Seleção: <span className={summaryStrongClasses}>{item.values}</span></p>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-950">Seleção de produtos</h3>
+                    <h3 className={`text-xl ${headingClasses}`}>Seleção de produtos</h3>
                     <div className="mt-3 space-y-3">
                       {productSummary.map((item) => (
-                        <div key={item.label} className="rounded-[1rem] border border-[#e8e2d7] bg-[#fcfaf5] px-4 py-4">
-                          <p className="text-sm font-semibold text-slate-950">{item.label}</p>
-                          <p className="mt-2 text-sm text-slate-600">Tipo: <span className="font-semibold text-slate-900">{item.type}</span></p>
-                          <p className="mt-1 text-sm text-slate-600">Seleção: <span className="font-semibold text-slate-900">{item.values}</span></p>
-                          {item.packaging ? <p className="mt-1 text-sm text-slate-600">Embalagem: <span className="font-semibold text-slate-900">{item.packaging}</span></p> : null}
+                        <div key={item.label} className={paneClasses}>
+                          <p className={labelClasses}>{item.label}</p>
+                          <p className={`mt-2 ${summaryTextClasses}`}>Tipo: <span className={summaryStrongClasses}>{item.type}</span></p>
+                          <p className={`mt-1 ${summaryTextClasses}`}>Seleção: <span className={summaryStrongClasses}>{item.values}</span></p>
+                          {item.packaging ? <p className={`mt-1 ${summaryTextClasses}`}>Embalagem: <span className={summaryStrongClasses}>{item.packaging}</span></p> : null}
                         </div>
                       ))}
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-950">Definição da regra</h3>
+                    <h3 className={`text-xl ${headingClasses}`}>Definição da regra</h3>
                     <div className="mt-3 space-y-3">
                       {draft.definitions.map((item, index) => (
-                        <div key={item.id} className="rounded-[1rem] border border-slate-900 bg-slate-950 px-4 py-4 text-white">
-                          <p className="text-sm font-semibold text-white">Definição {index + 1}</p>
+                        <div key={item.id} className={paneClasses}>
+                          <p className={labelClasses}>Definição {index + 1}</p>
                           <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                            <p className="text-sm text-slate-200">Último preço: <span className="font-semibold text-white">{item.ultimo_preco ? 'Sim' : 'Não'}</span></p>
-                            <p className="text-sm text-slate-200">Preço: <span className="font-semibold text-white">{formatDefinitionValue(item.preco, 'currency')}</span></p>
-                            <p className="text-sm text-slate-200">Desconto: <span className="font-semibold text-white">{formatDefinitionValue(item.desconto, definitionMode === 'percent' ? 'percent' : 'currency')}</span></p>
-                            <p className="text-sm text-slate-200">Acréscimo: <span className="font-semibold text-white">{formatDefinitionValue(item.acrescimo, definitionMode === 'percent' ? 'percent' : 'currency')}</span></p>
-                            <p className="text-sm text-slate-200">Pedido mínimo: <span className="font-semibold text-white">{formatDefinitionValue(item.pedido_minimo, 'currency')}</span></p>
-                            <p className="text-sm text-slate-200">Pedido máximo: <span className="font-semibold text-white">{formatDefinitionValue(item.pedido_maximo, 'currency')}</span></p>
-                            <p className="text-sm text-slate-200">Itens por pedido de: <span className="font-semibold text-white">{item.itens_pedido_de || '-'}</span></p>
-                            <p className="text-sm text-slate-200">Itens por pedido até: <span className="font-semibold text-white">{item.itens_pedido_ate || '-'}</span></p>
+                            <p className={summaryTextClasses}>Último preço: <span className={summaryStrongClasses}>{item.ultimo_preco ? 'Sim' : 'Não'}</span></p>
+                            <p className={summaryTextClasses}>Preço: <span className={summaryStrongClasses}>{formatDefinitionValue(item.preco, 'currency')}</span></p>
+                            <p className={summaryTextClasses}>Desconto: <span className={summaryStrongClasses}>{formatDefinitionValue(item.desconto, definitionMode === 'percent' ? 'percent' : 'currency')}</span></p>
+                            <p className={summaryTextClasses}>Acréscimo: <span className={summaryStrongClasses}>{formatDefinitionValue(item.acrescimo, definitionMode === 'percent' ? 'percent' : 'currency')}</span></p>
+                            <p className={summaryTextClasses}>Pedido mínimo: <span className={summaryStrongClasses}>{formatDefinitionValue(item.pedido_minimo, 'currency')}</span></p>
+                            <p className={summaryTextClasses}>Pedido máximo: <span className={summaryStrongClasses}>{formatDefinitionValue(item.pedido_maximo, 'currency')}</span></p>
+                            <p className={summaryTextClasses}>Itens por pedido de: <span className={summaryStrongClasses}>{item.itens_pedido_de || '-'}</span></p>
+                            <p className={summaryTextClasses}>Itens por pedido até: <span className={summaryStrongClasses}>{item.itens_pedido_ate || '-'}</span></p>
                           </div>
                         </div>
                       ))}
@@ -1141,10 +1154,10 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
                   </div>
 
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-950">Prévia do lote</h3>
-                    <div className="mt-3 overflow-x-auto rounded-[1rem] border border-[#e8e2d7]">
-                      <table className="min-w-full divide-y divide-[#eee6da] text-sm">
-                        <thead className="bg-[#fcfaf5] text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    <h3 className={`text-xl ${headingClasses}`}>Prévia do lote</h3>
+                    <div className="app-table-shell mt-3 overflow-x-auto rounded-[1rem]">
+                      <table className="min-w-full divide-y divide-line/60 text-sm">
+                        <thead className="app-table-muted text-left text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--app-muted)]">
                           <tr>
                             <th className="px-4 py-3">Público alvo</th>
                             <th className="px-4 py-3">Produto</th>
@@ -1153,45 +1166,45 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
                             <th className="px-4 py-3">Desconto</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#f1ebe0]">
+                        <tbody className="divide-y divide-line/50">
                           {previewRows.map((row) => (
-                            <tr key={row.key} className="bg-white">
-                              <td className="px-4 py-3 font-medium text-slate-900">{row.audience}</td>
-                              <td className="px-4 py-3 text-slate-600">{row.product}</td>
-                              <td className="px-4 py-3 text-slate-600">{row.definition}</td>
-                              <td className="px-4 py-3 text-slate-600">{row.price}</td>
-                              <td className="px-4 py-3 text-slate-600">{row.discount}</td>
+                            <tr key={row.key} className="app-table-row-hover">
+                              <td className="px-4 py-3 font-medium text-[color:var(--app-text)]">{row.audience}</td>
+                              <td className="px-4 py-3 text-[color:var(--app-muted)]">{row.product}</td>
+                              <td className="px-4 py-3 text-[color:var(--app-muted)]">{row.definition}</td>
+                              <td className="px-4 py-3 text-[color:var(--app-muted)]">{row.price}</td>
+                              <td className="px-4 py-3 text-[color:var(--app-muted)]">{row.discount}</td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
-                    {flatRowsPreview.length > 12 ? <p className="mt-3 text-sm text-slate-500">Exibindo 12 de {flatRowsPreview.length} combinações geradas.</p> : null}
+                    {flatRowsPreview.length > 12 ? <p className={`mt-3 text-sm ${mutedTextClasses}`}>Exibindo 12 de {flatRowsPreview.length} combinações geradas.</p> : null}
                   </div>
                 </div>
               </div>
             </SectionCard>
 
             <SectionCard title="Resumo final" description="Revise os dados consolidados antes de salvar o lote.">
-              <div className="space-y-3 text-sm text-slate-600">
-                <p>Nome: <span className="font-semibold text-slate-900">{draft.general.nome || '-'}</span></p>
-                <p>Código: <span className="font-semibold text-slate-900">{draft.general.codigo || '-'}</span></p>
-                <p>Tipo: <span className="font-semibold text-slate-900">{draft.general.tipo || '-'}</span></p>
-                <p>Origem: <span className="font-semibold text-slate-900">{draft.general.origem || '-'}</span></p>
-                <p>Perfil: <span className="font-semibold text-slate-900">{draft.general.perfil || '-'}</span></p>
-                <p>Índice: <span className="font-semibold text-slate-900">{draft.general.indice || '-'}</span></p>
-                <p>Posição: <span className="font-semibold text-slate-900">{draft.general.posicao || '-'}</span></p>
+              <div className={`space-y-3 text-sm ${mutedTextClasses}`}>
+                <p>Nome: <span className={summaryStrongClasses}>{draft.general.nome || '-'}</span></p>
+                <p>Código: <span className={summaryStrongClasses}>{draft.general.codigo || '-'}</span></p>
+                <p>Tipo: <span className={summaryStrongClasses}>{draft.general.tipo || '-'}</span></p>
+                <p>Origem: <span className={summaryStrongClasses}>{draft.general.origem || '-'}</span></p>
+                <p>Perfil: <span className={summaryStrongClasses}>{draft.general.perfil || '-'}</span></p>
+                <p>Índice: <span className={summaryStrongClasses}>{draft.general.indice || '-'}</span></p>
+                <p>Posição: <span className={summaryStrongClasses}>{draft.general.posicao || '-'}</span></p>
                 {generalToggleSummary.map(([label, value]) => (
                   <p key={label}>
-                    {label}: <span className="font-semibold text-slate-900">{value ? 'Sim' : 'Não'}</span>
+                    {label}: <span className={summaryStrongClasses}>{value ? 'Sim' : 'Não'}</span>
                   </p>
                 ))}
-                <p>Forma de pagamento: <span className="font-semibold text-slate-900">{draft.conditions.forma_pagamento_lookup?.label || '-'}</span></p>
-                <p>Condição de pagamento: <span className="font-semibold text-slate-900">{draft.conditions.condicao_pagamento_lookup?.label || '-'}</span></p>
-                <p>Forma de entrega: <span className="font-semibold text-slate-900">{draft.conditions.id_forma_entrega || '-'}</span></p>
-                <p>Data inicial: <span className="font-semibold text-slate-900">{formatInputDateTimeForDisplay(draft.conditions.data_inicio) || '-'}</span></p>
-                <p>Data final: <span className="font-semibold text-slate-900">{formatInputDateTimeForDisplay(draft.conditions.data_fim) || '-'}</span></p>
-                <p>Prazo médio: <span className="font-semibold text-slate-900">{draft.conditions.prazo_medio || '-'}</span></p>
+                <p>Forma de pagamento: <span className={summaryStrongClasses}>{draft.conditions.forma_pagamento_lookup?.label || '-'}</span></p>
+                <p>Condição de pagamento: <span className={summaryStrongClasses}>{draft.conditions.condicao_pagamento_lookup?.label || '-'}</span></p>
+                <p>Forma de entrega: <span className={summaryStrongClasses}>{draft.conditions.id_forma_entrega || '-'}</span></p>
+                <p>Data inicial: <span className={summaryStrongClasses}>{formatInputDateTimeForDisplay(draft.conditions.data_inicio) || '-'}</span></p>
+                <p>Data final: <span className={summaryStrongClasses}>{formatInputDateTimeForDisplay(draft.conditions.data_fim) || '-'}</span></p>
+                <p>Prazo médio: <span className={summaryStrongClasses}>{draft.conditions.prazo_medio || '-'}</span></p>
               </div>
             </SectionCard>
           </div>
@@ -1203,7 +1216,7 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
               type="button"
               onClick={goPrev}
               disabled={currentStepIndex === 0}
-              className="rounded-full border border-[#e6dfd3] px-4 py-3 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="app-button-secondary rounded-full px-4 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t('common.previous', 'Anterior')}
             </button>
@@ -1212,7 +1225,7 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
               <button
                 type="button"
                 onClick={goNext}
-                className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white"
+                className={primaryButtonLargeClasses}
               >
                 {t('common.next', 'Próximo')}
                 <ChevronRight className="h-4 w-4" />
@@ -1222,7 +1235,7 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
                 type="button"
                 onClick={() => void handleSave()}
                 disabled={isSaving || !canSave}
-                className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white disabled:opacity-70"
+                className={primaryButtonLargeClasses}
               >
                 {isSaving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 {t('common.save', 'Salvar')}

@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudRecord } from '@/src/components/crud-base/types'
 import { formatLocalizedDecimal, normalizeCurrencyInputValue, parseInteger, parseLocalizedNumber } from '@/src/lib/value-parsers'
 import { normalizeLookupState, nullableLookupId } from '@/src/lib/lookup-options'

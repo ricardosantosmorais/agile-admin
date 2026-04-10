@@ -66,18 +66,18 @@ function TreeNode({
 
   return (
     <Fragment>
-      <div className="flex items-center gap-2 rounded-[0.95rem] px-2.5 py-2 hover:bg-[#fcfaf5]" style={{ paddingLeft: `${level * 16 + 8}px` }}>
+      <div className="app-table-row-hover flex items-center gap-2 rounded-[0.95rem] px-2.5 py-2" style={{ paddingLeft: `${level * 16 + 8}px` }}>
         {hasChildren ? (
-          <button type="button" onClick={() => setOpen((current) => !current)} className="inline-flex h-6 w-6 items-center justify-center rounded-full text-slate-500">
+          <button type="button" onClick={() => setOpen((current) => !current)} className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[color:var(--app-muted)]">
             {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
           </button>
         ) : (
-          <span className="inline-flex h-6 w-6 items-center justify-center text-slate-300">
+          <span className="inline-flex h-6 w-6 items-center justify-center text-[color:var(--app-muted)]/70">
             <FolderTree className="h-4 w-4" />
           </span>
         )}
-        <label className="flex min-w-0 flex-1 items-center gap-2 text-sm text-slate-700">
-          <input type="checkbox" checked={checked} onChange={() => onToggle(node.id)} className="h-4 w-4 rounded border-[#d8ccb7]" />
+        <label className="flex min-w-0 flex-1 items-center gap-2 text-sm text-[color:var(--app-text)]">
+          <input type="checkbox" checked={checked} onChange={() => onToggle(node.id)} className="h-4 w-4 rounded border-[color:var(--app-control-border)]" />
           <span className="truncate">{node.nome}</span>
         </label>
       </div>
@@ -101,11 +101,11 @@ export function DepartamentoTreeSelector({
   const nodes = useMemo(() => filterTree(buildTree(items), search), [items, search])
 
   if (!nodes.length) {
-    return <div className="rounded-[1rem] border border-dashed border-[#e6dfd3] px-4 py-6 text-sm text-slate-500">Nenhum departamento encontrado.</div>
+    return <div className="app-pane rounded-[1rem] border border-dashed border-[color:var(--app-card-border)] px-4 py-6 text-sm text-[color:var(--app-muted)]">Nenhum departamento encontrado.</div>
   }
 
   return (
-    <div className="max-h-[420px] overflow-y-auto rounded-[1rem] border border-[#ece5d9] bg-white py-2">
+    <div className="app-pane max-h-[420px] overflow-y-auto rounded-[1rem] border border-[color:var(--app-card-border)] py-2">
       {nodes.map((node) => (
         <TreeNode key={node.id} node={node} level={0} selectedIds={selectedIds} onToggle={onToggle} />
       ))}

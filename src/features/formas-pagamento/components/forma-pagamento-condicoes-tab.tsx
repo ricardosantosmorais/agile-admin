@@ -23,6 +23,8 @@ function getRowId(item: FormaPagamentoCondicaoRecord) {
   return `${item.id_forma_pagamento}:${item.id_condicao_pagamento}`
 }
 
+const feedbackClasses = 'app-error-panel rounded-[1rem] px-4 py-3 text-sm'
+
 export function FormaPagamentoCondicoesTab({
   formaPagamentoId,
   items,
@@ -111,7 +113,7 @@ export function FormaPagamentoCondicoesTab({
         onConfirm={() => void handleCreate()}
         isSaving={isSaving}
       >
-        {feedback ? <div className="rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{feedback}</div> : null}
+        {feedback ? <div className={feedbackClasses}>{feedback}</div> : null}
         <FormField label={t('financial.paymentMethods.tabs.conditions', 'Condições de pagamento')}>
           <LookupSelect
             label={t('financial.paymentMethods.tabs.conditions', 'Condições de pagamento')}

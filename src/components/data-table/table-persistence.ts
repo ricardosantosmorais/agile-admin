@@ -1,5 +1,3 @@
-'use client'
-
 export function readSessionState<TState>(storageKey: string): TState | null {
   if (typeof window === 'undefined') {
     return null

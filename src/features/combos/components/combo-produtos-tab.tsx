@@ -6,6 +6,7 @@ import { BooleanChoice } from '@/src/components/ui/boolean-choice'
 import { ConfirmDialog } from '@/src/components/ui/confirm-dialog'
 import { CrudModal } from '@/src/components/ui/crud-modal'
 import { FormField } from '@/src/components/ui/form-field'
+import { InputWithAffix } from '@/src/components/ui/input-with-affix'
 import { LookupSelect, type LookupOption } from '@/src/components/ui/lookup-select'
 import { StatusBadge } from '@/src/components/ui/status-badge'
 import { TooltipIconButton } from '@/src/components/ui/tooltip-icon-button'
@@ -293,7 +294,11 @@ export function ComboProdutosTab({
             render: (item) => !readOnly ? (
               <div className="flex items-center gap-2">
                 <TooltipIconButton label={t('simpleCrud.actions.edit', 'Editar')}>
-                  <button type="button" onClick={() => openEditModal(item)} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#e6dfd3] bg-white text-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => openEditModal(item)}
+                    className="app-button-secondary inline-flex h-9 w-9 items-center justify-center rounded-full p-0"
+                  >
                     <Pencil className="h-4 w-4" />
                   </button>
                 </TooltipIconButton>
@@ -304,7 +309,7 @@ export function ComboProdutosTab({
                       setSelectedIds([item.id])
                       setConfirmOpen(true)
                     }}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-700"
+                    className="app-button-danger inline-flex h-9 w-9 items-center justify-center rounded-full p-0"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -324,7 +329,7 @@ export function ComboProdutosTab({
         onConfirm={() => void handleSave()}
       >
         <div className="grid gap-4 md:grid-cols-2">
-          {modalFeedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{modalFeedback}</div> : null}
+          {modalFeedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{modalFeedback}</div> : null}
 
           <FormField label={t('marketing.combos.tabs.products.fields.changeQuantity', 'Altera quantidade')}>
             <BooleanChoice
@@ -378,29 +383,23 @@ export function ComboProdutosTab({
           ) : null}
 
           <FormField label={t('marketing.combos.tabs.products.fields.price', 'Preço')}>
-            <div className="flex overflow-hidden rounded-[0.9rem] border border-[#e6dfd3] bg-white">
-              <span className="inline-flex items-center border-r border-[#e6dfd3] bg-[#fcfaf5] px-3 text-sm font-semibold text-slate-600">R$</span>
-              <input
-                value={draft.preco}
-                onChange={(event) => setDraft((current) => ({ ...current, preco: currencyMask(event.target.value) }))}
-                className={`${inputClasses()} rounded-none border-0 shadow-none focus:ring-0`}
-                disabled={readOnly}
-                inputMode="decimal"
-              />
-            </div>
+            <InputWithAffix
+              value={draft.preco}
+              onChange={(event) => setDraft((current) => ({ ...current, preco: currencyMask(event.target.value) }))}
+              prefix="R$"
+              disabled={readOnly}
+              inputMode="decimal"
+            />
           </FormField>
 
           <FormField label={t('marketing.combos.tabs.products.fields.discount', 'Desconto')}>
-            <div className="flex overflow-hidden rounded-[0.9rem] border border-[#e6dfd3] bg-white">
-              <input
-                value={draft.desconto}
-                onChange={(event) => setDraft((current) => ({ ...current, desconto: decimalMask(event.target.value) }))}
-                className={`${inputClasses()} rounded-none border-0 shadow-none focus:ring-0`}
-                disabled={readOnly}
-                inputMode="decimal"
-              />
-              <span className="inline-flex items-center border-l border-[#e6dfd3] bg-[#fcfaf5] px-3 text-sm font-semibold text-slate-600">%</span>
-            </div>
+            <InputWithAffix
+              value={draft.desconto}
+              onChange={(event) => setDraft((current) => ({ ...current, desconto: decimalMask(event.target.value) }))}
+              suffix="%"
+              disabled={readOnly}
+              inputMode="decimal"
+            />
           </FormField>
 
           <FormField label={t('marketing.combos.tabs.products.fields.minQuantity', 'Quant. mínima')}>

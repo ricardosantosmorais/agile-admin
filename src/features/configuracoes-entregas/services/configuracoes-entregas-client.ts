@@ -1,5 +1,3 @@
-﻿'use client'
-
 import { httpClient } from '@/src/services/http/http-client'
 import { buildDirtyConfiguracoesEntregasPayload, normalizeConfiguracoesEntregasRecord } from '@/src/features/configuracoes-entregas/services/configuracoes-entregas-mappers'
 import type { ConfiguracoesEntregasFormValues, ConfiguracoesEntregasRecord } from '@/src/features/configuracoes-entregas/types/configuracoes-entregas'

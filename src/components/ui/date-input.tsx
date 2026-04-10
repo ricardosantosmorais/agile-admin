@@ -11,7 +11,7 @@ type DateInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
 export function DateInput({ className = '', ...props }: DateInputProps) {
   return (
     <div className="relative">
-      <CalendarDays className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      <CalendarDays className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
       <input
         {...props}
         type="date"

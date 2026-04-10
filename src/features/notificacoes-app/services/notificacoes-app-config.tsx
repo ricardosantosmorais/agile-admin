@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import { normalizeNotificacaoRecord, toNotificacaoPayload } from '@/src/features/notificacoes-app/services/notificacoes-app-mappers'
 import { formatDateTime } from '@/src/lib/date-time'

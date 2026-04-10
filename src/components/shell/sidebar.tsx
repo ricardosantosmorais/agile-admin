@@ -66,7 +66,7 @@ function SidebarNav({
           <button
             type="button"
             onClick={onCloseMobile}
-            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#e7e0d1] bg-white text-slate-600"
+            className="app-button-secondary flex h-10 w-10 items-center justify-center rounded-2xl text-[color:var(--app-muted)]"
             aria-label={t('common.close', 'Fechar')}
           >
             <X className="h-4 w-4" />
@@ -85,8 +85,8 @@ function SidebarNav({
             const itemClassName = [
               'flex items-center rounded-2xl transition',
               isItemActive(pathname, item.to)
-                ? 'bg-accent text-white shadow-[0_10px_24px_rgba(25,95,77,0.18)]'
-                : 'text-slate-600 hover:bg-[#f8f5ee] hover:text-slate-950',
+                ? 'app-nav-active text-white'
+                : 'app-nav-hover text-[color:var(--app-muted)] hover:text-[color:var(--app-text)]',
               mobile ? 'gap-3 px-3.5 py-3' : isSidebarCollapsed ? 'justify-center py-3' : 'gap-3 px-3.5 py-2.5',
             ].join(' ')
 
@@ -142,7 +142,7 @@ function SidebarNav({
                 onClick={() => onToggleGroup(item.key)}
                 className={[
                   'flex w-full items-center rounded-2xl transition',
-                  groupHasActiveChild ? 'bg-[#edf8f3] text-accent' : 'text-slate-600 hover:bg-[#f8f5ee] hover:text-slate-950',
+                  groupHasActiveChild ? 'app-nav-group-active' : 'app-nav-hover text-[color:var(--app-muted)] hover:text-[color:var(--app-text)]',
                   mobile ? 'justify-between px-3.5 py-3' : isSidebarCollapsed ? 'justify-center py-3' : 'justify-between px-3.5 py-2.5',
                 ].join(' ')}
                 title={!mobile && isSidebarCollapsed ? item.label : undefined}
@@ -164,8 +164,8 @@ function SidebarNav({
                     const childClassName = [
                       'flex items-center gap-3 rounded-2xl px-3.5 py-2.5 transition',
                       isItemActive(pathname, child.to)
-                        ? 'bg-slate-950 text-white shadow-[0_10px_22px_rgba(15,23,42,0.12)]'
-                        : 'text-slate-500 hover:bg-[#f8f5ee] hover:text-slate-950',
+                        ? 'app-nav-child-active text-white'
+                        : 'app-nav-hover text-slate-500 hover:text-[color:var(--app-text)]',
                     ].join(' ')
 
                     if (child.action === 'logout') {
@@ -260,7 +260,7 @@ export function Sidebar() {
     <>
       <aside
         className={[
-          'hidden min-h-[calc(100vh-1.5rem)] self-start flex-col justify-between rounded-[1.8rem] border border-[#ebe6d8] bg-white px-3 py-4 shadow-[0_16px_40px_rgba(15,23,42,0.06)] transition-all duration-300 lg:flex',
+          'app-shell-card-modern hidden min-h-[calc(100vh-1.5rem)] self-start flex-col justify-between rounded-[1.8rem] px-3 py-4 transition-all duration-300 lg:flex',
           isSidebarCollapsed ? 'w-[88px]' : 'w-[270px]',
         ].join(' ')}
       >
@@ -283,15 +283,15 @@ export function Sidebar() {
         {isSidebarCollapsed ? (
           <div className="flex justify-center pt-2">
             <div
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f6f8fb]"
+              className="app-control-muted flex h-8 w-8 items-center justify-center rounded-full"
               title={`${currentTenant.nome} · ${currentTenant.status}`}
             >
               <Dot className={['h-7 w-7', getTenantStatusTone(currentTenant.status)].join(' ')} />
             </div>
           </div>
         ) : (
-          <div className="rounded-[1.25rem] bg-[#faf8f3] px-3.5 py-3 text-[12px] leading-5 text-slate-500">
-            <p className="font-semibold text-slate-900">{currentTenant.nome}</p>
+          <div className="app-brand-panel rounded-[1.25rem] px-3.5 py-3 text-[12px] leading-5 text-[color:var(--app-muted)]">
+            <p className="font-semibold text-[color:var(--app-text)]">{currentTenant.nome}</p>
             <div className="mt-1 flex items-center gap-1.5">
               <Dot className={['h-5 w-5 -ml-1', getTenantStatusTone(currentTenant.status)].join(' ')} />
               <span>{t(`shell.${currentTenant.status.toLowerCase()}`, currentTenant.status)}</span>
@@ -309,7 +309,7 @@ export function Sidebar() {
             onClick={closeMobileSidebar}
           />
 
-          <aside className="absolute inset-y-0 left-0 flex w-[min(86vw,320px)] flex-col border-r border-[#ebe6d8] bg-white px-3 py-4 shadow-[0_18px_46px_rgba(15,23,42,0.18)]">
+          <aside className="app-shell-card-modern absolute inset-y-0 left-0 flex w-[min(86vw,320px)] flex-col rounded-none px-3 py-4 shadow-[0_18px_46px_rgba(15,23,42,0.18)]">
             <div className="min-h-0 flex-1 overflow-y-auto">
               <SidebarNav
                 mobile
@@ -327,8 +327,8 @@ export function Sidebar() {
               />
             </div>
 
-            <div className="mt-4 rounded-[1.25rem] bg-[#faf8f3] px-3.5 py-3 text-[12px] leading-5 text-slate-500">
-              <p className="font-semibold text-slate-900">{currentTenant.nome}</p>
+            <div className="app-brand-panel mt-4 rounded-[1.25rem] px-3.5 py-3 text-[12px] leading-5 text-[color:var(--app-muted)]">
+              <p className="font-semibold text-[color:var(--app-text)]">{currentTenant.nome}</p>
               <div className="mt-1 flex items-center gap-1.5">
                 <Dot className={['h-5 w-5 -ml-1', getTenantStatusTone(currentTenant.status)].join(' ')} />
                 <span>{t(`shell.${currentTenant.status.toLowerCase()}`, currentTenant.status)}</span>

@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudRecord } from '@/src/components/crud-base/types'
 import { parseCurrencyInput } from '@/src/lib/input-masks'
 import { toLookupOption } from '@/src/lib/lookup-options'

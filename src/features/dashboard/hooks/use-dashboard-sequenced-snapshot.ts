@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { dashboardPresets, type DashboardSnapshot } from '@/src/lib/fake-data'
+import { dashboardPresets, type DashboardSnapshot } from '@/src/features/dashboard/types/dashboard'
 import { appData } from '@/src/services/app-data'
 
 export type DashboardPhaseId =

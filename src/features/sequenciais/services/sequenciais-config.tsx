@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import { getSequencialModuleLabel, SEQUENCIAIS_MODULE_OPTIONS } from '@/src/features/sequenciais/services/sequenciais-options'
 

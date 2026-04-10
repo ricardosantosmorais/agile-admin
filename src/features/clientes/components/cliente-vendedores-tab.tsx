@@ -112,7 +112,7 @@ export function ClienteVendedoresTab({
 
       <CrudModal open={modalOpen} title={t('clientes.form.relations.includeSeller', 'Add seller')} onClose={closeModal} onConfirm={() => void handleCreate()}>
         <div className="grid gap-4 md:grid-cols-2">
-          {modalFeedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{modalFeedback}</div> : null}
+          {modalFeedback ? <div className="app-error-panel md:col-span-2 rounded-[1rem] px-4 py-3 text-sm">{modalFeedback}</div> : null}
           <Field label={t('clientes.form.relations.seller', 'Seller')}><ClientLookupSelect resource="vendedores" label={t('clientes.form.relations.seller', 'Seller')} value={draft.vendedor} onChange={(value) => setDraft((current) => ({ ...current, vendedor: value }))} disabled={readOnly} /></Field>
           <Field label={t('clientes.form.relations.default', 'Default')}>
             <BooleanChoice value={draft.padrao} onChange={(value) => setDraft((current) => ({ ...current, padrao: value }))} disabled={readOnly} trueLabel={t('common.yes', 'Yes')} falseLabel={t('common.no', 'No')} />

@@ -1,5 +1,3 @@
-'use client'
-
 import { ParamsBridge } from '@/src/next/params-bridge'
 import { VendedorFormPage } from '@/src/features/vendedores/components/vendedor-form-page'
 

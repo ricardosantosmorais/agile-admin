@@ -80,7 +80,7 @@ export function ResizableHorizontalPanels({
   return (
     <div
       ref={containerRef}
-      className={`flex ${minHeightClassName} flex-row overflow-hidden rounded-[1.2rem] border border-[#efe8dc] bg-[#fbf8f2] ${className}`.trim()}
+      className={`app-pane flex ${minHeightClassName} flex-row overflow-hidden rounded-[1.2rem] ${className}`.trim()}
       style={{ height }}
     >
       <div
@@ -99,13 +99,13 @@ export function ResizableHorizontalPanels({
           setIsDragging(true)
         }}
         className={[
-          'group relative flex w-4 shrink-0 cursor-col-resize items-center justify-center bg-[#fbf8f2]',
-          isDragging ? 'before:bg-[#c4baa7]' : 'before:bg-[#e3dacb]',
+          'app-pane-muted group relative flex w-4 shrink-0 cursor-col-resize items-center justify-center',
+          isDragging ? 'before:bg-[color:var(--app-text-muted)]' : 'before:bg-[color:var(--app-border)]',
           'before:h-full before:w-[2px] before:rounded-full before:content-[\'\']',
         ].join(' ')}
       >
-        <span className="absolute inline-flex h-14 w-2.5 items-center justify-center rounded-full border border-[#e3dacb] bg-white shadow-sm">
-          <span className="h-6 w-1 rounded-full bg-[#d3c8b7]" />
+        <span className="app-control absolute inline-flex h-14 w-2.5 items-center justify-center rounded-full shadow-sm">
+          <span className="h-6 w-1 rounded-full bg-[color:var(--app-text-muted)]/50" />
         </span>
       </div>
 

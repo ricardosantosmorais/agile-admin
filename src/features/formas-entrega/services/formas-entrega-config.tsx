@@ -1,5 +1,3 @@
-'use client'
-
 import { loadCrudLookupOptions } from '@/src/components/crud-base/crud-client'
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import { normalizeFormaEntregaRecord, serializeFormaEntregaRecord } from '@/src/features/formas-entrega/services/formas-entrega-mappers'
@@ -66,7 +64,7 @@ export const FORMAS_ENTREGA_CONFIG: CrudModuleConfig = {
   },
   columns: [
     { id: 'id', labelKey: 'simpleCrud.fields.id', label: 'ID', sortKey: 'id', thClassName: 'w-[120px]', filter: { kind: 'text', key: 'id' } },
-    { id: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', sortKey: 'nome', tdClassName: 'font-semibold text-slate-950', filter: { kind: 'text', key: 'nome::like' } },
+    { id: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', sortKey: 'nome', tdClassName: 'font-semibold text-[color:var(--app-text)]', filter: { kind: 'text', key: 'nome::like' } },
     {
       id: 'tipo',
       labelKey: 'logistics.deliveryMethods.fields.type',

@@ -1,5 +1,3 @@
-'use client'
-
 import { StatusBadge } from '@/src/components/ui/status-badge'
 import type { CrudListRecord } from '@/src/components/crud-base/types'
 import {
@@ -39,8 +37,8 @@ export const PRODUTOS_PRECIFICADORES_LIST_CONFIG = {
     ativo: '',
   },
   columns: [
-    { id: 'id', labelKey: 'common.id', label: 'ID', sortKey: 'created_at', tdClassName: 'font-medium text-sm text-slate-600', filter: { kind: 'text', key: 'id' } },
-    { id: 'nome', labelKey: 'common.name', label: 'Nome', sortKey: 'nome', tdClassName: 'font-semibold text-slate-950', filter: { kind: 'text', key: 'nome' } },
+    { id: 'id', labelKey: 'common.id', label: 'ID', sortKey: 'created_at', tdClassName: 'font-medium text-sm text-[color:var(--app-muted)]', filter: { kind: 'text', key: 'id' } },
+    { id: 'nome', labelKey: 'common.name', label: 'Nome', sortKey: 'nome', tdClassName: 'font-semibold text-[color:var(--app-text)]', filter: { kind: 'text', key: 'nome' } },
     {
       id: 'tipo',
       labelKey: 'priceStock.productPricers.fields.type',

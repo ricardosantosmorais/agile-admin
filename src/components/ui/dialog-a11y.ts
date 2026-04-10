@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useId, useRef } from 'react'
 
 const FOCUSABLE_SELECTOR = [
@@ -25,6 +23,32 @@ function getFocusableElements(container: HTMLElement | null) {
   })
 }
 
+function getInitialFocusTarget(container: HTMLElement | null) {
+  if (!container) {
+    return null
+  }
+
+  const preferredTarget = container.querySelector<HTMLElement>('[data-autofocus]')
+  if (preferredTarget && !preferredTarget.hasAttribute('disabled')) {
+    return preferredTarget
+  }
+
+  const bodyContainer = container.querySelector<HTMLElement>('[data-dialog-body]')
+  const bodyFocusableElements = getFocusableElements(bodyContainer).filter(
+    (element) => element.getAttribute('data-dialog-close') !== 'true',
+  )
+
+  if (bodyFocusableElements.length) {
+    return bodyFocusableElements[0]
+  }
+
+  const focusableElements = getFocusableElements(container).filter(
+    (element) => element.getAttribute('data-dialog-close') !== 'true',
+  )
+
+  return focusableElements[0] ?? null
+}
+
 type UseDialogA11yOptions = {
   open: boolean
   onClose: () => void
@@ -35,6 +59,11 @@ export function useDialogA11y({ open, onClose }: UseDialogA11yOptions) {
   const descriptionId = useId()
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null)
+  const onCloseRef = useRef(onClose)
+
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
 
   useEffect(() => {
     if (!open || typeof document === 'undefined') {
@@ -46,14 +75,13 @@ export function useDialogA11y({ open, onClose }: UseDialogA11yOptions) {
       : null
 
     const dialog = dialogRef.current
-    const focusableElements = getFocusableElements(dialog)
-    const nextFocusTarget = focusableElements[0] ?? dialog
+    const nextFocusTarget = getInitialFocusTarget(dialog) ?? dialog
     nextFocusTarget?.focus()
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         event.preventDefault()
-        onClose()
+        onCloseRef.current()
         return
       }
 
@@ -91,7 +119,7 @@ export function useDialogA11y({ open, onClose }: UseDialogA11yOptions) {
       document.removeEventListener('keydown', handleKeyDown)
       previouslyFocusedElementRef.current?.focus()
     }
-  }, [onClose, open])
+  }, [open])
 
   return {
     dialogRef,

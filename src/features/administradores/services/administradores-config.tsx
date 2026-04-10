@@ -1,5 +1,3 @@
-'use client'
-
 import Link from 'next/link'
 import { KeyRound } from 'lucide-react'
 import { StatusBadge } from '@/src/components/ui/status-badge'

@@ -1,5 +1,3 @@
-'use client'
-
 import * as Sentry from '@sentry/nextjs'
 import { useState } from 'react'
 import { useAuth } from '@/src/contexts/auth-context'

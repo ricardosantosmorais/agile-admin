@@ -7,6 +7,7 @@ export type FeatureKey =
   | 'httpClient'
   | 'dicionarioDados'
   | 'integracaoAplicativos'
+  | 'integracoesAtendimento'
   | 'produtos'
   | 'produtosPrecificadores'
   | 'restricoesProdutos'
@@ -133,6 +134,10 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
   integracaoAplicativos: {
     label: 'Aplicativos',
     matchers: ['integracao-usuarios-list', 'integracao usuarios', 'api de integracao aplicativos', 'aplicativos api'],
+  },
+  integracoesAtendimento: {
+    label: 'Integrações > Atendimento',
+    matchers: ['integracao-atendimento-form', 'integracoes atendimento', 'integrações atendimento', 'atendimento integracao', 'atendimento integração'],
   },
   produtos: {
     label: 'Produtos',
@@ -574,4 +579,3 @@ export function getFeatureAccess(session: AuthSession | null, featureKey: Featur
 export function getFeatureLabel(featureKey: FeatureKey) {
   return featureConfigs[featureKey].label
 }
-

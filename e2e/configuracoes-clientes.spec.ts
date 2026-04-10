@@ -47,12 +47,15 @@ test.describe('Configurações > Clientes', () => {
     await expect(page.getByRole('main')).toBeVisible({ timeout: 60_000 })
 
     await expect(page.locator('form')).toBeVisible()
-    await expect(page.getByRole('button', { name: /salvar|save/i }).first()).toBeVisible()
+    const saveButton = page.getByRole('button', { name: /salvar|save/i }).first()
+    await expect(saveButton).toBeVisible()
+    await expect(saveButton).toBeDisabled()
 
     await page.locator('form').locator('input').first().fill('telefone,sexo,cnpj')
     await page.locator('form').locator('select').first().selectOption('email')
+    await expect(saveButton).toBeEnabled()
 
-    await page.getByRole('button', { name: /salvar|save/i }).first().click()
+    await saveButton.click()
 
     await expect.poll(() => postedBody).not.toBeNull()
 

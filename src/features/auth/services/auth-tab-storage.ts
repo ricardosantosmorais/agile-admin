@@ -1,5 +1,3 @@
-'use client'
-
 import type { PendingLogin } from '@/src/features/auth/types/auth'
 
 const ACTIVE_TENANT_KEY = 'admin-v2-web:tenant'

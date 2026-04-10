@@ -1,5 +1,3 @@
-'use client'
-
 import { Package, Percent, ShoppingCart } from 'lucide-react'
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 import { TabbedCatalogFormPage } from '@/src/features/catalog/components/tabbed-catalog-form-page'

@@ -1,5 +1,3 @@
-'use client'
-
 import { createCrudClient, resolveCrudLookupOption } from '@/src/components/crud-base/crud-client'
 
 const baseClient = createCrudClient('/api/tributos')

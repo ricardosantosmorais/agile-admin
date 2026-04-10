@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 import { formatCpfCnpj, formatCurrency } from '@/src/lib/formatters'
 

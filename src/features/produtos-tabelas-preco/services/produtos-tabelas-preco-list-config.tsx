@@ -1,5 +1,3 @@
-'use client'
-
 import { loadCrudLookupOptions } from '@/src/components/crud-base/crud-client'
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 
@@ -37,7 +35,7 @@ export const PRODUTOS_TABELAS_PRECO_LIST_CONFIG: CrudModuleConfig = {
       labelKey: 'priceStock.productPriceTables.fields.product',
       label: 'Produto',
       sortKey: 'produto:nome',
-      tdClassName: 'font-semibold text-slate-950',
+    tdClassName: 'font-semibold text-[color:var(--app-text)]',
       render: (record) => String((record.produto as { nome?: unknown } | null)?.nome || record.id_produto || '-'),
       filter: {
         kind: 'lookup',

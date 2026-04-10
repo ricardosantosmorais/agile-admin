@@ -42,6 +42,10 @@ const OCCURRENCIAS: FormaEntregaOcorrencia[] = [
   'todos',
 ]
 
+const editActionButtonClasses = 'app-button-secondary inline-flex h-9 w-9 items-center justify-center rounded-full'
+const deleteActionButtonClasses = 'app-button-danger inline-flex h-9 w-9 items-center justify-center rounded-full'
+const feedbackClasses = 'app-error-panel md:col-span-2 rounded-[1rem] px-4 py-3 text-sm'
+
 function initialDraft(): Draft {
   return {
     ocorrencia: 'canal_distribuicao',
@@ -265,7 +269,7 @@ export function FormaEntregaOcorrenciasTab({
         emptyMessage={isLoading ? t('common.loading', 'Loading...') : t('logistics.deliveryMethods.messages.emptyOccurrences', 'Nenhum registro foi encontrado para esta aba.')}
         columns={[
           { header: t('logistics.deliveryMethods.fields.type', 'Tipo'), render: (item) => occurrenceLabel(item.ocorrencia, t) },
-          { header: modeLabel.slice(0, -1), cellClassName: 'font-semibold text-slate-950', render: (item) => formatFormaEntregaOccurrenceLabel(item) },
+          { header: modeLabel.slice(0, -1), cellClassName: 'font-semibold text-[color:var(--app-text)]', render: (item) => formatFormaEntregaOccurrenceLabel(item) },
           {
             header: t('common.actions', 'Acoes'),
             headerClassName: 'w-[104px]',
@@ -273,12 +277,12 @@ export function FormaEntregaOcorrenciasTab({
             render: (item) => !readOnly ? (
               <div className="flex items-center gap-2">
                 <TooltipIconButton label={t('simpleCrud.actions.edit', 'Editar')}>
-                  <button type="button" onClick={() => openEditModal(item)} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#e6dfd3] bg-white text-slate-700">
+                  <button type="button" onClick={() => openEditModal(item)} className={editActionButtonClasses}>
                     <Pencil className="h-4 w-4" />
                   </button>
                 </TooltipIconButton>
                 <TooltipIconButton label={t('simpleCrud.actions.delete', 'Excluir')}>
-                  <button type="button" onClick={() => { setSelectedIds([item.id]); setConfirmOpen(true) }} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-700">
+                  <button type="button" onClick={() => { setSelectedIds([item.id]); setConfirmOpen(true) }} className={deleteActionButtonClasses}>
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </TooltipIconButton>
@@ -297,7 +301,7 @@ export function FormaEntregaOcorrenciasTab({
         onConfirm={() => void handleSave()}
       >
         <div className="grid gap-4 md:grid-cols-2">
-          {feedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{feedback}</div> : null}
+          {feedback ? <div className={feedbackClasses}>{feedback}</div> : null}
           <FormField label={t('logistics.deliveryMethods.fields.type', 'Tipo')}>
             <select
               value={draft.ocorrencia}

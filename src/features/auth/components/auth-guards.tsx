@@ -26,7 +26,7 @@ function SessionEndedOverlay({
 }) {
   return (
     <div className="fixed inset-0 z-[280] flex items-center justify-center bg-[rgba(15,23,42,0.14)] p-4 backdrop-blur-[3px]">
-      <div className="w-full max-w-xl rounded-[1.6rem] border border-[#e6dfd3] bg-white p-6 shadow-[0_32px_90px_rgba(15,23,42,0.22)]">
+      <div className="app-pane w-full max-w-xl rounded-[1.6rem] border border-line p-6 shadow-[0_32px_90px_rgba(15,23,42,0.22)]">
         <div className="mb-5 flex items-start gap-4">
           <div className="mt-1 flex h-11 w-11 items-center justify-center rounded-full bg-rose-50 text-rose-600">
             <AlertTriangle className="h-5 w-5" />
@@ -41,7 +41,7 @@ function SessionEndedOverlay({
           <button
             type="button"
             onClick={onGoToLogin}
-            className="inline-flex h-12 items-center justify-center rounded-full bg-[#0f172a] px-5 text-sm font-semibold text-white transition hover:bg-slate-900"
+            className="app-button-primary inline-flex h-12 items-center justify-center rounded-full px-5 text-sm font-semibold transition"
           >
             <LogIn className="mr-2 h-4 w-4" />
             {loginLabel}

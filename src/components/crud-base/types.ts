@@ -1,5 +1,3 @@
-'use client'
-
 import type { InputHTMLAttributes } from 'react'
 import type { AppDataTableFilterConfig } from '@/src/components/data-table/types'
 import type { AppDataTableRowAction } from '@/src/components/data-table/types'

@@ -1,5 +1,3 @@
-'use client'
-
 export function downloadTextFile(filename: string, content: string, mimeType = 'text/plain;charset=utf-8') {
   if (typeof window === 'undefined') {
     return

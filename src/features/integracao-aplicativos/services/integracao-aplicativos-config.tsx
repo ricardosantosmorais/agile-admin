@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import { DEFAULT_APLICATIVO_INTEGRACAO_LIST_FILTERS } from '@/src/features/integracao-aplicativos/services/integracao-aplicativos-mappers'
 

@@ -35,21 +35,21 @@ export function UsuarioAccessesModal({
           {accesses.length ? accesses.map((access) => (
             <div
               key={access.id}
-              className="grid gap-2 rounded-[1.1rem] border border-[#ece5d9] bg-[#fcfaf5] px-4 py-3 md:grid-cols-2"
+              className="app-pane-muted grid gap-2 rounded-[1.1rem] border px-4 py-3 md:grid-cols-2"
             >
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-slate-500">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[var(--app-muted)]">
                   {t('usuarios.columns.lastAccess', 'Último acesso')}
                 </p>
-                <p className="mt-1 text-sm font-semibold text-slate-950">{access.ultimoAcesso || '-'}</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--app-text)]">{access.ultimoAcesso || '-'}</p>
               </div>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-slate-500">IP</p>
-                <p className="mt-1 text-sm font-semibold text-slate-950">{access.ipUltimoAcesso || '-'}</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[var(--app-muted)]">IP</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--app-text)]">{access.ipUltimoAcesso || '-'}</p>
               </div>
             </div>
           )) : (
-            <div className="rounded-[1rem] border border-dashed border-[#e6dfd3] px-4 py-6 text-center text-sm text-slate-500">
+            <div className="rounded-[1rem] border border-dashed border-[var(--app-border)] px-4 py-6 text-center text-sm text-[var(--app-muted)]">
               {t('usuarios.modals.accessesEmpty', 'Não existem acessos registrados para este usuário.')}
             </div>
           )}

@@ -17,7 +17,7 @@ import { useI18n } from '@/src/i18n/use-i18n'
 
 function availableBadge(value: boolean | number | string, t: ReturnType<typeof useI18n>['t']) {
   const active = value === true || value === 1 || value === '1'
-  return <StatusBadge tone={active ? 'success' : 'warning'}>{active ? t('common.yes', 'Sim') : t('common.no', 'Nao')}</StatusBadge>
+  return <StatusBadge tone={active ? 'success' : 'warning'}>{active ? t('common.yes', 'Sim') : t('common.no', 'Não')}</StatusBadge>
 }
 
 export function CampanhaProdutosIdsTab({
@@ -47,7 +47,7 @@ export function CampanhaProdutosIdsTab({
       setItems(await campanhasClient.listProdutos(campaignId))
       onError(null)
     } catch (error) {
-      onError(error instanceof Error ? error.message : t('marketing.campaigns.products.loadError', 'Nao foi possivel carregar os produtos da campanha.'))
+      onError(error instanceof Error ? error.message : t('marketing.campaigns.products.loadError', 'Não foi possível carregar os produtos da campanha.'))
     } finally {
       setIsLoading(false)
     }
@@ -68,7 +68,7 @@ export function CampanhaProdutosIdsTab({
 
       if (resolved.missing.length > 0) {
         throw new Error(
-          t('marketing.campaigns.products.validation.notFound', 'Nao foi possivel localizar os produtos informados: {{tokens}}.')
+          t('marketing.campaigns.products.validation.notFound', 'Não foi possível localizar os produtos informados: {{tokens}}.')
             .replace('{{tokens}}', resolved.missing.join(', ')),
         )
       }
@@ -90,7 +90,7 @@ export function CampanhaProdutosIdsTab({
       setModalOpen(false)
       await refresh()
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : t('marketing.campaigns.products.saveError', 'Nao foi possivel salvar os produtos da campanha.'))
+      setFeedback(error instanceof Error ? error.message : t('marketing.campaigns.products.saveError', 'Não foi possível salvar os produtos da campanha.'))
     }
   }
 
@@ -101,7 +101,7 @@ export function CampanhaProdutosIdsTab({
       setConfirmOpen(false)
       await refresh()
     } catch (error) {
-      onError(error instanceof Error ? error.message : t('marketing.campaigns.products.deleteError', 'Nao foi possivel excluir os produtos da campanha.'))
+      onError(error instanceof Error ? error.message : t('marketing.campaigns.products.deleteError', 'Não foi possível excluir os produtos da campanha.'))
     }
   }
 
@@ -120,9 +120,9 @@ export function CampanhaProdutosIdsTab({
         emptyMessage={isLoading ? t('common.loading', 'Loading...') : t('marketing.campaigns.products.empty', 'Nenhum produto foi vinculado a campanha.')}
         columns={[
           { header: t('simpleCrud.fields.id', 'ID'), render: (item) => item.produto?.id || item.id_produto },
-          { header: t('simpleCrud.fields.code', 'Codigo'), render: (item) => item.produto?.codigo || '-' },
+          { header: t('simpleCrud.fields.code', 'Código'), render: (item) => item.produto?.codigo || '-' },
           { header: t('simpleCrud.fields.name', 'Nome'), cellClassName: 'font-semibold text-slate-950', render: (item) => item.produto?.nome || '-' },
-          { header: t('simpleCrud.fields.available', 'Disponivel'), render: (item) => availableBadge(item.produto?.disponivel ?? false, t) },
+          { header: t('simpleCrud.fields.available', 'Disponível'), render: (item) => availableBadge(item.produto?.disponivel ?? false, t) },
           {
             header: t('common.actions', 'Acoes'),
             headerClassName: 'w-[72px]',
@@ -134,7 +134,7 @@ export function CampanhaProdutosIdsTab({
                     setSelectedIds([item.id_produto])
                     setConfirmOpen(true)
                   }}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-700"
+                  className="app-button-danger inline-flex h-9 w-9 items-center justify-center rounded-full p-0"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -155,15 +155,15 @@ export function CampanhaProdutosIdsTab({
         }}
         onConfirm={() => void handleSave()}
       >
-        {feedback ? <div className="rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{feedback}</div> : null}
+        {feedback ? <div className="rounded-[1rem] border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{feedback}</div> : null}
         <div className="grid gap-4">
-          <div className="rounded-[1.2rem] border border-[#e6dfd3] bg-[#fcfaf5] p-4">
+          <div className="app-pane-muted rounded-[1.2rem] border p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold text-slate-950">{t('marketing.campaigns.products.methods.searchTitle', 'Método 1: buscar e selecionar')}</p>
-                <p className="mt-1 text-sm leading-6 text-slate-600">{t('marketing.campaigns.products.methods.searchDescription', 'Use a busca quando quiser localizar um produto pelo nome, código ou referência visual.')}</p>
+                <p className="text-sm font-semibold text-[var(--app-text)]">{t('marketing.campaigns.products.methods.searchTitle', 'Método 1: buscar e selecionar')}</p>
+                <p className="mt-1 text-sm leading-6 text-[var(--app-text-muted)]">{t('marketing.campaigns.products.methods.searchDescription', 'Use a busca quando quiser localizar um produto pelo nome, código ou referência visual.')}</p>
               </div>
-              {hasLookupSelection ? <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">{t('marketing.campaigns.products.methods.selected', 'Selecionado')}</span> : null}
+              {hasLookupSelection ? <span className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200">{t('marketing.campaigns.products.methods.selected', 'Selecionado')}</span> : null}
             </div>
             <div className="mt-4">
               <FormField label={t('marketing.campaigns.products.fields.productLookup', 'Produto por busca')}>
@@ -177,19 +177,19 @@ export function CampanhaProdutosIdsTab({
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-            <span className="h-px flex-1 bg-[#e6dfd3]" />
+          <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--app-text-muted)]">
+            <span className="h-px flex-1 bg-[var(--app-border)]" />
             {t('marketing.campaigns.products.methods.or', 'ou')}
-            <span className="h-px flex-1 bg-[#e6dfd3]" />
+            <span className="h-px flex-1 bg-[var(--app-border)]" />
           </div>
 
-          <div className="rounded-[1.2rem] border border-[#e6dfd3] bg-white p-4">
+          <div className="app-pane rounded-[1.2rem] border p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold text-slate-950">{t('marketing.campaigns.products.methods.manualTitle', 'Método 2: informar IDs ou códigos')}</p>
-                <p className="mt-1 text-sm leading-6 text-slate-600">{t('marketing.campaigns.products.methods.manualDescription', 'Cole um ou vários IDs ou códigos separados por vírgula. O sistema resolve cada item antes de salvar.')}</p>
+                <p className="text-sm font-semibold text-[var(--app-text)]">{t('marketing.campaigns.products.methods.manualTitle', 'Método 2: informar IDs ou códigos')}</p>
+                <p className="mt-1 text-sm leading-6 text-[var(--app-text-muted)]">{t('marketing.campaigns.products.methods.manualDescription', 'Cole um ou vários IDs ou códigos separados por vírgula. O sistema resolve cada item antes de salvar.')}</p>
               </div>
-              {hasTypedTokens ? <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">{t('marketing.campaigns.products.methods.filled', 'Preenchido')}</span> : null}
+              {hasTypedTokens ? <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-3 py-1 text-xs font-semibold text-sky-200">{t('marketing.campaigns.products.methods.filled', 'Preenchido')}</span> : null}
             </div>
             <div className="mt-4">
               <FormField label={t('marketing.campaigns.products.fields.productIds', 'IDs ou códigos dos produtos')}>
@@ -209,7 +209,7 @@ export function CampanhaProdutosIdsTab({
       <ConfirmDialog
         open={confirmOpen}
         title={t('marketing.campaigns.products.deleteTitle', 'Excluir produtos')}
-        description={t('marketing.campaigns.products.deleteDescription', 'Os produtos selecionados serao removidos da campanha.')}
+        description={t('marketing.campaigns.products.deleteDescription', 'Os produtos selecionados serão removidos da campanha.')}
         confirmLabel={t('common.delete', 'Excluir')}
         onClose={() => setConfirmOpen(false)}
         onConfirm={() => void handleDelete()}

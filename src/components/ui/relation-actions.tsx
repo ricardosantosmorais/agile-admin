@@ -24,7 +24,9 @@ export function RelationActions({
         type="button"
         onClick={onDelete}
         disabled={!hasSelection}
-        className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
+        data-state={hasSelection ? 'enabled' : 'disabled'}
+        aria-disabled={!hasSelection}
+        className="app-button-danger inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold disabled:cursor-not-allowed"
       >
         <Trash2 className="h-4 w-4" />
         {t('common.delete', 'Delete')}
@@ -32,7 +34,7 @@ export function RelationActions({
       <button
         type="button"
         onClick={onCreate}
-        className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white"
+        className="app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold"
       >
         {createLabel ?? t('common.create', 'Add')}
       </button>

@@ -1,5 +1,3 @@
-'use client'
-
 export type FormularioCampoSelectorOption = {
   titulo: string
   valor: string

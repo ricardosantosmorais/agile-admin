@@ -1,5 +1,3 @@
-'use client'
-
 import type { InputHTMLAttributes, ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import type { LookupOption } from '@/src/components/ui/lookup-select'

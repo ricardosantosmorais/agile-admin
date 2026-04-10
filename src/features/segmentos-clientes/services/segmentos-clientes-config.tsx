@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 import { formatNullableCurrency } from '@/src/lib/formatters'
 import { parseCurrencyInput } from '@/src/lib/input-masks'

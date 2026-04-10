@@ -1,5 +1,3 @@
-'use client'
-
 import { httpClient } from '@/src/services/http/http-client'
 import type { ContatoDetail, ContatoListFilters, ContatoListItem } from '@/src/features/contatos/types/contatos'
 

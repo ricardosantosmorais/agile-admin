@@ -33,7 +33,7 @@ function MetadataLine({
   }
 
   return (
-    <p className="mt-3 text-xs leading-5 text-slate-500">
+    <p className="mt-3 text-xs leading-5 text-muted-foreground">
       {t('configuracoes.virtualAssistant.lastUpdated', 'Ãšltima alteraÃ§Ã£o: {{date}} por {{user}}', {
         date: formatDateTime(metadata.updatedAt),
         user: metadata.updatedBy,
@@ -53,7 +53,7 @@ export function AssistenteVirtualIdentitySection({
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
+        <div className="app-surface-subtle rounded-[1.15rem] border border-line p-4">
           <FormField label={t('configuracoes.virtualAssistant.fields.ia_ativo.label', 'Assistente ativo')} asLabel={false}>
             <select
               value={values.ia_ativo}
@@ -65,13 +65,13 @@ export function AssistenteVirtualIdentitySection({
               <option value="0">{t('common.no', 'NÃ£o')}</option>
             </select>
           </FormField>
-          <p className="mt-2 text-xs leading-5 text-slate-500">
+          <p className="mt-2 text-xs leading-5 text-muted-foreground">
             {t('configuracoes.virtualAssistant.fields.ia_ativo.helper', 'Ativa ou desativa o assistente virtual para o tenant.')}
           </p>
           <MetadataLine metadata={metadata.ia_ativo} t={t} />
         </div>
 
-        <div className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
+        <div className="app-surface-subtle rounded-[1.15rem] border border-line p-4">
           <FormField label={t('configuracoes.virtualAssistant.fields.ia_nome.label', 'Nome do assistente')} asLabel={false}>
             <input
               value={values.ia_nome}
@@ -81,19 +81,19 @@ export function AssistenteVirtualIdentitySection({
               className={inputClasses()}
             />
           </FormField>
-          <p className="mt-2 text-xs leading-5 text-slate-500">
+          <p className="mt-2 text-xs leading-5 text-muted-foreground">
             {t('configuracoes.virtualAssistant.fields.ia_nome.helper', 'Nome exibido para o assistente virtual.')}
           </p>
           <MetadataLine metadata={metadata.ia_nome} t={t} />
         </div>
       </div>
 
-      <div className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
+      <div className="app-surface-subtle rounded-[1.15rem] border border-line p-4">
         <div className="mb-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
             {t('configuracoes.virtualAssistant.fields.ia_avatar.label', 'Avatar')}
           </p>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
             {t('configuracoes.virtualAssistant.fields.ia_avatar.helper', 'Imagem usada para representar o assistente virtual na experiÃªncia do tenant.')}
           </p>
         </div>

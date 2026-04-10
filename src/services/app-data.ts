@@ -1,21 +1,6 @@
-import {
-  fakeAdminForms,
-  fakeAdmins,
-  fakeChangelog,
-  fakeConfigModules,
-  fakePerfis,
-  fakeReports,
-  fakeTenants,
-  fakeUser,
-  getDashboardSnapshot,
-  type AdminFormRecord,
-  type AdminRecord,
-  type ChangelogItem,
-  type ConfigModule,
-  type DashboardRangeKey,
-  type ReportRecord,
-  type Tenant,
-} from '@/src/lib/fake-data'
+﻿import { configModules, type ConfigModule } from '@/src/features/configuracoes/data/config-modules'
+import { shellChangelog, type ChangelogItem } from '@/src/features/shell/data/changelog'
+import type { DashboardRangeKey, DashboardSnapshot } from '@/src/features/dashboard/types/dashboard'
 import type {
   ClientFormRecord,
   ClientListFilters,
@@ -229,16 +214,6 @@ function invalidateNotificationsCache(key?: string) {
 }
 
 export const appData = {
-  auth: {
-    async login(email: string, senha?: string) {
-      void senha
-      return withLatency({
-        ...fakeUser,
-        email,
-        avatarFallback: email.slice(0, 2).toUpperCase(),
-      })
-    },
-  },
   shell: {
     async getNotifications(tenantId?: string): Promise<NotificationsListResponse> {
       const cacheKey = tenantId || 'default'
@@ -283,12 +258,7 @@ export const appData = {
       }
     },
     async getChangelog(): Promise<ChangelogItem[]> {
-      return withLatency(clone(fakeChangelog))
-    },
-  },
-  tenants: {
-    async list(): Promise<Tenant[]> {
-      return withLatency(clone(fakeTenants))
+      return withLatency(clone(shellChangelog))
     },
   },
   dashboard: {
@@ -316,13 +286,13 @@ export const appData = {
         clearDashboardCache(tenantId, startDate, endDate)
       }
 
-      const cached = forceRefresh ? null : readDashboardCache<ReturnType<typeof getDashboardSnapshot>>(cacheKey)
+      const cached = forceRefresh ? null : readDashboardCache<DashboardSnapshot>(cacheKey)
 
       if (cached) {
         return cached
       }
 
-      const response = { ok: true, json: async () => httpClient<ReturnType<typeof getDashboardSnapshot>>('/api/dashboard', {
+      const response = { ok: true, json: async () => httpClient<DashboardSnapshot>('/api/dashboard', {
         method: 'POST',
         cache: forceRefresh ? 'no-store' : 'default',
         body: JSON.stringify({
@@ -340,20 +310,9 @@ export const appData = {
         throw new Error(payload?.message || 'Não foi possível carregar o dashboard.')
       }
 
-      const data = (await response.json()) as ReturnType<typeof getDashboardSnapshot>
+      const data = (await response.json()) as DashboardSnapshot
       writeDashboardCache(cacheKey, data)
       return data
-    },
-  },
-  admins: {
-    async list(): Promise<AdminRecord[]> {
-      return withLatency(clone(fakeAdmins))
-    },
-    async listPerfis() {
-      return withLatency(clone(fakePerfis))
-    },
-    async getById(id: string): Promise<AdminFormRecord | null> {
-      return withLatency(clone(fakeAdminForms.find((item) => item.id === id) ?? null))
     },
   },
   clients: {
@@ -461,20 +420,12 @@ export const appData = {
       })
     },
   },
-  reports: {
-    async list(): Promise<ReportRecord[]> {
-      return withLatency(clone(fakeReports))
-    },
-    async getById(id: string): Promise<ReportRecord | null> {
-      return withLatency(clone(fakeReports.find((item) => item.id === id) ?? null))
-    },
-  },
   config: {
     async listModules(): Promise<ConfigModule[]> {
-      return withLatency(clone(fakeConfigModules))
+      return withLatency(clone(configModules))
     },
     async getModule(slug: string): Promise<ConfigModule | null> {
-      return withLatency(clone(fakeConfigModules.find((item) => item.slug === slug) ?? null))
+      return withLatency(clone(configModules.find((item) => item.slug === slug) ?? null))
     },
   },
 }

@@ -21,9 +21,9 @@ function DetailRow({
   value: ReactNode
 }) {
   return (
-    <div className="grid gap-1 border-b border-[#efe8dd] py-2 last:border-b-0 md:grid-cols-[180px_minmax(0,1fr)]">
-      <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</span>
-      <div className="min-w-0 text-sm text-slate-800">{value}</div>
+    <div className="grid gap-1 border-b border-[var(--app-border)] py-2 last:border-b-0 md:grid-cols-[180px_minmax(0,1fr)]">
+      <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">{label}</span>
+      <div className="min-w-0 text-sm text-[var(--app-text)]">{value}</div>
     </div>
   )
 }
@@ -41,8 +41,8 @@ export function ClientViewModal({ open, client, onClose }: ClientViewModalProps)
       {client ? (
         <div className="space-y-5">
           <div className="grid gap-5 lg:grid-cols-2">
-            <div className="rounded-[1.2rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
-              <h3 className="mb-3 text-sm font-bold text-slate-950">{t('clientes.modals.viewSummaryTitle', 'Resumo do cliente')}</h3>
+            <div className="app-pane-muted rounded-[1.2rem] border p-4">
+              <h3 className="mb-3 text-sm font-bold text-[var(--app-text)]">{t('clientes.modals.viewSummaryTitle', 'Resumo do cliente')}</h3>
               <div className="space-y-2">
                 <DetailRow label={t('clientes.columns.codigo', 'Código')} value={client.codigo || '-'} />
                 <DetailRow label={t('clientes.columns.cnpjCpf', 'CPF/CNPJ')} value={client.cnpjCpf || '-'} />
@@ -58,8 +58,8 @@ export function ClientViewModal({ open, client, onClose }: ClientViewModalProps)
               </div>
             </div>
 
-            <div className="rounded-[1.2rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
-              <h3 className="mb-3 text-sm font-bold text-slate-950">{t('clientes.modals.viewStatusTitle', 'Situação e atividade')}</h3>
+            <div className="app-pane-muted rounded-[1.2rem] border p-4">
+              <h3 className="mb-3 text-sm font-bold text-[var(--app-text)]">{t('clientes.modals.viewStatusTitle', 'Situação e atividade')}</h3>
               <div className="space-y-2">
                 <DetailRow
                   label={t('clientes.columns.ultimoPedido', 'Último pedido')}
@@ -103,7 +103,7 @@ export function ClientViewModal({ open, client, onClose }: ClientViewModalProps)
             <button
               type="button"
               onClick={onClose}
-              className="inline-flex items-center gap-2 rounded-full border border-[#e1d8c8] bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+              className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold"
             >
               {t('common.close', 'Fechar')}
             </button>

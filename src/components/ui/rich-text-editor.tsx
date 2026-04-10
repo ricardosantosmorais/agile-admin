@@ -2,9 +2,9 @@
 
 import { useEffect, useRef } from 'react'
 import { EditorContent, useEditor } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
+import StarterKit from '@tiptap/starter-kit'
 import {
   Bold,
   ImagePlus,
@@ -58,8 +58,8 @@ async function normalizeHtmlImagesToBase64(html: string) {
 function toolbarButtonClass(active = false, disabled = false) {
   return [
     'inline-flex h-9 w-9 items-center justify-center rounded-[0.8rem] border transition',
-    active ? 'border-slate-950 bg-slate-950 text-white' : 'border-[#e6dfd3] bg-white text-slate-700',
-    disabled ? 'cursor-not-allowed opacity-40' : 'hover:border-[#cfc3ad] hover:text-slate-950',
+    active ? 'border-slate-950 bg-slate-950 text-white' : 'app-control text-[color:var(--app-muted)]',
+    disabled ? 'cursor-not-allowed opacity-40' : 'hover:border-[color:var(--app-control-border-strong)] hover:text-[color:var(--app-text)]',
   ].join(' ')
 }
 
@@ -84,7 +84,7 @@ export function RichTextEditor({ value, onChange, disabled = false }: RichTextEd
         inline: false,
       }),
       Placeholder.configure({
-        placeholder: 'Digite o conteudo da pagina...',
+        placeholder: 'Digite o conteúdo da página...',
       }),
     ],
     content: value || '',
@@ -95,7 +95,8 @@ export function RichTextEditor({ value, onChange, disabled = false }: RichTextEd
     },
     editorProps: {
       attributes: {
-        class: 'min-h-[360px] max-h-[560px] w-full overflow-y-auto px-5 py-4 text-sm text-slate-900 outline-none [&_h2]:mb-3 [&_h2]:mt-5 [&_h2]:text-xl [&_h2]:font-bold [&_h3]:mb-2 [&_h3]:mt-4 [&_h3]:text-lg [&_h3]:font-semibold [&_p]:my-2 [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:my-3 [&_ol]:list-decimal [&_ol]:pl-6 [&_a]:text-emerald-700 [&_a]:underline',
+        class:
+          'min-h-[360px] max-h-[560px] w-full overflow-y-auto px-5 py-4 text-sm text-[color:var(--app-text)] outline-none [&_h2]:mb-3 [&_h2]:mt-5 [&_h2]:text-xl [&_h2]:font-bold [&_h3]:mb-2 [&_h3]:mt-4 [&_h3]:text-lg [&_h3]:font-semibold [&_p]:my-2 [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:my-3 [&_ol]:list-decimal [&_ol]:pl-6 [&_a]:text-emerald-600 [&_a]:underline',
       },
     },
   })
@@ -174,9 +175,9 @@ export function RichTextEditor({ value, onChange, disabled = false }: RichTextEd
   }
 
   return (
-    <div className="w-full overflow-hidden rounded-[1rem] border border-[#e6dfd3] bg-white">
+    <div className="app-pane w-full overflow-hidden rounded-[1rem]">
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(event) => void handleImageUpload(event)} />
-      <div className="flex flex-wrap items-center gap-2 border-b border-[#ece5d9] px-3 py-3">
+      <div className="flex flex-wrap items-center gap-2 border-b border-[color:var(--app-card-border)] px-3 py-3">
         <button type="button" className={toolbarButtonClass(editor.isActive('bold'), disabled)} onClick={() => editor.chain().focus().toggleBold().run()} disabled={disabled}><Bold className="h-4 w-4" /></button>
         <button type="button" className={toolbarButtonClass(editor.isActive('italic'), disabled)} onClick={() => editor.chain().focus().toggleItalic().run()} disabled={disabled}><Italic className="h-4 w-4" /></button>
         <button type="button" className={toolbarButtonClass(editor.isActive('underline'), true)} disabled><Underline className="h-4 w-4" /></button>
@@ -184,12 +185,12 @@ export function RichTextEditor({ value, onChange, disabled = false }: RichTextEd
         <button type="button" className={toolbarButtonClass(editor.isActive('orderedList'), disabled)} onClick={() => editor.chain().focus().toggleOrderedList().run()} disabled={disabled}><ListOrdered className="h-4 w-4" /></button>
         <button type="button" className={toolbarButtonClass(editor.isActive('link'), disabled)} onClick={setLink} disabled={disabled}><Link2 className="h-4 w-4" /></button>
         <button type="button" className={toolbarButtonClass(false, disabled)} onClick={() => fileInputRef.current?.click()} disabled={disabled}><ImagePlus className="h-4 w-4" /></button>
-        <button type="button" className="inline-flex h-9 items-center justify-center rounded-[0.8rem] border border-[#e6dfd3] bg-white px-3 text-xs font-semibold text-slate-700 transition hover:border-[#cfc3ad] hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-40" onClick={setImageByUrl} disabled={disabled}>IMG URL</button>
-        <div className="mx-1 h-6 w-px bg-[#ece5d9]" />
+        <button type="button" className="app-button-secondary inline-flex h-9 items-center justify-center rounded-[0.8rem] px-3 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-40" onClick={setImageByUrl} disabled={disabled}>IMG URL</button>
+        <div className="mx-1 h-6 w-px bg-[color:var(--app-card-border)]" />
         <button type="button" className={toolbarButtonClass(false, disabled || !editor.can().chain().focus().undo().run())} onClick={() => editor.chain().focus().undo().run()} disabled={disabled || !editor.can().chain().focus().undo().run()}><Undo2 className="h-4 w-4" /></button>
         <button type="button" className={toolbarButtonClass(false, disabled || !editor.can().chain().focus().redo().run())} onClick={() => editor.chain().focus().redo().run()} disabled={disabled || !editor.can().chain().focus().redo().run()}><Redo2 className="h-4 w-4" /></button>
       </div>
-      <EditorContent editor={editor} className={disabled ? 'bg-slate-50 text-slate-500 [&_.ProseMirror]:bg-slate-50' : '[&_.ProseMirror_img]:max-w-full [&_.ProseMirror_img]:rounded-xl'} onBlur={() => void emitNormalizedHtml()} />
+      <EditorContent editor={editor} className={disabled ? 'app-control-muted text-[color:var(--app-muted)] [&_.ProseMirror]:bg-transparent' : '[&_.ProseMirror_img]:max-w-full [&_.ProseMirror_img]:rounded-xl'} onBlur={() => void emitNormalizedHtml()} />
     </div>
   )
 }

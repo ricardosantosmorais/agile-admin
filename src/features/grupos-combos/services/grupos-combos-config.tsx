@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import { normalizeGrupoComboRecord, toGrupoComboPayload } from '@/src/features/grupos-combos/services/grupos-combos-mappers'
 

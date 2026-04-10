@@ -1,5 +1,3 @@
-﻿'use client'
-
 import { httpClient } from '@/src/services/http/http-client'
 import { buildDirtyConfiguracoesPedidosPayload, normalizeConfiguracoesPedidosRecord } from '@/src/features/configuracoes-pedidos/services/configuracoes-pedidos-mappers'
 import type { ConfiguracoesPedidosFormValues, ConfiguracoesPedidosRecord } from '@/src/features/configuracoes-pedidos/types/configuracoes-pedidos'

@@ -21,24 +21,24 @@ export function ClienteGeralTab({ form, readOnly, onPatch }: ClienteGeralTabProp
 
   return (
     <div className="space-y-5">
-      <SectionCard title={t('clientes.form.general.identification', 'Identification')}>
+      <SectionCard title={t('clientes.form.general.identification', 'Identificação')}>
         <div className="space-y-7">
-          <FormRow label={t('clientes.form.general.active', 'Active')} contentClassName="max-w-[360px]">
-            <BooleanChoice value={form.ativo} onChange={(value) => onPatch('ativo', value)} disabled={readOnly} trueLabel={t('common.yes', 'Yes')} falseLabel={t('common.no', 'No')} />
+          <FormRow label={t('clientes.form.general.active', 'Ativo')} contentClassName="max-w-[360px]">
+            <BooleanChoice value={form.ativo} onChange={(value) => onPatch('ativo', value)} disabled={readOnly} trueLabel={t('common.yes', 'Sim')} falseLabel={t('common.no', 'Não')} />
           </FormRow>
-          <FormRow label={t('clientes.form.general.blocked', 'Blocked')} contentClassName="max-w-[360px]" helperText={t('clientes.form.general.blockedHint', 'Indica se o cliente está bloqueado para realizar pedidos.')}>
-            <BooleanChoice value={form.bloqueado} onChange={(value) => onPatch('bloqueado', value)} disabled={readOnly} trueLabel={t('common.yes', 'Yes')} falseLabel={t('common.no', 'No')} />
+          <FormRow label={t('clientes.form.general.blocked', 'Bloqueado')} contentClassName="max-w-[360px]" helperText={t('clientes.form.general.blockedHint', 'Indica se o cliente está bloqueado para realizar pedidos.')}>
+            <BooleanChoice value={form.bloqueado} onChange={(value) => onPatch('bloqueado', value)} disabled={readOnly} trueLabel={t('common.yes', 'Sim')} falseLabel={t('common.no', 'Não')} />
           </FormRow>
-          <FormRow label={t('clientes.form.general.blockedPlatform', 'Platform blocked')} contentClassName="max-w-[360px]" helperText={t('clientes.form.general.blockedPlatformHint', 'Indica se o cliente está bloqueado na plataforma.')}>
-            <BooleanChoice value={form.bloqueadoPlataforma} onChange={() => undefined} disabled trueLabel={t('common.yes', 'Yes')} falseLabel={t('common.no', 'No')} />
+          <FormRow label={t('clientes.form.general.blockedPlatform', 'Bloqueado na plataforma')} contentClassName="max-w-[360px]" helperText={t('clientes.form.general.blockedPlatformHint', 'Indica se o cliente está bloqueado na plataforma.')}>
+            <BooleanChoice value={form.bloqueadoPlataforma} onChange={() => undefined} disabled trueLabel={t('common.yes', 'Sim')} falseLabel={t('common.no', 'Não')} />
           </FormRow>
-          <FormRow label={t('clientes.form.general.released', 'Released')} contentClassName="max-w-[360px]" helperText={t('clientes.form.general.releasedHint', 'Indica se os pedidos do cliente serão liberados sem aprovação do vendedor.')}>
-            <BooleanChoice value={form.liberado} onChange={(value) => onPatch('liberado', value)} disabled={readOnly} trueLabel={t('common.yes', 'Yes')} falseLabel={t('common.no', 'No')} />
+          <FormRow label={t('clientes.form.general.released', 'Liberado')} contentClassName="max-w-[360px]" helperText={t('clientes.form.general.releasedHint', 'Indica se os pedidos do cliente serão liberados sem aprovação do vendedor.')}>
+            <BooleanChoice value={form.liberado} onChange={(value) => onPatch('liberado', value)} disabled={readOnly} trueLabel={t('common.yes', 'Sim')} falseLabel={t('common.no', 'Não')} />
           </FormRow>
-          <FormRow label={t('clientes.form.general.code', 'Code')} contentClassName="max-w-[320px]">
+          <FormRow label={t('clientes.form.general.code', 'Código')} contentClassName="max-w-[320px]">
             <input value={form.codigo} onChange={(event) => onPatch('codigo', event.target.value)} className={inputClasses()} disabled={readOnly} />
           </FormRow>
-          <FormRow label={t('clientes.form.general.activationCode', 'Activation code')} contentClassName="max-w-[320px]">
+          <FormRow label={t('clientes.form.general.activationCode', 'Código de ativação')} contentClassName="max-w-[320px]">
             <input value={form.codigoAtivacao} onChange={(event) => onPatch('codigoAtivacao', event.target.value)} className={inputClasses()} disabled={readOnly} />
           </FormRow>
 
@@ -51,7 +51,7 @@ export function ClienteGeralTab({ form, readOnly, onPatch }: ClienteGeralTabProp
                   onClick={() => !readOnly && onPatch('tipo', tipo)}
                   className={[
                     'rounded-[1rem] border px-4 py-3 text-sm font-semibold transition',
-                    form.tipo === tipo ? 'border-slate-950 bg-slate-950 text-white' : 'border-[#e6dfd3] bg-white text-slate-700',
+                    form.tipo === tipo ? 'app-button-primary' : 'app-button-secondary',
                     readOnly ? 'cursor-not-allowed opacity-60' : '',
                   ].join(' ')}
                 >

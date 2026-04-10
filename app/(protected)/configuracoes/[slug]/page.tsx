@@ -91,7 +91,7 @@ export default function ConfiguracaoRoutePage() {
               )}
             >
               <div className="grid gap-4 md:grid-cols-2">
-                {module.campos.map((field) => (
+                {module.campos.map((field: { label: string; valor: string }) => (
                   <label key={field.label} className="rounded-[1.25rem] border border-line bg-surface px-4 py-3">
                     <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                       {field.label}

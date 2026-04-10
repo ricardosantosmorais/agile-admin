@@ -1,5 +1,3 @@
-'use client'
-
 import { httpClient } from '@/src/services/http/http-client'
 import type { CrudDataClient, CrudListFilters, CrudListResponse, CrudOption, CrudRecord, CrudResource } from '@/src/components/crud-base/types'
 

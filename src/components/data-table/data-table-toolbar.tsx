@@ -19,11 +19,11 @@ type DataTablePageActionsProps = {
 function getButtonClasses(tone: DataTableToolbarButtonProps['tone']) {
   switch (tone) {
     case 'danger':
-      return 'border border-rose-200 bg-rose-50 text-rose-700'
+      return 'app-button-danger'
     case 'secondary':
-      return 'border border-[#e6dfd3] bg-[#fcfaf5] text-slate-700'
+      return 'app-button-secondary'
     default:
-      return 'bg-slate-950 text-white'
+      return 'app-button-primary'
   }
 }
 
@@ -75,7 +75,7 @@ export function DataTableSectionAction({ label, icon: Icon, onClick }: DataTable
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-full border border-[#e6dfd3] bg-[#fcfaf5] px-4 text-sm font-semibold text-slate-700"
+      className="app-button-secondary inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-full px-4 text-sm font-semibold"
     >
       <Icon className="h-4 w-4" />
       {label}
@@ -102,7 +102,7 @@ export function DataTableFilterToggleAction({
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-full border border-[#e6dfd3] bg-[#fcfaf5] px-4 text-sm font-semibold text-slate-700"
+      className="app-button-secondary inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-full px-4 text-sm font-semibold"
     >
       <SlidersHorizontal className="h-4 w-4" />
       <span>{expanded ? expandedLabel : collapsedLabel}</span>

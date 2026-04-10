@@ -128,7 +128,7 @@ export function GruposClientesFormPage({ id: forcedId }: { id?: string }) {
                 {isEditing ? t('common.save', 'Save') : t('people.customerGroups.saveAndContinue', 'Save and continue')}
               </button>
             ) : null}
-            <Link href="/grupos-clientes" className="inline-flex items-center rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-slate-700">
+          <Link href="/grupos-clientes" className="app-button-secondary inline-flex items-center rounded-full px-4 py-3 text-sm font-semibold">
               {t('common.back', 'Back')}
             </Link>
           </div>
@@ -164,7 +164,7 @@ export function GruposClientesFormPage({ id: forcedId }: { id?: string }) {
                 {isEditing ? t('common.save', 'Save') : t('people.customerGroups.saveAndContinue', 'Save and continue')}
               </button>
             ) : null}
-            <Link href="/grupos-clientes" className="inline-flex items-center rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold text-slate-700">
+              <Link href="/grupos-clientes" className="app-button-secondary inline-flex items-center rounded-full px-5 py-3 text-sm font-semibold">
               {t('common.cancel', 'Cancel')}
             </Link>
           </div>

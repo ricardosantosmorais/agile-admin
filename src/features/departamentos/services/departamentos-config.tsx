@@ -1,5 +1,3 @@
-'use client'
-
 import { loadCrudLookupOptions } from '@/src/components/crud-base/crud-client'
 import type { CrudModuleConfig, CrudListFilters } from '@/src/components/crud-base/types'
 import { FormField } from '@/src/components/ui/form-field'

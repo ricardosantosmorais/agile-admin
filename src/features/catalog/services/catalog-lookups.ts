@@ -1,5 +1,3 @@
-'use client'
-
 import { httpClient } from '@/src/services/http/http-client'
 import type { LookupOption } from '@/src/components/ui/lookup-select'
 

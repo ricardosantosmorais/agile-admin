@@ -1,5 +1,3 @@
-﻿'use client'
-
 import { httpClient } from '@/src/services/http/http-client'
 import { buildDirtyConfiguracoesVendedoresPayload, normalizeConfiguracoesVendedoresRecord } from '@/src/features/configuracoes-vendedores/services/configuracoes-vendedores-mappers'
 import type { ConfiguracoesVendedoresFormValues, ConfiguracoesVendedoresRecord } from '@/src/features/configuracoes-vendedores/types/configuracoes-vendedores'

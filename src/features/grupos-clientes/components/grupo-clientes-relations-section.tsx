@@ -67,12 +67,12 @@ export function GrupoClientesRelationsSection({
         title={t('people.customerGroups.tabs.customers', 'Customers')}
         action={(
           <div className="flex flex-wrap items-center gap-2">
-            <button type="button" className="inline-flex items-center gap-2 rounded-full border border-dashed border-[#d8ccb7] bg-white px-4 py-2 text-sm text-slate-500" disabled>
+            <button type="button" className="app-button-secondary inline-flex items-center gap-2 rounded-full border-dashed px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-60" disabled>
               <Upload className="h-4 w-4" />
               {t('people.customerGroups.import.comingSoon', 'Spreadsheet import in next step')}
             </button>
             {!readOnly && selectedRelationIds.length ? (
-              <button type="button" onClick={() => setConfirmDeleteIds(selectedRelationIds)} className="inline-flex items-center gap-2 rounded-full bg-rose-600 px-4 py-2 text-sm font-semibold text-white">
+              <button type="button" onClick={() => setConfirmDeleteIds(selectedRelationIds)} className="app-button-danger inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold">
                 <Trash2 className="h-4 w-4" />
                 {t('common.deleteSelected', 'Delete selected')}
               </button>
@@ -90,7 +90,7 @@ export function GrupoClientesRelationsSection({
               disabled={readOnly}
             />
             {!readOnly ? (
-              <button type="button" onClick={() => void handleAddCliente()} className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white">
+              <button type="button" onClick={() => void handleAddCliente()} className="app-button-primary inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold">
                 {t('common.include', 'Include')}
               </button>
             ) : null}
@@ -111,7 +111,7 @@ export function GrupoClientesRelationsSection({
                 headerClassName: 'w-[90px]',
                 render: (item) => !readOnly ? (
                   <TooltipIconButton label={t('simpleCrud.actions.delete', 'Delete')}>
-                    <button type="button" onClick={() => setConfirmDeleteIds([item.id_cliente])} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-700">
+                    <button type="button" onClick={() => setConfirmDeleteIds([item.id_cliente])} className="app-button-danger inline-flex h-9 w-9 items-center justify-center rounded-full p-0">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </TooltipIconButton>

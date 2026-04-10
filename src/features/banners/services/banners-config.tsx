@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import { normalizeBannerRecord, toBannerPayload } from '@/src/features/banners/services/banners-mappers'
 

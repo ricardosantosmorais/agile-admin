@@ -37,6 +37,15 @@ function normalizeIntegerInput(value: string, maxLength = 3) {
   return value.replace(/[^\d]/g, '').slice(0, maxLength)
 }
 
+const summaryCardClasses = 'app-pane-muted rounded-[1rem] px-4 py-3'
+const summaryLabelClasses = 'text-[11px] font-semibold uppercase tracking-[0.16em] text-[color:var(--app-muted)]'
+const summaryValueClasses = 'mt-1 text-sm font-semibold text-[color:var(--app-text)]'
+const editActionButtonClasses = 'app-button-secondary inline-flex h-9 w-9 items-center justify-center rounded-full'
+const deleteActionButtonClasses = 'app-button-danger inline-flex h-9 w-9 items-center justify-center rounded-full'
+const formCheckGroupClasses = 'app-control-muted inline-flex h-[46px] items-center gap-3 rounded-[1rem] px-3.5 text-sm text-[color:var(--app-text)]'
+const formCheckListClasses = 'app-control-muted flex flex-wrap gap-4 rounded-[1rem] px-4 py-3'
+const feedbackClasses = 'app-error-panel md:col-span-2 rounded-[1rem] px-4 py-3 text-sm'
+
 function createSettingsDraft(form: Record<string, unknown>): ScheduleSettingsDraft {
   return {
     agendamento: checked(form.agendamento),
@@ -186,32 +195,32 @@ export function FormaEntregaAgendamentoTab({
         title={t('logistics.deliveryMethods.tabs.scheduling', 'Agendamento')}
         description={t('logistics.deliveryMethods.help.scheduleSummary', 'A configuração fica resumida aqui. Para incluir ou alterar, use o modal de edição.')}
         action={!readOnly ? (
-          <button type="button" onClick={openSettingsModal} className="inline-flex items-center gap-2 rounded-full border border-[#e6dfd3] bg-white px-4 py-2.5 text-sm font-semibold text-slate-700">
+          <button type="button" onClick={openSettingsModal} className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold">
             <Pencil className="h-4 w-4" />
             {t('common.edit', 'Editar')}
           </button>
         ) : null}
       >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-[1rem] border border-[#ece5d9] bg-[#fcfaf5] px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{t('logistics.deliveryMethods.scheduling.enabled', 'Agendamento')}</p>
-            <p className="mt-1 text-sm font-semibold text-slate-900">{settingsDraft.agendamento ? t('common.yes', 'Sim') : t('common.no', 'Não')}</p>
+          <div className={summaryCardClasses}>
+            <p className={summaryLabelClasses}>{t('logistics.deliveryMethods.scheduling.enabled', 'Agendamento')}</p>
+            <p className={summaryValueClasses}>{settingsDraft.agendamento ? t('common.yes', 'Sim') : t('common.no', 'Não')}</p>
           </div>
-          <div className="rounded-[1rem] border border-[#ece5d9] bg-[#fcfaf5] px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{t('logistics.deliveryMethods.scheduling.minDays', 'Mínimo de dias para agendamento')}</p>
-            <p className="mt-1 text-sm font-semibold text-slate-900">{settingsDraft.agendamento_dias_minimo || '0'}</p>
+          <div className={summaryCardClasses}>
+            <p className={summaryLabelClasses}>{t('logistics.deliveryMethods.scheduling.minDays', 'Mínimo de dias para agendamento')}</p>
+            <p className={summaryValueClasses}>{settingsDraft.agendamento_dias_minimo || '0'}</p>
           </div>
-          <div className="rounded-[1rem] border border-[#ece5d9] bg-[#fcfaf5] px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{t('logistics.deliveryMethods.scheduling.maxDays', 'Máximo de dias para agendamento')}</p>
-            <p className="mt-1 text-sm font-semibold text-slate-900">{settingsDraft.agendamento_dias_maximo || '0'}</p>
+          <div className={summaryCardClasses}>
+            <p className={summaryLabelClasses}>{t('logistics.deliveryMethods.scheduling.maxDays', 'Máximo de dias para agendamento')}</p>
+            <p className={summaryValueClasses}>{settingsDraft.agendamento_dias_maximo || '0'}</p>
           </div>
-          <div className="rounded-[1rem] border border-[#ece5d9] bg-[#fcfaf5] px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{t('logistics.deliveryMethods.scheduling.cutoffTime', 'Horário de corte')}</p>
-            <p className="mt-1 text-sm font-semibold text-slate-900">{settingsDraft.agendamento_horario_corte || '--:--'}</p>
+          <div className={summaryCardClasses}>
+            <p className={summaryLabelClasses}>{t('logistics.deliveryMethods.scheduling.cutoffTime', 'Horário de corte')}</p>
+            <p className={summaryValueClasses}>{settingsDraft.agendamento_horario_corte || '--:--'}</p>
           </div>
-          <div className="rounded-[1rem] border border-[#ece5d9] bg-[#fcfaf5] px-4 py-3 md:col-span-2 xl:col-span-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{t('logistics.sections.deliveryDays', 'Dias de entrega')}</p>
-            <p className="mt-1 text-sm font-semibold text-slate-900">{deliveryDays}</p>
+          <div className={`${summaryCardClasses} md:col-span-2 xl:col-span-4`}>
+            <p className={summaryLabelClasses}>{t('logistics.sections.deliveryDays', 'Dias de entrega')}</p>
+            <p className={summaryValueClasses}>{deliveryDays}</p>
           </div>
         </div>
       </SectionCard>
@@ -237,12 +246,12 @@ export function FormaEntregaAgendamentoTab({
             render: (item) => !readOnly ? (
               <div className="flex items-center gap-2">
                 <TooltipIconButton label={t('simpleCrud.actions.edit', 'Editar')}>
-                  <button type="button" onClick={() => openEditDateModal(item)} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#e6dfd3] bg-white text-slate-700">
+                  <button type="button" onClick={() => openEditDateModal(item)} className={editActionButtonClasses}>
                     <Pencil className="h-4 w-4" />
                   </button>
                 </TooltipIconButton>
                 <TooltipIconButton label={t('simpleCrud.actions.delete', 'Excluir')}>
-                  <button type="button" onClick={() => { setSelectedIds([item.id]); setConfirmOpen(true) }} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-700">
+                  <button type="button" onClick={() => { setSelectedIds([item.id]); setConfirmOpen(true) }} className={deleteActionButtonClasses}>
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </TooltipIconButton>
@@ -259,11 +268,11 @@ export function FormaEntregaAgendamentoTab({
         onConfirm={() => void handleSaveSettings()}
       >
         <div className="grid gap-4 md:grid-cols-2">
-          {settingsFeedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{settingsFeedback}</div> : null}
+          {settingsFeedback ? <div className={feedbackClasses}>{settingsFeedback}</div> : null}
 
           <FormField label={t('logistics.deliveryMethods.scheduling.enabled', 'Agendamento')} className="md:col-span-2">
-            <label className="inline-flex h-[46px] items-center gap-3 rounded-[1rem] border border-[#e6dfd3] px-3.5 text-sm text-slate-700">
-              <input type="checkbox" checked={settingsDraft.agendamento} onChange={(event) => setSettingsDraft((current) => ({ ...current, agendamento: event.target.checked }))} className="h-4 w-4 rounded border-slate-300" />
+            <label className={formCheckGroupClasses}>
+              <input type="checkbox" checked={settingsDraft.agendamento} onChange={(event) => setSettingsDraft((current) => ({ ...current, agendamento: event.target.checked }))} className="h-4 w-4 rounded border-[color:var(--app-control-border)]" />
               <span>{settingsDraft.agendamento ? t('common.yes', 'Sim') : t('common.no', 'Não')}</span>
             </label>
           </FormField>
@@ -282,7 +291,7 @@ export function FormaEntregaAgendamentoTab({
             className="md:col-span-2"
             helperText={t('logistics.deliveryMethods.help.scheduleDays', 'Marque os dias em que a forma de entrega permite agendamento.')}
           >
-            <div className="flex flex-wrap gap-4 rounded-[1rem] border border-[#e6dfd3] bg-white px-4 py-3">
+            <div className={formCheckListClasses}>
               {[
                 ['agendamento_seg', t('logistics.rotas.fields.monday', 'Segunda')],
                 ['agendamento_ter', t('logistics.rotas.fields.tuesday', 'Terça')],
@@ -292,12 +301,12 @@ export function FormaEntregaAgendamentoTab({
                 ['agendamento_sab', t('logistics.rotas.fields.saturday', 'Sábado')],
                 ['agendamento_dom', t('logistics.rotas.fields.sunday', 'Domingo')],
               ].map(([key, label]) => (
-                <label key={key} className="inline-flex items-center gap-2 text-sm text-slate-700">
+                <label key={key} className="inline-flex items-center gap-2 text-sm text-[color:var(--app-text)]">
                   <input
                     type="checkbox"
                     checked={settingsDraft[key as keyof ScheduleSettingsDraft] as boolean}
                     onChange={(event) => setSettingsDraft((current) => ({ ...current, [key]: event.target.checked }))}
-                    className="h-4 w-4 rounded border-slate-300"
+                    className="h-4 w-4 rounded border-[color:var(--app-control-border)]"
                   />
                   <span>{label}</span>
                 </label>
@@ -314,7 +323,7 @@ export function FormaEntregaAgendamentoTab({
         onConfirm={() => void handleSaveDate()}
       >
         <div className="grid gap-4 md:grid-cols-2">
-          {dateFeedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{dateFeedback}</div> : null}
+          {dateFeedback ? <div className={feedbackClasses}>{dateFeedback}</div> : null}
           <FormField label={t('logistics.deliveryMethods.scheduling.date', 'Data')}>
             <DateInput value={dateDraft.data} onChange={(event) => setDateDraft((current) => ({ ...current, data: event.target.value }))} />
           </FormField>
@@ -326,8 +335,8 @@ export function FormaEntregaAgendamentoTab({
             className="md:col-span-2"
             helperText={t('logistics.deliveryMethods.help.dateRestriction', 'Use “Sim” para bloquear a data. Use “Não” quando a data for apenas informativa.')}
           >
-            <label className="inline-flex h-[46px] items-center gap-3 rounded-[1rem] border border-[#e6dfd3] px-3.5 text-sm text-slate-700">
-              <input type="checkbox" checked={dateDraft.restricao} onChange={(event) => setDateDraft((current) => ({ ...current, restricao: event.target.checked }))} className="h-4 w-4 rounded border-slate-300" />
+            <label className={formCheckGroupClasses}>
+              <input type="checkbox" checked={dateDraft.restricao} onChange={(event) => setDateDraft((current) => ({ ...current, restricao: event.target.checked }))} className="h-4 w-4 rounded border-[color:var(--app-control-border)]" />
               <span>{dateDraft.restricao ? t('common.yes', 'Sim') : t('common.no', 'Não')}</span>
             </label>
           </FormField>

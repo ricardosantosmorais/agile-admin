@@ -23,6 +23,8 @@ function getRowId(item: TabelaPrecoFilialRecord) {
   return `${item.id_tabela_preco}:${item.id_filial}`
 }
 
+const feedbackClasses = 'app-error-panel rounded-[1rem] px-4 py-3 text-sm'
+
 export function TabelasPrecoFiliaisTab({
   tabelaPrecoId,
   items,
@@ -112,7 +114,7 @@ export function TabelasPrecoFiliaisTab({
         onConfirm={() => void handleCreate()}
         isSaving={isSaving}
       >
-        {feedback ? <div className="rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{feedback}</div> : null}
+        {feedback ? <div className={feedbackClasses}>{feedback}</div> : null}
         <div className="grid gap-4 md:grid-cols-2">
           <FormField label={t('financial.common.branch', 'Filial')}>
             <LookupSelect
@@ -128,7 +130,7 @@ export function TabelasPrecoFiliaisTab({
               type="button"
               onClick={() => setDraft((current) => ({ ...current, padrao: !current.padrao }))}
               disabled={readOnly}
-              className={`inline-flex h-11 w-full items-center justify-center rounded-[1rem] border text-sm font-semibold transition ${draft.padrao ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-line bg-white text-slate-700'}`}
+              className={`inline-flex h-11 w-full items-center justify-center rounded-[1rem] border text-sm font-semibold transition ${draft.padrao ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-500' : 'app-button-secondary'}`}
             >
               {draft.padrao ? t('common.yes', 'Sim') : t('common.no', 'Não')}
             </button>

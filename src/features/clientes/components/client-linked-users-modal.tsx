@@ -29,10 +29,11 @@ export function ClientLinkedUsersModal({
   onRemove,
 }: ClientLinkedUsersModalProps) {
   const { t } = useI18n()
+
   return (
     <OverlayModal
       open={open}
-      title={client ? `${t('clientes.modals.linkedUsersTitle', 'Usuarios vinculados')} - ${client.nomeRazaoSocial}` : t('clientes.modals.linkedUsersTitle', 'Usuarios vinculados')}
+      title={client ? `${t('clientes.modals.linkedUsersTitle', 'Usuários vinculados')} - ${client.nomeRazaoSocial}` : t('clientes.modals.linkedUsersTitle', 'Usuários vinculados')}
       onClose={onClose}
     >
       <AsyncState isLoading={isLoading} error={error}>
@@ -41,11 +42,11 @@ export function ClientLinkedUsersModal({
             users.map((user) => (
               <div
                 key={user.idUsuario}
-                className="flex flex-col gap-3 rounded-[1.1rem] border border-[#ece5d9] bg-[#fcfaf5] px-4 py-3 md:flex-row md:items-center md:justify-between"
+                className="app-pane-muted flex flex-col gap-3 rounded-[1.1rem] border px-4 py-3 md:flex-row md:items-center md:justify-between"
               >
                 <div>
-                  <p className="text-sm font-semibold text-slate-950">{user.email || '-'}</p>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="text-sm font-semibold text-[var(--app-text)]">{user.email || '-'}</p>
+                  <p className="mt-1 text-xs text-[var(--app-muted)]">
                     {t('clientes.modals.activatedAt', 'Ativado em {{date}}', { date: user.dataAtivacao ? formatDate(user.dataAtivacao) : '-' })}
                   </p>
                 </div>
@@ -53,7 +54,7 @@ export function ClientLinkedUsersModal({
                   <button
                     type="button"
                     onClick={() => onRemove(user.idUsuario)}
-                    className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-700"
+                    className="app-button-danger inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
                   >
                     <Trash2 className="h-4 w-4" />
                     {t('clientes.actions.remove', 'Remover')}
@@ -62,8 +63,8 @@ export function ClientLinkedUsersModal({
               </div>
             ))
           ) : (
-            <div className="rounded-[1rem] border border-dashed border-[#e6dfd3] px-4 py-6 text-center text-sm text-slate-500">
-              {t('clientes.modals.linkedUsersEmpty', 'Nenhum usuario vinculado encontrado.')}
+            <div className="rounded-[1rem] border border-dashed border-[var(--app-border)] px-4 py-6 text-center text-sm text-[var(--app-muted)]">
+              {t('clientes.modals.linkedUsersEmpty', 'Nenhum usuário vinculado encontrado.')}
             </div>
           )}
         </div>

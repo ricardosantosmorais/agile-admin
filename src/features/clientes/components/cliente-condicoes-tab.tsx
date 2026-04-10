@@ -106,7 +106,7 @@ export function ClienteCondicoesTab({
 
       <CrudModal open={modalOpen} title={t('clientes.form.relations.includePaymentCondition', 'Add payment term')} onClose={closeModal} onConfirm={() => void handleCreate()}>
         <div className="grid gap-4 md:grid-cols-2">
-          {modalFeedback ? <div className="md:col-span-2 rounded-[1rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{modalFeedback}</div> : null}
+          {modalFeedback ? <div className="app-error-panel md:col-span-2 rounded-[1rem] px-4 py-3 text-sm">{modalFeedback}</div> : null}
           <Field label={t('clientes.form.relations.paymentCondition', 'Payment term')}><ClientLookupSelect resource="condicoes_pagamento" label={t('clientes.form.relations.paymentCondition', 'Payment term')} value={draft.condicaoPagamento} onChange={(value) => setDraft((current) => ({ ...current, condicaoPagamento: value }))} disabled={readOnly} /></Field>
           <Field label={t('clientes.form.relations.branch', 'Branch')}><ClientLookupSelect resource="filiais" label={t('clientes.form.relations.branch', 'Branch')} value={draft.filial} onChange={(value) => setDraft((current) => ({ ...current, filial: value }))} disabled={readOnly} /></Field>
         </div>

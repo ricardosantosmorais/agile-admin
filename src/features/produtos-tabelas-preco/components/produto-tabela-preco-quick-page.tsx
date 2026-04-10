@@ -15,6 +15,11 @@ import { useFooterActionsVisibility } from '@/src/hooks/use-footer-actions-visib
 import { useI18n } from '@/src/i18n/use-i18n'
 import { currencyMask } from '@/src/lib/input-masks'
 
+const primaryButtonClasses = 'app-button-primary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-60'
+const footerPrimaryButtonClasses = 'app-button-primary inline-flex items-center gap-2 rounded-full px-4.5 py-2.5 text-sm font-semibold disabled:opacity-60'
+const secondaryButtonClasses = 'app-button-secondary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold'
+const footerSecondaryButtonClasses = 'app-button-secondary inline-flex items-center rounded-full px-4.5 py-2.5 text-sm font-semibold'
+
 export function ProdutoTabelaPrecoQuickPage({ id }: { id?: string }) {
   const { t } = useI18n()
   const access = useFeatureAccess('produtosTabelasPreco')
@@ -117,14 +122,14 @@ export function ProdutoTabelaPrecoQuickPage({ id }: { id?: string }) {
           <div className="flex flex-wrap gap-2">
             {(access.canCreate || access.canEdit) ? (
               !isFooterVisible ? (
-              <button type="button" disabled={isSaving} onClick={() => void handleSave()} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60">
+              <button type="button" disabled={isSaving} onClick={() => void handleSave()} className={primaryButtonClasses}>
                 {isSaving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 {isSaving ? t('common.loading', 'Loading...') : t('common.save', 'Save')}
               </button>
               ) : null
             ) : null}
             {!isFooterVisible ? (
-              <Link href="/produtos-x-tabelas-de-preco" className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold text-slate-700"><ArrowLeft className="h-4 w-4" />{t('common.back', 'Back')}</Link>
+              <Link href="/produtos-x-tabelas-de-preco" className={secondaryButtonClasses}><ArrowLeft className="h-4 w-4" />{t('common.back', 'Back')}</Link>
             ) : null}
           </div>
         }
@@ -135,7 +140,7 @@ export function ProdutoTabelaPrecoQuickPage({ id }: { id?: string }) {
       <SectionCard>
         <div className="grid gap-5 lg:grid-cols-[minmax(0,520px)_1fr]">
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-900">{t('priceStock.productPriceTables.fields.product', 'Produto')}</label>
+            <label className="text-sm font-semibold text-[color:var(--app-text)]">{t('priceStock.productPriceTables.fields.product', 'Produto')}</label>
             <LookupSelect
               label={t('priceStock.productPriceTables.fields.product', 'Produto')}
               value={product}
@@ -144,7 +149,7 @@ export function ProdutoTabelaPrecoQuickPage({ id }: { id?: string }) {
               disabled={Boolean(id)}
             />
           </div>
-          <div className="flex items-end text-sm text-slate-500">
+          <div className="flex items-end text-sm text-[color:var(--app-muted)]">
             {product?.id
               ? t('priceStock.productPriceTables.help.bulkEdit', 'Os preços abaixo cruzam o produto selecionado com todas as tabelas de preço ativas.')
               : t('priceStock.productPriceTables.help.selectProduct', 'Selecione um produto para carregar a grade de precificação rápida.')}
@@ -158,7 +163,7 @@ export function ProdutoTabelaPrecoQuickPage({ id }: { id?: string }) {
             <div className="overflow-x-auto">
               <table className="min-w-full border-separate border-spacing-y-2">
                 <thead>
-                  <tr className="text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  <tr className="text-left text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--app-muted)]">
                     <th className="px-3 py-2">{t('priceStock.productPriceTables.fields.priceTable', 'Tabela de preço')}</th>
                     <th className="px-3 py-2">Preço 1</th>
                     <th className="px-3 py-2">Preço 2</th>
@@ -171,8 +176,8 @@ export function ProdutoTabelaPrecoQuickPage({ id }: { id?: string }) {
                 </thead>
                 <tbody>
                   {items.map((item, index) => (
-                    <tr key={item.id_tabela_preco} className="rounded-[1rem] bg-[#fffdf9] shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
-                      <td className="px-3 py-2 font-semibold text-slate-900">{item.nome_tabela}</td>
+                    <tr key={item.id_tabela_preco} className="app-pane-muted rounded-[1rem] shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+                      <td className="px-3 py-2 font-semibold text-[color:var(--app-text)]">{item.nome_tabela}</td>
                       {(['preco1', 'preco2', 'preco3', 'preco4', 'preco5', 'preco6', 'preco7'] as const).map((priceKey) => (
                         <td key={priceKey} className="min-w-[140px] px-3 py-2">
                           <InputWithAffix
@@ -190,7 +195,7 @@ export function ProdutoTabelaPrecoQuickPage({ id }: { id?: string }) {
               </table>
             </div>
           ) : (
-            <div className="rounded-[1.25rem] border border-dashed border-[#e6dfd3] bg-[#fcfaf5] px-6 py-10 text-center text-sm text-slate-500">
+            <div className="app-pane-muted rounded-[1.25rem] border-dashed px-6 py-10 text-center text-sm text-[color:var(--app-muted)]">
               {t('priceStock.productPriceTables.help.selectProduct', 'Selecione um produto para carregar a grade de precificação rápida.')}
             </div>
           )}
@@ -202,13 +207,13 @@ export function ProdutoTabelaPrecoQuickPage({ id }: { id?: string }) {
               type="button"
               disabled={isSaving}
               onClick={() => void handleSave()}
-              className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4.5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+              className={footerPrimaryButtonClasses}
             >
               {isSaving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               {isSaving ? t('common.loading', 'Loading...') : t('common.save', 'Save')}
             </button>
           ) : null}
-          <Link href="/produtos-x-tabelas-de-preco" className="inline-flex items-center rounded-full border border-line bg-white px-4.5 py-2.5 text-sm font-semibold text-slate-700">
+          <Link href="/produtos-x-tabelas-de-preco" className={footerSecondaryButtonClasses}>
             {t('common.back', 'Back')}
           </Link>
         </div>

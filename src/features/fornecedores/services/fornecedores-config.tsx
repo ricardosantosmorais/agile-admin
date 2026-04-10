@@ -1,5 +1,3 @@
-'use client'
-
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 import { BRAZILIAN_STATES } from '@/src/lib/brazil'
 import { cepMask, cnpjMask, cpfMask, phoneMask } from '@/src/lib/input-masks'
