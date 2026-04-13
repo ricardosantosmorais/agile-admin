@@ -33,7 +33,7 @@ export function AssistenteVirtualMessagesSection({
         const fieldMeta = metadata[fieldKey]
 
         return (
-          <div key={fieldKey} className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
+          <div key={fieldKey} className="app-control-muted rounded-[1.15rem] p-4">
             <FormField label={t(`configuracoes.virtualAssistant.fields.${fieldKey}.label`, fieldKey)} asLabel={false}>
               <textarea
                 value={values[fieldKey]}
@@ -45,17 +45,17 @@ export function AssistenteVirtualMessagesSection({
               />
             </FormField>
 
-            <div className="mt-2 flex items-center justify-between gap-3 text-xs text-slate-500">
+            <div className="mt-2 flex items-center justify-between gap-3 text-xs text-[color:var(--app-muted)]">
               <p className="leading-5">
                 {t(`configuracoes.virtualAssistant.fields.${fieldKey}.helper`, '')}
               </p>
-              <span className="shrink-0 font-medium text-slate-400">
+              <span className="shrink-0 font-medium text-[color:var(--app-text-muted)]">
                 {values[fieldKey].length}/150
               </span>
             </div>
 
             {fieldMeta ? (
-              <p className="mt-3 text-xs leading-5 text-slate-500">
+              <p className="mt-3 text-xs leading-5 text-[color:var(--app-muted)]">
                 {t('configuracoes.virtualAssistant.lastUpdated', 'Ãšltima alteraÃ§Ã£o: {{date}} por {{user}}', {
                   date: formatDateTime(fieldMeta.updatedAt),
                   user: fieldMeta.updatedBy,

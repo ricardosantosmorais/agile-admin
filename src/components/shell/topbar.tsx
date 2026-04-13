@@ -121,6 +121,7 @@ export function Topbar() {
   const [notificationsError, setNotificationsError] = useState('')
   const hasLoadedNotificationsRef = useRef(false)
   const rootRef = useRef<HTMLDivElement | null>(null)
+  const tenantSearchInputRef = useRef<HTMLInputElement | null>(null)
   const hasMarkedNotificationsRef = useRef(false)
   const isMarkingNotificationsRef = useRef(false)
   const changelogState = useAsyncData(() => appData.shell.getChangelog(), [])
@@ -222,6 +223,17 @@ export function Topbar() {
   }, [activePanel, currentTenant.id, session, shouldBlockUnauthenticatedRedirect])
 
   useEffect(() => {
+    if (activePanel !== 'tenant') {
+      return
+    }
+
+    // Aguarda o painel montar para garantir foco no campo de busca da empresa.
+    window.requestAnimationFrame(() => {
+      tenantSearchInputRef.current?.focus()
+    })
+  }, [activePanel])
+
+  useEffect(() => {
     if (shouldBlockUnauthenticatedRedirect) {
       return
     }
@@ -295,6 +307,7 @@ export function Topbar() {
                     <div className="app-control-muted flex items-center gap-2 rounded-2xl px-3 py-2">
                       <Search className="h-4 w-4 text-slate-400" />
                       <input
+                        ref={tenantSearchInputRef}
                         value={tenantSearchTerm}
                         onChange={(event) => setTenantSearchTerm(event.target.value)}
                         className="w-full border-none bg-transparent text-sm outline-none placeholder:text-slate-400"

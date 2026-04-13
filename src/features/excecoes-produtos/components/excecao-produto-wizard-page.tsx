@@ -63,8 +63,8 @@ function createProductCriterion(index: number): ExcecaoProdutoProductCriterion {
 
 function renderInputClass(invalid = false) {
   return [
-    'w-full rounded-[1rem] bg-white px-3.5 py-3 text-sm text-slate-900',
-    invalid ? 'border border-rose-300 ring-2 ring-rose-100' : 'border border-[#e6dfd3]',
+    'app-control w-full rounded-[1rem] px-3.5 py-3 text-sm',
+    invalid ? 'border-rose-300 ring-2 ring-rose-500/20' : '',
   ].join(' ')
 }
 
@@ -79,9 +79,9 @@ function buildWeekdaySummary(conditions: ExcecaoProdutoConditionsDraft) {
 
 function InfoCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-[1rem] border border-[#e8e2d7] bg-white px-4 py-4">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
-      <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{value}</p>
+    <div className="app-control rounded-[1rem] px-4 py-4">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--app-muted)]">{label}</p>
+      <p className="mt-2 text-3xl font-semibold tracking-tight text-[color:var(--app-text)]">{value}</p>
     </div>
   )
 }
@@ -95,16 +95,16 @@ function SummaryBlock({
 }) {
   return (
     <div>
-      <h3 className="text-xl font-semibold text-slate-950">{title}</h3>
+      <h3 className="text-xl font-semibold text-[color:var(--app-text)]">{title}</h3>
       <div className="mt-3 space-y-3">
         {items.map((item) => (
-          <div key={item.label} className="rounded-[1rem] border border-[#e8e2d7] bg-[#fcfaf5] px-4 py-4">
-            <p className="text-sm font-semibold text-slate-950">{item.label}</p>
-            <p className="mt-2 text-sm text-slate-600">
-              Tipo: <span className="font-semibold text-slate-900">{item.type}</span>
+          <div key={item.label} className="app-control-muted rounded-[1rem] px-4 py-4">
+            <p className="text-sm font-semibold text-[color:var(--app-text)]">{item.label}</p>
+            <p className="mt-2 text-sm text-[color:var(--app-muted)]">
+              Tipo: <span className="font-semibold text-[color:var(--app-text)]">{item.type}</span>
             </p>
-            <p className="mt-1 text-sm text-slate-600">
-              Seleção: <span className="font-semibold text-slate-900">{item.values}</span>
+            <p className="mt-1 text-sm text-[color:var(--app-muted)]">
+              Seleção: <span className="font-semibold text-[color:var(--app-text)]">{item.values}</span>
             </p>
           </div>
         ))}
@@ -152,7 +152,7 @@ function CriteriaSection<TType extends string>({
           <button
             type="button"
             onClick={onAdd}
-            className="inline-flex items-center gap-2 rounded-full border border-[#e6dfd3] bg-white px-4 py-2 text-sm font-semibold text-slate-700"
+            className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
           >
             <Plus className="h-4 w-4" />
             {t('common.add', 'Adicionar')}
@@ -166,19 +166,19 @@ function CriteriaSection<TType extends string>({
             <div
               key={item.id}
               className={[
-                'rounded-[1.25rem] border bg-[#fffdf9] p-4',
-                invalid ? 'border-rose-300' : 'border-[#e9e1d5]',
+                'app-control rounded-[1.25rem] p-4',
+                invalid ? 'border-rose-300' : '',
               ].join(' ')}
             >
               <div className="mb-4 flex items-start justify-between gap-3">
-                <div className="text-sm font-semibold text-slate-900">
+                <div className="text-sm font-semibold text-[color:var(--app-text)]">
                   {criterionLabel} {index + 1}
                 </div>
                 {items.length > 1 ? (
                   <button
                     type="button"
                     onClick={() => onRemove(item.id)}
-                    className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-3 py-2 text-sm font-semibold text-rose-600"
+                    className="inline-flex items-center gap-2 rounded-full border border-rose-400/40 bg-rose-500/10 px-3 py-2 text-sm font-semibold text-rose-300"
                   >
                     <Trash2 className="h-4 w-4" />
                     {t('common.remove', 'Remover')}
@@ -188,7 +188,7 @@ function CriteriaSection<TType extends string>({
 
               <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">
+                  <label className="text-sm font-semibold text-[color:var(--app-text)]">
                     {t('maintenance.productExceptions.criterionType', 'Tipo do critério')}
                   </label>
                   <select
@@ -206,7 +206,7 @@ function CriteriaSection<TType extends string>({
 
                 <div className="space-y-2">
                   {item.type === ('todos' as TType) ? (
-                    <div className="flex min-h-[72px] items-center rounded-[1rem] border border-dashed border-[#e6dfd3] bg-[#fcfaf5] px-4 py-3 text-sm text-slate-500">
+                    <div className="app-control-muted flex min-h-[72px] items-center rounded-[1rem] border-dashed px-4 py-3 text-sm text-[color:var(--app-muted)]">
                       {t(
                         'maintenance.productExceptions.appliesToAll',
                         'Este bloco aplica a todos. Nenhuma seleção adicional é necessária.',
@@ -214,7 +214,7 @@ function CriteriaSection<TType extends string>({
                     </div>
                   ) : (
                     <>
-                      <label className="text-sm font-semibold text-slate-900">{meta.label}</label>
+                      <label className="text-sm font-semibold text-[color:var(--app-text)]">{meta.label}</label>
                       {meta.resource ? (
                         <LookupSelect
                           label={meta.label}
@@ -256,13 +256,13 @@ function CriteriaSection<TType extends string>({
                       {item.values.map((value) => (
                         <span
                           key={value.id}
-                          className="inline-flex items-center gap-2 rounded-full bg-[#f4efe6] px-3 py-1.5 text-xs font-medium text-slate-700"
+                          className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
                         >
                           {value.label}
                           <button
                             type="button"
                             onClick={() => onValuesChange(item.id, item.values.filter((selected) => selected.id !== value.id))}
-                            className="text-slate-500 transition hover:text-slate-700"
+                            className="text-[color:var(--app-muted)] transition hover:text-[color:var(--app-text)]"
                           >
                             ×
                           </button>
@@ -536,7 +536,7 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
           <div className="flex items-center gap-2">
             <Link
               href="/excecoes-produtos"
-              className="inline-flex h-11 items-center gap-2 rounded-full border border-[#e6dfd3] bg-white px-4 text-sm font-semibold text-slate-700"
+                className="app-button-secondary inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold"
             >
               <ArrowLeft className="h-4 w-4" />
               {t('common.back', 'Voltar')}
@@ -545,7 +545,7 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
               type="button"
               onClick={() => void handleSave()}
               disabled={isSaving}
-              className="inline-flex h-11 items-center gap-2 rounded-full bg-slate-950 px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="app-button-primary inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSaving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               {t('common.save', 'Salvar')}
@@ -601,7 +601,7 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
             <SectionCard title={t('maintenance.productExceptions.ruleTitle', 'Configuração da exceção')}>
               <div className="grid gap-4 xl:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">
+                  <label className="text-sm font-semibold text-[color:var(--app-text)]">
                     {t('maintenance.productExceptions.fields.reason', 'Motivo da exceção')}
                   </label>
                   <textarea
@@ -614,7 +614,7 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">
+                    <label className="text-sm font-semibold text-[color:var(--app-text)]">
                       {t('maintenance.productExceptions.fields.metadata', 'Metadata')}
                     </label>
                     <textarea
@@ -647,7 +647,7 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
               <div className="space-y-5">
                 <div className="grid gap-4 xl:grid-cols-2">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">
+                    <label className="text-sm font-semibold text-[color:var(--app-text)]">
                       {t('maintenance.productExceptions.fields.startDate', 'Data inicial')}
                     </label>
                     <input
@@ -658,7 +658,7 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">
+                    <label className="text-sm font-semibold text-[color:var(--app-text)]">
                       {t('maintenance.productExceptions.fields.endDate', 'Data final')}
                     </label>
                     <input
@@ -672,7 +672,7 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
 
                 <div className="grid gap-4 xl:grid-cols-2">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">
+                    <label className="text-sm font-semibold text-[color:var(--app-text)]">
                       {t('maintenance.productExceptions.fields.paymentMethod', 'Forma de pagamento')}
                     </label>
                     <LookupSelect
@@ -690,7 +690,7 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">
+                    <label className="text-sm font-semibold text-[color:var(--app-text)]">
                       {t('maintenance.productExceptions.fields.paymentCondition', 'Condição de pagamento')}
                     </label>
                     <LookupSelect
@@ -710,7 +710,7 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">
+                    <label className="text-sm font-semibold text-[color:var(--app-text)]">
                     {t('maintenance.productExceptions.fields.deliveryType', 'Tipo de entrega')}
                   </label>
                   <input
@@ -722,12 +722,12 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
                   />
                 </div>
 
-                <div className="rounded-[1.2rem] border border-[#ece4d8] bg-[#fcfaf5] p-4">
+                <div className="app-control-muted rounded-[1.2rem] p-4">
                   <div className="mb-4">
-                    <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-[color:var(--app-muted)]">
                       {t('maintenance.productExceptions.fields.schedule', 'Dias e horários')}
                     </h3>
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-[color:var(--app-muted)]">
                       {t('maintenance.productExceptions.scheduleHint', 'Marque os dias em que a exceção deve valer. Se um dia estiver marcado sem horário, ela valerá durante todo o dia.')}
                     </p>
                   </div>
@@ -744,7 +744,7 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
                       return (
                         <div
                           key={day.key}
-                          className="grid gap-3 rounded-[1rem] border border-[#ece4d8] bg-white p-3 md:grid-cols-[220px_1fr_1fr] md:items-center"
+                          className="app-control grid gap-3 rounded-[1rem] p-3 md:grid-cols-[220px_1fr_1fr] md:items-center"
                         >
                           <ToggleCard
                             label={day.label}
@@ -819,27 +819,27 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
                     />
 
                     <div>
-                      <h3 className="text-xl font-semibold text-slate-950">Prévia do lote</h3>
-                      <div className="mt-3 overflow-x-auto rounded-[1rem] border border-[#e8e2d7]">
-                        <table className="min-w-full divide-y divide-[#eee6da] text-sm">
-                          <thead className="bg-[#fcfaf5] text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      <h3 className="text-xl font-semibold text-[color:var(--app-text)]">Prévia do lote</h3>
+                      <div className="mt-3 overflow-x-auto rounded-[1rem] border border-[color:var(--app-card-border)]">
+                        <table className="min-w-full divide-y divide-[color:var(--app-card-border)] text-sm">
+                          <thead className="bg-[color:var(--app-control-muted-bg)] text-left text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--app-muted)]">
                             <tr>
                               <th className="px-4 py-3">Público-alvo</th>
                               <th className="px-4 py-3">Produto</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-[#f1ebe0]">
+                          <tbody className="divide-y divide-[color:var(--app-card-border)]">
                             {previewRows.map((row) => (
-                              <tr key={row.key} className="bg-white">
-                                <td className="px-4 py-3 font-medium text-slate-900">{row.audience}</td>
-                                <td className="px-4 py-3 text-slate-600">{row.product}</td>
+                              <tr key={row.key} className="bg-[color:var(--app-panel-solid)]">
+                                <td className="px-4 py-3 font-medium text-[color:var(--app-text)]">{row.audience}</td>
+                                <td className="px-4 py-3 text-[color:var(--app-muted)]">{row.product}</td>
                               </tr>
                             ))}
                           </tbody>
                         </table>
                       </div>
                       {flatRowsPreview.length > 12 ? (
-                        <p className="mt-3 text-sm text-slate-500">
+                        <p className="mt-3 text-sm text-[color:var(--app-muted)]">
                           Exibindo 12 de {flatRowsPreview.length} combinações geradas.
                         </p>
                       ) : null}
@@ -848,46 +848,46 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
                 </div>
               </SectionCard>
               <SectionCard title="Resumo final" description="Revise os valores comuns antes de salvar.">
-                <div className="space-y-3 text-sm text-slate-600">
+                <div className="space-y-3 text-sm text-[color:var(--app-muted)]">
                   <p>
                     {t('maintenance.productExceptions.fields.active', 'Ativo')}:{' '}
-                    <span className="font-semibold text-slate-900">{draft.general.ativo ? 'Sim' : 'Não'}</span>
+                    <span className="font-semibold text-[color:var(--app-text)]">{draft.general.ativo ? 'Sim' : 'Não'}</span>
                   </p>
                   <p>
                     {t('maintenance.productExceptions.fields.quote', 'Orçamento')}:{' '}
-                    <span className="font-semibold text-slate-900">{draft.general.orcamento ? 'Sim' : 'Não'}</span>
+                    <span className="font-semibold text-[color:var(--app-text)]">{draft.general.orcamento ? 'Sim' : 'Não'}</span>
                   </p>
                   <p>
                     {t('maintenance.productExceptions.fields.metadata', 'Metadata')}:{' '}
-                    <span className="font-semibold text-slate-900">{draft.general.metadata || '-'}</span>
+                    <span className="font-semibold text-[color:var(--app-text)]">{draft.general.metadata || '-'}</span>
                   </p>
                   <p>
                     {t('maintenance.productExceptions.fields.reason', 'Motivo da exceção')}:{' '}
-                    <span className="font-semibold text-slate-900">{draft.general.motivo || '-'}</span>
+                    <span className="font-semibold text-[color:var(--app-text)]">{draft.general.motivo || '-'}</span>
                   </p>
                   <p>
                     {t('maintenance.productExceptions.fields.paymentMethod', 'Forma de pagamento')}:{' '}
-                    <span className="font-semibold text-slate-900">{draft.conditions.forma_pagamento_lookup?.label || '-'}</span>
+                    <span className="font-semibold text-[color:var(--app-text)]">{draft.conditions.forma_pagamento_lookup?.label || '-'}</span>
                   </p>
                   <p>
                     {t('maintenance.productExceptions.fields.paymentCondition', 'Condição de pagamento')}:{' '}
-                    <span className="font-semibold text-slate-900">{draft.conditions.condicao_pagamento_lookup?.label || '-'}</span>
+                    <span className="font-semibold text-[color:var(--app-text)]">{draft.conditions.condicao_pagamento_lookup?.label || '-'}</span>
                   </p>
                   <p>
                     {t('maintenance.productExceptions.fields.deliveryType', 'Tipo de entrega')}:{' '}
-                    <span className="font-semibold text-slate-900">{draft.conditions.tipo_entrega || '-'}</span>
+                    <span className="font-semibold text-[color:var(--app-text)]">{draft.conditions.tipo_entrega || '-'}</span>
                   </p>
                   <p>
                     {t('maintenance.productExceptions.fields.startDate', 'Data inicial')}:{' '}
-                    <span className="font-semibold text-slate-900">{formatInputDateTimeForDisplay(draft.conditions.data_inicio) || '-'}</span>
+                    <span className="font-semibold text-[color:var(--app-text)]">{formatInputDateTimeForDisplay(draft.conditions.data_inicio) || '-'}</span>
                   </p>
                   <p>
                     {t('maintenance.productExceptions.fields.endDate', 'Data final')}:{' '}
-                    <span className="font-semibold text-slate-900">{formatInputDateTimeForDisplay(draft.conditions.data_fim) || '-'}</span>
+                    <span className="font-semibold text-[color:var(--app-text)]">{formatInputDateTimeForDisplay(draft.conditions.data_fim) || '-'}</span>
                   </p>
                   <p>
                     {t('maintenance.productExceptions.fields.schedule', 'Dias e horários')}:{' '}
-                    <span className="font-semibold text-slate-900">{buildWeekdaySummary(draft.conditions).join('; ') || '-'}</span>
+                    <span className="font-semibold text-[color:var(--app-text)]">{buildWeekdaySummary(draft.conditions).join('; ') || '-'}</span>
                   </p>
                 </div>
               </SectionCard>
@@ -900,7 +900,7 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
                 type="button"
                 onClick={goPrev}
                 disabled={activeStep === 'audience'}
-                className="inline-flex h-11 items-center gap-2 rounded-full border border-[#e6dfd3] bg-white px-4 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="app-button-secondary inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <ArrowLeft className="h-4 w-4" />
                 {t('common.previous', 'Anterior')}
@@ -911,7 +911,7 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
                   type="button"
                   onClick={() => void handleSave()}
                   disabled={isSaving}
-                  className="inline-flex h-11 items-center gap-2 rounded-full bg-slate-950 px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                  className="app-button-primary inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isSaving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                   {t('common.save', 'Salvar')}
@@ -920,7 +920,7 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
                 <button
                   type="button"
                   onClick={goNext}
-                  className="inline-flex h-11 items-center gap-2 rounded-full bg-slate-950 px-4 text-sm font-semibold text-white"
+                  className="app-button-primary inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold"
                 >
                   {t('common.next', 'Próximo')}
                   <ChevronRight className="h-4 w-4" />

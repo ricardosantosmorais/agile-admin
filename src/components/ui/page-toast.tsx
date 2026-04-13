@@ -39,7 +39,9 @@ export function PageToast({
       <div className={[
         'mx-auto flex max-w-3xl items-start gap-3 rounded-[1.1rem] border px-4 py-3 shadow-[0_18px_40px_rgba(15,23,42,0.12)] backdrop-blur',
         'pointer-events-auto',
-        isError ? 'border-rose-200 bg-rose-50/95 text-rose-700' : 'border-emerald-200 bg-emerald-50/95 text-emerald-700',
+        isError
+          ? 'border-rose-200 bg-rose-50/95 text-rose-700 dark:border-rose-400/35 dark:bg-rose-500/12 dark:text-rose-100'
+          : 'border-emerald-200 bg-emerald-50/95 text-emerald-700 dark:border-emerald-400/35 dark:bg-emerald-500/12 dark:text-emerald-100',
       ].join(' ')}>
         <div className="pt-0.5">
           {isError ? <AlertCircle className="h-5 w-5" /> : <CheckCircle2 className="h-5 w-5" />}

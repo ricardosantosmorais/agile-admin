@@ -274,8 +274,8 @@ export function ProdutoEmbalagensTab({
               onChange={(event) => setDraft((current) => ({ ...current, ativo: event.target.value === '1' }))}
               className={inputClasses()}
             >
-              <option value="1">Sim</option>
-              <option value="0">Não</option>
+              <option value="1">{t('common.yes', 'Sim')}</option>
+              <option value="0">{t('common.no', 'Não')}</option>
             </select>
           </FormField>
         </div>

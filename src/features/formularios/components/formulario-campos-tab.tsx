@@ -420,8 +420,8 @@ export function FormularioCamposTab({
       id: 'nome',
       label: t('maintenance.formFields.fields.name', 'Nome'),
       cell: (item) => (
-        <span className="inline-flex items-center gap-1.5 font-semibold text-slate-950">
-          {isProtectedField(item) ? <Lock className="h-3.5 w-3.5 text-slate-500" /> : null}
+        <span className="inline-flex items-center gap-1.5 font-semibold text-[color:var(--app-text)]">
+          {isProtectedField(item) ? <Lock className="h-3.5 w-3.5 text-[color:var(--app-muted)]" /> : null}
           {String(item.nome || '-')}
         </span>
       ),
@@ -501,9 +501,9 @@ export function FormularioCamposTab({
 
         {isLoading ? (
           <div className="space-y-3">
-            <div className="h-14 animate-pulse rounded-[1rem] bg-[#f2eee5]" />
-            <div className="h-14 animate-pulse rounded-[1rem] bg-[#f7f3eb]" />
-            <div className="h-14 animate-pulse rounded-[1rem] bg-[#f2eee5]" />
+            <div className="app-pane-muted h-14 animate-pulse rounded-[1rem]" />
+            <div className="app-pane-muted h-14 animate-pulse rounded-[1rem]" />
+            <div className="app-pane-muted h-14 animate-pulse rounded-[1rem]" />
           </div>
         ) : (
           <AppDataTable
@@ -593,7 +593,7 @@ export function FormularioCamposTab({
           <SectionCard title={t('maintenance.forms.fieldsTab.selectorOptionsTitle', 'Opções personalizadas')}>
             <div className="space-y-3">
               {selectorOptions.map((option, index) => (
-                <div key={`selector-option-${index}`} className="grid gap-2 rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] p-3 md:grid-cols-[1fr_1fr_auto]">
+                <div key={`selector-option-${index}`} className="app-control-muted grid gap-2 rounded-[1rem] p-3 md:grid-cols-[1fr_1fr_auto]">
                   <input
                     type="text"
                     className={inputClasses()}
@@ -610,7 +610,7 @@ export function FormularioCamposTab({
                   />
                   <button
                     type="button"
-                    className="rounded-full border border-[#e6dfd3] bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-[#f8f4ec]"
+                    className="app-button-secondary rounded-full px-4 py-2 text-sm font-semibold"
                     onClick={() => setSelectorOptions((current) => current.filter((_, itemIndex) => itemIndex !== index))}
                   >
                     {t('maintenance.forms.fieldsTab.removeOption', 'Excluir')}
@@ -621,12 +621,12 @@ export function FormularioCamposTab({
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <button
                   type="button"
-                  className="rounded-full border border-[#e6dfd3] bg-[#fcfaf5] px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-[#f5efe5]"
+                  className="app-button-secondary rounded-full px-4 py-2 text-sm font-semibold"
                   onClick={() => setSelectorOptions((current) => [...current, { titulo: '', valor: '' }])}
                 >
                   {t('maintenance.forms.fieldsTab.addOption', 'Nova opção')}
                 </button>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-[color:var(--app-muted)]">
                   {t('maintenance.forms.fieldsTab.selectorOptionsHint', 'Essas opções serão salvas no campo seletor personalizado.')}
                 </p>
               </div>

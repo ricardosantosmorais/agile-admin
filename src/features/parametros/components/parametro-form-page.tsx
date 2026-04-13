@@ -24,7 +24,9 @@ import { extractSavedId } from '@/src/lib/api-payload'
 import { useRouteParams } from '@/src/next/route-context'
 
 const primaryButtonDisabledClasses =
-  'disabled:cursor-not-allowed disabled:border disabled:border-slate-200 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none'
+  'disabled:cursor-not-allowed disabled:opacity-60'
+
+const fieldCardClasses = 'app-control-muted rounded-[1.15rem] p-4'
 
 function toLookupOptions(items: ParametroLookupOption[]) {
   return items.map((item) => ({ id: item.value, label: item.label }))
@@ -161,7 +163,7 @@ export function ParametroFormPage() {
                 type="submit"
                 form={formId}
                 disabled={!hasChanges || saving}
-                className={`inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white ${primaryButtonDisabledClasses}`}
+                className={`app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold ${primaryButtonDisabledClasses}`}
               >
                 {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 {t('common.save', 'Salvar')}
@@ -172,7 +174,7 @@ export function ParametroFormPage() {
                 type="button"
                 onClick={restoreOriginal}
                 disabled={!hasChanges || saving}
-                className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <RotateCcw className="h-4 w-4" />
                 {t('parameters.actions.restore', 'Restaurar')}
@@ -180,7 +182,7 @@ export function ParametroFormPage() {
             ) : null}
             <Link
               href="/configuracoes/parametros"
-              className="inline-flex items-center rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+              className="app-button-secondary inline-flex items-center rounded-full px-4 py-3 text-sm font-semibold"
             >
               {t('common.back', 'Voltar')}
             </Link>
@@ -197,7 +199,7 @@ export function ParametroFormPage() {
             description={t('parameters.form.description', 'Defina chave, filial, permissão e o conteúdo JSON usado pelo componente da loja.')}
           >
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              <div className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
+              <div className={fieldCardClasses}>
                 <FormField label={t('parameters.fields.active', 'Ativo')} asLabel={false}>
                   <select
                     value={values.ativo}
@@ -211,7 +213,7 @@ export function ParametroFormPage() {
                 </FormField>
               </div>
 
-              <div className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
+              <div className={fieldCardClasses}>
                 <FormField label={t('parameters.fields.key', 'Chave')} asLabel={false}>
                   <select
                     value={values.chave}
@@ -229,7 +231,7 @@ export function ParametroFormPage() {
                 </FormField>
               </div>
 
-              <div className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
+              <div className={fieldCardClasses}>
                 <FormField label={t('parameters.fields.branch', 'Filial')} asLabel={false}>
                   <LookupSelect
                     label={t('parameters.fields.branch', 'Filial')}
@@ -244,7 +246,7 @@ export function ParametroFormPage() {
                 </FormField>
               </div>
 
-              <div className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
+              <div className={fieldCardClasses}>
                 <FormField label={t('parameters.fields.position', 'Posição')} asLabel={false}>
                   <input
                     value={values.posicao}
@@ -256,7 +258,7 @@ export function ParametroFormPage() {
                 </FormField>
               </div>
 
-              <div className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
+              <div className={fieldCardClasses}>
                 <FormField label={t('parameters.fields.permission', 'Permissão')} asLabel={false}>
                   <select
                     value={values.permissao}
@@ -272,7 +274,7 @@ export function ParametroFormPage() {
                 </FormField>
               </div>
 
-              <div className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4 md:col-span-2 xl:col-span-3">
+              <div className={`${fieldCardClasses} md:col-span-2 xl:col-span-3`}>
                 <FormField label={t('parameters.fields.description', 'Descrição')} asLabel={false}>
                   <input
                     value={values.descricao}
@@ -304,7 +306,7 @@ export function ParametroFormPage() {
               <button
                 type="submit"
                 disabled={!hasChanges || saving}
-                className={`inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white ${primaryButtonDisabledClasses}`}
+                className={`app-button-primary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${primaryButtonDisabledClasses}`}
               >
                 {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 {t('common.save', 'Salvar')}
@@ -313,14 +315,14 @@ export function ParametroFormPage() {
                 type="button"
                 onClick={restoreOriginal}
                 disabled={!hasChanges || saving}
-                className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="app-button-secondary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <RotateCcw className="h-4 w-4" />
                 {t('parameters.actions.restore', 'Restaurar')}
               </button>
               <Link
                 href="/configuracoes/parametros"
-                className="inline-flex items-center rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold text-slate-700"
+                className="app-button-secondary inline-flex items-center rounded-full px-5 py-3 text-sm font-semibold"
               >
                 {t('common.cancel', 'Cancelar')}
               </Link>

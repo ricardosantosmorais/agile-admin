@@ -1,17 +1,21 @@
 ﻿# Admin v2 Web - DocumentaÃ§Ã£o
 
 ## Objetivo
+
 Esta pasta documenta a arquitetura, os fluxos, os padrÃµes compartilhados e o estado atual da migraÃ§Ã£o do `admin-v2-web`.
 
 O objetivo Ã©:
+
 - dar contexto tÃ©cnico para manutenÃ§Ã£o e novas entregas;
 - registrar decisÃµes arquiteturais e operacionais do v2;
 - apoiar onboarding, QA e comparaÃ§Ã£o com o legado.
 
 ## Baseline operacional do repositÃ³rio
+
 As regras operacionais para agentes e contribuiÃ§Ãµes automatizadas estÃ£o em [../AGENTS.md](../AGENTS.md).
 
 Esse arquivo define:
+
 - fluxo padrÃ£o de implementaÃ§Ã£o;
 - regras de arquitetura e migraÃ§Ã£o;
 - cobertura mÃ­nima de testes;
@@ -19,9 +23,11 @@ Esse arquivo define:
 - definition of done do repositÃ³rio.
 
 ## RelaÃ§Ã£o com o legado
+
 O legado em `C:\Projetos\admin` continua sendo a referÃªncia funcional de regras de negÃ³cio, permissÃµes e comportamento operacional.
 
 O v2 reaproveita a mesma base de produto, mas com outra arquitetura:
+
 - Next.js App Router no frontend;
 - bridges em `app/api/*`;
 - autenticaÃ§Ã£o, tenant e sessÃ£o tratados no prÃ³prio app;
@@ -29,6 +35,7 @@ O v2 reaproveita a mesma base de produto, mas com outra arquitetura:
 - componentes compartilhados para listas, formulÃ¡rios, modais, sessÃ£o e feedback.
 
 ## Leitura recomendada
+
 1. [01 - VisÃ£o Geral](./01-visao-geral.md)
 2. [02 - Stack e ExecuÃ§Ã£o](./02-stack-e-execucao.md)
 3. [03 - AutenticaÃ§Ã£o, SessÃ£o e Multiempresa](./03-autenticacao-sessao-multiempresa.md)
@@ -71,9 +78,12 @@ O v2 reaproveita a mesma base de produto, mas com outra arquitetura:
 40. [41 - Módulo Configurações > Assistentes e Parâmetros](./41-modulo-configuracoes-assistentes-e-parametros.md)
 41. [42 - Módulo Perfis](./42-modulo-perfis.md)
 42. [43 - Módulo Ferramentas > HTTP Client](./43-modulo-ferramentas-http-client.md)
-43. [ADRs](./adr/README.md)
+43. [Módulo Integrações > Financeiro](./44-modulo-integracao-financeiro.md)
+44. [Módulo Integrações > Gateways de Pagamento](./45-modulo-integracoes-gateways-pagamento.md)
+45. [ADRs](./adr/README.md)
 
 ## Fontes principais usadas
+
 - `../package.json`
 - `../app`
 - `../src/components`
@@ -85,8 +95,9 @@ O v2 reaproveita a mesma base de produto, mas com outra arquitetura:
 - `C:\Projetos\admin\docs`
 
 ## Regra prÃ¡tica de atualizaÃ§Ã£o
+
 Sempre que houver mudanÃ§a real de arquitetura, ambiente, fluxo operacional, mÃ³dulo migrado ou componente compartilhado:
+
 - atualizar o documento de mÃ³dulo correspondente;
 - revisar [06 - MÃ³dulos e Cobertura Atual](./06-modulos-e-cobertura-atual.md);
 - revisar este Ã­ndice se um documento novo entrar em `docs/`.
-

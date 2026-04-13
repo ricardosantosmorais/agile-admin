@@ -1,384 +1,405 @@
-'use client'
+'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { dashboardPresets, type DashboardSnapshot } from '@/src/features/dashboard/types/dashboard'
-import { appData } from '@/src/services/app-data'
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { dashboardPresets, type DashboardSnapshot } from '@/src/features/dashboard/types/dashboard';
+import { appData } from '@/src/services/app-data';
 
-export type DashboardPhaseId =
-  | 'summary'
-  | 'customers'
-  | 'series'
-  | 'funnel'
-  | 'mix'
-  | 'clients'
-  | 'operations'
-  | 'payments'
-  | 'marketingMix'
-  | 'marketingTops'
+export type DashboardPhaseId = 'summary' | 'customers' | 'series' | 'funnel' | 'mix' | 'clients' | 'operations' | 'payments' | 'marketingMix' | 'marketingTops';
 
 export type StoredDashboardRange = {
-  label?: string
-  start: string
-  end: string
-}
+	label?: string;
+	start: string;
+	end: string;
+	previousStart?: string | null;
+	previousEnd?: string | null;
+};
 
 type DateRangeValue = {
-  start: string
-  end: string
+	start: string;
+	end: string;
+};
+
+function createAutomaticPreviousRange(range: DateRangeValue): DateRangeValue {
+	const startDate = new Date(`${range.start}T00:00:00`);
+	const endDate = new Date(`${range.end}T00:00:00`);
+	const days = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+	const previousEnd = new Date(startDate);
+	previousEnd.setDate(previousEnd.getDate() - 1);
+	const previousStart = new Date(previousEnd);
+	previousStart.setDate(previousStart.getDate() - days + 1);
+
+	return {
+		start: formatDateInput(previousStart),
+		end: formatDateInput(previousEnd),
+	};
 }
 
 type DashboardPhaseDefinition = {
-  id: DashboardPhaseId
-  blocks: string[]
-}
+	id: DashboardPhaseId;
+	blocks: string[];
+};
 
-const STORAGE_KEY = 'dashboard'
+const STORAGE_KEY = 'dashboard';
 
 const phaseDefinitions: DashboardPhaseDefinition[] = [
-  { id: 'summary', blocks: ['resumo'] },
-  { id: 'customers', blocks: ['clientes_resumo'] },
-  { id: 'series', blocks: ['serie', 'alertas'] },
-  { id: 'funnel', blocks: ['funil'] },
-  { id: 'mix', blocks: ['mix'] },
-  { id: 'clients', blocks: ['clientes_listas', 'coorte'] },
-  { id: 'operations', blocks: ['produtos', 'operacao'] },
-  { id: 'payments', blocks: ['pagamentos', 'marketing_resumo'] },
-  { id: 'marketingMix', blocks: ['marketing_mix'] },
-  { id: 'marketingTops', blocks: ['marketing_tops'] },
-]
+	{ id: 'summary', blocks: ['resumo'] },
+	{ id: 'customers', blocks: ['clientes_resumo'] },
+	{ id: 'series', blocks: ['serie', 'alertas', 'resumo', 'funil', 'operacao'] },
+	{ id: 'funnel', blocks: ['funil'] },
+	{ id: 'mix', blocks: ['mix'] },
+	{ id: 'clients', blocks: ['clientes_listas', 'coorte'] },
+	{ id: 'operations', blocks: ['produtos', 'operacao'] },
+	{ id: 'payments', blocks: ['pagamentos', 'marketing_resumo'] },
+	{ id: 'marketingMix', blocks: ['marketing_mix'] },
+	{ id: 'marketingTops', blocks: ['marketing_tops'] },
+];
 
-const orderedPhaseIds = phaseDefinitions.map((phase) => phase.id)
+const orderedPhaseIds = phaseDefinitions.map((phase) => phase.id);
 
 function formatDateInput(date: Date) {
-  return date.toISOString().slice(0, 10)
+	return date.toISOString().slice(0, 10);
 }
 
 function getDefaultPresetRanges(today: Date) {
-  return dashboardPresets.map((preset) => {
-    if (preset.id === 'mes_atual') {
-      const start = new Date(today.getFullYear(), today.getMonth(), 1)
-      const end = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-      return {
-        id: preset.id,
-        label: preset.label,
-        range: {
-          start: formatDateInput(start),
-          end: formatDateInput(end),
-        },
-      }
-    }
+	return dashboardPresets.map((preset) => {
+		if (preset.id === 'mes_atual') {
+			const start = new Date(today.getFullYear(), today.getMonth(), 1);
+			const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+			return {
+				id: preset.id,
+				label: preset.label,
+				range: {
+					start: formatDateInput(start),
+					end: formatDateInput(end),
+				},
+			};
+		}
 
-    const end = new Date(today)
-    const start = new Date(today)
-    start.setDate(end.getDate() - (preset.days - 1))
+		const end = new Date(today);
+		const start = new Date(today);
+		start.setDate(end.getDate() - (preset.days - 1));
 
-    return {
-      id: preset.id,
-      label: preset.label,
-      range: {
-        start: formatDateInput(start),
-        end: formatDateInput(end),
-      },
-    }
-  })
+		return {
+			id: preset.id,
+			label: preset.label,
+			range: {
+				start: formatDateInput(start),
+				end: formatDateInput(end),
+			},
+		};
+	});
 }
 
 function readStoredDashboardRange() {
-  if (typeof window === 'undefined') {
-    return null
-  }
+	if (typeof window === 'undefined') {
+		return null;
+	}
 
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    if (!raw) {
-      return null
-    }
+	try {
+		const raw = window.localStorage.getItem(STORAGE_KEY);
+		if (!raw) {
+			return null;
+		}
 
-    const parsed = JSON.parse(raw) as Partial<StoredDashboardRange>
-    if (!parsed.start || !parsed.end) {
-      return null
-    }
+		const parsed = JSON.parse(raw) as Partial<StoredDashboardRange>;
+		if (!parsed.start || !parsed.end) {
+			return null;
+		}
 
-    return {
-      label: parsed.label,
-      start: parsed.start,
-      end: parsed.end,
-    } satisfies StoredDashboardRange
-  } catch {
-    return null
-  }
+		return {
+			label: parsed.label,
+			start: parsed.start,
+			end: parsed.end,
+			previousStart: parsed.previousStart ?? null,
+			previousEnd: parsed.previousEnd ?? null,
+		} satisfies StoredDashboardRange;
+	} catch {
+		return null;
+	}
 }
 
 function createEmptySnapshot(rangeLabel: string): DashboardSnapshot {
-  return {
-    rangeLabel,
-    primaryMetrics: [],
-    customerMetrics: [],
-    serie: [],
-    ticketByDay: [],
-    channel: [],
-    emitente: [],
-    funil: [],
-    monitoringAlerts: [],
-    coorte: [],
-    topClients: [],
-    topProducts: [],
-    payments: [],
-    hourlyRevenue: [],
-    marketingMetrics: [],
-    marketingMixExclusive: [],
-    marketingMixInclusive: [],
-    marketingTicketComparison: [],
-    topCoupons: [],
-    topPromotions: [],
-  }
+	return {
+		rangeLabel,
+		primaryMetrics: [],
+		customerMetrics: [],
+		serie: [],
+		ticketByDay: [],
+		channel: [],
+		emitente: [],
+		funil: [],
+		monitoringAlerts: [],
+		coorte: [],
+		topClients: [],
+		topProducts: [],
+		payments: [],
+		hourlyRevenue: [],
+		marketingMetrics: [],
+		marketingMixExclusive: [],
+		marketingMixInclusive: [],
+		marketingTicketComparison: [],
+		topCoupons: [],
+		topPromotions: [],
+	};
 }
 
 function mergePhaseSnapshot(current: DashboardSnapshot, partial: DashboardSnapshot, phaseId: DashboardPhaseId) {
-  switch (phaseId) {
-    case 'summary':
-      return { ...current, rangeLabel: partial.rangeLabel, primaryMetrics: partial.primaryMetrics }
-    case 'customers':
-      return { ...current, customerMetrics: partial.customerMetrics }
-    case 'series':
-      return {
-        ...current,
-        serie: partial.serie,
-        ticketByDay: partial.ticketByDay,
-        monitoringAlerts: partial.monitoringAlerts,
-      }
-    case 'funnel':
-      return { ...current, funil: partial.funil }
-    case 'mix':
-      return { ...current, channel: partial.channel, emitente: partial.emitente }
-    case 'clients':
-      return { ...current, topClients: partial.topClients, coorte: partial.coorte }
-    case 'operations':
-      return { ...current, topProducts: partial.topProducts, hourlyRevenue: partial.hourlyRevenue }
-    case 'payments':
-      return {
-        ...current,
-        payments: partial.payments,
-        marketingMetrics: partial.marketingMetrics,
-        marketingTicketComparison: partial.marketingTicketComparison,
-      }
-    case 'marketingMix':
-      return {
-        ...current,
-        marketingMixExclusive: partial.marketingMixExclusive,
-        marketingMixInclusive: partial.marketingMixInclusive,
-      }
-    case 'marketingTops':
-      return { ...current, topCoupons: partial.topCoupons, topPromotions: partial.topPromotions }
-    default:
-      return current
-  }
+	switch (phaseId) {
+		case 'summary':
+			return { ...current, rangeLabel: partial.rangeLabel, primaryMetrics: partial.primaryMetrics };
+		case 'customers':
+			return { ...current, customerMetrics: partial.customerMetrics };
+		case 'series':
+			return {
+				...current,
+				serie: partial.serie,
+				ticketByDay: partial.ticketByDay,
+				monitoringAlerts: partial.monitoringAlerts,
+			};
+		case 'funnel':
+				return {
+					...current,
+					funil: partial.funil,
+					primaryMetrics: current.primaryMetrics.map((metric, index) => {
+						if (index !== 3) {
+							return metric;
+						}
+
+						const conversionMetric = partial.primaryMetrics[3];
+						return conversionMetric ?? metric;
+					}),
+				};
+		case 'mix':
+			return { ...current, channel: partial.channel, emitente: partial.emitente };
+		case 'clients':
+			return { ...current, topClients: partial.topClients, coorte: partial.coorte };
+		case 'operations':
+			return { ...current, topProducts: partial.topProducts, hourlyRevenue: partial.hourlyRevenue };
+		case 'payments':
+			return {
+				...current,
+				payments: partial.payments,
+				marketingMetrics: partial.marketingMetrics,
+				marketingTicketComparison: partial.marketingTicketComparison,
+			};
+		case 'marketingMix':
+			return {
+				...current,
+				marketingMixExclusive: partial.marketingMixExclusive,
+				marketingMixInclusive: partial.marketingMixInclusive,
+			};
+		case 'marketingTops':
+			return { ...current, topCoupons: partial.topCoupons, topPromotions: partial.topPromotions };
+		default:
+			return current;
+	}
 }
 
 function normalizeRequestedPhases(phaseIds: DashboardPhaseId[]) {
-  const requested = new Set(phaseIds)
-  return orderedPhaseIds.filter((phaseId) => requested.has(phaseId))
+	const requested = new Set(phaseIds);
+	return orderedPhaseIds.filter((phaseId) => requested.has(phaseId));
 }
 
 export function useDashboardSequencedSnapshot(tenantId: string) {
-  const today = useMemo(() => new Date(), [])
-  const presetRanges = useMemo(() => getDefaultPresetRanges(today), [today])
-  const [selectedRange, setSelectedRange] = useState<DateRangeValue>(() => {
-    const stored = readStoredDashboardRange()
-    return stored ? { start: stored.start, end: stored.end } : presetRanges[0].range
-  })
-  const [snapshot, setSnapshot] = useState<DashboardSnapshot | null>(null)
-  const [requestedPhases, setRequestedPhases] = useState<DashboardPhaseId[]>(['summary'])
-  const [completedPhases, setCompletedPhases] = useState<DashboardPhaseId[]>([])
-  const [failedPhases, setFailedPhases] = useState<DashboardPhaseId[]>([])
-  const [error, setError] = useState('')
-  const [refreshToken, setRefreshToken] = useState(0)
-  const forceRefreshRef = useRef(false)
-  const cycleForceRefreshRef = useRef(false)
-  const phaseWaitersRef = useRef<
-    Array<{
-      phaseIds: DashboardPhaseId[]
-      resolve: () => void
-      reject: (error: Error) => void
-    }>
-  >([])
+	const today = useMemo(() => new Date(), []);
+	const presetRanges = useMemo(() => getDefaultPresetRanges(today), [today]);
+	const [selectedRange, setSelectedRange] = useState<DateRangeValue>(() => {
+		const stored = readStoredDashboardRange();
+		return stored ? { start: stored.start, end: stored.end } : presetRanges[0].range;
+	});
+	const [selectedPreviousRange, setSelectedPreviousRange] = useState<DateRangeValue | null>(() => {
+		const stored = readStoredDashboardRange();
+		const baseRange = stored ? { start: stored.start, end: stored.end } : presetRanges[0].range;
+		return createAutomaticPreviousRange(baseRange);
+	});
+	const [snapshot, setSnapshot] = useState<DashboardSnapshot | null>(null);
+	const [requestedPhases, setRequestedPhases] = useState<DashboardPhaseId[]>(['summary', 'funnel']);
+	const [completedPhases, setCompletedPhases] = useState<DashboardPhaseId[]>([]);
+	const [failedPhases, setFailedPhases] = useState<DashboardPhaseId[]>([]);
+	const [error, setError] = useState('');
+	const [refreshToken, setRefreshToken] = useState(0);
+	const forceRefreshRef = useRef(false);
+	const cycleForceRefreshRef = useRef(false);
+	const phaseWaitersRef = useRef<
+		Array<{
+			phaseIds: DashboardPhaseId[];
+			resolve: () => void;
+			reject: (error: Error) => void;
+		}>
+	>([]);
 
-  const selectedRangeLabel = useMemo(() => {
-    const preset = presetRanges.find(
-      (item) => item.range.start === selectedRange.start && item.range.end === selectedRange.end,
-    )
-    if (preset) {
-      return preset.label
-    }
+	const selectedRangeLabel = useMemo(() => {
+		const preset = presetRanges.find((item) => item.range.start === selectedRange.start && item.range.end === selectedRange.end);
+		if (preset) {
+			return preset.label;
+		}
 
-    return `${selectedRange.start} a ${selectedRange.end}`
-  }, [presetRanges, selectedRange.end, selectedRange.start])
+		return `${selectedRange.start} a ${selectedRange.end}`;
+	}, [presetRanges, selectedRange.end, selectedRange.start]);
 
-  const currentPhase = useMemo(
-    () =>
-      orderedPhaseIds.find(
-        (phaseId) =>
-          requestedPhases.includes(phaseId) &&
-          !completedPhases.includes(phaseId) &&
-          !failedPhases.includes(phaseId),
-      ) ?? null,
-    [completedPhases, failedPhases, requestedPhases],
-  )
+	const currentPhase = useMemo(
+		() => orderedPhaseIds.find((phaseId) => requestedPhases.includes(phaseId) && !completedPhases.includes(phaseId) && !failedPhases.includes(phaseId)) ?? null,
+		[completedPhases, failedPhases, requestedPhases],
+	);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return
-    }
+	useEffect(() => {
+		if (typeof window === 'undefined') {
+			return;
+		}
 
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        label: selectedRangeLabel,
-        start: selectedRange.start,
-        end: selectedRange.end,
-      } satisfies StoredDashboardRange),
-    )
-  }, [selectedRange.end, selectedRange.start, selectedRangeLabel])
+		const stored: StoredDashboardRange = {
+			label: selectedRangeLabel,
+			start: selectedRange.start,
+			end: selectedRange.end,
+		};
 
-  useEffect(() => {
-    const baseSnapshot = createEmptySnapshot(selectedRangeLabel)
-    cycleForceRefreshRef.current = forceRefreshRef.current
-    forceRefreshRef.current = false
+		window.localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+	}, [selectedRange.end, selectedRange.start, selectedRangeLabel]);
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSnapshot(baseSnapshot)
-    setCompletedPhases([])
-    setFailedPhases([])
-    setError('')
-  }, [refreshToken, selectedRange.end, selectedRange.start, selectedRangeLabel, tenantId])
+	useEffect(() => {
+		const baseSnapshot = createEmptySnapshot(selectedRangeLabel);
+		cycleForceRefreshRef.current = forceRefreshRef.current;
+		forceRefreshRef.current = false;
 
-  useEffect(() => {
-    if (!currentPhase) {
-      return
-    }
+		// eslint-disable-next-line react-hooks/set-state-in-effect
+		setSnapshot(baseSnapshot);
+		setCompletedPhases([]);
+		setFailedPhases([]);
+		setError('');
+	}, [refreshToken, selectedRange.end, selectedRange.start, selectedRangeLabel, selectedPreviousRange, tenantId]);
 
-    const phaseDefinition = phaseDefinitions.find((entry) => entry.id === currentPhase)
-    if (!phaseDefinition) {
-      return
-    }
+	useEffect(() => {
+		if (!currentPhase) {
+			return;
+		}
 
-    const baseSnapshot = createEmptySnapshot(selectedRangeLabel)
-    const phaseId = phaseDefinition.id
-    const phaseBlocks = phaseDefinition.blocks
-    let cancelled = false
+		const phaseDefinition = phaseDefinitions.find((entry) => entry.id === currentPhase);
+		if (!phaseDefinition) {
+			return;
+		}
 
-    async function loadPhase() {
-      try {
-        const partial = await appData.dashboard.getSnapshotByBlocks(
-          tenantId,
-          selectedRange.start,
-          selectedRange.end,
-          selectedRangeLabel,
-          phaseBlocks,
-          { forceRefresh: cycleForceRefreshRef.current },
-        )
+		const baseSnapshot = createEmptySnapshot(selectedRangeLabel);
+		const phaseId = phaseDefinition.id;
+		const phaseBlocks = phaseDefinition.blocks;
+		let cancelled = false;
 
-        if (cancelled) {
-          return
-        }
+		async function loadPhase() {
+			try {
+				const partial = await appData.dashboard.getSnapshotByBlocks(tenantId, selectedRange.start, selectedRange.end, selectedRangeLabel, phaseBlocks, {
+					forceRefresh: cycleForceRefreshRef.current,
+					previousStart: selectedPreviousRange?.start ?? null,
+					previousEnd: selectedPreviousRange?.end ?? null,
+				});
 
-        setSnapshot((current) => mergePhaseSnapshot(current ?? baseSnapshot, partial, phaseId))
-        setCompletedPhases((current) => (current.includes(phaseId) ? current : [...current, phaseId]))
-      } catch (phaseError) {
-        if (cancelled) {
-          return
-        }
+				if (cancelled) {
+					return;
+				}
 
-        const normalizedError = phaseError instanceof Error
-          ? phaseError
-          : new Error('Nao foi possivel carregar parte dos dados do dashboard.')
+				setSnapshot((current) => mergePhaseSnapshot(current ?? baseSnapshot, partial, phaseId));
+				setCompletedPhases((current) => (current.includes(phaseId) ? current : [...current, phaseId]));
+			} catch (phaseError) {
+				if (cancelled) {
+					return;
+				}
 
-        setFailedPhases((current) => (current.includes(phaseId) ? current : [...current, phaseId]))
-        setError(normalizedError.message)
-      }
-    }
+				const normalizedError = phaseError instanceof Error ? phaseError : new Error('Nao foi possivel carregar parte dos dados do dashboard.');
 
-    void loadPhase()
+				setFailedPhases((current) => (current.includes(phaseId) ? current : [...current, phaseId]));
+				setError(normalizedError.message);
+			}
+		}
 
-    return () => {
-      cancelled = true
-    }
-  }, [currentPhase, selectedRange.end, selectedRange.start, selectedRangeLabel, tenantId])
+		void loadPhase();
 
-  useEffect(() => {
-    if (cycleForceRefreshRef.current && completedPhases.length > 0) {
-      cycleForceRefreshRef.current = false
-    }
-  }, [completedPhases])
+		return () => {
+			cancelled = true;
+		};
+	}, [currentPhase, selectedRange.end, selectedRange.start, selectedRangeLabel, selectedPreviousRange, tenantId]);
 
-  useEffect(() => {
-    if (!phaseWaitersRef.current.length) {
-      return
-    }
+	useEffect(() => {
+		if (!cycleForceRefreshRef.current) {
+			return;
+		}
 
-    const remainingWaiters: typeof phaseWaitersRef.current = []
+		const requested = normalizeRequestedPhases(requestedPhases);
+		const concluded = new Set<DashboardPhaseId>([...completedPhases, ...failedPhases]);
+		const hasPendingRequestedPhase = requested.some((phaseId) => !concluded.has(phaseId));
 
-    for (const waiter of phaseWaitersRef.current) {
-      const failedPhase = waiter.phaseIds.find((phaseId) => failedPhases.includes(phaseId))
-      if (failedPhase) {
-        waiter.reject(new Error(`Falha ao carregar a fase ${failedPhase} do dashboard.`))
-        continue
-      }
+		if (!hasPendingRequestedPhase) {
+			cycleForceRefreshRef.current = false;
+		}
+	}, [completedPhases, failedPhases, requestedPhases]);
 
-      const isComplete = waiter.phaseIds.every((phaseId) => completedPhases.includes(phaseId))
-      if (isComplete) {
-        waiter.resolve()
-        continue
-      }
+	useEffect(() => {
+		if (!phaseWaitersRef.current.length) {
+			return;
+		}
 
-      remainingWaiters.push(waiter)
-    }
+		const remainingWaiters: typeof phaseWaitersRef.current = [];
 
-    phaseWaitersRef.current = remainingWaiters
-  }, [completedPhases, failedPhases])
+		for (const waiter of phaseWaitersRef.current) {
+			const failedPhase = waiter.phaseIds.find((phaseId) => failedPhases.includes(phaseId));
+			if (failedPhase) {
+				waiter.reject(new Error(`Falha ao carregar a fase ${failedPhase} do dashboard.`));
+				continue;
+			}
 
-  function requestPhases(phaseIds: DashboardPhaseId | DashboardPhaseId[]) {
-    const nextIds = Array.isArray(phaseIds) ? phaseIds : [phaseIds]
+			const isComplete = waiter.phaseIds.every((phaseId) => completedPhases.includes(phaseId));
+			if (isComplete) {
+				waiter.resolve();
+				continue;
+			}
 
-    setRequestedPhases((current) => {
-      const normalized = normalizeRequestedPhases([...current, ...nextIds])
-      if (normalized.length === current.length && normalized.every((phaseId, index) => phaseId === current[index])) {
-        return current
-      }
+			remainingWaiters.push(waiter);
+		}
 
-      return normalized
-    })
-  }
+		phaseWaitersRef.current = remainingWaiters;
+	}, [completedPhases, failedPhases]);
 
-  function ensurePhasesLoaded(phaseIds: DashboardPhaseId[]) {
-    requestPhases(phaseIds)
+	function requestPhases(phaseIds: DashboardPhaseId | DashboardPhaseId[]) {
+		const nextIds = Array.isArray(phaseIds) ? phaseIds : [phaseIds];
 
-    if (phaseIds.every((phaseId) => completedPhases.includes(phaseId))) {
-      return Promise.resolve()
-    }
+		setRequestedPhases((current) => {
+			const normalized = normalizeRequestedPhases([...current, ...nextIds]);
+			if (normalized.length === current.length && normalized.every((phaseId, index) => phaseId === current[index])) {
+				return current;
+			}
 
-    return new Promise<void>((resolve, reject) => {
-      phaseWaitersRef.current.push({ phaseIds, resolve, reject })
-    })
-  }
+			return normalized;
+		});
+	}
 
-  return {
-    allPhaseIds: orderedPhaseIds,
-    presetRanges,
-    selectedRange,
-    selectedRangeLabel,
-    setSelectedRange,
-    snapshot,
-    requestedPhases,
-    completedPhases,
-    failedPhases,
-    currentPhase,
-    error,
-    requestPhases,
-    ensurePhasesLoaded,
-    refreshSnapshot: () => {
-      forceRefreshRef.current = true
-      setRefreshToken((current) => current + 1)
-    },
-  }
+	function ensurePhasesLoaded(phaseIds: DashboardPhaseId[]) {
+		requestPhases(phaseIds);
+
+		if (phaseIds.every((phaseId) => completedPhases.includes(phaseId))) {
+			return Promise.resolve();
+		}
+
+		return new Promise<void>((resolve, reject) => {
+			phaseWaitersRef.current.push({ phaseIds, resolve, reject });
+		});
+	}
+
+	return {
+		allPhaseIds: orderedPhaseIds,
+		presetRanges,
+		selectedRange,
+		selectedRangeLabel,
+		setSelectedRange,
+		selectedPreviousRange,
+		setSelectedPreviousRange,
+		snapshot,
+		requestedPhases,
+		completedPhases,
+		failedPhases,
+		currentPhase,
+		error,
+		requestPhases,
+		ensurePhasesLoaded,
+		refreshSnapshot: () => {
+			forceRefreshRef.current = true;
+			setRefreshToken((current) => current + 1);
+		},
+	};
 }

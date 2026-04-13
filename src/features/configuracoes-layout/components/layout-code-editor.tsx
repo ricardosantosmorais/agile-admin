@@ -3,6 +3,7 @@
 import Editor, { type Monaco } from '@monaco-editor/react'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import { useEffect, useMemo, useRef } from 'react'
+import { useUi } from '@/src/contexts/ui-context'
 
 type LayoutCodeEditorProps = {
   editorId: string
@@ -44,6 +45,7 @@ export function LayoutCodeEditor({
   onChange,
   height = '100%',
 }: LayoutCodeEditorProps) {
+  const { theme } = useUi()
   const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
   const externalValueRef = useRef(value)
@@ -122,13 +124,14 @@ export function LayoutCodeEditor({
 
   return (
     <div
-      className="flex h-full min-h-[34rem] flex-col overflow-hidden rounded-[1.2rem] border border-[#e8e2d7] bg-[#fbfaf7]"
+      className="app-control-muted flex h-full min-h-[34rem] flex-col overflow-hidden rounded-[1.2rem]"
       style={height === '100%' ? undefined : { height }}
     >
       <Editor
         className="h-full"
         height={height === '100%' ? '100%' : height}
         defaultLanguage={language}
+        theme={theme === 'dark' ? 'vs-dark' : 'light'}
         beforeMount={(monaco) => {
           monaco.languages.html.htmlDefaults.setOptions({
             format: {

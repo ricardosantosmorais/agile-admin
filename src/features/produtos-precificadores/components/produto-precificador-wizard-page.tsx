@@ -165,14 +165,14 @@ function RequiredLabel({ label }: { label: string }) {
 function renderInputClass(invalid = false) {
   return [
     'app-control w-full rounded-[1rem] px-3.5 py-3 text-sm text-[color:var(--app-text)]',
-    invalid ? 'border-rose-300 ring-2 ring-rose-100' : '',
+    invalid ? 'border-rose-300 ring-2 ring-rose-100 dark:border-rose-400/55 dark:ring-rose-500/20' : '',
   ].join(' ')
 }
 
 function renderLookupTriggerClass(invalid = false) {
   return [
     'rounded-[1rem]',
-    invalid ? 'border border-rose-300 ring-2 ring-rose-100' : '',
+    invalid ? 'border border-rose-300 ring-2 ring-rose-100 dark:border-rose-400/55 dark:ring-rose-500/20' : '',
   ].join(' ')
 }
 
@@ -285,7 +285,7 @@ function CriterionEditor<TType extends string>({
             return (
               <div
                 key={item.id}
-                className={['app-pane-muted rounded-[1.25rem] p-4', selectionError ? 'border-rose-300' : ''].join(' ')}
+                className={['app-pane-muted rounded-[1.25rem] p-4', selectionError ? 'border-rose-300 dark:border-rose-400/55' : ''].join(' ')}
               >
                 <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                   <div className={labelClasses}>

@@ -36,7 +36,17 @@ export function PageHeader({ title, actions, breadcrumbs }: PageHeaderProps) {
   const isDashboard = segments.length === 0 || segments[0] === 'dashboard'
   const hasSkippedDynamicSegment = segments.some((segment) => isDynamicSegment(segment))
   function formatSegment(segment: string) {
-    return t(`routes.${segment}`, segmentFallbacks[segment] ?? segment.charAt(0).toUpperCase() + segment.slice(1))
+    const routeLabel = t(`routes.${segment}`, '')
+    if (routeLabel) {
+      return routeLabel
+    }
+
+    const menuLabel = t(`menuKeys.${segment}`, '')
+    if (menuLabel) {
+      return menuLabel
+    }
+
+    return segmentFallbacks[segment] ?? segment.charAt(0).toUpperCase() + segment.slice(1)
   }
 
   const breadcrumbItems = breadcrumbs?.length

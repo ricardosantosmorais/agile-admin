@@ -63,15 +63,15 @@ export const FORMULARIOS_CONFIG: CrudModuleConfig = {
   routeBase: '/formularios',
   featureKey: 'formularios',
   listTitleKey: 'maintenance.forms.title',
-  listTitle: 'Formulários',
+  listTitle: 'FormulÃ¡rios',
   listDescriptionKey: 'maintenance.forms.listDescription',
-  listDescription: 'Listagem com código, nome e status ativo do formulário.',
+  listDescription: 'Listagem com cÃ³digo, nome e status ativo do formulÃ¡rio.',
   formTitleKey: 'maintenance.forms.formTitle',
-  formTitle: 'Formulário',
+  formTitle: 'FormulÃ¡rio',
   breadcrumbSectionKey: 'routes.manutencao',
-  breadcrumbSection: 'Manutenção',
+  breadcrumbSection: 'ManutenÃ§Ã£o',
   breadcrumbModuleKey: 'routes.formularios',
-  breadcrumbModule: 'Formulários',
+  breadcrumbModule: 'FormulÃ¡rios',
   defaultFilters: {
     page: 1,
     perPage: 15,
@@ -85,13 +85,13 @@ export const FORMULARIOS_CONFIG: CrudModuleConfig = {
   listEmbed: 'url',
   columns: [
     { id: 'id', labelKey: 'simpleCrud.fields.id', label: 'ID', sortKey: 'id', thClassName: 'w-[90px]', filter: { kind: 'text', key: 'id', inputMode: 'numeric' } },
-    { id: 'codigo', labelKey: 'maintenance.forms.fields.code', label: 'Código', sortKey: 'codigo', thClassName: 'w-[180px]', filter: { kind: 'text', key: 'codigo' } },
+    { id: 'codigo', labelKey: 'maintenance.forms.fields.code', label: 'CÃ³digo', sortKey: 'codigo', thClassName: 'w-[180px]', filter: { kind: 'text', key: 'codigo' } },
     {
       id: 'titulo',
       labelKey: 'maintenance.forms.fields.title',
       label: 'Nome',
       sortKey: 'titulo',
-      tdClassName: 'font-semibold text-slate-950',
+      tdClassName: 'font-semibold text-[color:var(--app-text)]',
       filter: { kind: 'text', key: 'titulo::like' },
       render: (record, context) => {
         const protectedLabel = toBoolean(record.protegido)
@@ -103,13 +103,13 @@ export const FORMULARIOS_CONFIG: CrudModuleConfig = {
 
         return (
           <span className="inline-flex max-w-full items-center gap-1.5">
-            {protectedLabel ? <Lock className="h-3.5 w-3.5 shrink-0 text-slate-500" /> : null}
+            {protectedLabel ? <Lock className="h-3.5 w-3.5 shrink-0 text-[color:var(--app-muted)]" /> : null}
             {targetUrl ? (
               <a
                 href={targetUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="truncate text-slate-950 underline decoration-dotted underline-offset-2"
+                className="truncate text-[color:var(--app-text)] underline decoration-dotted underline-offset-2"
               >
                 {title}
               </a>
@@ -132,7 +132,7 @@ export const FORMULARIOS_CONFIG: CrudModuleConfig = {
         key: 'ativo',
         options: [
           { value: '1', labelKey: 'common.yes', label: 'Sim' },
-          { value: '0', labelKey: 'common.no', label: 'Não' },
+          { value: '0', labelKey: 'common.no', label: 'NÃ£o' },
         ],
       },
     },
@@ -148,13 +148,13 @@ export const FORMULARIOS_CONFIG: CrudModuleConfig = {
       layout: 'rows',
       fields: [
         { key: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', type: 'toggle', defaultValue: true },
-        { key: 'menu', labelKey: 'maintenance.forms.fields.userMenu', label: 'Menu do Usuário', type: 'toggle', defaultValue: false, disabled: ({ form }) => isProtectedForm(form) },
-        { key: 'codigo', labelKey: 'maintenance.forms.fields.code', label: 'Código', type: 'text', maxLength: 32, disabled: ({ form }) => isProtectedForm(form) },
-        { key: 'titulo', labelKey: 'maintenance.forms.fields.title', label: 'Título', type: 'text', required: true, maxLength: 255 },
-        { key: 'icone', labelKey: 'maintenance.forms.fields.icon', label: 'Ícone', type: 'text', maxLength: 255 },
+        { key: 'menu', labelKey: 'maintenance.forms.fields.userMenu', label: 'Menu do UsuÃ¡rio', type: 'toggle', defaultValue: false, disabled: ({ form }) => isProtectedForm(form) },
+        { key: 'codigo', labelKey: 'maintenance.forms.fields.code', label: 'CÃ³digo', type: 'text', maxLength: 32, disabled: ({ form }) => isProtectedForm(form) },
+        { key: 'titulo', labelKey: 'maintenance.forms.fields.title', label: 'TÃ­tulo', type: 'text', required: true, maxLength: 255 },
+        { key: 'icone', labelKey: 'maintenance.forms.fields.icon', label: 'Ãcone', type: 'text', maxLength: 255 },
         { key: 'mensagem_alerta', labelKey: 'maintenance.forms.fields.alertMessage', label: 'Mensagem de alerta', type: 'text', maxLength: 255 },
-        { key: 'mensagem_confirmacao', labelKey: 'maintenance.forms.fields.confirmationMessage', label: 'Mensagem de confirmação', type: 'text', maxLength: 255 },
-        { key: 'instrucoes', labelKey: 'maintenance.forms.fields.instructions', label: 'Instruções', type: 'textarea', rows: 5 },
+        { key: 'mensagem_confirmacao', labelKey: 'maintenance.forms.fields.confirmationMessage', label: 'Mensagem de confirmaÃ§Ã£o', type: 'text', maxLength: 255 },
+        { key: 'instrucoes', labelKey: 'maintenance.forms.fields.instructions', label: 'InstruÃ§Ãµes', type: 'textarea', rows: 5 },
       ],
     },
   ],

@@ -76,14 +76,14 @@ export function ParametrosListPage() {
           label: t('parameters.fields.id', 'ID'),
           sortKey: 'id',
           thClassName: 'w-[120px]',
-          cell: (row: ParametroListRecord) => <span className="font-semibold text-slate-950">{row.id}</span>,
+          cell: (row: ParametroListRecord) => <span className="font-semibold text-[color:var(--app-text)]">{row.id}</span>,
           filter: { kind: 'text', id: 'id', key: 'id', label: t('parameters.fields.id', 'ID') },
         },
         {
           id: 'chave',
           label: t('parameters.fields.key', 'Chave'),
           sortKey: 'chave',
-          tdClassName: 'font-semibold text-slate-950',
+          tdClassName: 'font-semibold text-[color:var(--app-text)]',
           cell: (row: ParametroListRecord) => row.chave,
           filter: { kind: 'text', id: 'chave', key: 'chave', label: t('parameters.fields.key', 'Chave') },
         },
@@ -274,20 +274,20 @@ export function ParametrosListPage() {
         <AsyncState isLoading={Boolean(selectedViewId) && viewState.isLoading} error={selectedViewId ? viewState.error : ''}>
           {viewState.data ? (
             <div className="space-y-5">
-              <div className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              <div className="app-control-muted rounded-[1.15rem] p-4">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--app-muted)]">
                   {viewState.data.chave}
                 </p>
                 {viewState.data.descricao ? (
-                  <p className="mt-2 text-sm leading-6 text-slate-600">{viewState.data.descricao}</p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--app-muted)]">{viewState.data.descricao}</p>
                 ) : null}
               </div>
 
               <div className="space-y-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--app-muted)]">
                   {t('parameters.fields.parameters', 'Parâmetros')}
                 </p>
-                <pre className="overflow-x-auto rounded-[1rem] border border-[#ebe4d8] bg-slate-950 p-4 text-sm leading-6 text-slate-100">
+                <pre className="overflow-x-auto rounded-[1rem] border border-[color:var(--app-control-border)] bg-slate-950 p-4 text-sm leading-6 text-slate-100 dark:border-[color:var(--app-control-border-strong)]">
                   <code>{formatParametroJson(viewState.data.parametros)}</code>
                 </pre>
               </div>

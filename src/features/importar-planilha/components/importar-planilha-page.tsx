@@ -44,6 +44,12 @@ type ToastState = {
 }
 
 const EMPTY_ROWS: ProcessoArquivoRecord[] = []
+const metricCardClasses = 'app-control-muted rounded-[1rem] px-4 py-3'
+const detailCardClasses = 'app-control-muted rounded-[1rem] px-4 py-3'
+const detailPanelClasses = 'app-control-muted rounded-[1.25rem] p-4'
+const labelClasses = 'text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--app-muted)]'
+const metricLabelClasses = 'text-[11px] font-semibold uppercase tracking-[0.16em] text-[color:var(--app-muted)]'
+const valueClasses = 'mt-2 text-sm font-semibold text-[color:var(--app-text)]'
 
 export function ImportarPlanilhaPage() {
   const { t } = useI18n()
@@ -66,7 +72,6 @@ export function ImportarPlanilhaPage() {
   )
 
   const rows = listState.data?.data ?? EMPTY_ROWS
-  const actionableRowsCount = rows.filter((row) => row.canCancel || row.canStart).length
   const statusSummary = useMemo(() => ({
     total: rows.length,
     draft: rows.filter((row) => row.status === 'rascunho').length,
@@ -91,7 +96,7 @@ export function ImportarPlanilhaPage() {
         label: t('maintenance.spreadsheetImport.fields.id', 'ID'),
         sortKey: 'id',
         thClassName: 'w-[120px]',
-        cell: (row: ProcessoArquivoRecord) => <span className="font-semibold text-slate-950">{row.id || '-'}</span>,
+        cell: (row: ProcessoArquivoRecord) => <span className="font-semibold text-[color:var(--app-text)]">{row.id || '-'}</span>,
         filter: {
           kind: 'text',
           id: 'id',
@@ -289,25 +294,25 @@ export function ImportarPlanilhaPage() {
 
       <AsyncState isLoading={listState.isLoading} error={listState.error}>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-          <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{t('maintenance.spreadsheetImport.title', 'Importar Planilha')}</div>
-            <div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{statusSummary.total}</div>
+          <div className={metricCardClasses}>
+            <div className={metricLabelClasses}>{t('maintenance.spreadsheetImport.title', 'Importar Planilha')}</div>
+            <div className="mt-2 text-2xl font-black tracking-tight text-[color:var(--app-text)]">{statusSummary.total}</div>
           </div>
-          <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{t('maintenance.spreadsheetImport.status.rascunho', 'Rascunho')}</div>
-            <div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{statusSummary.draft}</div>
+          <div className={metricCardClasses}>
+            <div className={metricLabelClasses}>{t('maintenance.spreadsheetImport.status.rascunho', 'Rascunho')}</div>
+            <div className="mt-2 text-2xl font-black tracking-tight text-[color:var(--app-text)]">{statusSummary.draft}</div>
           </div>
-          <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{t('maintenance.spreadsheetImport.status.iniciado', 'Iniciado')}</div>
-            <div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{statusSummary.running}</div>
+          <div className={metricCardClasses}>
+            <div className={metricLabelClasses}>{t('maintenance.spreadsheetImport.status.iniciado', 'Iniciado')}</div>
+            <div className="mt-2 text-2xl font-black tracking-tight text-[color:var(--app-text)]">{statusSummary.running}</div>
           </div>
-          <div className="rounded-[1rem] border border-emerald-100 bg-emerald-50/60 px-4 py-3">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">{t('maintenance.spreadsheetImport.status.sucesso', 'Sucesso')}</div>
-            <div className="mt-2 text-2xl font-black tracking-tight text-emerald-900">{statusSummary.success}</div>
+          <div className="app-metric-card-success rounded-[1rem] px-4 py-3">
+            <div className="app-metric-card-success-label text-[11px] font-semibold uppercase tracking-[0.16em]">{t('maintenance.spreadsheetImport.status.sucesso', 'Sucesso')}</div>
+            <div className="app-metric-card-success-value mt-2 text-2xl font-black tracking-tight">{statusSummary.success}</div>
           </div>
-          <div className="rounded-[1rem] border border-rose-100 bg-rose-50/70 px-4 py-3">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-rose-700">{t('maintenance.spreadsheetImport.status.erro', 'Erro')}</div>
-            <div className="mt-2 text-2xl font-black tracking-tight text-rose-900">{statusSummary.error}</div>
+          <div className="app-metric-card-danger rounded-[1rem] px-4 py-3">
+            <div className="app-metric-card-danger-label text-[11px] font-semibold uppercase tracking-[0.16em]">{t('maintenance.spreadsheetImport.status.erro', 'Erro')}</div>
+            <div className="app-metric-card-danger-value mt-2 text-2xl font-black tracking-tight">{statusSummary.error}</div>
           </div>
         </div>
 
@@ -322,14 +327,13 @@ export function ImportarPlanilhaPage() {
               />
               <DataTablePageActions
                 actions={[
-                  actionableRowsCount > 0
-                    ? {
-                        label: t('maintenance.spreadsheetImport.actions.cancelSelected', 'Cancelar selecionados'),
-                        icon: XCircle,
-                        onClick: () => void handleCancelSelected(),
-                        tone: 'danger',
-                      }
-                    : null,
+                  {
+                    label: t('maintenance.spreadsheetImport.actions.cancelSelected', 'Cancelar selecionados'),
+                    icon: XCircle,
+                    onClick: () => void handleCancelSelected(),
+                    tone: 'danger',
+                    disabled: tableState.selectedIds.length === 0,
+                  },
                   {
                     label: t('maintenance.spreadsheetImport.actions.newSpreadsheet', 'Novo (XLS ou XLSX)'),
                     icon: Upload,
@@ -442,8 +446,8 @@ export function ImportarPlanilhaPage() {
             className={[
               'group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-[1.25rem] border border-dashed px-6 py-8 text-center transition',
               uploading
-                ? 'cursor-not-allowed border-[#eadfcd] bg-[#f7f3eb] opacity-80'
-                : 'border-[#d8ccb7] bg-[#fcfaf5] hover:border-[#cdbb9d] hover:bg-[#f8f3ea]',
+                ? 'app-control-muted cursor-not-allowed opacity-80'
+                : 'app-control-muted hover:border-[color:var(--app-control-border-strong)]',
             ].join(' ')}
           >
             <input
@@ -453,31 +457,31 @@ export function ImportarPlanilhaPage() {
               disabled={uploading}
               className="sr-only"
             />
-            <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-[#e7dece] bg-white text-slate-700">
+            <span className="app-control inline-flex h-14 w-14 items-center justify-center rounded-full text-[color:var(--app-text)]">
               <FileSpreadsheet className="h-6 w-6" />
             </span>
             <div className="space-y-1">
-              <p className="text-sm font-semibold text-slate-900">
+              <p className="text-sm font-semibold text-[color:var(--app-text)]">
                 {uploadFile ? uploadFile.name : t('maintenance.spreadsheetImport.noFileSelected', 'Nenhum arquivo selecionado.')}
               </p>
-              <p className="text-sm text-slate-500">{t('common.selectFile', 'Selecionar arquivo')}</p>
+              <p className="text-sm text-[color:var(--app-muted)]">{t('common.selectFile', 'Selecionar arquivo')}</p>
             </div>
           </label>
 
           {uploading ? (
-            <div className="space-y-2 rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-              <div className="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            <div className="app-control-muted space-y-2 rounded-[1rem] px-4 py-3">
+              <div className="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--app-muted)]">
                 <span>{t('maintenance.spreadsheetImport.uploadProgress', 'Progresso do envio')}</span>
                 <span>{uploadProgress}%</span>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-[#ece5d9]">
-                <div className="h-full rounded-full bg-slate-950 transition-all" style={{ width: `${uploadProgress}%` }} />
+              <div className="h-2 w-full overflow-hidden rounded-full bg-[color:var(--app-control-border)]">
+                <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${uploadProgress}%` }} />
               </div>
             </div>
           ) : null}
 
-          <div className="rounded-[1.1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-4">
-            <div className="space-y-1 text-sm text-slate-600">
+          <div className="app-control-muted rounded-[1.1rem] px-4 py-4">
+            <div className="space-y-1 text-sm text-[color:var(--app-muted)]">
               <p>{t('maintenance.spreadsheetImport.hints.one', 'Use somente arquivos .xls ou .xlsx no modelo esperado.')}</p>
               <p>{t('maintenance.spreadsheetImport.hints.two', 'O processamento está restrito a arquivos de até 500 MB.')}</p>
             </div>
@@ -488,7 +492,7 @@ export function ImportarPlanilhaPage() {
               type="button"
               onClick={() => void handleUpload()}
               disabled={uploading}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="app-button-primary inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
             >
               {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
               {uploading
@@ -509,37 +513,37 @@ export function ImportarPlanilhaPage() {
           {detailState.data ? (
             <div className="space-y-5">
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{t('maintenance.spreadsheetImport.fields.id', 'ID')}</div>
-                  <div className="mt-2 text-sm font-semibold text-slate-950">{detailState.data.id}</div>
+                <div className={detailCardClasses}>
+                  <div className={labelClasses}>{t('maintenance.spreadsheetImport.fields.id', 'ID')}</div>
+                  <div className={valueClasses}>{detailState.data.id}</div>
                 </div>
-                <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{t('maintenance.spreadsheetImport.fields.user', 'Usuário')}</div>
-                  <div className="mt-2 text-sm font-semibold text-slate-950">{detailState.data.usuarioNome}</div>
+                <div className={detailCardClasses}>
+                  <div className={labelClasses}>{t('maintenance.spreadsheetImport.fields.user', 'Usuário')}</div>
+                  <div className={valueClasses}>{detailState.data.usuarioNome}</div>
                 </div>
-                <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{t('maintenance.spreadsheetImport.fields.status', 'Status')}</div>
+                <div className={detailCardClasses}>
+                  <div className={labelClasses}>{t('maintenance.spreadsheetImport.fields.status', 'Status')}</div>
                   <div className="mt-2"><StatusBadge tone={detailState.data.statusTone}>{detailState.data.statusLabel}</StatusBadge></div>
                 </div>
-                <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{t('maintenance.spreadsheetImport.detail.processedAt', 'Data do processamento')}</div>
-                  <div className="mt-2 text-sm font-semibold text-slate-950">{detailState.data.dataProcessado || '-'}</div>
+                <div className={detailCardClasses}>
+                  <div className={labelClasses}>{t('maintenance.spreadsheetImport.detail.processedAt', 'Data do processamento')}</div>
+                  <div className={valueClasses}>{detailState.data.dataProcessado || '-'}</div>
                 </div>
               </div>
 
-              <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{t('maintenance.spreadsheetImport.detail.file', 'Arquivo')}</div>
-                <div className="mt-2 text-sm font-semibold text-slate-950">{detailState.data.arquivo || '-'}</div>
+              <div className={detailCardClasses}>
+                <div className={labelClasses}>{t('maintenance.spreadsheetImport.detail.file', 'Arquivo')}</div>
+                <div className={valueClasses}>{detailState.data.arquivo || '-'}</div>
               </div>
 
-              <div className="rounded-[1.25rem] border border-[#ece4d8] bg-[#fcfaf5] p-4">
+              <div className={detailPanelClasses}>
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-600">{t('maintenance.spreadsheetImport.detail.logs', 'Logs')}</h3>
-                  <span className="rounded-full border border-[#e6dfd3] bg-white px-3 py-1 text-xs font-semibold text-slate-500">
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-[color:var(--app-muted)]">{t('maintenance.spreadsheetImport.detail.logs', 'Logs')}</h3>
+                  <span className="app-control rounded-full px-3 py-1 text-xs font-semibold text-[color:var(--app-muted)]">
                     {detailState.data.logs.length}
                   </span>
                 </div>
-                <div className="overflow-hidden rounded-[1rem] bg-white">
+                <div className="overflow-hidden rounded-[1rem]">
                   <AppDataTable
                     rows={detailState.data.logs}
                     getRowId={(row) => row.id}

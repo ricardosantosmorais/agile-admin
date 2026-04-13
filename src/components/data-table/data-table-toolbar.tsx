@@ -10,6 +10,7 @@ type DataTableToolbarButtonProps = {
   onClick?: () => void
   href?: string
   tone?: 'primary' | 'secondary' | 'danger'
+  disabled?: boolean
 }
 
 type DataTablePageActionsProps = {
@@ -27,11 +28,11 @@ function getButtonClasses(tone: DataTableToolbarButtonProps['tone']) {
   }
 }
 
-function ToolbarButton({ label, icon: Icon, onClick, href, tone = 'secondary' }: DataTableToolbarButtonProps) {
-  const className = `inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-full px-4 text-sm font-semibold ${getButtonClasses(tone)}`
+function ToolbarButton({ label, icon: Icon, onClick, href, tone = 'secondary', disabled = false }: DataTableToolbarButtonProps) {
+  const className = `inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-full px-4 text-sm font-semibold ${getButtonClasses(tone)} disabled:cursor-not-allowed disabled:opacity-50`
 
   // The datatable toolbar accepts either buttons or links so each list page stays declarative.
-  if (href) {
+  if (href && !disabled) {
     return (
       <Link href={href} className={className}>
         <Icon className="h-4 w-4" />
@@ -41,7 +42,7 @@ function ToolbarButton({ label, icon: Icon, onClick, href, tone = 'secondary' }:
   }
 
   return (
-    <button type="button" onClick={onClick} className={className}>
+    <button type="button" onClick={onClick} className={className} disabled={disabled}>
       <Icon className="h-4 w-4" />
       {label}
     </button>

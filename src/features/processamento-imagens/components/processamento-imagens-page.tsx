@@ -44,6 +44,12 @@ type ToastState = {
 }
 
 const EMPTY_ROWS: ProcessoImagemRecord[] = []
+const metricCardClasses = 'app-control-muted rounded-[1rem] px-4 py-3'
+const detailCardClasses = 'app-control-muted rounded-[1rem] px-4 py-3'
+const detailPanelClasses = 'app-control-muted rounded-[1.25rem] p-4'
+const labelClasses = 'text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--app-muted)]'
+const metricLabelClasses = 'text-[11px] font-semibold uppercase tracking-[0.16em] text-[color:var(--app-muted)]'
+const valueClasses = 'mt-2 text-sm font-semibold text-[color:var(--app-text)]'
 
 export function ProcessamentoImagensPage() {
   const { t } = useI18n()
@@ -66,7 +72,6 @@ export function ProcessamentoImagensPage() {
   )
 
   const rows = listState.data?.data ?? EMPTY_ROWS
-  const selectableRowsCount = rows.filter((row) => row.canCancel).length
   const statusSummary = useMemo(() => ({
     total: rows.length,
     running: rows.filter((row) => row.status === 'criado' || row.status === 'iniciado').length,
@@ -90,7 +95,7 @@ export function ProcessamentoImagensPage() {
         label: t('maintenance.imageProcessing.fields.id', 'ID'),
         sortKey: 'id',
         thClassName: 'w-[120px]',
-        cell: (row: ProcessoImagemRecord) => <span className="font-semibold text-slate-950">{row.id || '-'}</span>,
+        cell: (row: ProcessoImagemRecord) => <span className="font-semibold text-[color:var(--app-text)]">{row.id || '-'}</span>,
         filter: {
           kind: 'text',
           id: 'id',
@@ -272,21 +277,21 @@ export function ProcessamentoImagensPage() {
 
       <AsyncState isLoading={listState.isLoading} error={listState.error}>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{t('maintenance.imageProcessing.title', 'Processamento de Imagens')}</div>
-            <div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{statusSummary.total}</div>
+          <div className={metricCardClasses}>
+            <div className={metricLabelClasses}>{t('maintenance.imageProcessing.title', 'Processamento de Imagens')}</div>
+            <div className="mt-2 text-2xl font-black tracking-tight text-[color:var(--app-text)]">{statusSummary.total}</div>
           </div>
-          <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{t('maintenance.imageProcessing.status.iniciado', 'Iniciado')}</div>
-            <div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{statusSummary.running}</div>
+          <div className={metricCardClasses}>
+            <div className={metricLabelClasses}>{t('maintenance.imageProcessing.status.iniciado', 'Iniciado')}</div>
+            <div className="mt-2 text-2xl font-black tracking-tight text-[color:var(--app-text)]">{statusSummary.running}</div>
           </div>
-          <div className="rounded-[1rem] border border-emerald-100 bg-emerald-50/60 px-4 py-3">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">{t('maintenance.imageProcessing.status.sucesso', 'Sucesso')}</div>
-            <div className="mt-2 text-2xl font-black tracking-tight text-emerald-900">{statusSummary.success}</div>
+          <div className="app-metric-card-success rounded-[1rem] px-4 py-3">
+            <div className="app-metric-card-success-label text-[11px] font-semibold uppercase tracking-[0.16em]">{t('maintenance.imageProcessing.status.sucesso', 'Sucesso')}</div>
+            <div className="app-metric-card-success-value mt-2 text-2xl font-black tracking-tight">{statusSummary.success}</div>
           </div>
-          <div className="rounded-[1rem] border border-rose-100 bg-rose-50/70 px-4 py-3">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-rose-700">{t('maintenance.imageProcessing.status.erro', 'Erro')}</div>
-            <div className="mt-2 text-2xl font-black tracking-tight text-rose-900">{statusSummary.error}</div>
+          <div className="app-metric-card-danger rounded-[1rem] px-4 py-3">
+            <div className="app-metric-card-danger-label text-[11px] font-semibold uppercase tracking-[0.16em]">{t('maintenance.imageProcessing.status.erro', 'Erro')}</div>
+            <div className="app-metric-card-danger-value mt-2 text-2xl font-black tracking-tight">{statusSummary.error}</div>
           </div>
         </div>
 
@@ -301,14 +306,13 @@ export function ProcessamentoImagensPage() {
               />
               <DataTablePageActions
                 actions={[
-                  selectableRowsCount > 0
-                    ? {
-                        label: t('maintenance.imageProcessing.actions.cancelSelected', 'Cancelar selecionados'),
-                        icon: XCircle,
-                        onClick: () => void handleCancelSelected(),
-                        tone: 'danger',
-                      }
-                    : null,
+                  {
+                    label: t('maintenance.imageProcessing.actions.cancelSelected', 'Cancelar selecionados'),
+                    icon: XCircle,
+                    onClick: () => void handleCancelSelected(),
+                    tone: 'danger',
+                    disabled: tableState.selectedIds.length === 0,
+                  },
                   {
                     label: t('maintenance.imageProcessing.actions.newZip', 'Novo (ZIP)'),
                     icon: Upload,
@@ -414,8 +418,8 @@ export function ProcessamentoImagensPage() {
             className={[
               'group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-[1.25rem] border border-dashed px-6 py-8 text-center transition',
               uploading
-                ? 'cursor-not-allowed border-[#eadfcd] bg-[#f7f3eb] opacity-80'
-                : 'border-[#d8ccb7] bg-[#fcfaf5] hover:border-[#cdbb9d] hover:bg-[#f8f3ea]',
+                ? 'app-control-muted cursor-not-allowed opacity-80'
+                : 'app-control-muted hover:border-[color:var(--app-control-border-strong)]',
             ].join(' ')}
           >
             <input
@@ -425,31 +429,31 @@ export function ProcessamentoImagensPage() {
               disabled={uploading}
               className="sr-only"
             />
-            <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-[#e7dece] bg-white text-slate-700">
+            <span className="app-control inline-flex h-14 w-14 items-center justify-center rounded-full text-[color:var(--app-text)]">
               <FileArchive className="h-6 w-6" />
             </span>
             <div className="space-y-1">
-              <p className="text-sm font-semibold text-slate-900">
+              <p className="text-sm font-semibold text-[color:var(--app-text)]">
                 {uploadFile ? uploadFile.name : t('maintenance.imageProcessing.noFileSelected', 'Nenhum arquivo selecionado.')}
               </p>
-              <p className="text-sm text-slate-500">{t('common.selectFile', 'Selecionar arquivo')}</p>
+              <p className="text-sm text-[color:var(--app-muted)]">{t('common.selectFile', 'Selecionar arquivo')}</p>
             </div>
           </label>
 
           {uploading ? (
-            <div className="space-y-2 rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-              <div className="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            <div className="app-control-muted space-y-2 rounded-[1rem] px-4 py-3">
+              <div className="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--app-muted)]">
                 <span>{t('maintenance.imageProcessing.uploadProgress', 'Progresso do envio')}</span>
                 <span>{uploadProgress}%</span>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-[#ece5d9]">
-                <div className="h-full rounded-full bg-slate-950 transition-all" style={{ width: `${uploadProgress}%` }} />
+              <div className="h-2 w-full overflow-hidden rounded-full bg-[color:var(--app-control-border)]">
+                <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${uploadProgress}%` }} />
               </div>
             </div>
           ) : null}
 
-          <div className="rounded-[1.1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-4">
-            <div className="space-y-1 text-sm text-slate-600">
+          <div className="app-control-muted rounded-[1.1rem] px-4 py-4">
+            <div className="space-y-1 text-sm text-[color:var(--app-muted)]">
               <p>{t('maintenance.imageProcessing.hints.one', 'Use somente arquivos .zip com imagens na pasta raiz.')}</p>
               <p>{t('maintenance.imageProcessing.hints.two', 'Nomeie os arquivos com o ID do produto, por exemplo: 1234_1.jpg, 1234_2.jpg.')}</p>
               <p>{t('maintenance.imageProcessing.hints.three', 'Cada imagem deve ter no máximo 1 MB e o ZIP até 500 MB.')}</p>
@@ -457,14 +461,14 @@ export function ProcessamentoImagensPage() {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <a href="/assets/media/files/produtos_exemplo.zip" className="text-sm font-semibold text-slate-700 underline decoration-[#ccb999] underline-offset-4" target="_blank" rel="noreferrer">
+            <a href="/assets/media/files/produtos_exemplo.zip" className="text-sm font-semibold text-[color:var(--app-text)] underline decoration-[color:var(--app-control-border-strong)] underline-offset-4" target="_blank" rel="noreferrer">
               {t('maintenance.imageProcessing.actions.downloadExample', 'Baixar arquivo de exemplo')}
             </a>
             <button
               type="button"
               onClick={() => void handleUpload()}
               disabled={uploading}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="app-button-primary inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
             >
               {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
               {uploading
@@ -485,37 +489,37 @@ export function ProcessamentoImagensPage() {
           {detailState.data ? (
             <div className="space-y-5">
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{t('maintenance.imageProcessing.fields.id', 'ID')}</div>
-                  <div className="mt-2 text-sm font-semibold text-slate-950">{detailState.data.id}</div>
+                <div className={detailCardClasses}>
+                  <div className={labelClasses}>{t('maintenance.imageProcessing.fields.id', 'ID')}</div>
+                  <div className={valueClasses}>{detailState.data.id}</div>
                 </div>
-                <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{t('maintenance.imageProcessing.fields.user', 'Usuário')}</div>
-                  <div className="mt-2 text-sm font-semibold text-slate-950">{detailState.data.usuarioNome}</div>
+                <div className={detailCardClasses}>
+                  <div className={labelClasses}>{t('maintenance.imageProcessing.fields.user', 'Usuário')}</div>
+                  <div className={valueClasses}>{detailState.data.usuarioNome}</div>
                 </div>
-                <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{t('maintenance.imageProcessing.fields.status', 'Status')}</div>
+                <div className={detailCardClasses}>
+                  <div className={labelClasses}>{t('maintenance.imageProcessing.fields.status', 'Status')}</div>
                   <div className="mt-2"><StatusBadge tone={detailState.data.statusTone}>{detailState.data.statusLabel}</StatusBadge></div>
                 </div>
-                <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{t('maintenance.imageProcessing.detail.processedAt', 'Data do processamento')}</div>
-                  <div className="mt-2 text-sm font-semibold text-slate-950">{detailState.data.dataProcessado || '-'}</div>
+                <div className={detailCardClasses}>
+                  <div className={labelClasses}>{t('maintenance.imageProcessing.detail.processedAt', 'Data do processamento')}</div>
+                  <div className={valueClasses}>{detailState.data.dataProcessado || '-'}</div>
                 </div>
               </div>
 
-              <div className="rounded-[1rem] border border-[#ece4d8] bg-[#fcfaf5] px-4 py-3">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{t('maintenance.imageProcessing.detail.file', 'Arquivo')}</div>
-                <div className="mt-2 text-sm font-semibold text-slate-950">{detailState.data.arquivo || '-'}</div>
+              <div className={detailCardClasses}>
+                <div className={labelClasses}>{t('maintenance.imageProcessing.detail.file', 'Arquivo')}</div>
+                <div className={valueClasses}>{detailState.data.arquivo || '-'}</div>
               </div>
 
-              <div className="rounded-[1.25rem] border border-[#ece4d8] bg-[#fcfaf5] p-4">
+              <div className={detailPanelClasses}>
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-600">{t('maintenance.imageProcessing.detail.logs', 'Logs')}</h3>
-                  <span className="rounded-full border border-[#e6dfd3] bg-white px-3 py-1 text-xs font-semibold text-slate-500">
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-[color:var(--app-muted)]">{t('maintenance.imageProcessing.detail.logs', 'Logs')}</h3>
+                  <span className="app-control rounded-full px-3 py-1 text-xs font-semibold text-[color:var(--app-muted)]">
                     {detailState.data.logs.length}
                   </span>
                 </div>
-                <div className="overflow-hidden rounded-[1rem] bg-white">
+                <div className="overflow-hidden rounded-[1rem]">
                   <AppDataTable
                     rows={detailState.data.logs}
                     getRowId={(row) => row.id}

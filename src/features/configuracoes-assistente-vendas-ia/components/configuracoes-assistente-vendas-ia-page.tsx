@@ -102,14 +102,14 @@ export function ConfiguracoesAssistenteVendasIaPage() {
             <button
               type="button"
               onClick={() => void load()}
-              className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+              className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold"
             >
               <RefreshCcw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
               {t('common.refresh', 'Atualizar')}
             </button>
             <Link
               href="/configuracoes"
-              className="inline-flex items-center rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+              className="app-button-secondary inline-flex items-center rounded-full px-4 py-3 text-sm font-semibold"
             >
               {t('common.back', 'Voltar')}
             </Link>
@@ -125,16 +125,16 @@ export function ConfiguracoesAssistenteVendasIaPage() {
             'Acesse o assistente de vendas com IA sem sair do Admin v2, preservando o contexto autenticado do usuário.',
           )}
         >
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[1rem] border border-[#ebe4d8] bg-[#fcfaf5] px-4 py-3">
+          <div className="app-pane-muted mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[1rem] px-4 py-3">
             <div className="flex items-start gap-3">
-              <div className="rounded-full bg-[#eefaf4] p-3 text-emerald-600">
+              <div className="rounded-full bg-emerald-500/10 p-3 text-emerald-500 dark:text-emerald-300">
                 <Sparkles className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-950">
+                <p className="text-sm font-semibold text-[color:var(--app-text)]">
                   {t('configuracoes.salesAssistant.contextValue', 'Ambiente externo autenticado')}
                 </p>
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="mt-1 text-sm leading-6 text-[color:var(--app-muted)]">
                   {t(
                     'configuracoes.salesAssistant.contextDescription',
                     'O assistente é carregado em um iframe interno da plataforma, com token temporário gerado no servidor do Admin v2.',
@@ -147,7 +147,7 @@ export function ConfiguracoesAssistenteVendasIaPage() {
                 href={embed.embedUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+                className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold"
               >
                 <ExternalLink className="h-4 w-4" />
                 {t('configuracoes.salesAssistant.openExternal', 'Abrir em nova guia')}
@@ -156,20 +156,20 @@ export function ConfiguracoesAssistenteVendasIaPage() {
           </div>
 
           {embed?.embedUrl ? (
-            <div className="overflow-hidden rounded-[1.5rem] border border-[#ebe4d8] bg-[#fcfaf5]">
+            <div className="app-pane-muted overflow-hidden rounded-[1.5rem]">
               <iframe
                 ref={iframeRef}
                 src={embed.embedUrl}
                 title={t('configuracoes.salesAssistant.iframeTitle', 'Assistente de vendas IA')}
-                className="min-h-[75vh] w-full border-0 bg-white"
+                className="min-h-[75vh] w-full border-0 bg-[color:var(--app-bg)]"
                 sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
                 allow="clipboard-write"
               />
             </div>
           ) : (
-            <div className="flex min-h-[28rem] items-center justify-center rounded-[1.5rem] border border-dashed border-[#d8d0c2] bg-[#fcfaf5] px-6 py-8 text-center text-sm text-slate-500">
+            <div className="app-pane-muted flex min-h-[28rem] items-center justify-center rounded-[1.5rem] border-dashed px-6 py-8 text-center text-sm text-[color:var(--app-muted)]">
               <div className="space-y-3">
-                <LoaderCircle className="mx-auto h-6 w-6 animate-spin text-slate-400" />
+                <LoaderCircle className="mx-auto h-6 w-6 animate-spin text-[color:var(--app-text-muted)]" />
                 <p>{t('configuracoes.salesAssistant.loading', 'Carregando o assistente de vendas IA...')}</p>
               </div>
             </div>

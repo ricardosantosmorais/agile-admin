@@ -265,7 +265,7 @@ export function LookupSelect<TOption extends LookupOption>({
         className="app-control flex w-full items-center justify-between gap-3 rounded-[1rem] px-3.5 py-3 text-left text-sm shadow-none disabled:cursor-not-allowed disabled:opacity-60"
       >
         <span className="min-w-0 truncate">{value?.label || `${t('clientes.form.general.select', 'Select')} ${label.toLowerCase()}`}</span>
-        <ChevronDown className={['h-4 w-4 shrink-0 text-slate-400 transition', open ? 'rotate-180' : ''].join(' ')} />
+        <ChevronDown className={['h-4 w-4 shrink-0 text-[color:var(--app-muted)] transition', open ? 'rotate-180' : ''].join(' ')} />
       </button>
 
       {open && dropdownStyle && typeof document !== 'undefined'
@@ -276,7 +276,7 @@ export function LookupSelect<TOption extends LookupOption>({
               className="app-table-shell fixed z-[240] rounded-[1.2rem] p-3 shadow-[0_22px_46px_rgba(15,23,42,0.12)]"
             >
               <div className="app-control-muted flex items-center gap-2 rounded-[0.95rem] px-3 py-2.5">
-                <Search className="h-4 w-4 text-slate-400" />
+                <Search className="h-4 w-4 text-[color:var(--app-muted)]" />
                 <input
                   ref={inputRef}
                   autoFocus
@@ -288,7 +288,7 @@ export function LookupSelect<TOption extends LookupOption>({
                   aria-controls={listboxId}
                   aria-autocomplete="list"
                   aria-activedescendant={highlightedIndex >= 0 ? `${listboxId}-option-${highlightedIndex}` : undefined}
-                  className="w-full border-none bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                  className="w-full border-none bg-transparent text-sm text-[color:var(--app-text)] outline-none placeholder:text-[color:var(--app-muted)]"
                   placeholder={t('common.searchFor', 'Search {{label}}', { label: label.toLowerCase() })}
                 />
               </div>
@@ -308,16 +308,16 @@ export function LookupSelect<TOption extends LookupOption>({
                     event.stopPropagation()
                     commitSelection(null)
                   }}
-                  className="flex w-full items-center gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm text-slate-600 transition hover:bg-[color:var(--app-hover-surface)]"
+                  className="flex w-full items-center gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm text-[color:var(--app-muted)] transition hover:bg-[color:var(--app-hover-surface)]"
                 >
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-dashed border-slate-300 text-[10px]">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-dashed border-[color:var(--app-control-border)] text-[10px]">
                     x
                   </span>
                   {t('common.clearSelection', 'Clear selection')}
                 </button>
 
                 {isLoading && !options.length ? (
-                  <div className="flex items-center justify-center gap-2 px-3 py-6 text-sm text-slate-500">
+                  <div className="flex items-center justify-center gap-2 px-3 py-6 text-sm text-[color:var(--app-muted)]">
                     <LoaderCircle className="h-4 w-4 animate-spin" />
                     {t('common.loadingOptions', 'Loading options...')}
                   </div>
@@ -346,19 +346,19 @@ export function LookupSelect<TOption extends LookupOption>({
                         ].join(' ')}
                       >
                         <div className="min-w-0">
-                          <p className="truncate font-medium text-slate-900">{option.label}</p>
-                          {option.description ? <p className="truncate text-xs text-slate-500">{option.description}</p> : null}
+                          <p className="truncate font-medium text-[color:var(--app-text)]">{option.label}</p>
+                          {option.description ? <p className="truncate text-xs text-[color:var(--app-muted)]">{option.description}</p> : null}
                         </div>
                         {isSelected ? <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> : null}
                       </button>
                     )
                   })
                 ) : (
-                  <div className="px-3 py-6 text-center text-sm text-slate-500">{t('common.noResults', 'No results found.')}</div>
+                  <div className="px-3 py-6 text-center text-sm text-[color:var(--app-muted)]">{t('common.noResults', 'No results found.')}</div>
                 )}
 
                 {isLoading && options.length ? (
-                  <div className="flex items-center justify-center gap-2 px-3 py-3 text-xs text-slate-500">
+                  <div className="flex items-center justify-center gap-2 px-3 py-3 text-xs text-[color:var(--app-muted)]">
                     <LoaderCircle className="h-4 w-4 animate-spin" />
                     {t('common.loadingMoreOptions', 'Loading more options...')}
                   </div>

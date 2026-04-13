@@ -15,8 +15,8 @@ type PasswordRulesFeedbackProps = {
 
 function RuleItem({ passed, label }: { passed: boolean; label: string }) {
   return (
-    <li className={`flex items-center gap-2 ${passed ? 'font-semibold text-emerald-700' : 'text-slate-500'}`}>
-      {passed ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4 text-rose-500" />}
+    <li className={`flex items-center gap-2 ${passed ? 'font-semibold text-emerald-600 dark:text-emerald-300' : 'text-[color:var(--app-muted)]'}`}>
+      {passed ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4 text-rose-500 dark:text-rose-300" />}
       {label}
     </li>
   )
@@ -24,7 +24,7 @@ function RuleItem({ passed, label }: { passed: boolean; label: string }) {
 
 export function PasswordRulesFeedback({ rules, labels }: PasswordRulesFeedbackProps) {
   return (
-    <div className="rounded-[1rem] border border-[#ece5d9] bg-[#fcfaf5] px-4 py-4 text-sm text-slate-600">
+    <div className="app-pane-muted rounded-[1rem] px-4 py-4 text-sm">
       <ul className="space-y-1">
         <RuleItem passed={rules.length} label={labels.length} />
         <RuleItem passed={rules.uppercase} label={labels.uppercase} />

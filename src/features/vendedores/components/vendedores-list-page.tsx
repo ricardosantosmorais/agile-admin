@@ -59,7 +59,7 @@ export function VendedoresListPage() {
       filter: resolveFilterConfig(column, t),
       cell: (record: CrudListRecord) => {
         if (column.render) {
-          return column.render(record, { tenantUrl })
+          return column.render(record, { tenantUrl, t })
         }
         if (column.id === 'ativo' || column.id === 'bloqueado') {
           const checked = record[column.id] === true || record[column.id] === 1 || record[column.id] === '1'
