@@ -205,7 +205,9 @@ ObservaÃ§Ã£o:
   - rota dedicada para permissÃµes de acesso por aplicativo, no lugar do modal legado.
 - `Integrações` já possui:
   - páginas diretas para `Atendimento`, `Clientes`, `Aplicativos`, `Notificações`, `Segurança`, `Scripts`, `Marketing`, `Login Social`, `Promoções`, `Logística` e `Financeiro`;
+  - `Integração com ERP` com páginas diretas para `Parâmetros`, `Imagens`, `API`, `Banco de Dados`, `Instalação do Integrador`, `Dashboard ERP`, `Rotinas Integradas`, `Serviços` e `Serviços com Falha`;
   - bridges dedicadas em `app/api/integracoes/*` para todos os módulos do menu;
+  - bridge dedicada em `app/api/integracao-com-erp/*` para configuração e leitura operacional do dashboard ERP;
   - `Gateways de Pagamento` com listagem, formulário novo, edição por id e regras condicionais do legado reaproveitadas no CRUD do v2;
   - cobertura E2E do fluxo principal para `Atendimento`, `Clientes`, `Login Social`, `Logística`, `Marketing`, `Notificações`, `Promoções`, `Scripts`, `Segurança`, `Financeiro` e `Gateways de Pagamento`.
 - `ManutenÃ§Ã£o > Termos de pesquisa` jÃ¡ possui:

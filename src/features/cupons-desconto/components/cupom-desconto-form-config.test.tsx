@@ -1,11 +1,15 @@
 import { fireEvent } from '@testing-library/react'
 import { screen } from '@testing-library/react'
 import { useState } from 'react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { CrudFormSections } from '@/src/components/crud-base/crud-form-sections'
 import type { CrudRecord } from '@/src/components/crud-base/types'
 import { CUPONS_DESCONTO_CONFIG } from '@/src/features/cupons-desconto/services/cupons-desconto-config'
 import { renderWithProviders } from '@/src/test/render'
+
+vi.mock('@/src/contexts/auth-context', () => ({
+  useAuth: () => ({ session: { currentTenant: { assetsBucketUrl: '' } } }),
+}))
 
 function CupomDescontoFormHarness({ initialForm }: { initialForm?: CrudRecord }) {
   const [form, setForm] = useState<CrudRecord>({

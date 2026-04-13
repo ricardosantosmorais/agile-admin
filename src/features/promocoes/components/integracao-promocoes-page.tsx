@@ -5,7 +5,6 @@ import { ParameterFormPageBase } from '@/src/components/form-page/parameter-form
 import { integracaoPromocoesClient } from '@/src/features/promocoes/services/integracao-promocoes-client';
 import {
 	createEmptyIntegracaoPromocoesRecord,
-	type IntegracaoPromocoesEncryptedKey,
 	type IntegracaoPromocoesRecord,
 	type IntegracaoPromocoesValues,
 } from '@/src/features/promocoes/services/integracao-promocoes-mappers';
@@ -96,12 +95,7 @@ export function IntegracaoPromocoesPage() {
 			emptyLookups={{}}
 			client={{
 				get: () => integracaoPromocoesClient.get() as Promise<IntegracaoPromocoesRecord>,
-				save: (initialValues, currentValues) => {
-					const includeEncryptedKeys = (['idever_client_secret', 'idever_app_secret'] as IntegracaoPromocoesEncryptedKey[]).filter(
-						(key) => currentValues[key] !== initialValues[key] || !initialValues[key].trim(),
-					);
-					return integracaoPromocoesClient.save(currentValues, { includeEncryptedKeys });
-				},
+				save: (initialValues, currentValues) => integracaoPromocoesClient.saveDiff(initialValues, currentValues),
 			}}
 		/>
 	);

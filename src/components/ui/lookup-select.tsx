@@ -248,7 +248,9 @@ export function LookupSelect<TOption extends LookupOption>({
     }
 
     const activeOption = listRef.current?.querySelector<HTMLElement>(`[data-option-index="${highlightedIndex}"]`)
-    activeOption?.scrollIntoView({ block: 'nearest' })
+    if (typeof activeOption?.scrollIntoView === 'function') {
+      activeOption.scrollIntoView({ block: 'nearest' })
+    }
   }, [highlightedIndex, open])
 
   return (

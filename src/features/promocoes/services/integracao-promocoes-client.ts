@@ -1,5 +1,6 @@
 import {
 	buildIntegracaoPromocoesSavePayload,
+	getIntegracaoPromocoesEncryptedKeysToSave,
 	normalizeIntegracaoPromocoesRecord,
 	type IntegracaoPromocoesEncryptedKey,
 	type IntegracaoPromocoesRecord,
@@ -22,6 +23,11 @@ export const integracaoPromocoesClient = {
 			method: 'POST',
 			body: JSON.stringify({ parameters }),
 			cache: 'no-store',
+		});
+	},
+	async saveDiff(initialValues: IntegracaoPromocoesValues, currentValues: IntegracaoPromocoesValues) {
+		return this.save(currentValues, {
+			includeEncryptedKeys: getIntegracaoPromocoesEncryptedKeysToSave(initialValues, currentValues),
 		});
 	},
 };

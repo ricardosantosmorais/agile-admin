@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { LoaderCircle, Save } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { FieldUpdateMeta } from '@/src/components/form-page/field-update-meta';
 import { AsyncState } from '@/src/components/ui/async-state';
 import { FormField } from '@/src/components/ui/form-field';
 import { inputClasses } from '@/src/components/ui/input-styles';
@@ -16,7 +17,6 @@ import { useAuth } from '@/src/features/auth/hooks/use-auth';
 import { useFooterActionsVisibility } from '@/src/hooks/use-footer-actions-visibility';
 import { useFormState } from '@/src/hooks/use-form-state';
 import { useI18n } from '@/src/i18n/use-i18n';
-import { formatDateTime } from '@/src/lib/date-time';
 import { httpClient } from '@/src/services/http/http-client';
 
 type FieldMetadata = {
@@ -60,10 +60,6 @@ type SectionMeta = {
 
 const primaryButtonDisabledClasses = 'disabled:cursor-not-allowed disabled:opacity-60';
 const LEGACY_LOCKED_TENANT_ID = '1705083119553379';
-
-function hasMetadataValue(fieldMeta: FieldMetadata | undefined) {
-	return Boolean(fieldMeta?.updatedAt || fieldMeta?.updatedBy);
-}
 
 function maskSecretValue(value: string, editable: boolean) {
 	if (editable) {
@@ -158,7 +154,7 @@ export function ParameterFormPageBase<FormValues extends Record<string, string>,
 	emptyLookups,
 	client,
 }: Props<FormValues, Collections, Context>) {
-	const { t } = useI18n();
+	const { locale, t } = useI18n();
 	const { session, user } = useAuth();
 	const access = useFeatureAccess(featureKey);
 	const [loading, setLoading] = useState(true);
@@ -439,14 +435,7 @@ export function ParameterFormPageBase<FormValues extends Record<string, string>,
 												</FormField>
 
 												{field.helper ? <p className="text-(--app-muted) mt-2 text-xs leading-5">{field.helper}</p> : null}
-												{fieldMeta && hasMetadataValue(fieldMeta) ? (
-													<p className="text-(--app-muted) mt-2 text-xs leading-5">
-														{t('configuracoes.home.lastUpdated', 'Última alteração: {{date}} por {{user}}', {
-															date: formatDateTime(fieldMeta.updatedAt),
-															user: fieldMeta.updatedBy,
-														})}
-													</p>
-												) : null}
+												<FieldUpdateMeta metadata={fieldMeta} t={t} locale={locale} labelKey="configuracoes.home.lastUpdated" fallback="Última alteração: {{date}} por {{user}}" />
 											</div>
 										);
 									})}

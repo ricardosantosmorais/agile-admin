@@ -22,6 +22,10 @@ vi.mock('@/src/components/ui/lookup-select', () => ({
   LookupSelect: ({ label }: { label: string }) => <div data-testid={`lookup-${label}`}>{label}</div>,
 }))
 
+vi.mock('@/src/contexts/auth-context', () => ({
+  useAuth: () => ({ session: { currentTenant: { assetsBucketUrl: '' } } }),
+}))
+
 function BannerFormHarness() {
   const [form, setForm] = useState<CrudRecord>({
     ativo: true,

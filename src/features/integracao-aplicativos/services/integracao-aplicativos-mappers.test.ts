@@ -116,8 +116,7 @@ describe('integracao-aplicativos-mappers', () => {
       {
         tabelaNome: 'administradores',
         verboGet: true,
-        verboPost: false,
-        verboPut: true,
+        verboSalvar: true,
         verboDelete: false,
       },
     ])
@@ -127,9 +126,9 @@ describe('integracao-aplicativos-mappers', () => {
     const payload = toAplicativoIntegracaoPayload({
       id: '90',
       ativo: false,
-      codigo: ' ?? APP-90 ?? ',
-      nome: ' ?? App 90 ',
-      email: ' ?? app90@empresa.com.br ?? ',
+      codigo: ' APP-90 ',
+      nome: ' App 90 ',
+      email: ' app90@empresa.com.br ',
     })
 
     expect(payload).toEqual({

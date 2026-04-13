@@ -1,6 +1,7 @@
 import { httpClient } from '@/src/services/http/http-client';
 import {
 	buildIntegracaoLoginSocialSavePayload,
+	getIntegracaoLoginSocialEncryptedKeysToSave,
 	normalizeIntegracaoLoginSocialRecord,
 	type IntegracaoLoginSocialEncryptedKey,
 	type IntegracaoLoginSocialRecord,
@@ -22,6 +23,11 @@ export const integracaoLoginSocialClient = {
 			method: 'POST',
 			body: JSON.stringify({ parameters }),
 			cache: 'no-store',
+		});
+	},
+	async saveDiff(initialValues: IntegracaoLoginSocialValues, currentValues: IntegracaoLoginSocialValues) {
+		return this.save(currentValues, {
+			includeEncryptedKeys: getIntegracaoLoginSocialEncryptedKeysToSave(initialValues, currentValues),
 		});
 	},
 };

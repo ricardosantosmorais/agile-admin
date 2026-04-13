@@ -19,6 +19,15 @@ export type FeatureKey =
 	| 'integracoesLogistica'
 	| 'integracoesMarketing'
 	| 'integracoesPromocoes'
+	| 'erpDashboard'
+	| 'erpRotinasIntegradas'
+	| 'erpServicos'
+	| 'erpServicosFalha'
+	| 'erpParametros'
+	| 'erpImagens'
+	| 'erpApi'
+	| 'erpBancoDados'
+	| 'erpInstalacaoIntegrador'
 	| 'produtos'
 	| 'produtosPrecificadores'
 	| 'restricoesProdutos'
@@ -186,6 +195,43 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
 	integracoesPromocoes: {
 		label: 'Integrações > Promoções',
 		matchers: ['integracao-promocoes-form', 'integracoes promocoes', 'integrações promoções', 'promocoes integracao', 'promoções integração'],
+	},
+	erpDashboard: {
+		label: 'ERP > Dashboard',
+		matchers: ['integracao-dashboard-form', 'integracao dashboard', 'integração dashboard', 'erp dashboard', 'dashboard erp'],
+	},
+	erpRotinasIntegradas: {
+		label: 'ERP > Rotinas Integradas',
+		matchers: ['integracao-erp-rotinas-list', 'rotinas integradas', 'rotinas integracao erp', 'rotinas integração erp'],
+	},
+	erpServicos: {
+		label: 'ERP > Serviços',
+		matchers: ['servicos-integracao-list', 'serviços integração', 'servicos integracao', 'servicos erp', 'serviços erp'],
+	},
+	erpServicosFalha: {
+		label: 'ERP > Serviços com Falha',
+		matchers: ['servicos-integracao-falha-list', 'serviços com falha', 'servicos com falha', 'falhas servicos erp', 'falhas serviços erp'],
+	},
+	erpParametros: {
+		label: 'ERP > Parâmetros',
+		matchers: ['parametros-erp-form', 'parâmetros erp', 'parametros erp'],
+	},
+	erpImagens: {
+		label: 'ERP > Imagens',
+		matchers: ['imagens-erp-form', 'imagens erp', 'imagem erp'],
+	},
+	erpApi: {
+		label: 'ERP > API',
+		matchers: ['api-erp-form', 'api erp', 'erp api'],
+	},
+	erpBancoDados: {
+		label: 'ERP > Banco de Dados',
+		matchers: ['banco-dados-erp-form', 'banco de dados erp', 'database erp'],
+	},
+	erpInstalacaoIntegrador: {
+		label: 'ERP > Instalação do Integrador',
+		matchers: ['ativacao-integrador-view', 'instalacao do integrador', 'instalação do integrador', 'ativacao integrador', 'ativação integrador'],
+		allowOpenWithoutAction: true,
 	},
 	produtos: {
 		label: 'Produtos',

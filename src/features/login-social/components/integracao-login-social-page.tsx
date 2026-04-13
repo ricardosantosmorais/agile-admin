@@ -6,7 +6,6 @@ import { integracaoLoginSocialClient } from '@/src/features/login-social/service
 import {
 	buildIntegracaoLoginSocialRedirectUrl,
 	createEmptyIntegracaoLoginSocialRecord,
-	type IntegracaoLoginSocialEncryptedKey,
 	type IntegracaoLoginSocialRecord,
 	type IntegracaoLoginSocialValues,
 } from '@/src/features/login-social/services/integracao-login-social-mappers';
@@ -126,12 +125,7 @@ export function IntegracaoLoginSocialPage() {
 			emptyLookups={{}}
 			client={{
 				get: () => integracaoLoginSocialClient.get() as Promise<IntegracaoLoginSocialRecord>,
-				save: (initialValues, currentValues) => {
-					const includeEncryptedKeys = (['g_senha_aplicacao', 'fb_senha_aplicacao'] as IntegracaoLoginSocialEncryptedKey[]).filter(
-						(key) => currentValues[key] !== initialValues[key] || !initialValues[key].trim(),
-					);
-					return integracaoLoginSocialClient.save(currentValues, { includeEncryptedKeys });
-				},
+				save: (initialValues, currentValues) => integracaoLoginSocialClient.saveDiff(initialValues, currentValues),
 			}}
 		/>
 	);
