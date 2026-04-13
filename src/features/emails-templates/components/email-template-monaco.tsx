@@ -3,6 +3,7 @@
 import Editor, { type Monaco } from '@monaco-editor/react'
 import type { editor as MonacoEditor, IDisposable, languages as MonacoLanguages, Position } from 'monaco-editor'
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { useUi } from '@/src/contexts/ui-context'
 import type { EmailTemplateValidationIssue } from '@/src/features/emails-templates/services/emails-templates-validator'
 
 type EmailTemplateMonacoProps = {
@@ -123,6 +124,7 @@ export const EmailTemplateMonaco = forwardRef<EmailTemplateMonacoHandle, EmailTe
   { value, language, variables, onChange, height = '100%' },
   ref,
 ) {
+  const { theme } = useUi()
   const containerRef = useRef<HTMLDivElement | null>(null)
   const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
@@ -300,10 +302,10 @@ export const EmailTemplateMonaco = forwardRef<EmailTemplateMonacoHandle, EmailTe
   return (
     <div
       ref={containerRef}
-      className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-[0.95rem] bg-[#fbfaf7]"
+      className="app-control-muted flex h-full min-h-0 w-full flex-col overflow-hidden rounded-[0.95rem]"
       style={height === '100%' ? undefined : { height }}
     >
-      <div className="flex items-center justify-between border-b border-[#efe8dc] bg-[#fcfaf5] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+      <div className="flex items-center justify-between border-b border-[color:var(--app-card-border)] bg-[color:var(--app-control-muted-bg)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--app-muted)]">
         <span>{language === 'php' ? 'PHP' : 'HTML / Twig'}</span>
         <span>{variables.length} variáveis</span>
       </div>
@@ -355,6 +357,7 @@ export const EmailTemplateMonaco = forwardRef<EmailTemplateMonacoHandle, EmailTe
             })
           }}
           options={options}
+          theme={theme === 'dark' ? 'vs-dark' : 'light'}
           path={`email-template-editor-${language}.html`}
         />
       </div>

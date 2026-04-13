@@ -238,29 +238,29 @@ export function MultiLookupSelect({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={open ? listboxId : undefined}
-        className="flex min-h-[46px] w-full items-center justify-between gap-3 rounded-[1rem] border border-[#e6dfd3] bg-white px-3.5 py-2.5 text-left text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
+        className="app-control flex min-h-[46px] w-full items-center justify-between gap-3 rounded-[1rem] px-3.5 py-2.5 text-left text-sm shadow-[inset_0_1px_0_var(--app-inset-highlight)] disabled:cursor-not-allowed disabled:opacity-60"
       >
         <div className="min-w-0 flex-1">
           {selectedOptions.length ? (
             <div className="flex flex-wrap gap-1.5">
               {selectedOptions.slice(0, 3).map((option) => (
-                <span key={option.id} className="inline-flex max-w-full items-center rounded-full bg-[#fcfaf5] px-2.5 py-1 text-xs font-medium text-slate-700">
+                <span key={option.id} className="app-button-secondary inline-flex max-w-full items-center rounded-full px-2.5 py-1 text-xs font-medium">
                   <span className="truncate">{option.label}</span>
                 </span>
               ))}
               {selectedOptions.length > 3 ? (
-                <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                <span className="app-control-muted inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium text-[color:var(--app-muted)]">
                   +{selectedOptions.length - 3}
                 </span>
               ) : null}
             </div>
           ) : (
-            <span className="text-slate-500">
+            <span className="text-[color:var(--app-muted)]">
               {placeholder || t('common.searchFor', 'Search {{label}}', { label: label.toLowerCase() })}
             </span>
           )}
         </div>
-        <ChevronDown className={['h-4 w-4 shrink-0 text-slate-400 transition', open ? 'rotate-180' : ''].join(' ')} />
+        <ChevronDown className={['h-4 w-4 shrink-0 text-[color:var(--app-muted)] transition', open ? 'rotate-180' : ''].join(' ')} />
       </button>
 
       {open && dropdownStyle && typeof document !== 'undefined'
@@ -268,10 +268,10 @@ export function MultiLookupSelect({
             <div
               ref={dropdownRef}
               style={dropdownStyle}
-              className="fixed z-[240] rounded-[1.2rem] border border-[#e6dfd3] bg-white p-3 shadow-[0_22px_46px_rgba(15,23,42,0.12)]"
+              className="app-card-modern fixed z-[240] rounded-[1.2rem] p-3 shadow-[0_22px_46px_rgba(15,23,42,0.12)]"
             >
-              <div className="flex items-center gap-2 rounded-[0.95rem] border border-[#ebe4d8] bg-[#fcfaf5] px-3 py-2.5">
-                <Search className="h-4 w-4 text-slate-400" />
+              <div className="app-control-muted flex items-center gap-2 rounded-[0.95rem] px-3 py-2.5">
+                <Search className="h-4 w-4 text-[color:var(--app-muted)]" />
                 <input
                   autoFocus
                   value={query}
@@ -290,11 +290,11 @@ export function MultiLookupSelect({
                   aria-controls={listboxId}
                   aria-autocomplete="list"
                   aria-activedescendant={highlightedIndex >= 0 ? `${listboxId}-option-${highlightedIndex}` : undefined}
-                  className="w-full border-none bg-transparent text-sm outline-none placeholder:text-slate-400"
+                  className="w-full border-none bg-transparent text-sm text-[color:var(--app-text)] outline-none placeholder:text-[color:var(--app-muted)]"
                   placeholder={t('common.searchFor', 'Search {{label}}', { label: label.toLowerCase() })}
                 />
                 {query ? (
-                  <button type="button" onClick={() => setQuery('')} className="text-slate-400">
+                  <button type="button" onClick={() => setQuery('')} className="text-[color:var(--app-muted)] transition hover:text-[color:var(--app-text)]">
                     <X className="h-4 w-4" />
                   </button>
                 ) : null}
@@ -315,9 +315,9 @@ export function MultiLookupSelect({
                     onChange([])
                     setHighlightedIndex(filteredOptions.length ? 0 : -1)
                   }}
-                  className="flex w-full items-center gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm text-slate-600 transition hover:bg-[#fcfaf5]"
+                  className="flex w-full items-center gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm text-[color:var(--app-muted)] transition hover:bg-[color:var(--app-hover-surface)]"
                 >
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-dashed border-slate-300 text-[10px]">x</span>
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-dashed border-[color:var(--app-control-border)] text-[10px]">x</span>
                   {t('common.clearSelection', 'Clear selection')}
                 </button>
 
@@ -341,20 +341,20 @@ export function MultiLookupSelect({
                           toggleValue(option.id)
                         }}
                         className={[
-                          'flex w-full items-start justify-between gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm transition hover:bg-[#fcfaf5]',
-                          isHighlighted ? 'bg-[#fcfaf5]' : '',
+                          'flex w-full items-start justify-between gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm transition hover:bg-[color:var(--app-hover-surface)]',
+                          isHighlighted ? 'bg-[color:var(--app-hover-surface)]' : '',
                         ].join(' ')}
                       >
                         <div className="min-w-0">
-                          <p className="truncate font-medium text-slate-900">{option.label}</p>
-                          {option.description ? <p className="truncate text-xs text-slate-500">{option.description}</p> : null}
+                          <p className="truncate font-medium text-[color:var(--app-text)]">{option.label}</p>
+                          {option.description ? <p className="truncate text-xs text-[color:var(--app-muted)]">{option.description}</p> : null}
                         </div>
                         {isSelected ? <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> : null}
                       </button>
                     )
                   })
                 ) : (
-                  <div className="px-3 py-6 text-center text-sm text-slate-500">{t('common.noResults', 'No results found.')}</div>
+                  <div className="px-3 py-6 text-center text-sm text-[color:var(--app-muted)]">{t('common.noResults', 'No results found.')}</div>
                 )}
               </div>
             </div>,

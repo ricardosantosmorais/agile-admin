@@ -52,7 +52,7 @@ export function ConfiguracoesVendedoresFormSections({
               const fieldMeta = metadata[field.key]
 
               return (
-                <div key={field.key} className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
+                <div key={field.key} className="app-control-muted rounded-[1.15rem] p-4">
                   <FormField label={field.label} asLabel={false}>
                     <select
                       value={values[field.key] ?? ''}
@@ -69,9 +69,9 @@ export function ConfiguracoesVendedoresFormSections({
                     </select>
                   </FormField>
 
-                  {field.helper ? <p className="mt-2 text-xs leading-5 text-slate-500">{field.helper}</p> : null}
+                  {field.helper ? <p className="mt-2 text-xs leading-5 text-[color:var(--app-muted)]">{field.helper}</p> : null}
                   {fieldMeta ? (
-                    <p className="mt-2 text-xs leading-5 text-slate-500">
+                    <p className="mt-2 text-xs leading-5 text-[color:var(--app-muted)]">
                       {t('configuracoes.home.lastUpdated', 'Ãšltima alteraÃ§Ã£o: {{date}} por {{user}}', {
                         date: formatDateTime(fieldMeta.updatedAt),
                         user: fieldMeta.updatedBy,
@@ -91,7 +91,7 @@ export function ConfiguracoesVendedoresFormSections({
       >
         <div className="grid gap-4 xl:grid-cols-2">
           {scheduleDays.map((day) => (
-            <div key={day.toggleKey} className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
+            <div key={day.toggleKey} className="app-control-muted rounded-[1.15rem] p-4">
               <div className="grid gap-4 md:grid-cols-[1.2fr_1fr_1fr]">
                 <div>
                   <FormField label={day.label} asLabel={false}>
@@ -106,7 +106,7 @@ export function ConfiguracoesVendedoresFormSections({
                       <option value="0">{t('common.no', 'NÃ£o')}</option>
                     </select>
                   </FormField>
-                  <p className="mt-2 text-xs leading-5 text-slate-500">{day.helper}</p>
+                  <p className="mt-2 text-xs leading-5 text-[color:var(--app-muted)]">{day.helper}</p>
                 </div>
                 <div>
                   <FormField label={t('common.from', 'De')} asLabel={false}>

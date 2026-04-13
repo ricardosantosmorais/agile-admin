@@ -137,12 +137,12 @@ export function EntityPasswordPage({
         actions={(
           <div className="flex flex-wrap gap-2">
             {!isFooterVisible ? (
-              <button type="submit" form={formId} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white">
+              <button type="submit" form={formId} className="app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold">
                 <Save className="h-4 w-4" />
                 {t('common.save')}
               </button>
             ) : null}
-            <Link href={modulePath} className="inline-flex items-center rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-slate-700">
+            <Link href={modulePath} className="app-button-secondary inline-flex items-center rounded-full px-4 py-3 text-sm font-semibold">
               {t('common.back')}
             </Link>
           </div>
@@ -183,11 +183,11 @@ export function EntityPasswordPage({
           </SectionCard>
 
           <div ref={footerRef} className="flex flex-wrap justify-center gap-3">
-            <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white">
+            <button type="submit" className="app-button-primary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold">
               <Save className="h-4 w-4" />
               {t('common.save')}
             </button>
-            <Link href={modulePath} className="inline-flex items-center rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold text-slate-700">
+            <Link href={modulePath} className="app-button-secondary inline-flex items-center rounded-full px-5 py-3 text-sm font-semibold">
               {t('common.cancel')}
             </Link>
           </div>

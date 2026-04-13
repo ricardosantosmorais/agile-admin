@@ -127,7 +127,7 @@ function VariableNode({
       <button
         type="button"
         disabled={disabled || !canInsert}
-        className="group flex w-full items-center justify-between gap-3 rounded-xl border border-[#efe8dc] bg-[#fcfaf5] px-3 py-2 text-left text-sm text-slate-700 transition hover:border-[#d8c9ad] hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+        className="app-control-muted group flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left text-sm transition hover:border-[color:var(--app-control-border-strong)] disabled:cursor-not-allowed disabled:opacity-60"
         draggable={!disabled && canInsert}
         onDragStart={(event) => {
           if (!token) return
@@ -138,8 +138,8 @@ function VariableNode({
           onInsertToken(token)
         }}
       >
-        <span className="min-w-0 rounded-full bg-[#ece4d8] px-2.5 py-1 text-[11px] font-semibold text-slate-700">{node.label}</span>
-        <span className="max-w-[52%] truncate rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-slate-500">{renderValuePreview(sourceValue)}</span>
+        <span className="app-button-secondary min-w-0 rounded-full px-2.5 py-1 text-[11px] font-semibold">{node.label}</span>
+        <span className="app-control max-w-[52%] truncate rounded-full px-2.5 py-1 text-[11px] font-medium text-[color:var(--app-muted)]">{renderValuePreview(sourceValue)}</span>
       </button>
     )
   }
@@ -148,14 +148,14 @@ function VariableNode({
     <div className="space-y-1">
       <button
         type="button"
-        className="flex w-full items-center justify-between gap-2 rounded-xl border border-[#efe8dc] bg-[#fcfaf5] px-3 py-2 text-left text-sm font-semibold text-slate-700 transition hover:border-[#d8c9ad] hover:bg-white"
+        className="app-control-muted flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold transition hover:border-[color:var(--app-control-border-strong)]"
         onClick={() => toggle(node.key)}
       >
         <span className="inline-flex min-w-0 items-center gap-1.5">
           {isExpanded ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronRight className="h-4 w-4 shrink-0" />}
           <span className="truncate">{node.label}</span>
         </span>
-        <span className="rounded-full bg-[#efe7da] px-2 py-0.5 text-[11px] font-semibold text-slate-500">
+        <span className="app-button-secondary rounded-full px-2 py-0.5 text-[11px] font-semibold text-[color:var(--app-muted)]">
           {node.type === 'array' ? `[${node.children.length}]` : `{${node.children.length}}`}
         </span>
       </button>
@@ -220,7 +220,7 @@ export function EmailTemplateVariableTree({
 
   if (!payload || (Array.isArray(payload) && payload.length === 0) || (isObject(payload) && Object.keys(payload).length === 0)) {
     return (
-      <div className="rounded-xl border border-dashed border-[#dfd4c1] bg-[#fcfaf6] px-3 py-5 text-sm text-slate-500">
+      <div className="app-control-muted rounded-xl border-dashed px-3 py-5 text-sm text-[color:var(--app-muted)]">
         {emptyMessage}
       </div>
     )

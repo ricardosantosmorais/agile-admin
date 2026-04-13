@@ -78,6 +78,9 @@ export function mapDashboardPayloadToSnapshot(payload: unknown, rangeLabel: stri
   const produtos = asRecord(source.produtos)
   const operacao = asRecord(source.operacao)
   const alertas = asRecord(source.alertas)
+  const aprovadosQtd = asNumber(funilAtual.aprovados_qtd || funilAtual.validos_qtd)
+  const carrinhoQtd = asNumber(funilAtual.carrinho_qtd)
+  const taxaConversaoAtual = asNumber(funilComparativo.taxa_aproveitamento_atual) || percent(aprovadosQtd, carrinhoQtd)
 
   const series = buildSeries(source)
   const paymentRows = asArray<ApiRecord>(pagamentos.formas)
@@ -123,7 +126,7 @@ export function mapDashboardPayloadToSnapshot(payload: unknown, rangeLabel: stri
       {
         label: 'Taxa de conversao',
         labelKey: 'dashboard.metricLabels.taxaConversao',
-        value: asNumber(funilAtual.taxa_aproveitamento),
+        value: taxaConversaoAtual,
         variation: asNumber(funilComparativo.taxa_aproveitamento_variacao),
         type: 'percent',
         tone: 'rose',
@@ -167,7 +170,7 @@ export function mapDashboardPayloadToSnapshot(payload: unknown, rangeLabel: stri
     })),
     funil: [
       { name: 'Carrinho', value: asNumber(funilAtual.carrinho_qtd), qtd: asNumber(funilAtual.carrinho_qtd), valor: asNumber(funilAtual.carrinho_valor), pctCarrinho: 100, pctAprovados: 0 },
-      { name: 'Aprovados', value: asNumber(funilAtual.aprovados_qtd), qtd: asNumber(funilAtual.aprovados_qtd), valor: asNumber(funilAtual.aprovados_valor), pctCarrinho: asNumber(funilAtual.taxa_aproveitamento), pctAprovados: 100 },
+      { name: 'Aprovados', value: asNumber(funilAtual.aprovados_qtd), qtd: asNumber(funilAtual.aprovados_qtd), valor: asNumber(funilAtual.aprovados_valor), pctCarrinho: taxaConversaoAtual, pctAprovados: 100 },
       { name: 'Faturado', value: asNumber(funilAtual.faturados_qtd), qtd: asNumber(funilAtual.faturados_qtd), valor: asNumber(funilAtual.faturados_valor), pctCarrinho: percent(asNumber(funilAtual.faturados_qtd), asNumber(funilAtual.carrinho_qtd)), pctAprovados: percent(asNumber(funilAtual.faturados_qtd), asNumber(funilAtual.aprovados_qtd)) },
       { name: 'Cancelado', value: asNumber(funilAtual.cancelados_qtd), qtd: asNumber(funilAtual.cancelados_qtd), valor: asNumber(funilAtual.cancelados_valor), pctCarrinho: percent(asNumber(funilAtual.cancelados_qtd), asNumber(funilAtual.carrinho_qtd)), pctAprovados: percent(asNumber(funilAtual.cancelados_qtd), asNumber(funilAtual.aprovados_qtd)) },
     ],

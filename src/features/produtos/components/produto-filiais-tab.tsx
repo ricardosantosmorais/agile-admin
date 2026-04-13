@@ -317,10 +317,10 @@ export function ProdutoFiliaisTab({
               onChange={(event) => setDraft((current) => ({ ...current, status: event.target.value }))}
               className={inputClasses()}
             >
-              <option value="disponivel">Disponível</option>
-              <option value="indisponivel">Indisponível</option>
-              <option value="em_revisao">Em revisão</option>
-              <option value="fora_de_linha">Fora de linha</option>
+              <option value="disponivel">{t('catalog.produtos.options.available', 'Disponível')}</option>
+              <option value="indisponivel">{t('catalog.produtos.options.unavailable', 'Indisponível')}</option>
+              <option value="em_revisao">{t('catalog.produtos.options.inReview', 'Em revisão')}</option>
+              <option value="fora_de_linha">{t('catalog.produtos.options.discontinued', 'Fora de linha')}</option>
             </select>
           </FormField>
           <FormField label={t('simpleCrud.fields.active', 'Ativo')}>
@@ -329,8 +329,8 @@ export function ProdutoFiliaisTab({
               onChange={(event) => setDraft((current) => ({ ...current, ativo: event.target.value === '1' }))}
               className={inputClasses()}
             >
-              <option value="1">Sim</option>
-              <option value="0">Não</option>
+              <option value="1">{t('common.yes', 'Sim')}</option>
+              <option value="0">{t('common.no', 'Não')}</option>
             </select>
           </FormField>
         </div>

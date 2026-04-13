@@ -35,6 +35,10 @@ const DEFAULT_FILTERS: LogsListFilters = {
   acao: '',
 }
 
+const detailCardClasses = 'app-control-muted rounded-[1rem] p-4'
+const detailLabelClasses = 'text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--app-muted)]'
+const detailValueClasses = 'mt-1 text-sm text-[color:var(--app-text)]'
+
 function buildFiltersFromQuery(searchParams: ReturnType<typeof useSearchParams>): LogsListFilters {
   return {
     ...DEFAULT_FILTERS,
@@ -146,7 +150,7 @@ export function LogsPage() {
           label: t('maintenance.logs.fields.recordId', 'ID'),
           sortKey: 'id_registro',
           thClassName: 'w-[120px]',
-          cell: (row: LogsListRecord) => <span className="font-semibold text-slate-950">{row.id_registro || '-'}</span>,
+          cell: (row: LogsListRecord) => <span className="font-semibold text-[color:var(--app-text)]">{row.id_registro || '-'}</span>,
           filter: { kind: 'text', id: 'id_registro', key: 'id_registro', label: t('maintenance.logs.fields.recordId', 'ID') },
         },
         {
@@ -357,49 +361,49 @@ export function LogsPage() {
           {detail ? (
             <div className="space-y-5">
               <div className="grid gap-3 md:grid-cols-2">
-                <div className="rounded-[1rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                <div className={detailCardClasses}>
+                  <p className={detailLabelClasses}>
                     {t('maintenance.logs.fields.action', 'Ação')}
                   </p>
-                  <p className="mt-1 text-sm font-semibold text-slate-900">{formatActionLabel(detail.acao, t)}</p>
+                  <p className={`${detailValueClasses} font-semibold`}>{formatActionLabel(detail.acao, t)}</p>
                 </div>
-                <div className="rounded-[1rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                <div className={detailCardClasses}>
+                  <p className={detailLabelClasses}>
                     {t('maintenance.logs.fields.module', 'Módulo')}
                   </p>
-                  <p className="mt-1 text-sm font-semibold text-slate-900">
+                  <p className={`${detailValueClasses} font-semibold`}>
                     {detail.modulo_nome || t('maintenance.logs.moduleNotMapped', 'Módulo não mapeado')}
                   </p>
                 </div>
-                <div className="rounded-[1rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                <div className={detailCardClasses}>
+                  <p className={detailLabelClasses}>
                     {t('maintenance.logs.fields.user', 'Usuário')}
                   </p>
-                  <p className="mt-1 text-sm text-slate-900">{detail.usuario_nome || '-'}</p>
+                  <p className={detailValueClasses}>{detail.usuario_nome || '-'}</p>
                 </div>
-                <div className="rounded-[1rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                <div className={detailCardClasses}>
+                  <p className={detailLabelClasses}>
                     {t('maintenance.logs.fields.date', 'Data')}
                   </p>
-                  <p className="mt-1 text-sm text-slate-900">{detail.data ? formatDateTime(detail.data) : '-'}</p>
+                  <p className={detailValueClasses}>{detail.data ? formatDateTime(detail.data) : '-'}</p>
                 </div>
               </div>
 
               {detail.descricao ? (
-                <div className="rounded-[1rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                <div className={detailCardClasses}>
+                  <p className={detailLabelClasses}>
                     {t('maintenance.logs.fields.description', 'Descrição')}
                   </p>
-                  <p className="mt-1 text-sm leading-6 text-slate-700">{detail.descricao}</p>
+                  <p className="mt-1 text-sm leading-6 text-[color:var(--app-muted)]">{detail.descricao}</p>
                 </div>
               ) : null}
 
               <div className="grid gap-4 lg:grid-cols-2">
                 <div className="space-y-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  <p className={detailLabelClasses}>
                     {t('maintenance.logs.fields.previousRecord', 'Registro anterior')}
                   </p>
-                  <div className="overflow-hidden rounded-[1rem] border border-[#ebe4d8] bg-slate-950">
+                  <div className="overflow-hidden rounded-[1rem] border border-[color:var(--app-control-border)] bg-slate-950 dark:border-[color:var(--app-control-border-strong)]">
                     <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/80 px-4 py-2.5">
                       <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-300">
                         {t('maintenance.logs.fields.changedLines', 'Linhas alteradas')}
@@ -418,7 +422,7 @@ export function LogsPage() {
                                 line.highlighted ? 'bg-rose-500/15' : ''
                               }`}
                             >
-                              <span className="select-none pr-3 text-right text-slate-500">{index + 1}</span>
+                              <span className="select-none pr-3 text-right text-[color:var(--app-text-muted)]">{index + 1}</span>
                               <span>{line.text || ' '}</span>
                             </span>
                           ))}
@@ -430,10 +434,10 @@ export function LogsPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  <p className={detailLabelClasses}>
                     {t('maintenance.logs.fields.newRecord', 'Registro novo')}
                   </p>
-                  <div className="overflow-hidden rounded-[1rem] border border-[#ebe4d8] bg-slate-950">
+                  <div className="overflow-hidden rounded-[1rem] border border-[color:var(--app-control-border)] bg-slate-950 dark:border-[color:var(--app-control-border-strong)]">
                     <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/80 px-4 py-2.5">
                       <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-300">
                         {t('maintenance.logs.fields.changedLines', 'Linhas alteradas')}
@@ -452,7 +456,7 @@ export function LogsPage() {
                                 line.highlighted ? 'bg-emerald-500/15' : ''
                               }`}
                             >
-                              <span className="select-none pr-3 text-right text-slate-500">{index + 1}</span>
+                              <span className="select-none pr-3 text-right text-[color:var(--app-text-muted)]">{index + 1}</span>
                               <span>{line.text || ' '}</span>
                             </span>
                           ))}

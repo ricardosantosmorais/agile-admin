@@ -164,6 +164,36 @@ html[data-theme='dark'] .bg-surface {
   background-color: var(--app-surface) !important;
 }
 
+html[data-theme='dark'] [class*="bg-[#fcfaf"],
+html[data-theme='dark'] [class*="bg-[#fbfaf"],
+html[data-theme='dark'] [class*="bg-[#f8f"],
+html[data-theme='dark'] [class*="bg-[#f7f"],
+html[data-theme='dark'] [class*="bg-[#f6f"],
+html[data-theme='dark'] [class*="bg-[#f4e"],
+html[data-theme='dark'] [class*="bg-[#f2e"],
+html[data-theme='dark'] [class*="bg-[#ece"] {
+  background: var(--app-control-muted-bg) !important;
+}
+
+html[data-theme='dark'] [class*="border-[#e"],
+html[data-theme='dark'] [class*="border-[#d"],
+html[data-theme='dark'] [class*="border-[#c"] {
+  border-color: var(--app-control-border) !important;
+}
+
+html[data-theme='dark'] .text-slate-950,
+html[data-theme='dark'] .text-slate-900,
+html[data-theme='dark'] .text-slate-800,
+html[data-theme='dark'] .text-slate-700 {
+  color: var(--app-text) !important;
+}
+
+html[data-theme='dark'] .text-slate-600,
+html[data-theme='dark'] .text-slate-500,
+html[data-theme='dark'] .text-slate-400 {
+  color: var(--app-muted) !important;
+}
+
 .app-shell-card-modern {
   border: 1px solid var(--app-card-border);
   background:
@@ -345,6 +375,32 @@ html[data-theme='dark'] .bg-surface {
 
 .app-stat-card-icon-rose {
   color: #e11d48;
+}
+
+.app-metric-card-success {
+  border: 1px solid #a7f3d0;
+  background: rgba(236, 253, 245, 0.72);
+}
+
+.app-metric-card-success-label {
+  color: #047857;
+}
+
+.app-metric-card-success-value {
+  color: #064e3b;
+}
+
+.app-metric-card-danger {
+  border: 1px solid #fecdd3;
+  background: rgba(255, 241, 242, 0.76);
+}
+
+.app-metric-card-danger-label {
+  color: #be123c;
+}
+
+.app-metric-card-danger-value {
+  color: #881337;
 }
 
 .app-table-row-hover:hover {
@@ -549,6 +605,32 @@ html[data-theme='dark'] .app-stat-card-icon-amber {
 
 html[data-theme='dark'] .app-stat-card-icon-rose {
   color: #fb7185;
+}
+
+html[data-theme='dark'] .app-metric-card-success {
+  border-color: rgba(16, 185, 129, 0.34);
+  background: rgba(16, 185, 129, 0.12);
+}
+
+html[data-theme='dark'] .app-metric-card-success-label {
+  color: #9ef0c7;
+}
+
+html[data-theme='dark'] .app-metric-card-success-value {
+  color: #d1fae5;
+}
+
+html[data-theme='dark'] .app-metric-card-danger {
+  border-color: rgba(244, 63, 94, 0.34);
+  background: rgba(244, 63, 94, 0.12);
+}
+
+html[data-theme='dark'] .app-metric-card-danger-label {
+  color: #f9a8b4;
+}
+
+html[data-theme='dark'] .app-metric-card-danger-value {
+  color: #ffe4e6;
 }
 
 html[data-theme='dark'] .app-table-row-hover:hover {

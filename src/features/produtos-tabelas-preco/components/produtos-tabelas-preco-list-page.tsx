@@ -65,7 +65,7 @@ export function ProdutosTabelasPrecoListPage() {
         return <StatusBadge tone={checked ? 'success' : 'warning'}>{checked ? t('common.yes', 'Yes') : t('common.no', 'No')}</StatusBadge>
       }
       if (column.render) {
-        return column.render(record, {})
+        return column.render(record, { t })
       }
       return <span className="truncate">{String(record[column.id] ?? '-')}</span>
     },

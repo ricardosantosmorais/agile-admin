@@ -104,14 +104,14 @@ function describeSide(record: CrudListRecord, entries: ReadonlyArray<readonly [s
     .filter(Boolean) as Array<{ label: string; value: string }>
 
   if (!resolved.length) {
-    return <span className="text-slate-400">Todos</span>
+    return <span className="text-[color:var(--app-muted)]">Todos</span>
   }
 
   return (
     <div className="space-y-1">
       {resolved.map((entry) => (
-        <div key={`${entry.label}-${entry.value}`} className="text-sm text-slate-600">
-          <span className="font-semibold text-slate-900">{entry.label}:</span> {entry.value}
+        <div key={`${entry.label}-${entry.value}`} className="text-sm text-[color:var(--app-muted)]">
+          <span className="font-semibold text-[color:var(--app-text)]">{entry.label}:</span> {entry.value}
         </div>
       ))}
     </div>
@@ -163,12 +163,12 @@ export function RestricoesProdutosListPage() {
       label: t('common.id', 'ID'),
       sortKey: 'id',
       thClassName: 'w-[120px]',
-      cell: (row) => <span className="font-medium text-slate-600">{String(row.id || '-')}</span>,
+      cell: (row) => <span className="font-medium text-[color:var(--app-muted)]">{String(row.id || '-')}</span>,
     },
     {
       id: 'preview',
       label: t('maintenance.productRestrictions.list.preview', 'Regras (preview)'),
-      cell: (row) => <span className="text-sm font-semibold text-slate-900">{buildPreview(row)}</span>,
+      cell: (row) => <span className="text-sm font-semibold text-[color:var(--app-text)]">{buildPreview(row)}</span>,
     },
     {
       id: 'perfil',
@@ -322,25 +322,25 @@ export function RestricoesProdutosListPage() {
               const rules = getRules(row)
 
               return (
-                <div className="rounded-[1rem] border border-[#ece4d8] bg-white p-4">
-                  <div className="mb-3 text-sm font-semibold text-slate-900">
+                <div className="app-control rounded-[1rem] p-4">
+                  <div className="mb-3 text-sm font-semibold text-[color:var(--app-text)]">
                     {t('maintenance.productRestrictions.sections.rules', 'Regras')} ({rules.length})
                   </div>
-                  <div className="overflow-x-auto rounded-[0.9rem] border border-[#eee6da]">
-                    <table className="min-w-full divide-y divide-[#eee6da] text-sm">
-                      <thead className="bg-[#fcfaf5] text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  <div className="overflow-x-auto rounded-[0.9rem] border border-[color:var(--app-card-border)]">
+                    <table className="min-w-full divide-y divide-[color:var(--app-card-border)] text-sm">
+                      <thead className="bg-[color:var(--app-control-muted-bg)] text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--app-muted)]">
                         <tr>
                           <th className="px-4 py-3">{t('maintenance.productRestrictions.sections.target', 'Alvo')}</th>
                           <th className="px-4 py-3">{t('maintenance.productRestrictions.sections.products', 'Produtos')}</th>
                           <th className="px-4 py-3">{t('maintenance.productRestrictions.sections.period', 'Período')}</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#f1ebe0] bg-white">
+                      <tbody className="divide-y divide-[color:var(--app-card-border)] bg-[color:var(--app-panel-solid)]">
                         {rules.map((rule, index) => (
                           <tr key={`${String(rule.id || row.id)}-${index}`}>
                             <td className="px-4 py-3">{describeSide(rule, TARGET_FIELDS)}</td>
                             <td className="px-4 py-3">{describeSide(rule, PRODUCT_FIELDS)}</td>
-                            <td className="px-4 py-3 text-slate-600">
+                            <td className="px-4 py-3 text-[color:var(--app-muted)]">
                               {rule.data_inicio ? formatDateTime(String(rule.data_inicio)) : '—'} {'->'} {rule.data_fim ? formatDateTime(String(rule.data_fim)) : '—'}
                             </td>
                           </tr>

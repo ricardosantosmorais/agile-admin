@@ -3,11 +3,13 @@
 ## Cobertura jÃ¡ migrada
 
 ### Base
+
 - Login
 - Dashboard
 - NotificaÃ§Ãµes
 
 ### Cadastros BÃ¡sicos / ManutenÃ§Ã£o
+
 - Filiais
 - Canais de distribuiÃ§Ã£o
 - Grupos de filiais
@@ -15,6 +17,7 @@
 - Sequenciais
 
 ### ManutenÃ§Ã£o
+
 - Campos de formulÃ¡rios
 - Termos de pesquisa
 - RestriÃ§Ã£o x Produtos
@@ -22,6 +25,7 @@
 - Logs
 
 ### Pessoas
+
 - Clientes
 - Supervisores
 - Contatos
@@ -35,6 +39,7 @@
 - Perfis
 
 ### ConfiguraÃ§Ãµes
+
 - Clientes
 - Entregas
 - Geral
@@ -49,6 +54,7 @@
 - Assistente de vendas IA
 
 ObservaÃ§Ã£o:
+
 - `ConfiguraÃ§Ãµes > Clientes` inaugura o padrÃ£o de formulÃ¡rio direto para esse menu, sem tela de listagem intermediÃ¡ria.
 - `ConfiguraÃ§Ãµes > Entregas` segue o mesmo padrÃ£o, mas adiciona uma segunda carga para listar as formas de entrega disponÃ­veis.
 - `ConfiguraÃ§Ãµes > Geral` segue o mesmo padrÃ£o, mas usa schema dinÃ¢mico de `configuracoes_empresa` para montar os campos.
@@ -58,6 +64,7 @@ ObservaÃ§Ã£o:
 - `ConfiguraÃ§Ãµes > Assistente de vendas IA` embute a ferramenta externa no prÃ³prio v2 com JWT server-side.
 
 ### CatÃ¡logo / ConteÃºdo
+
 - Produtos
 - Linhas
 - Cores
@@ -75,6 +82,7 @@ ObservaÃ§Ã£o:
 - Produtos x Departamentos
 
 ### Marketing
+
 - Combos
 - Grupos de Combos
 - Leve e Pague
@@ -86,6 +94,7 @@ ObservaÃ§Ã£o:
 - Avise-me
 
 ### LogÃ­stica
+
 - Formas de entrega
 - Transportadoras
 - Portos
@@ -94,12 +103,14 @@ ObservaÃ§Ã£o:
 - Rotas
 
 ### Financeiro
+
 - Limites de crÃ©dito
 - CondiÃ§Ãµes de pagamento
 - Tabelas de preÃ§o
 - Formas de pagamento
 
 ### PreÃ§os e Estoques
+
 - Tributos
 - Tributos x Partilha
 - Produtos x Filiais
@@ -107,20 +118,40 @@ ObservaÃ§Ã£o:
 - Produtos x Precificadores
 
 ### Pedidos
+
 - Pedidos
 
 ### Ferramentas
+
 - Editor SQL
 - HTTP Client
 - DicionÃ¡rio de Dados
 
 ### API de IntegraÃ§Ã£o
+
 - Aplicativos
 
+### Integrações
+
+- Atendimento
+- Clientes
+- Aplicativos
+- Notificações
+- Segurança
+- Scripts
+- Marketing
+- Login Social
+- Promoções
+- Logística
+- Financeiro
+- Gateways de Pagamento
+
 ### RelatÃ³rios
+
 - RelatÃ³rios v2
 
 ## ObservaÃ§Ãµes atuais de cobertura
+
 - `Dashboard` carrega fases e grÃ¡ficos sob demanda, mantendo a carga completa apenas na exportaÃ§Ã£o de PDF.
 - `ConfiguraÃ§Ãµes > Clientes` lÃª e grava parÃ¢metros do tenant direto em `empresas/parametros`, seguindo o contrato do legado.
 - `ConfiguraÃ§Ãµes > Entregas` usa o mesmo contrato de parÃ¢metros e complementa o carregamento com `formas_entrega` para o campo padrÃ£o.
@@ -172,6 +203,11 @@ ObservaÃ§Ã£o:
   - criaÃ§Ã£o e ediÃ§Ã£o de aplicativo com contrato do legado (`gestao_usuario`);
   - aÃ§Ãµes para copiar `Client ID`, copiar `Secret` e gerar novo `Secret`;
   - rota dedicada para permissÃµes de acesso por aplicativo, no lugar do modal legado.
+- `Integrações` já possui:
+  - páginas diretas para `Atendimento`, `Clientes`, `Aplicativos`, `Notificações`, `Segurança`, `Scripts`, `Marketing`, `Login Social`, `Promoções`, `Logística` e `Financeiro`;
+  - bridges dedicadas em `app/api/integracoes/*` para todos os módulos do menu;
+  - `Gateways de Pagamento` com listagem, formulário novo, edição por id e regras condicionais do legado reaproveitadas no CRUD do v2;
+  - cobertura E2E do fluxo principal para `Atendimento`, `Clientes`, `Login Social`, `Logística`, `Marketing`, `Notificações`, `Promoções`, `Scripts`, `Segurança`, `Financeiro` e `Gateways de Pagamento`.
 - `ManutenÃ§Ã£o > Termos de pesquisa` jÃ¡ possui:
   - listagem server-side com filtros por `id`, `termos`, `resultado` e `ativo`;
   - criaÃ§Ã£o e ediÃ§Ã£o com os campos `ativo`, `termos` e `resultado`;
@@ -222,26 +258,33 @@ ObservaÃ§Ã£o:
 ## Estado arquitetural da cobertura
 
 ### CRUDs simples
+
 Usam majoritariamente:
+
 - `CrudListPage`
 - `CrudFormPage`
 
 ### FormulÃ¡rios hÃ­bridos
+
 Usam:
+
 - `CrudFormSections`
 - componentes relacionais locais
 - formulÃ¡rios tabulados
 
 Casos tÃ­picos:
+
 - grupos de clientes
 - regras de cadastro
 - catÃ¡logo com abas
 - produtos
 
 ### FormulÃ¡rios diretos de parÃ¢metros
+
 Usam pÃ¡gina prÃ³pria de ediÃ§Ã£o, sem listagem, quando o legado trabalha diretamente com parÃ¢metros do tenant.
 
 Caso atual:
+
 - `ConfiguraÃ§Ãµes > Clientes`
 - `ConfiguraÃ§Ãµes > Entregas`
 - `ConfiguraÃ§Ãµes > Geral`
@@ -252,7 +295,9 @@ Caso atual:
 - `ConfiguraÃ§Ãµes > Assistente virtual`
 
 ### Telas operacionais
+
 Continuam como pÃ¡ginas prÃ³prias, com mais regra de negÃ³cio:
+
 - clientes
 - contatos
 - vendedores
@@ -267,12 +312,15 @@ Continuam como pÃ¡ginas prÃ³prias, com mais regra de negÃ³cio:
 - assistente de vendas IA
 
 ## O que ainda nÃ£o estÃ¡ fechado
+
 - E2E dedicado para `Assistente virtual`, `ParÃ¢metros` e `Assistente de vendas IA`;
 - refinamentos complementares de `Produtos`, caso surjam regras avanÃ§adas adicionais de `Grades` no QA funcional;
 - Ã¡reas ainda mapeadas para `/legacy/...`;
 - integraÃ§Ã£o completa de upload com backend/S3 em todos os mÃ³dulos elegÃ­veis;
 - melhorias futuras de ergonomia do Editor SQL puramente no frontend, como formataÃ§Ã£o manual e aÃ§Ãµes por seleÃ§Ã£o.
+
 ## RegressÃµes cobertas nesta fase
+
 - `Topbar` com teste unitÃ¡rio para identificaÃ§Ã£o do tenant master e carregamento do painel de notificaÃ§Ãµes.
 - `Pedidos` com teste unitÃ¡rio das aÃ§Ãµes operacionais e E2E cobrindo listagem, detalhe e abertura de todas as abas principais.
 - `ConfiguraÃ§Ãµes` com teste de integraÃ§Ã£o validando o estado disabled/enabled do botÃ£o `Salvar` conforme o dirty state.

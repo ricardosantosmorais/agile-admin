@@ -39,8 +39,8 @@ function ToolbarActionButton({
         className={[
           'inline-flex h-10 items-center justify-center gap-2 rounded-full px-3 transition disabled:cursor-not-allowed disabled:opacity-50',
           prominent
-            ? 'bg-slate-950 text-white hover:bg-slate-800'
-            : 'border border-[#e6dfd3] bg-white text-slate-700 hover:border-[#cdbfa8] hover:bg-[#fcfaf5] hover:text-slate-950',
+            ? 'app-button-primary'
+            : 'app-button-secondary hover:border-[color:var(--app-control-border-strong)]',
         ].join(' ')}
       >
         {children}
@@ -89,13 +89,13 @@ export function EmailsTemplatesFormPage({ id }: { id?: string }) {
 
             return (
               <div className="flex flex-wrap items-center gap-2">
-                <div className="flex items-center overflow-hidden rounded-2xl border border-[#e7e0d1] bg-white p-1">
+                <div className="app-control flex items-center overflow-hidden rounded-2xl p-1">
                   <button
                     type="button"
                     onClick={() => handleModelChange('twig')}
                     className={[
                       'rounded-xl px-2.5 py-1.5 text-[11px] font-bold transition',
-                      currentModel === 'twig' ? 'bg-accent text-white' : 'text-slate-500 hover:text-slate-950',
+                      currentModel === 'twig' ? 'bg-accent text-white' : 'text-[color:var(--app-muted)] hover:text-[color:var(--app-text)]',
                     ].join(' ')}
                     aria-label={t('maintenance.emailTemplates.editor.modelTwig', 'Twig')}
                   >
@@ -106,7 +106,7 @@ export function EmailsTemplatesFormPage({ id }: { id?: string }) {
                     onClick={() => handleModelChange('php')}
                     className={[
                       'rounded-xl px-2.5 py-1.5 text-[11px] font-bold transition',
-                      currentModel === 'php' ? 'bg-accent text-white' : 'text-slate-500 hover:text-slate-950',
+                      currentModel === 'php' ? 'bg-accent text-white' : 'text-[color:var(--app-muted)] hover:text-[color:var(--app-text)]',
                     ].join(' ')}
                     aria-label={t('maintenance.emailTemplates.editor.modelPhp', 'PHP')}
                   >

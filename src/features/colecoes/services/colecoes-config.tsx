@@ -45,13 +45,13 @@ export const COLECOES_CONFIG: CrudModuleConfig = {
       label: 'Restrito',
       sortKey: 'restrito',
       thClassName: 'w-[110px]',
-      render: (record) => {
+      render: (record, context) => {
         const checked = record.restrito === true || record.restrito === 1 || record.restrito === '1'
-        return <StatusBadge tone={checked ? 'success' : 'warning'}>{checked ? 'Sim' : 'Não'}</StatusBadge>
+        return <StatusBadge tone={checked ? 'success' : 'warning'}>{checked ? context.t('common.yes', 'Sim') : context.t('common.no', 'Não')}</StatusBadge>
       },
-      filter: { kind: 'select', key: 'restrito', options: [{ value: '1', label: 'Sim' }, { value: '0', label: 'Não' }] },
+      filter: { kind: 'select', key: 'restrito', options: [{ value: '1', labelKey: 'common.yes', label: 'Sim' }, { value: '0', labelKey: 'common.no', label: 'Não' }] },
     },
-    { id: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', sortKey: 'ativo', thClassName: 'w-[100px]', valueKey: 'ativo', filter: { kind: 'select', key: 'ativo', options: [{ value: '1', label: 'Sim' }, { value: '0', label: 'Não' }] } },
+    { id: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', sortKey: 'ativo', thClassName: 'w-[100px]', valueKey: 'ativo', filter: { kind: 'select', key: 'ativo', options: [{ value: '1', labelKey: 'common.yes', label: 'Sim' }, { value: '0', labelKey: 'common.no', label: 'Não' }] } },
   ],
   mobileTitle: (record) => String(record.nome || '-'),
   mobileSubtitle: (record) => String(record.codigo || '-'),
@@ -72,7 +72,16 @@ export const COLECOES_CONFIG: CrudModuleConfig = {
         { key: 'imagem', labelKey: 'catalog.fields.banner', label: 'Banner', type: 'image', uploadProfileId: 'tenant-public-images', uploadFolder: 'colecoes' },
         { key: 'imagem_mobile', labelKey: 'catalog.fields.mobileBanner', label: 'Banner mobile', type: 'image', uploadProfileId: 'tenant-public-images', uploadFolder: 'colecoes' },
         { key: 'link', labelKey: 'catalog.fields.link', label: 'Link do banner', type: 'text' },
-        { key: 'target', labelKey: 'catalog.fields.target', label: 'Target do banner', type: 'select', options: [{ value: '_self', label: 'Mesma janela' }, { value: '_blank', label: 'Nova janela' }] },
+        {
+          key: 'target',
+          labelKey: 'catalog.fields.target',
+          label: 'Target do banner',
+          type: 'select',
+          options: [
+            { value: '_self', labelKey: 'catalog.fields.targetOptions.sameWindow', label: 'Mesma janela' },
+            { value: '_blank', labelKey: 'catalog.fields.targetOptions.newWindow', label: 'Nova janela' },
+          ],
+        },
         { key: 'descricao', labelKey: 'catalog.fields.description', label: 'Descrição', type: 'richtext' },
       ],
     },

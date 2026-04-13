@@ -11,7 +11,7 @@ import { useFooterActionsVisibility } from '@/src/hooks/use-footer-actions-visib
 import { useI18n } from '@/src/i18n/use-i18n'
 
 const primaryButtonDisabledClasses =
-  'disabled:cursor-not-allowed disabled:border disabled:border-slate-200 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none'
+  'disabled:cursor-not-allowed disabled:opacity-60'
 
 type Props = {
   moduleTitle: string
@@ -58,7 +58,7 @@ export function ManualFormPageShell({
       type="submit"
       form={formId}
       disabled={!hasChanges || saving}
-      className={`inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white ${primaryButtonDisabledClasses}`}
+      className={`app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold ${primaryButtonDisabledClasses}`}
     >
       {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
       {t('common.save', 'Salvar')}
@@ -78,7 +78,7 @@ export function ManualFormPageShell({
             {canSave && !isFooterVisible ? saveButton : null}
             <Link
               href="/configuracoes"
-              className="inline-flex items-center rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+              className="app-button-secondary inline-flex items-center rounded-full px-4 py-3 text-sm font-semibold"
             >
               {t('common.back', 'Voltar')}
             </Link>
@@ -91,10 +91,10 @@ export function ManualFormPageShell({
 
         <form id={formId} onSubmit={onSubmit} className="space-y-5">
           <SectionCard title={moduleTitle} description={moduleDescription}>
-            <div className="rounded-[1rem] border border-[#ebe4d8] bg-[#fcfaf5] px-4 py-3 text-sm text-slate-700">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{contextTitle}</p>
-              <p className="mt-2 text-sm font-medium text-slate-950">{contextValue}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{contextDescription}</p>
+            <div className="app-pane-muted rounded-[1rem] px-4 py-3 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--app-muted)]">{contextTitle}</p>
+              <p className="mt-2 text-sm font-medium text-[color:var(--app-text)]">{contextValue}</p>
+              <p className="mt-2 text-sm leading-6 text-[color:var(--app-muted)]">{contextDescription}</p>
             </div>
           </SectionCard>
 
@@ -105,14 +105,14 @@ export function ManualFormPageShell({
               <button
                 type="submit"
                 disabled={!hasChanges || saving}
-                className={`inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white ${primaryButtonDisabledClasses}`}
+                className={`app-button-primary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${primaryButtonDisabledClasses}`}
               >
                 {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 {t('common.save', 'Salvar')}
               </button>
               <Link
                 href="/configuracoes"
-                className="inline-flex items-center rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold text-slate-700"
+                className="app-button-secondary inline-flex items-center rounded-full px-5 py-3 text-sm font-semibold"
               >
                 {t('common.cancel', 'Cancelar')}
               </Link>

@@ -1,6 +1,5 @@
-import { IntegracaoAtendimentoPage } from '@/src/features/integracoes/atendimento/components/integracao-atendimento-page'
+import { IntegracaoAtendimentoPage } from '@/src/features/atendimento/components/integracao-atendimento-page';
 
 export default function IntegracoesAtendimentoRoutePage() {
-  return <IntegracaoAtendimentoPage />
+	return <IntegracaoAtendimentoPage />;
 }
-

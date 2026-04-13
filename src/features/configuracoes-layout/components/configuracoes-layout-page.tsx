@@ -44,7 +44,7 @@ import { useI18n } from '@/src/i18n/use-i18n'
 import { createProfileUploadHandler } from '@/src/lib/uploads'
 
 const primaryButtonDisabledClasses =
-  'disabled:cursor-not-allowed disabled:border disabled:border-slate-200 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none'
+  'disabled:cursor-not-allowed disabled:opacity-60'
 const LEGACY_LOCKED_TENANT_ID = '1705083119553379'
 
 const areaIconMap = {
@@ -270,7 +270,7 @@ export function ConfiguracoesLayoutPage() {
       return (
         <div className="grid gap-4">
           {(['meta_titulo', 'meta_palavras_chave', 'meta_descricao'] as const).map((fieldKey) => (
-            <div key={fieldKey} className="rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
+            <div key={fieldKey} className="app-control-muted rounded-[1.15rem] p-4">
               <FormField label={t(`configuracoes.layout.fields.${fieldKey}.label`, fieldKey)} asLabel={false}>
                 <input
                   value={values[fieldKey]}
@@ -279,7 +279,7 @@ export function ConfiguracoesLayoutPage() {
                   className={inputClasses()}
                 />
               </FormField>
-              <p className="mt-2 text-xs leading-5 text-slate-500">
+              <p className="mt-2 text-xs leading-5 text-[color:var(--app-muted)]">
                 {t(`configuracoes.layout.fields.${fieldKey}.helper`, '')}
               </p>
             </div>
@@ -290,13 +290,13 @@ export function ConfiguracoesLayoutPage() {
 
     return (
       <div className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-[1.15rem] border border-[#ebe4d8] bg-[#fcfaf5] px-4 py-3">
-          <div className="text-sm text-slate-700">
+        <div className="app-pane-muted flex flex-wrap items-center justify-between gap-3 rounded-[1.15rem] px-4 py-3">
+          <div className="text-sm text-[color:var(--app-muted)]">
             <span className="font-semibold">
               {t(`configuracoes.layout.areas.${activeArea}.title`, activeArea)}
             </span>
             {activeAreaDefinition.supportsViewport ? (
-              <span className="ml-2 rounded-full border border-[#e8e2d7] bg-white px-3 py-1.5 text-xs font-semibold text-slate-600">
+              <span className="app-button-secondary ml-2 inline-flex rounded-full px-3 py-1.5 text-xs font-semibold">
                 {t('configuracoes.layout.editingTarget', 'Editando')} {t(`configuracoes.layout.viewport.${activeViewport}`, activeViewport)}
               </span>
             ) : null}
@@ -304,7 +304,7 @@ export function ConfiguracoesLayoutPage() {
 
           <div className="flex flex-wrap items-center gap-2">
             {activeAreaDefinition.supportsViewport ? (
-              <div className="inline-flex rounded-full border border-[#e8e2d7] bg-white p-1">
+              <div className="app-control-muted inline-flex rounded-full p-1">
                 {(['desktop', 'mobile'] as ConfiguracoesLayoutViewport[]).map((viewport) => (
                   <button
                     key={viewport}
@@ -312,7 +312,7 @@ export function ConfiguracoesLayoutPage() {
                     onClick={() => setViewportByArea((current) => ({ ...current, [activeArea]: viewport }))}
                     className={[
                       'inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold transition',
-                      activeViewport === viewport ? 'bg-slate-950 text-white' : 'text-slate-600',
+                      activeViewport === viewport ? 'app-button-primary' : 'text-[color:var(--app-muted)] hover:text-[color:var(--app-text)]',
                     ].join(' ')}
                   >
                     {viewport === 'desktop' ? <Monitor className="h-3.5 w-3.5" /> : <Smartphone className="h-3.5 w-3.5" />}
@@ -325,7 +325,7 @@ export function ConfiguracoesLayoutPage() {
             <button
               type="button"
               onClick={handleRestoreCurrentArea}
-              className="inline-flex items-center gap-2 rounded-full border border-[#e8e2d7] bg-white px-3 py-2 text-sm font-semibold text-slate-700"
+              className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold"
             >
               <RotateCcw className="h-4 w-4" />
               {t('configuracoes.layout.actions.restore', 'Restaurar')}
@@ -333,12 +333,12 @@ export function ConfiguracoesLayoutPage() {
           </div>
         </div>
 
-        <div className="rounded-[1.25rem] border border-[#ebe4d8] bg-[#fcfaf5] p-4">
+        <div className="app-control-muted rounded-[1.25rem] p-4">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--app-muted)]">
               {t('configuracoes.layout.codeTitle', 'Código')}
             </p>
-            <div className="rounded-full border border-[#e8e2d7] bg-white px-3 py-2 text-xs font-semibold text-slate-600">
+            <div className="app-button-secondary rounded-full px-3 py-2 text-xs font-semibold">
               {String(activeFieldKey).toUpperCase()}
             </div>
           </div>
@@ -365,7 +365,7 @@ export function ConfiguracoesLayoutPage() {
                 type="submit"
                 form={formId}
                 disabled={!hasChanges || saving}
-                className={`inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white ${primaryButtonDisabledClasses}`}
+                className={`app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold ${primaryButtonDisabledClasses}`}
               >
                 {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 {t('common.save', 'Salvar')}
@@ -373,7 +373,7 @@ export function ConfiguracoesLayoutPage() {
             ) : null}
             <Link
               href="/configuracoes"
-              className="inline-flex items-center rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+              className="app-button-secondary inline-flex items-center rounded-full px-4 py-3 text-sm font-semibold"
             >
               {t('common.back', 'Voltar')}
             </Link>
@@ -413,7 +413,7 @@ export function ConfiguracoesLayoutPage() {
               <button
                 type="submit"
                 disabled={!hasChanges || saving}
-                className={`inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white ${primaryButtonDisabledClasses}`}
+                className={`app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold ${primaryButtonDisabledClasses}`}
               >
                 {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 {t('common.save', 'Salvar')}

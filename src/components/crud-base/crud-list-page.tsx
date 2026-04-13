@@ -69,7 +69,7 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
     filter: resolveFilterConfig(column, t),
     cell: (record: CrudRecord) => {
       if (column.render) {
-        return column.render(record, { tenantUrl, assetsBucketUrl })
+        return column.render(record, { tenantUrl, assetsBucketUrl, t })
       }
       if (column.id === 'ativo') {
         const activeValue = record.ativo as unknown
@@ -194,10 +194,10 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
             onToggleSelectAll={controller.tableState.toggleSelectAll}
             mobileCard={{ title: config.mobileTitle, subtitle: config.mobileSubtitle, meta: config.mobileMeta, badges: mobileBadges }}
             renderExpandedRow={config.details?.length ? (record) => (
-              <div className="grid gap-3 rounded-[1.1rem] border border-[#ebe4d8] bg-white p-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="app-control-muted grid gap-3 rounded-[1.1rem] p-4 md:grid-cols-2 xl:grid-cols-3">
                 {config.details?.map((detail) => (
-                  <div key={detail.key} className="text-sm text-slate-600">
-                    <span className="font-semibold text-slate-900">{t(detail.labelKey, detail.label)}:</span> {detail.render(record)}
+                  <div key={detail.key} className="text-sm text-[color:var(--app-muted)]">
+                    <span className="font-semibold text-[color:var(--app-text)]">{t(detail.labelKey, detail.label)}:</span> {detail.render(record)}
                   </div>
                 ))}
               </div>

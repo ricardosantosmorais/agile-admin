@@ -106,6 +106,10 @@ function toStringValue(value: unknown) {
   return String(value).trim()
 }
 
+function normalizeParametroKey(value: unknown) {
+  return asString(value).trim().replace(/^[?\uFFFD\s]+/, '')
+}
+
 function mapFiliais(payload: unknown): ParametroLookupOption[] {
   return asArray(asRecord(payload).data)
     .map((item) => {
@@ -215,7 +219,7 @@ export function buildParametroSavePayload(values: ParametroFormValues) {
   return {
     ...(values.id ? { id: values.id } : {}),
     ativo: values.ativo === '1',
-    chave: values.chave.trim(),
+    chave: normalizeParametroKey(values.chave),
     id_filial: values.id_filial || null,
     descricao: values.descricao.trim(),
     parametros: values.parametros,

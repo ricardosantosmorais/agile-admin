@@ -60,15 +60,15 @@ function normalizeModel(value: unknown): TemplateModel {
 
 function WorkspaceLoadingState({ message }: { message: string }) {
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-[1rem] border border-dashed border-[#e7decf] bg-[#fcfaf5] px-4 py-4">
-      <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+    <div className="app-control-muted flex h-full min-h-0 flex-col rounded-[1rem] border-dashed px-4 py-4">
+      <div className="inline-flex items-center gap-2 text-sm font-medium text-[color:var(--app-text)]">
         <Loader2 className="h-4 w-4 animate-spin" />
         {message}
       </div>
       <div className="mt-4 space-y-3">
-        <div className="h-11 animate-pulse rounded-[0.95rem] bg-[#efe8dc]" />
-        <div className="h-11 animate-pulse rounded-[0.95rem] bg-[#f5f1e8]" />
-        <div className="h-11 animate-pulse rounded-[0.95rem] bg-[#efe8dc]" />
+        <div className="h-11 animate-pulse rounded-[0.95rem] bg-[color:var(--app-control-border)] opacity-40" />
+        <div className="h-11 animate-pulse rounded-[0.95rem] bg-[color:var(--app-control-border)] opacity-25" />
+        <div className="h-11 animate-pulse rounded-[0.95rem] bg-[color:var(--app-control-border)] opacity-40" />
       </div>
     </div>
   )
@@ -92,14 +92,14 @@ function VariablesPanel({
   const { t } = useI18n()
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-[1rem] bg-white">
-      <div className="border-b border-[#efe8dc] bg-[#fcfaf5] px-4 py-3">
+    <div className="app-control flex h-full min-h-0 flex-col overflow-hidden rounded-[1rem]">
+      <div className="border-b border-[color:var(--app-card-border)] bg-[color:var(--app-control-muted-bg)] px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-600">
+            <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--app-text)]">
               {t('maintenance.emailTemplates.editor.availableVariables', 'Available variables')}
             </h4>
-            <p className="mt-1 text-xs leading-5 text-slate-500">
+            <p className="mt-1 text-xs leading-5 text-[color:var(--app-muted)]">
               {t('maintenance.emailTemplates.editor.insertHint', 'Click or drag a variable to insert it at cursor position.')}
             </p>
           </div>
@@ -111,7 +111,7 @@ function VariablesPanel({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-hidden bg-[#f8f4ec]">
+      <div className="min-h-0 flex-1 overflow-hidden bg-[color:var(--app-control-muted-bg)]">
         {payloadLoading ? (
           <WorkspaceLoadingState message={t('maintenance.emailTemplates.editor.loadingVariables', 'Carregando variáveis disponíveis...')} />
         ) : (
@@ -335,7 +335,7 @@ export function EmailTemplateEditorTab({
 
       <div className="px-1 py-1 sm:px-1.5 sm:py-1.5">
         <div className="lg:hidden">
-          <div className="flex min-h-[620px] flex-col overflow-hidden rounded-[1rem] bg-white">
+          <div className="app-control flex min-h-[620px] flex-col overflow-hidden rounded-[1rem]">
             <EmailTemplateMonaco
               ref={editorRef}
               value={html}
@@ -365,7 +365,7 @@ export function EmailTemplateEditorTab({
               />
             )}
             right={(
-              <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-[1rem] bg-white">
+              <div className="app-control flex h-full min-h-0 flex-col overflow-hidden rounded-[1rem]">
                 <div className="flex min-h-0 flex-1 overflow-hidden p-0">
                   <EmailTemplateMonaco
                     ref={editorRef}
@@ -392,9 +392,9 @@ export function EmailTemplateEditorTab({
       >
         <AsyncState isLoading={historyLoading} error={historyError}>
           <SectionCard className="overflow-hidden px-0 py-0">
-            <div className="border-b border-[#efe8dc] bg-[#fcfaf5] px-4 py-3">
+            <div className="border-b border-[color:var(--app-card-border)] bg-[color:var(--app-control-muted-bg)] px-4 py-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-[color:var(--app-muted)]">
                   {t('maintenance.emailTemplates.editor.history', 'Template history')}
                 </p>
                 <StatusBadge tone="neutral">
@@ -407,7 +407,7 @@ export function EmailTemplateEditorTab({
             </div>
             <div className="max-h-[65vh] overflow-auto">
               <table className="min-w-full border-collapse text-left text-sm">
-                <thead className="sticky top-0 z-[1] bg-[#f8f4ec] text-slate-700">
+                <thead className="sticky top-0 z-[1] bg-[color:var(--app-control-muted-bg)] text-[color:var(--app-text)]">
                   <tr>
                     <th className="px-4 py-3 text-[13px] font-semibold">ID</th>
                     <th className="px-4 py-3 text-[13px] font-semibold">{t('maintenance.emailTemplates.editor.historyUser', 'User')}</th>
@@ -417,18 +417,18 @@ export function EmailTemplateEditorTab({
                 </thead>
                 <tbody>
                   {historyRows.length ? historyRows.map((row) => (
-                    <tr key={row.id} className="border-t border-[#f0ebe2] align-top">
-                      <td className="px-4 py-3 text-slate-700">
-                        <span className="inline-flex rounded-full bg-[#f6f1e8] px-2.5 py-1 text-xs font-semibold text-slate-600">
+                    <tr key={row.id} className="border-t border-[color:var(--app-card-border)] align-top">
+                      <td className="px-4 py-3 text-[color:var(--app-text)]">
+                        <span className="app-control-muted inline-flex rounded-full px-2.5 py-1 text-xs font-semibold text-[color:var(--app-muted)]">
                           #{row.id}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-slate-700">{row.usuario?.nome || '-'}</td>
-                      <td className="px-4 py-3 text-slate-700">{row.data ? formatDateTime(row.data) : '-'}</td>
+                      <td className="px-4 py-3 text-[color:var(--app-text)]">{row.usuario?.nome || '-'}</td>
+                      <td className="px-4 py-3 text-[color:var(--app-text)]">{row.data ? formatDateTime(row.data) : '-'}</td>
                       <td className="px-4 py-3 text-right">
                         <button
                           type="button"
-                          className="inline-flex items-center gap-2 rounded-full border border-[#e6dfd3] bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-900 hover:text-slate-950"
+                          className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-xs font-semibold transition"
                           onClick={() => {
                             const nextHtml = String(row.html || '')
                             patch('modelo', inferTemplateModel(nextHtml))
@@ -442,7 +442,7 @@ export function EmailTemplateEditorTab({
                     </tr>
                   )) : (
                     <tr>
-                      <td colSpan={4} className="px-4 py-10 text-center text-sm text-slate-500">
+                      <td colSpan={4} className="px-4 py-10 text-center text-sm text-[color:var(--app-muted)]">
                         {t('maintenance.emailTemplates.editor.emptyHistory', 'No history available for this template.')}
                       </td>
                     </tr>
@@ -465,7 +465,7 @@ export function EmailTemplateEditorTab({
           loadingTitle={t('maintenance.emailTemplates.editor.previewLoadingTitle', 'Carregando pré-visualização')}
           loadingDescription={t('maintenance.emailTemplates.editor.previewLoading', 'Renderizando template...')}
         >
-          <div className="overflow-hidden rounded-[1.2rem] border border-[#e6dfd3] bg-[#fcfaf5] p-2">
+          <div className="app-control-muted overflow-hidden rounded-[1.2rem] p-2">
             <iframe
               title={t('maintenance.emailTemplates.editor.previewFrameTitle', 'Template preview')}
               srcDoc={previewHtml}

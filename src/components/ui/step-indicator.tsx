@@ -27,22 +27,22 @@ export function StepIndicator({ items, activeStep, onStepClick }: StepIndicatorP
                 type="button"
                 onClick={() => onStepClick?.(item.id)}
                 className={[
-                  'inline-flex items-center gap-3 rounded-full border px-4 py-2.5 text-left transition',
-                  isActive ? 'border-slate-950 bg-slate-950 text-white' : isDone ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-[#e6dfd3] bg-white text-slate-700',
+                  'inline-flex items-center gap-3 rounded-full px-4 py-2.5 text-left text-sm font-semibold transition',
+                  isActive ? 'app-button-primary' : isDone ? 'border border-emerald-400/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300' : 'app-button-secondary',
                   onStepClick ? '' : 'cursor-default',
                 ].join(' ')}
               >
                 <span
                   className={[
                     'inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold',
-                    isActive ? 'bg-white/15 text-white' : isDone ? 'bg-emerald-600 text-white' : 'bg-[#f4efe6] text-slate-700',
+                    isActive ? 'bg-white/15 text-white' : isDone ? 'bg-emerald-600 text-white' : 'app-control-muted text-[color:var(--app-text)]',
                   ].join(' ')}
                 >
                   {index + 1}
                 </span>
-                <span className="whitespace-nowrap text-sm font-semibold">{item.label}</span>
+                <span className="whitespace-nowrap">{item.label}</span>
               </button>
-              {index < items.length - 1 ? <div className="h-px w-10 bg-[#e6dfd3]" /> : null}
+              {index < items.length - 1 ? <div className="h-px w-10 bg-[color:var(--app-control-border)]" /> : null}
             </div>
           )
         })}

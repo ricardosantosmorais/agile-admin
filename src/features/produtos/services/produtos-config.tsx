@@ -7,15 +7,15 @@ import { buildProdutoPayload, normalizeProdutoRecord } from '@/src/features/prod
 function productStatusLabel(value: unknown) {
   switch (String(value || '')) {
     case 'disponivel':
-      return { label: 'Disponível', tone: 'success' as const }
+      return { labelKey: 'catalog.produtos.options.available', label: 'Disponível', tone: 'success' as const }
     case 'indisponivel':
-      return { label: 'Indisponível', tone: 'danger' as const }
+      return { labelKey: 'catalog.produtos.options.unavailable', label: 'Indisponível', tone: 'danger' as const }
     case 'em_revisao':
-      return { label: 'Em revisão', tone: 'warning' as const }
+      return { labelKey: 'catalog.produtos.options.inReview', label: 'Em revisão', tone: 'warning' as const }
     case 'fora_de_linha':
-      return { label: 'Fora de linha', tone: 'info' as const }
+      return { labelKey: 'catalog.produtos.options.discontinued', label: 'Fora de linha', tone: 'info' as const }
     default:
-      return { label: String(value || '-'), tone: 'neutral' as const }
+      return { labelKey: '', label: String(value || '-'), tone: 'neutral' as const }
   }
 }
 
@@ -132,15 +132,15 @@ export const PRODUTOS_CONFIG: CrudModuleConfig = {
         kind: 'select',
         key: 'status',
         options: [
-          { value: 'disponivel', label: 'Disponível' },
-          { value: 'indisponivel', label: 'Indisponível' },
-          { value: 'em_revisao', label: 'Em revisão' },
-          { value: 'fora_de_linha', label: 'Fora de linha' },
+          { value: 'disponivel', labelKey: 'catalog.produtos.options.available', label: 'Disponível' },
+          { value: 'indisponivel', labelKey: 'catalog.produtos.options.unavailable', label: 'Indisponível' },
+          { value: 'em_revisao', labelKey: 'catalog.produtos.options.inReview', label: 'Em revisão' },
+          { value: 'fora_de_linha', labelKey: 'catalog.produtos.options.discontinued', label: 'Fora de linha' },
         ],
       },
-      render: (record) => {
+      render: (record, context) => {
         const status = productStatusLabel(record.status)
-        return <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
+        return <StatusBadge tone={status.tone}>{status.labelKey ? context.t(status.labelKey, status.label) : status.label}</StatusBadge>
       },
     },
     {
@@ -154,8 +154,8 @@ export const PRODUTOS_CONFIG: CrudModuleConfig = {
         kind: 'select',
         key: 'disponivel',
         options: [
-          { value: '1', label: 'Sim' },
-          { value: '0', label: 'Não' },
+          { value: '1', labelKey: 'common.yes', label: 'Sim' },
+          { value: '0', labelKey: 'common.no', label: 'Não' },
         ],
       },
     },
@@ -170,8 +170,8 @@ export const PRODUTOS_CONFIG: CrudModuleConfig = {
         kind: 'select',
         key: 'ativo',
         options: [
-          { value: '1', label: 'Sim' },
-          { value: '0', label: 'Não' },
+          { value: '1', labelKey: 'common.yes', label: 'Sim' },
+          { value: '0', labelKey: 'common.no', label: 'Não' },
         ],
       },
     },
@@ -245,10 +245,10 @@ export const PRODUTOS_CONFIG: CrudModuleConfig = {
           type: 'select',
           required: true,
           options: [
-            { value: 'venda', label: 'Venda' },
-            { value: 'servico', label: 'Serviço' },
-            { value: 'comodato', label: 'Comodato' },
-            { value: 'kit', label: 'Kit' },
+            { value: 'venda', labelKey: 'catalog.produtos.options.typeSale', label: 'Venda' },
+            { value: 'servico', labelKey: 'catalog.produtos.options.typeService', label: 'Serviço' },
+            { value: 'comodato', labelKey: 'catalog.produtos.options.typeComodato', label: 'Comodato' },
+            { value: 'kit', labelKey: 'catalog.produtos.options.typeKit', label: 'Kit' },
           ],
         },
         {
@@ -258,10 +258,10 @@ export const PRODUTOS_CONFIG: CrudModuleConfig = {
           type: 'select',
           required: true,
           options: [
-            { value: 'disponivel', label: 'Disponível' },
-            { value: 'indisponivel', label: 'Indisponível' },
-            { value: 'em_revisao', label: 'Em revisão' },
-            { value: 'fora_de_linha', label: 'Fora de linha' },
+            { value: 'disponivel', labelKey: 'catalog.produtos.options.available', label: 'Disponível' },
+            { value: 'indisponivel', labelKey: 'catalog.produtos.options.unavailable', label: 'Indisponível' },
+            { value: 'em_revisao', labelKey: 'catalog.produtos.options.inReview', label: 'Em revisão' },
+            { value: 'fora_de_linha', labelKey: 'catalog.produtos.options.discontinued', label: 'Fora de linha' },
           ],
         },
         { key: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', type: 'text', required: true, maxLength: 255 },
