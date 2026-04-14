@@ -38,7 +38,8 @@ frontend:
           do
             value="${!var_name}"
             if [ -n "$value" ]; then
-              printf '%s=%s\n' "$var_name" "$value" >> .env.production
+              escaped_value=$(printf '%s' "$value" | tr -d '\r' | sed 's/\\/\\\\/g; s/"/\\"/g')
+              printf '%s="%s"\n' "$var_name" "$escaped_value" >> .env.production
             fi
           done
         - npm run build
