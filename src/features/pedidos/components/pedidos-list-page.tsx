@@ -1,7 +1,7 @@
 ﻿'use client'
 
-import { Ban, CheckCircle2, Eye, Filter, ListFilter, RefreshCcw, ShoppingBag, SlidersHorizontal } from 'lucide-react'
-import { useMemo, useState, type ReactNode } from 'react'
+import { Ban, CheckCircle2, Eye, RefreshCcw } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { loadCrudLookupOptions } from '@/src/components/crud-base/crud-client'
 import { AppDataTable } from '@/src/components/data-table/app-data-table'
 import { DataTableFiltersCard } from '@/src/components/data-table/data-table-filters'
@@ -14,6 +14,7 @@ import { StatusBadge } from '@/src/components/ui/status-badge'
 import { AccessDeniedState } from '@/src/features/auth/components/access-denied-state'
 import { useFeatureAccess } from '@/src/features/auth/hooks/use-feature-access'
 import { usePedidoActions } from '@/src/features/pedidos/components/use-pedido-actions'
+import { PedidosAvaliacoesOverview } from '@/src/features/pedidos-avaliacoes/components/pedidos-avaliacoes-overview'
 import { pedidosClient } from '@/src/features/pedidos/services/pedidos-client'
 import { PEDIDO_STATUS_OPTIONS } from '@/src/features/pedidos/services/pedidos-meta'
 import type { PedidoListFilters, PedidoListRecord } from '@/src/features/pedidos/services/pedidos-types'
@@ -52,49 +53,10 @@ const defaultFilters: PedidoListFilters = {
 }
 
 type LookupResource = 'filiais' | 'vendedores' | 'formas_pagamento' | 'condicoes_pagamento' | 'formas_entrega'
-type ListMetricCardProps = {
-  label: string
-  value: string
-  helper?: string
-  icon: ReactNode
-  tone?: 'slate' | 'emerald' | 'amber' | 'sky'
-}
 
 async function loadLookup(resource: LookupResource, query: string, page: number, perPage: number) {
   const items = await loadCrudLookupOptions(resource, query, page, perPage)
   return items.map((item) => ({ id: item.value, label: item.label }))
-}
-
-function ListMetricCard({ label, value, helper, icon, tone = 'slate' }: ListMetricCardProps) {
-  const toneClasses = {
-    slate: 'app-stat-card-icon text-slate-300',
-    emerald: 'app-stat-card-icon app-stat-card-icon-emerald',
-    amber: 'app-stat-card-icon app-stat-card-icon-amber',
-    sky: 'app-stat-card-icon app-stat-card-icon-sky',
-  }
-
-  const accentClasses = {
-    slate: 'app-stat-card-accent app-stat-card-accent-sky',
-    emerald: 'app-stat-card-accent app-stat-card-accent-emerald',
-    amber: 'app-stat-card-accent app-stat-card-accent-amber',
-    sky: 'app-stat-card-accent app-stat-card-accent-sky',
-  }
-
-  return (
-    <div className="app-stat-card relative overflow-hidden rounded-[1.2rem] px-5 py-4">
-      <div className={accentClasses[tone]} aria-hidden="true" />
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
-          <div className="mt-2 text-lg font-bold tracking-tight text-[color:var(--app-text)]">{value}</div>
-          {helper ? <p className="mt-1 text-sm text-slate-500">{helper}</p> : null}
-        </div>
-        <div className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl ${toneClasses[tone]}`}>
-          {icon}
-        </div>
-      </div>
-    </div>
-  )
 }
 
 function formatChannel(value: string, t: (key: string, fallback?: string) => string) {
@@ -105,31 +67,6 @@ function formatChannel(value: string, t: (key: string, fallback?: string) => str
   if (normalized === 'mobile') return t('orders.channels.mobile', 'Mobile')
   if (normalized === 'pluggto') return t('orders.channels.pluggto', 'Plugg.to')
   return normalized
-}
-
-function countAppliedFilters(filters: PedidoListFilters) {
-  const keys: Array<keyof PedidoListFilters> = [
-    'id',
-    'id_transacao',
-    'codigo',
-    'id_filial',
-    'id_filial_estoque',
-    'id_filial_retira',
-    'cliente_codigo',
-    'cliente_cnpj_cpf',
-    'data_inicio',
-    'data_fim',
-    'id_vendedor',
-    'id_forma_pagamento_convertida',
-    'id_condicao_pagamento_convertida',
-    'id_forma_entrega',
-    'status',
-  ]
-
-  return keys.reduce((sum, key) => {
-    const value = filters[key]
-    return String(value || '').trim() ? sum + 1 : sum
-  }, 0)
 }
 
 export function PedidosListPage() {
@@ -157,15 +94,6 @@ export function PedidosListPage() {
     setDraft(defaultFilters)
     setFilters(defaultFilters)
   }
-
-  const appliedFiltersCount = countAppliedFilters(filters)
-  const selectedStatusLabel = filters.status
-    ? (PEDIDO_STATUS_OPTIONS.find((option) => option.value === filters.status)?.label || filters.status)
-    : t('orders.overview.allStatuses', 'Todos os status')
-  const selectedPeriodLabel = filters.data_inicio || filters.data_fim
-    ? [filters.data_inicio || t('orders.overview.periodOpenStart', 'Início aberto'), filters.data_fim || t('orders.overview.periodOpenEnd', 'Fim aberto')].join(' → ')
-    : t('orders.overview.allPeriod', 'Todo o período')
-  const orderingLabel = `${filters.orderBy} · ${filters.sort === 'asc' ? t('orders.overview.ascending', 'Ascendente') : t('orders.overview.descending', 'Descendente')}`
 
   const columns = useMemo(
     () => [
@@ -401,41 +329,11 @@ export function PedidosListPage() {
       />
 
       <AsyncState isLoading={pedidosState.isLoading} error={pedidosState.error}>
-        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
-          <ListMetricCard
-            label={t('orders.overview.filteredOrders', 'Pedidos filtrados')}
-            value={String(pedidosState.data?.meta?.total ?? 0)}
-            helper={pedidosState.data?.meta ? t('table.showingResults', 'Exibindo {{from}} a {{to}} de {{total}} registros', { from: pedidosState.data.meta.from, to: pedidosState.data.meta.to, total: pedidosState.data.meta.total }) : undefined}
-            icon={<ShoppingBag className="h-5 w-5" />}
-          />
-          <ListMetricCard
-            label={t('orders.overview.activeStatus', 'Status ativo')}
-            value={selectedStatusLabel}
-            helper={t('orders.overview.activeStatusHelper', 'Mostra o recorte atual aplicado ao status do pedido.')}
-            icon={<ListFilter className="h-5 w-5" />}
-            tone="emerald"
-          />
-          <ListMetricCard
-            label={t('orders.overview.selectedPeriod', 'Período selecionado')}
-            value={selectedPeriodLabel}
-            helper={t('orders.overview.selectedPeriodHelper', 'Faixa usada para consultar os pedidos nessa listagem.')}
-            icon={<Filter className="h-5 w-5" />}
-            tone="amber"
-          />
-          <ListMetricCard
-            label={t('orders.overview.activeView', 'Visão atual')}
-            value={orderingLabel}
-            helper={t('orders.overview.activeViewHelper', '{{count}} filtro(s) aplicado(s) nessa consulta.', { count: String(appliedFiltersCount) })}
-            icon={<SlidersHorizontal className="h-5 w-5" />}
-            tone="sky"
-          />
-        </div>
+        <PedidosAvaliacoesOverview />
 
         <SectionCard
-          title={t('orders.title', 'Pedidos')}
-          description={t('orders.listDescription', 'Listagem operacional com status, contexto comercial e atalhos para ações do pedido.')}
           action={(
-            <div className="flex w-full items-center justify-between gap-3">
+            <div className="flex w-full items-center justify-start gap-3">
               <DataTableFilterToggleAction
                 expanded={expanded}
                 onClick={() => setExpanded((current) => !current)}

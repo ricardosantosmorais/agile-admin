@@ -3,6 +3,9 @@ import { normalizeSearchValue } from '@/src/lib/text-normalization';
 
 export type FeatureKey =
 	| 'pedidos'
+	| 'consultasSimuladorPrecos'
+	| 'consultasEnviosFormularios'
+	| 'consultasAvaliacoesPedidos'
 	| 'editorSql'
 	| 'httpClient'
 	| 'dicionarioDados'
@@ -131,6 +134,18 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
 	pedidos: {
 		label: 'Pedidos',
 		matchers: ['pedido', 'pedidos', 'pedidos-list', 'pedido-list'],
+	},
+	consultasSimuladorPrecos: {
+		label: 'Consultas > Simulador de Preços',
+		matchers: ['simulador-precos', 'simulador de precos', 'simulador de preços', 'consultas simulador de precos'],
+	},
+	consultasEnviosFormularios: {
+		label: 'Consultas > Envios de Formulários',
+		matchers: ['formularios-envios', 'formularios envios', 'formulários envios', 'envios de formularios', 'envios de formulários'],
+	},
+	consultasAvaliacoesPedidos: {
+		label: 'Consultas > Avaliações de Pedidos',
+		matchers: ['pedidos-avaliacoes', 'pedidos avaliacoes', 'pedidos avaliações', 'avaliacoes de pedidos', 'avaliações de pedidos'],
 	},
 	editorSql: {
 		label: 'Editor SQL',

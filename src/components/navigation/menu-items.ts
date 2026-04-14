@@ -201,6 +201,8 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 	'api-erp-form': '/integracao-com-erp/api',
 	'banco-dados-erp-form': '/integracao-com-erp/banco-de-dados',
 	'ativacao-integrador-view': '/integracao-com-erp/instalacao-do-integrador',
+	'simulador-precos': '/consultas/simulador-de-precos',
+	'formularios-envios-list': '/consultas/envios-de-formularios',
 	'gateways-pagamento-list': '/integracoes/gateways-pagamento',
 	'gateways-pagamento-form': '/integracoes/gateways-pagamento/novo',
 	'cadastro-parametros-list': '/configuracoes/parametros',
@@ -475,10 +477,12 @@ function buildDynamicMenu(session: AuthSession, locale: Locale): MenuItem[] {
 	const permissions = session.user.funcionalidades.filter(isMenuPermission).sort(sortPermissions);
 	const levelOne = permissions.filter((permission) => Number(permission.nivel ?? 0) === 1);
 	const levelTwo = permissions.filter((permission) => Number(permission.nivel ?? 0) === 2);
+	const hiddenComponents = new Set(['pedidos-avaliacoes-list']);
 
-	const items: MenuItem[] = levelOne.map((parent) => {
+	const items: Array<MenuItem | null> = levelOne.map((parent): MenuItem | null => {
 		const children = levelTwo
 			.filter((permission) => permission.idFuncionalidadePai === parent.id)
+			.filter((permission) => !hiddenComponents.has(normalizeSearchValue(permission.componente ?? '')))
 			.map((permission) => ({
 				key: permission.id || permission.chave || permission.slug,
 				label: translateMenuFromCandidates(locale, [permission.componente, permission.slug, permission.chave, permission.id], permission.nome),
@@ -496,6 +500,10 @@ function buildDynamicMenu(session: AuthSession, locale: Locale): MenuItem[] {
 			} satisfies MenuItem;
 		}
 
+		if (hiddenComponents.has(normalizeSearchValue(parent.componente ?? ''))) {
+			return null;
+		}
+
 		const route = resolvePermissionRoute(parent);
 		return {
 			key: parent.id || parent.chave || parent.slug,
@@ -505,7 +513,7 @@ function buildDynamicMenu(session: AuthSession, locale: Locale): MenuItem[] {
 		} satisfies MenuItem;
 	});
 
-	return items.filter((item) => Boolean(item.to || item.action || item.children?.length));
+	return items.filter((item): item is MenuItem => Boolean(item && (item.to || item.action || item.children?.length)));
 }
 
 function buildStandardExtras(session: AuthSession, locale: Locale): MenuItem[] {
