@@ -27,10 +27,14 @@ frontend:
             UPLOAD_S3_PUBLIC_BUCKET \
             UPLOAD_S3_PRIVATE_BUCKET \
             UPLOAD_S3_PUBLIC_BASE_URL \
+            ADMIN_URL_API_AGILE \
+            ADMIN_API_AGILE_TOKEN \
             ADMIN_URL_API_PAINELB2B \
             ADMIN_API_PAINELB2B_TOKEN \
             ADMIN_URL_API_AGILESYNC \
-            ADMIN_API_AGILESYNC_TOKEN
+            ADMIN_API_AGILESYNC_TOKEN \
+            ADMIN_LEGACY_DECRYPT_KEY \
+            ADMIN_LEGACY_DECRYPT_IV
           do
             value="${!var_name}"
             if [ -n "$value" ]; then
