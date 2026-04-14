@@ -78,7 +78,7 @@ export function IntegracaoComErpInstalacaoIntegradorPage() {
 				}
 			/>
 
-			<AsyncState isLoading={loading} error={error}>
+			<AsyncState isLoading={loading} error={error ?? undefined}>
 				<PageToast message={feedback} onClose={() => setFeedback(null)} />
 
 				<SectionCard

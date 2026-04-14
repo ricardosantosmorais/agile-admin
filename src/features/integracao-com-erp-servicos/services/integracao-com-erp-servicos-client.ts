@@ -7,6 +7,8 @@ import {
 	normalizeIntegracaoComErpServicoExecutions,
 	normalizeIntegracaoComErpServicoHistory,
 	normalizeIntegracaoComErpServicoQuerySupport,
+	normalizeIntegracaoComErpServicoWizardCatalog,
+	normalizeIntegracaoComErpServicoWizardContext,
 	normalizeIntegracaoComErpServicosResponse,
 } from '@/src/features/integracao-com-erp-servicos/services/integracao-com-erp-servicos-mappers';
 import type {
@@ -20,6 +22,11 @@ import type {
 	IntegracaoComErpServicoHistoryResponse,
 	IntegracaoComErpServicoQuerySupportResponse,
 	IntegracaoComErpServicoUpdatePayload,
+	IntegracaoComErpServicoWizardCatalog,
+	IntegracaoComErpServicoWizardContext,
+	IntegracaoComErpServicoWizardPayload,
+	IntegracaoComErpServicoWizardQueryContext,
+	IntegracaoComErpServicoWizardResult,
 	IntegracaoComErpServicosCommandResult,
 	IntegracaoComErpServicosFilters,
 	IntegracaoComErpServicosResponse,
@@ -106,6 +113,45 @@ export const integracaoComErpServicosClient = {
 		}
 
 		return record;
+	},
+	async getWizardContext(): Promise<IntegracaoComErpServicoWizardContext> {
+		const payload = await httpClient<unknown>('/api/integracao-com-erp/servicos?mode=wizard-context', {
+			method: 'GET',
+			cache: 'no-store',
+		});
+
+		return normalizeIntegracaoComErpServicoWizardContext(payload);
+	},
+	async getWizardCatalog(templateId?: string): Promise<IntegracaoComErpServicoWizardCatalog> {
+		const params = new URLSearchParams({ mode: 'wizard-catalog' });
+		if (String(templateId || '').trim()) {
+			params.set('templateId', String(templateId).trim());
+		}
+
+		const payload = await httpClient<unknown>(`/api/integracao-com-erp/servicos?${params.toString()}`, {
+			method: 'GET',
+			cache: 'no-store',
+		});
+
+		return normalizeIntegracaoComErpServicoWizardCatalog(payload);
+	},
+	async getWizardQueryContext(tableName?: string): Promise<IntegracaoComErpServicoWizardQueryContext> {
+		const params = new URLSearchParams({ mode: 'wizard-query-context' });
+		if (String(tableName || '').trim()) {
+			params.set('tableName', String(tableName).trim());
+		}
+
+		return httpClient<IntegracaoComErpServicoWizardQueryContext>(`/api/integracao-com-erp/servicos?${params.toString()}`, {
+			method: 'GET',
+			cache: 'no-store',
+		});
+	},
+	async createWizard(payload: IntegracaoComErpServicoWizardPayload): Promise<IntegracaoComErpServicoWizardResult> {
+		return httpClient<IntegracaoComErpServicoWizardResult>('/api/integracao-com-erp/servicos', {
+			method: 'POST',
+			cache: 'no-store',
+			body: JSON.stringify({ action: 'create-wizard', payload }),
+		});
 	},
 	async listConfigHistory(serviceId: string): Promise<IntegracaoComErpServicoConfigHistoryResponse> {
 		const payload = await httpClient<unknown>(`/api/integracao-com-erp/servicos?mode=config-history&serviceId=${encodeURIComponent(serviceId)}&page=1&perPage=20`, {

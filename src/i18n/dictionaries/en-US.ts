@@ -4885,6 +4885,126 @@ export const enUS: TranslationDictionary = {
 				servicesWizard: {
 					title: 'Create Service',
 					description: 'Protected base for the ERP service creation wizard, including scope definition, type, auxiliary records, and final review.',
+					loadingTitle: 'Preparing wizard',
+					loadingDescription: 'Loading context, template, and auxiliary catalogs.',
+					loadError: 'Could not load the service wizard.',
+					heroTitle: 'Service creation assistant',
+					heroDescription: 'Build the initial ERP service configuration in steps, reusing an existing query or creating a new SQL base.',
+					steps: {
+						scope: 'Scope',
+						service: 'Service',
+						query: 'Query',
+						review: 'Review',
+					},
+					scope: {
+						shared: 'Company template',
+						specific: 'Specific template',
+						fixedTemplate: 'Company fixed template',
+					},
+					queryMode: {
+						new: 'Create new',
+						existing: 'Use existing',
+					},
+					fields: {
+						scope: 'Publishing scope',
+						template: 'Template',
+						companyCode: 'Company',
+						type: 'Technical type',
+						serviceType: 'Service type',
+						serviceName: 'Service name',
+						interval: 'Execution interval',
+						destinationTable: 'Object name (Destination table)',
+						executionType: 'Execution type',
+						executionChannel: 'Execution channel',
+						dataSource: 'Data source',
+						required: 'Required service',
+						queryMode: 'Query mode',
+						existingQuery: 'Existing query',
+						queryName: 'Query name',
+						queryReference: 'Reference',
+						queryPreview: 'SQL preview',
+					},
+					sections: {
+						scope: {
+							title: 'Scope and template',
+							description: 'Choose whether the service should stay in the company fixed template or in a specific template.',
+						},
+						service: {
+							title: 'Type and service data',
+							description: 'Align the service type with the legacy flow and configure the main operational data before building the query.',
+						},
+						query: {
+							title: 'Auxiliary records',
+							description: 'Choose whether to use an existing record or create a new one. Existing records are filtered by the template selected in step 1.',
+						},
+						queryContext: {
+							title: 'Autocomplete context',
+							description: 'Table fields and aliases',
+						},
+						queryParameters: {
+							title: 'Available parameters',
+							description: 'Use these markers in the SQL to reuse parameters already available in the integrator.',
+						},
+						queryResult: {
+							title: 'Test result',
+							description: 'Preview of the query response in the configured data source.',
+						},
+						review: {
+							title: 'Final review',
+							description: 'Review the main data before creating the service and opening the detailed edit screen.',
+						},
+					},
+					actions: {
+						testQuery: 'Test query',
+					},
+					feedback: {
+						testSuccess: 'Query validated successfully.',
+						testError: 'Could not test the query.',
+						saveSuccess: 'Service created successfully.',
+						saveError: 'Could not create the service.',
+					},
+					helpers: {
+						masterTemplate: 'Master users can publish to another template when needed.',
+						fixedTemplate: 'For this profile, the wizard always uses the template linked to the active company.',
+						required: 'Keeps the service marked as required in the initial configuration.',
+						executionTypeQuery: 'For query services, the execution type is always Comparison.',
+						executionChannelQuery: 'For query services, the channel is always AgileSyncService.',
+						existingQuery: 'When you use an existing query, the wizard reuses the object already registered in the selected template.',
+					},
+					serviceType: {
+						query: 'Query',
+					},
+					executionType: {
+						comparison: 'Comparison',
+					},
+					placeholders: {
+						serviceName: 'Ex.: Customer synchronization',
+						queryName: 'Ex.: Customers for ERP',
+					},
+					loadingQueryContext: 'Loading query context...',
+					loadingQueryParameters: 'Loading parameters...',
+					queryContextError: 'Could not load the query context.',
+					summary: {
+						context: 'Context summary',
+					},
+					metrics: {
+						rows: 'Rows',
+						total: 'Total',
+						pagination: 'Pagination',
+					},
+					empty: {
+						existingQuery: 'No query selected.',
+						queryContext: 'Select a destination table to load the available aliases and fields.',
+						queryParameters: 'No parameters available for the active company.',
+					},
+					validation: {
+						template: 'Select a valid template.',
+						serviceName: 'Enter the service name.',
+						destinationTable: 'Select the destination table.',
+						existingQuery: 'Select an existing query.',
+						queryName: 'Enter the new query name.',
+						querySql: 'Enter the query SQL.',
+					},
 				},
 				failedServices: {
 					title: 'Failed Services',

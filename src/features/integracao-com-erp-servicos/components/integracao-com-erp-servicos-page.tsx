@@ -1,6 +1,6 @@
 'use client';
 
-import { Info, Pencil, Play, Plus, RefreshCcw, RotateCw, ToggleRight } from 'lucide-react';
+import { Eye, Info, Pencil, Play, Plus, RefreshCcw, RotateCw, ToggleRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { AppDataTable } from '@/src/components/data-table/app-data-table';
 import { DataTableFiltersCard } from '@/src/components/data-table/data-table-filters';
@@ -412,9 +412,12 @@ export function IntegracaoComErpServicosPage() {
 							},
 							{
 								id: 'edit',
-								label: t('maintenance.erpIntegration.services.actions.edit', 'Editar'),
-								icon: Pencil,
+								label: access.canEdit
+									? t('maintenance.erpIntegration.services.actions.edit', 'Editar')
+									: t('maintenance.erpIntegration.services.actions.view', 'Visualizar'),
+								icon: access.canEdit ? Pencil : Eye,
 								href: `/integracao-com-erp/servicos/${row.idServico}/editar`,
+								visible: access.canEdit || access.canView,
 							},
 						]}
 						actionsColumnClassName="w-[176px]"

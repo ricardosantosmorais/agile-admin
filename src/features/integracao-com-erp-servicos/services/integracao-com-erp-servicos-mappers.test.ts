@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeIntegracaoComErpServicosResponse } from '@/src/features/integracao-com-erp-servicos/services/integracao-com-erp-servicos-mappers';
+import {
+	normalizeIntegracaoComErpServicoWizardCatalog,
+	normalizeIntegracaoComErpServicoWizardContext,
+	normalizeIntegracaoComErpServicosResponse,
+} from '@/src/features/integracao-com-erp-servicos/services/integracao-com-erp-servicos-mappers';
 
 describe('normalizeIntegracaoComErpServicosResponse', () => {
 	it('normaliza a listagem principal com status, metadata e caracteristicas', () => {
@@ -120,6 +124,57 @@ describe('normalizeIntegracaoComErpServicosResponse', () => {
 			gatewayName: 'gateway-clientes',
 			endpointUrl: 'https://api.exemplo.com/clientes',
 			hash: 'abc123',
+		});
+	});
+});
+
+describe('servicos wizard mappers', () => {
+	it('normaliza o contexto inicial do wizard', () => {
+		const result = normalizeIntegracaoComErpServicoWizardContext({
+			data: {
+				id_empresa: 15,
+				contexto: 'agile',
+				is_master: 1,
+				id_template_fixo: 99,
+				nome_template_fixo: 'Template da Empresa',
+				templates: [
+					{ id: 99, nome: 'Template da Empresa' },
+					{ id: 120, nome: 'Template B' },
+				],
+			},
+		});
+
+		expect(result).toEqual({
+			idEmpresa: '15',
+			contexto: 'agile',
+			isMaster: true,
+			idTemplateFixo: '99',
+			nomeTemplateFixo: 'Template da Empresa',
+			templates: [
+				{ id: '99', nome: 'Template da Empresa' },
+				{ id: '120', nome: 'Template B' },
+			],
+		});
+	});
+
+	it('normaliza catalogo do wizard com querys e tabelas', () => {
+		const result = normalizeIntegracaoComErpServicoWizardCatalog({
+			data: {
+				catalogo: {
+					querys: [
+						{ id: 10, nome: 'Clientes prontos' },
+					],
+					tabelas: [
+						{ id: 'clientes', nome: 'clientes', descricao: 'Tabela principal de clientes' },
+					],
+				},
+			},
+		});
+
+		expect(result).toEqual({
+			tipoObjeto: 'query',
+			querys: [{ id: '10', label: 'Clientes prontos' }],
+			tabelas: [{ id: 'clientes', label: 'clientes', description: 'Tabela principal de clientes' }],
 		});
 	});
 });

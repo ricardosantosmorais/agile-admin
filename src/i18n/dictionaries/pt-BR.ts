@@ -4887,6 +4887,126 @@ export const ptBR: TranslationDictionary = {
 				servicesWizard: {
 					title: 'Criar Serviço',
 					description: 'Base protegida para o wizard de criação de serviços do integrador ERP, com definição de escopo, tipo, cadastros auxiliares e revisão final.',
+					loadingTitle: 'Preparando wizard',
+					loadingDescription: 'Carregando contexto, template e catálogos auxiliares.',
+					loadError: 'Não foi possível carregar o wizard de serviço.',
+					heroTitle: 'Assistente de criação de serviço',
+					heroDescription: 'Monte a configuração inicial do serviço ERP em etapas, reaproveitando query existente ou criando uma nova base SQL.',
+					steps: {
+						scope: 'Escopo',
+						service: 'Serviço',
+						query: 'Query',
+						review: 'Revisão',
+					},
+					scope: {
+						shared: 'Template da empresa',
+						specific: 'Template específico',
+						fixedTemplate: 'Template fixo da empresa',
+					},
+					queryMode: {
+						new: 'Criar novo',
+						existing: 'Usar existente',
+					},
+					fields: {
+						scope: 'Escopo de publicação',
+						template: 'Template',
+						companyCode: 'Empresa',
+						type: 'Tipo técnico',
+						serviceType: 'Tipo do serviço',
+						serviceName: 'Nome do serviço',
+						interval: 'Intervalo de execução',
+						destinationTable: 'Nome Objeto (Tabela destino)',
+						executionType: 'Tipo de execução',
+						executionChannel: 'Canal de execução',
+						dataSource: 'Fonte de dados',
+						required: 'Serviço obrigatório',
+						queryMode: 'Modo da query',
+						existingQuery: 'Query existente',
+						queryName: 'Nome da query',
+						queryReference: 'Referência',
+						queryPreview: 'Prévia SQL',
+					},
+					sections: {
+						scope: {
+							title: 'Escopo e template',
+							description: 'Defina se o serviço ficará no template fixo da empresa ou em um template específico.',
+						},
+						service: {
+							title: 'Tipo e dados do serviço',
+							description: 'Alinhe o tipo do serviço com o legado e configure os dados operacionais principais antes de montar a query.',
+						},
+						query: {
+							title: 'Cadastros auxiliares',
+							description: 'Escolha entre usar registro existente ou criar novo. O filtro de existentes respeita o template escolhido no passo 1.',
+						},
+						queryContext: {
+							title: 'Contexto para autocomplete',
+							description: 'Campos e aliases da tabela',
+						},
+						queryParameters: {
+							title: 'Parâmetros disponíveis',
+							description: 'Use estes marcadores no SQL para aproveitar parâmetros já disponíveis no integrador.',
+						},
+						queryResult: {
+							title: 'Resultado do teste',
+							description: 'Prévia do retorno da query na fonte de dados configurada.',
+						},
+						review: {
+							title: 'Revisão final',
+							description: 'Confira os dados principais antes de criar o serviço e abrir a tela detalhada de edição.',
+						},
+					},
+					actions: {
+						testQuery: 'Testar query',
+					},
+					feedback: {
+						testSuccess: 'Query validada com sucesso.',
+						testError: 'Não foi possível testar a query.',
+						saveSuccess: 'Serviço criado com sucesso.',
+						saveError: 'Não foi possível criar o serviço.',
+					},
+					helpers: {
+						masterTemplate: 'Usuários master podem publicar em outro template quando necessário.',
+						fixedTemplate: 'Neste perfil, o wizard usa sempre o template vinculado à empresa ativa.',
+						required: 'Mantém o serviço marcado como obrigatório na configuração inicial.',
+						executionTypeQuery: 'Para serviços do tipo query, o tipo de execução é sempre Comparação.',
+						executionChannelQuery: 'Para serviços do tipo query, o canal é sempre AgileSyncService.',
+						existingQuery: 'Quando você usa uma query existente, o wizard reaproveita o objeto já cadastrado no template selecionado.',
+					},
+					serviceType: {
+						query: 'Query',
+					},
+					executionType: {
+						comparison: 'Comparação',
+					},
+					placeholders: {
+						serviceName: 'Ex.: Sincronização de clientes',
+						queryName: 'Ex.: Clientes para ERP',
+					},
+					loadingQueryContext: 'Carregando contexto da query...',
+					loadingQueryParameters: 'Carregando parâmetros...',
+					queryContextError: 'Não foi possível carregar o contexto da query.',
+					summary: {
+						context: 'Resumo do contexto',
+					},
+					metrics: {
+						rows: 'Linhas',
+						total: 'Total',
+						pagination: 'Paginação',
+					},
+					empty: {
+						existingQuery: 'Nenhuma query selecionada.',
+						queryContext: 'Selecione uma tabela de destino para carregar os aliases e campos disponíveis.',
+						queryParameters: 'Nenhum parâmetro disponível para a empresa ativa.',
+					},
+					validation: {
+						template: 'Selecione um template válido.',
+						serviceName: 'Informe o nome do serviço.',
+						destinationTable: 'Selecione a tabela de destino.',
+						existingQuery: 'Selecione uma query existente.',
+						queryName: 'Informe o nome da nova query.',
+						querySql: 'Informe o SQL da query.',
+					},
 				},
 				failedServices: {
 					title: 'Serviços com Falha',

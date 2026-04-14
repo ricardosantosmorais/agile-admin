@@ -33,6 +33,9 @@ export function PageToast({
 
   const resolvedTone = tone ?? (variant === 'success' ? 'success' : 'error')
   const isError = resolvedTone === 'error'
+  const accentStyle = {
+    color: isError ? 'var(--app-toast-error-text)' : 'var(--app-toast-success-text)',
+  } as const
 
   return (
     <div className="pointer-events-none fixed left-1/2 top-[5.5rem] z-[160] w-full max-w-3xl -translate-x-1/2 px-4">
@@ -40,14 +43,20 @@ export function PageToast({
         'mx-auto flex max-w-3xl items-start gap-3 rounded-[1.1rem] border px-4 py-3 shadow-[0_18px_40px_rgba(15,23,42,0.12)] backdrop-blur',
         'pointer-events-auto',
         isError
-          ? 'border-rose-200 bg-rose-50/95 text-rose-700 dark:border-rose-400/35 dark:bg-rose-500/12 dark:text-rose-100'
-          : 'border-emerald-200 bg-emerald-50/95 text-emerald-700 dark:border-emerald-400/35 dark:bg-emerald-500/12 dark:text-emerald-100',
+          ? 'border-rose-200 bg-rose-50/98 dark:border-rose-400/35 dark:bg-rose-500/12'
+          : 'border-emerald-200 bg-emerald-50/98 dark:border-emerald-400/35 dark:bg-emerald-500/12',
       ].join(' ')}>
-        <div className="pt-0.5">
+        <div className="pt-0.5" style={accentStyle}>
           {isError ? <AlertCircle className="h-5 w-5" /> : <CheckCircle2 className="h-5 w-5" />}
         </div>
-        <p className="flex-1 text-sm font-medium leading-6">{message}</p>
-        <button type="button" onClick={onClose} className="rounded-full p-1 opacity-70 transition hover:opacity-100" aria-label="Fechar mensagem">
+        <p className="flex-1 text-sm font-medium leading-6" style={accentStyle}>{message}</p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-full p-1 opacity-70 transition hover:opacity-100"
+          style={accentStyle}
+          aria-label="Fechar mensagem"
+        >
           <X className="h-4 w-4" />
         </button>
       </div>

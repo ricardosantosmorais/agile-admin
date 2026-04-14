@@ -55,7 +55,7 @@ export function IntegracaoComErpRotinasIntegradasPage() {
 					label: t('maintenance.erpIntegration.integratedRoutines.fields.code', 'Código'),
 					sortKey: 'codigo',
 					thClassName: 'w-[160px]',
-					cell: (routine: IntegracaoComErpRotinaIntegradaRecord) => <span className="font-semibold text-slate-950">{routine.codigo || '-'}</span>,
+					cell: (routine: IntegracaoComErpRotinaIntegradaRecord) => <span className="font-semibold text-(--app-text)">{routine.codigo || '-'}</span>,
 					filter: {
 						kind: 'text',
 						id: 'codigo',
@@ -80,7 +80,7 @@ export function IntegracaoComErpRotinasIntegradasPage() {
 					id: 'nome',
 					label: t('maintenance.erpIntegration.integratedRoutines.fields.name', 'Nome'),
 					sortKey: 'nome',
-					tdClassName: 'font-semibold text-slate-950',
+					tdClassName: 'font-semibold text-(--app-text)',
 					cell: (routine: IntegracaoComErpRotinaIntegradaRecord) => <span className="truncate">{routine.nome || '-'}</span>,
 					filter: {
 						kind: 'text',

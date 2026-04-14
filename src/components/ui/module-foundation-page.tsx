@@ -37,8 +37,8 @@ export function ModuleFoundationPage({
 		return <AccessDeniedState title={title} backHref="/dashboard" />;
 	}
 
-	const breadcrumbs = [{ label: t('routes.dashboard', 'Início'), href: '/dashboard' }];
-	if (moduleSectionLabel) {
+	const breadcrumbs: Array<{ label: string; href?: string }> = [{ label: t('routes.dashboard', 'Início'), href: '/dashboard' }];
+	if (moduleSectionLabel && moduleSectionPath) {
 		breadcrumbs.push({ label: moduleSectionLabel, href: moduleSectionPath });
 	}
 	breadcrumbs.push({ label: breadcrumbLabel });
@@ -47,11 +47,11 @@ export function ModuleFoundationPage({
 		<div className="space-y-5">
 			<PageHeader
 				breadcrumbs={breadcrumbs}
-				actions={
+				actions={(
 					<Link href={backHref} className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold">
 						{t('common.back', 'Voltar')}
 					</Link>
-				}
+				)}
 			/>
 
 			<SectionCard title={title} description={description}>

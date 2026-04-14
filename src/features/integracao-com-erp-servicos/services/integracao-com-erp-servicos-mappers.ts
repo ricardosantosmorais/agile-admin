@@ -14,6 +14,8 @@ import type {
 	IntegracaoComErpServicoQuerySupportItem,
 	IntegracaoComErpServicoQuerySupportResponse,
 	IntegracaoComErpServicoRecord,
+	IntegracaoComErpServicoWizardCatalog,
+	IntegracaoComErpServicoWizardContext,
 	IntegracaoComErpServicosResponse,
 } from '@/src/features/integracao-com-erp-servicos/services/integracao-com-erp-servicos-types';
 
@@ -336,6 +338,50 @@ export function normalizeIntegracaoComErpServicoExecutionLogContent(payload: unk
 		fileName: toStringValue(data.file_name),
 		content: rawContent || '-',
 		kind,
+	};
+}
+
+export function normalizeIntegracaoComErpServicoWizardContext(payload: unknown): IntegracaoComErpServicoWizardContext {
+	const data = asRecord(asRecord(payload).data);
+	const templates = asArray(data.templates).map((entry) => {
+		const row = asRecord(entry);
+		return {
+			id: toStringValue(row.id),
+			nome: toStringValue(row.nome) || '-',
+		};
+	}).filter((entry) => entry.id);
+
+	return {
+		idEmpresa: toStringValue(data.id_empresa),
+		contexto: toStringValue(data.contexto) === 'agile' ? 'agile' : 'empresa',
+		isMaster: toBooleanValue(data.is_master),
+		idTemplateFixo: toStringValue(data.id_template_fixo),
+		nomeTemplateFixo: toStringValue(data.nome_template_fixo),
+		templates,
+	};
+}
+
+export function normalizeIntegracaoComErpServicoWizardCatalog(payload: unknown): IntegracaoComErpServicoWizardCatalog {
+	const data = asRecord(asRecord(payload).data);
+	const catalogo = asRecord(data.catalogo);
+
+	return {
+		tipoObjeto: 'query',
+		querys: asArray(catalogo.querys).map((entry) => {
+			const row = asRecord(entry);
+			return {
+				id: toStringValue(row.id),
+				label: toStringValue(row.nome) || '-',
+			};
+		}).filter((entry) => entry.id),
+		tabelas: asArray(catalogo.tabelas).map((entry) => {
+			const row = asRecord(entry);
+			return {
+				id: toStringValue(row.id || row.nome),
+				label: toStringValue(row.nome || row.label || row.text) || '-',
+				description: toStringValue(row.descricao || row.description),
+			};
+		}).filter((entry) => entry.id),
 	};
 }
 

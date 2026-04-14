@@ -34,6 +34,8 @@
   --app-hover-surface: #f7f3eb;
   --app-button-secondary-bg: #f8f3ea;
   --app-button-secondary-border: #ddd5c7;
+  --app-toast-error-text: #881337;
+  --app-toast-success-text: #065f46;
   --app-focus-ring: rgba(239, 231, 215, 0.95);
   --app-inset-highlight: rgba(255, 255, 255, 0.8);
   color: var(--app-text);
@@ -71,6 +73,8 @@ html[data-theme='dark'] {
   --app-hover-surface: #162033;
   --app-button-secondary-bg: #162033;
   --app-button-secondary-border: rgba(71, 85, 105, 0.88);
+  --app-toast-error-text: #fda4af;
+  --app-toast-success-text: #86efac;
   --app-focus-ring: rgba(25, 95, 77, 0.28);
   --app-inset-highlight: rgba(255, 255, 255, 0.06);
   color-scheme: dark;

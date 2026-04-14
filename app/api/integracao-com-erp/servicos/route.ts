@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { readAuthSession } from '@/src/features/auth/services/auth-session';
 import { externalAdminApiFetch } from '@/src/services/http/external-admin-api';
@@ -7,6 +8,7 @@ type ApiRecord = Record<string, unknown>;
 
 type TenantContext = {
 	companyCode: string;
+	companyTemplateId: string;
 	userId: string;
 	token: string;
 	currentTenantId: string;
@@ -186,6 +188,7 @@ async function resolveTenantContext() {
 	return {
 		context: {
 			companyCode,
+			companyTemplateId: toStringValue(company.id_template),
 			userId: session.currentUserId,
 			token: session.token,
 			currentTenantId: session.currentTenantId,
@@ -254,6 +257,90 @@ async function postExternalJson(target: 'painelb2b' | 'agilesync', path: string,
 			},
 		};
 	}
+}
+
+function buildAgileV2BaseUrl() {
+	const explicit = (process.env.ADMIN_URL_API_AGILE || '').trim();
+	if (explicit) {
+		return explicit.replace(/\/+$/, '');
+	}
+
+	const painelb2b = (process.env.ADMIN_URL_API_PAINELB2B || '').trim();
+	if (!painelb2b) {
+		return '';
+	}
+
+	return painelb2b.replace(/\/api\/v1\/?$/i, '/api/v2').replace(/\/+$/, '');
+}
+
+async function agileV2ApiFetch(path: string, options: {
+	method?: 'GET' | 'POST' | 'DELETE';
+	query?: Record<string, string | number | boolean | null | undefined>;
+	body?: Record<string, string | number | boolean | null | undefined>;
+}) {
+	const baseUrl = buildAgileV2BaseUrl();
+	const token = (process.env.ADMIN_API_AGILE_TOKEN || process.env.ADMIN_API_PAINELB2B_TOKEN || '').trim();
+
+	if (!baseUrl || !token) {
+		return {
+			ok: false,
+			status: 500,
+			payload: { message: 'API Agile v2 não configurada para a operação solicitada.' },
+		};
+	}
+
+	const method = options.method ?? 'GET';
+	const searchParams = new URLSearchParams();
+	for (const [key, value] of Object.entries(options.query || {})) {
+		if (value === undefined || value === null || value === '') continue;
+		searchParams.set(key, String(value));
+	}
+	const url = `${baseUrl}/${path.replace(/^\/+/, '')}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+	const bodyParams = new URLSearchParams();
+	for (const [key, value] of Object.entries(options.body || {})) {
+		if (value === undefined || value === null || value === '') continue;
+		bodyParams.set(key, String(value));
+	}
+
+	try {
+		const response = await fetch(url, {
+			method,
+			headers: {
+				Accept: 'application/json',
+				Authorization: `Bearer ${token}`,
+				Token: token,
+				'X-API-TOKEN': token,
+				...(method !== 'GET' ? { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } : {}),
+			},
+			body: method !== 'GET' ? bodyParams.toString() : undefined,
+			cache: 'no-store',
+		});
+
+		const contentType = response.headers.get('content-type') ?? '';
+		const raw = await response.text();
+		const payload = contentType.includes('application/json') && raw.trim() ? JSON.parse(raw) : raw;
+
+		return {
+			ok: response.ok,
+			status: response.status,
+			payload,
+		};
+	} catch (error) {
+		return {
+			ok: false,
+			status: 500,
+			payload: { message: error instanceof Error ? error.message : 'Falha inesperada ao chamar a API Agile v2.' },
+		};
+	}
+}
+
+async function serverTenantFetch(context: TenantContext, path: string, options?: { method?: 'GET' | 'POST' | 'DELETE'; body?: unknown }) {
+	return serverApiFetch(path, {
+		method: options?.method ?? 'GET',
+		token: context.token,
+		tenantId: context.currentTenantId,
+		body: options?.body,
+	});
 }
 
 function buildCaracteristicas(servicoValue: unknown, servicoMetaValue?: unknown) {
@@ -328,6 +415,32 @@ function formatDurationFromSeconds(value: unknown) {
 	return [hours, minutes, seconds].map((part) => String(part).padStart(2, '0')).join(':');
 }
 
+function normalizeWizardQueryContextItems(rows: unknown[], kind: 'field' | 'parameter') {
+	return rows.map((entry) => {
+		const row = asRecord(entry);
+		const id = toStringValue(row.id || row.nome || row.label);
+		const label = toStringValue(row.nome || row.label || row.text || row.id);
+		const dataType = toStringValue(row.tipo);
+		const defaultValue = toStringValue(row.valor_padrao || row.default || row.valor);
+		const description = [
+			toStringValue(row.descricao || row.description),
+			dataType,
+			defaultValue ? `default(${defaultValue})` : '',
+		].filter(Boolean).join(' | ');
+
+		return {
+			id,
+			label: label || id,
+			description,
+			kind,
+			required: toBooleanValue(row.obrigatorio),
+			primaryKey: toBooleanValue(row.chave_primaria),
+			dataType,
+			defaultValue,
+		};
+	}).filter((entry) => entry.id);
+}
+
 export async function GET(request: NextRequest) {
 	const tenantResult = await resolveTenantContext();
 	if ('error' in tenantResult) {
@@ -337,6 +450,162 @@ export async function GET(request: NextRequest) {
 	const { context } = tenantResult;
 	const search = request.nextUrl.searchParams;
 	const mode = toStringValue(search.get('mode')).toLowerCase();
+
+	if (mode === 'wizard-context') {
+		const isMaster = await resolveIsMaster(context);
+		const templatesResult = isMaster
+			? await agileV2ApiFetch('templates', {
+				method: 'GET',
+				query: { perpage: 10000, order: 'nome', sort: 'asc' },
+			})
+			: null;
+
+		const templates = templatesResult?.ok
+			? asArray(asRecord(templatesResult.payload).data).map((entry) => {
+				const row = asRecord(entry);
+				return {
+					id: toStringValue(row.id),
+					nome: toStringValue(row.nome),
+				};
+			}).filter((entry) => entry.id)
+			: [];
+		const fallbackTemplateName = context.companyTemplateId
+			? `Template #${context.companyTemplateId}`
+			: '';
+		const normalizedTemplates = context.companyTemplateId && !templates.some((entry) => entry.id === context.companyTemplateId)
+			? [{ id: context.companyTemplateId, nome: fallbackTemplateName }, ...templates]
+			: templates;
+
+		return NextResponse.json({
+			data: {
+				id_empresa: context.companyCode,
+				contexto: isMaster ? 'agile' : 'empresa',
+				is_master: isMaster,
+				id_template_fixo: context.companyTemplateId,
+				nome_template_fixo: normalizedTemplates.find((entry) => entry.id === context.companyTemplateId)?.nome || fallbackTemplateName,
+				templates: normalizedTemplates,
+			},
+		});
+	}
+
+	if (mode === 'wizard-catalog') {
+		const fallbackTemplateId = context.companyTemplateId;
+		const requestedTemplateId = toStringValue(search.get('templateId'));
+		const templateId = requestedTemplateId || fallbackTemplateId;
+
+		if (!templateId) {
+			return NextResponse.json({ message: 'Template do wizard não identificado.' }, { status: 409 });
+		}
+
+		const [querysResult, tabelasResult] = await Promise.all([
+			agileV2ApiFetch('querys', {
+				method: 'GET',
+				query: { perpage: 1000, id_template: templateId, order: 'nome', sort: 'asc' },
+			}),
+			serverTenantFetch(context, 'dicionarios_tabelas?perpage=1000&order=nome&sort=asc'),
+		]);
+
+		if (!querysResult.ok) {
+			return NextResponse.json(
+				{ message: getErrorMessage(querysResult.payload, 'Não foi possível carregar as queries do wizard.') },
+				{ status: querysResult.status || 400 },
+			);
+		}
+
+		if (!tabelasResult.ok) {
+			return NextResponse.json(
+				{ message: getErrorMessage(tabelasResult.payload, 'Não foi possível carregar as tabelas de destino do wizard.') },
+				{ status: tabelasResult.status || 400 },
+			);
+		}
+
+		return NextResponse.json({
+			data: {
+				tipo_objeto: 'query',
+				catalogo: {
+					querys: asArray(asRecord(querysResult.payload).data).map((entry) => {
+						const row = asRecord(entry);
+						return {
+							id: toStringValue(row.id),
+							nome: toStringValue(row.nome),
+						};
+					}).filter((entry) => entry.id),
+					tabelas: asArray(asRecord(tabelasResult.payload).data).map((entry) => {
+						const row = asRecord(entry);
+						return {
+							id: toStringValue(row.nome || row.id),
+							nome: toStringValue(row.nome),
+							descricao: toStringValue(row.descricao),
+						};
+					}).filter((entry) => entry.id),
+				},
+			},
+		});
+	}
+
+	if (mode === 'wizard-query-context') {
+		const tableName = toStringValue(search.get('tableName'));
+		const editorVarsResult = await externalAdminApiFetch('painelb2b', 'agilesync_editorsqlvariaveis', {
+			method: 'GET',
+			query: {
+				id_empresa: context.companyCode,
+				id_servico: 0,
+				perpage: 100000,
+			},
+		});
+
+		if (!editorVarsResult.ok) {
+			return NextResponse.json(
+				{ message: getErrorMessage(editorVarsResult.payload, 'Não foi possível carregar o contexto da query.') },
+				{ status: editorVarsResult.status || 400 },
+			);
+		}
+
+		const editorRows = asArray(asRecord(editorVarsResult.payload).data);
+		const parameterRows = editorRows.filter((entry) => toStringValue(asRecord(entry).parentId).toLowerCase() === 'parametro');
+		const aliasRows = editorRows.filter((entry) => toStringValue(asRecord(entry).parentId).toLowerCase() === 'alias');
+		let mergedFieldRows = aliasRows;
+
+		if (tableName) {
+			const tablesResult = await serverTenantFetch(context, 'dicionarios_tabelas?perpage=1000&order=nome&sort=asc');
+			if (tablesResult.ok) {
+				const table = asArray(asRecord(tablesResult.payload).data)
+					.map((entry) => asRecord(entry))
+					.find((entry) => toStringValue(entry.nome) === tableName);
+
+				if (table) {
+					const tableId = toStringValue(table.id);
+					const tableDetailsResult = await serverTenantFetch(
+						context,
+						`dicionarios_tabelas?id=${encodeURIComponent(tableId)}&embed=campos,componentes.componente&perpage=1`,
+					);
+
+					if (tableDetailsResult.ok) {
+						const detailRow = asRecord(asArray(asRecord(tableDetailsResult.payload).data)[0]);
+						const fieldRows = asArray(detailRow.campos)
+							.map((entry) => asRecord(entry))
+							.filter((entry) => toStringValue(entry.nome))
+							.map((entry) => ({
+								id: toStringValue(entry.nome),
+								nome: toStringValue(entry.nome),
+								tipo: toStringValue(entry.tipo),
+								chave_primaria: entry.chave_primaria,
+								obrigatorio: !toBooleanValue(entry.permite_nulo),
+							}));
+
+						const known = new Set(aliasRows.map((entry) => toStringValue(asRecord(entry).nome).toLowerCase()).filter(Boolean));
+						const appended = fieldRows.filter((entry) => !known.has(toStringValue(entry.nome).toLowerCase()));
+						mergedFieldRows = [...aliasRows, ...appended];
+					}
+				}
+			}
+		}
+
+		return NextResponse.json({
+			fields: normalizeWizardQueryContextItems(mergedFieldRows, 'field'),
+			parameters: normalizeWizardQueryContextItems(parameterRows, 'parameter'),
+		});
+	}
 
 	if (mode === 'query-support') {
 		const serviceId = toStringValue(search.get('serviceId'));
@@ -720,6 +989,151 @@ export async function POST(request: NextRequest) {
 	const { context } = tenantResult;
 	const body = await request.json().catch(() => ({}));
 	const action = toStringValue(asRecord(body).action).toLowerCase();
+
+	if (action === 'create-wizard') {
+		const payload = asRecord(asRecord(body).payload);
+		const tipoObjeto = toStringValue(payload.tipoObjeto || payload.tipo_objeto) || 'query';
+		const escopo = toStringValue(payload.escopo).toLowerCase() === 'especifico' ? 'especifico' : 'compartilhado';
+		const isMaster = await resolveIsMaster(context);
+		const templateId = isMaster
+			? toStringValue(payload.idTemplate || payload.id_template) || context.companyTemplateId
+			: context.companyTemplateId;
+		const nomeServico = toStringValue(payload.nomeServico || payload.nome_servico);
+		const nomeObjeto = toStringValue(payload.nomeObjeto || payload.nome_objeto);
+		const intervaloExecucao = Math.max(1, Number(payload.intervaloExecucao || payload.intervalo_execucao || 10));
+		const obrigatorio = toBooleanValue(payload.obrigatorio);
+		const auxiliar = asRecord(payload.auxiliar);
+		const auxiliarModo = toStringValue(auxiliar.modo) === 'existente' ? 'existente' : 'novo';
+
+		if (!templateId) {
+			return NextResponse.json({ message: 'Template do wizard não identificado.' }, { status: 409 });
+		}
+
+		if (tipoObjeto !== 'query') {
+			return NextResponse.json({ message: 'A primeira versão do wizard suporta apenas serviços do tipo Query.' }, { status: 400 });
+		}
+
+		if (!nomeServico || !nomeObjeto) {
+			return NextResponse.json({ message: 'Informe o nome do serviço e a tabela de destino para continuar.' }, { status: 400 });
+		}
+
+		let idObjetoServico = '';
+		const created: Record<string, { id: string } | null> = {
+			query: null,
+			servico: null,
+			servico_empresa: null,
+		};
+
+		if (auxiliarModo === 'existente') {
+			idObjetoServico = toStringValue(auxiliar.id);
+			if (!idObjetoServico) {
+				return NextResponse.json({ message: 'Selecione uma query existente válida.' }, { status: 400 });
+			}
+		} else {
+			const queryName = toStringValue(auxiliar.nome);
+			const querySql = toStringValue(auxiliar.query);
+			if (!queryName || !querySql) {
+				return NextResponse.json({ message: 'Informe o nome e o SQL da nova query.' }, { status: 400 });
+			}
+
+			const queryResult = await agileV2ApiFetch('querys', {
+				method: 'POST',
+				body: {
+					id: 0,
+					nome: queryName,
+					query: querySql,
+					id_template: Number(templateId),
+					observacao: '',
+					hash: createHash('md5').update(querySql).digest('hex'),
+					data_hora: new Date().toISOString().slice(0, 19).replace('T', ' '),
+					ativo: true,
+					id_usuario: context.userId,
+				},
+			});
+
+			if (!queryResult.ok) {
+				return NextResponse.json(
+					{ message: getErrorMessage(queryResult.payload, 'Não foi possível criar a query do serviço.') },
+					{ status: queryResult.status || 400 },
+				);
+			}
+
+			idObjetoServico = toStringValue(asRecord(queryResult.payload).id || asRecord(asArray(asRecord(queryResult.payload).data)[0]).id);
+			if (!idObjetoServico) {
+				return NextResponse.json({ message: 'A API não retornou o ID da query criada.' }, { status: 400 });
+			}
+			created.query = { id: idObjetoServico };
+		}
+
+		const servicoResult = await agileV2ApiFetch('servicos', {
+			method: 'POST',
+			body: {
+				nome: nomeServico,
+				id_template: Number(templateId),
+				tipo_objeto: 'query',
+				id_objeto: Number(idObjetoServico),
+				nome_objeto: nomeObjeto,
+				saida_objeto: 'InsertOnDuplicateUpdate',
+				filtro_sql: '',
+				tipo_execucao: 'comparacao',
+				canal_execucao: 'agilesync',
+				fonte_dados: 'agileecommerce',
+				intervalo_execucao: intervaloExecucao,
+				compara_delecao: false,
+				carga_geral: false,
+				utiliza_sync_id: false,
+				ativo: true,
+				obrigatorio,
+				especifico: escopo === 'especifico',
+			},
+		});
+
+		if (!servicoResult.ok) {
+			if (created.query?.id) {
+				await agileV2ApiFetch(`querys/${encodeURIComponent(created.query.id)}`, { method: 'DELETE' });
+			}
+			return NextResponse.json(
+				{ message: getErrorMessage(servicoResult.payload, 'Não foi possível criar o serviço.') },
+				{ status: servicoResult.status || 400 },
+			);
+		}
+
+		const idServico = toStringValue(asRecord(servicoResult.payload).id || asRecord(asArray(asRecord(servicoResult.payload).data)[0]).id);
+		if (!idServico) {
+			return NextResponse.json({ message: 'A API não retornou o ID do serviço criado.' }, { status: 400 });
+		}
+		created.servico = { id: idServico };
+
+		const servicoEmpresaResult = await agileV2ApiFetch('servicos_empresas', {
+			method: 'POST',
+			body: {
+				id_servico: Number(idServico),
+				id_empresa: Number(context.companyCode),
+				intervalo_execucao: intervaloExecucao,
+				ativo: true,
+			},
+		});
+
+		if (!servicoEmpresaResult.ok) {
+			await agileV2ApiFetch(`servicos/${encodeURIComponent(idServico)}`, { method: 'DELETE' });
+			if (created.query?.id) {
+				await agileV2ApiFetch(`querys/${encodeURIComponent(created.query.id)}`, { method: 'DELETE' });
+			}
+			return NextResponse.json(
+				{ message: getErrorMessage(servicoEmpresaResult.payload, 'Não foi possível criar o vínculo do serviço com a empresa.') },
+				{ status: servicoEmpresaResult.status || 400 },
+			);
+		}
+
+		const idServicoEmpresa = toStringValue(asRecord(servicoEmpresaResult.payload).id || asRecord(asArray(asRecord(servicoEmpresaResult.payload).data)[0]).id);
+		created.servico_empresa = idServicoEmpresa ? { id: idServicoEmpresa } : null;
+
+		return NextResponse.json({
+			idServico,
+			resumoIds: created,
+			message: 'Serviço criado com sucesso.',
+		});
+	}
 
 	if (action === 'execute' || action === 'reload') {
 		const ids = normalizeIds(asRecord(body).ids);

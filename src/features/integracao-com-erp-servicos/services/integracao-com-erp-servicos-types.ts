@@ -210,3 +210,67 @@ export type IntegracaoComErpServicoExecutionLogContent = {
 	content: string;
 	kind: 'detail' | 'metadata';
 };
+
+export type IntegracaoComErpServicoWizardTemplateOption = {
+	id: string;
+	nome: string;
+};
+
+export type IntegracaoComErpServicoWizardContext = {
+	idEmpresa: string;
+	contexto: 'empresa' | 'agile';
+	isMaster: boolean;
+	idTemplateFixo: string;
+	nomeTemplateFixo: string;
+	templates: IntegracaoComErpServicoWizardTemplateOption[];
+};
+
+export type IntegracaoComErpServicoWizardOption = {
+	id: string;
+	label: string;
+	description?: string;
+};
+
+export type IntegracaoComErpServicoWizardCatalog = {
+	tipoObjeto: 'query';
+	querys: IntegracaoComErpServicoWizardOption[];
+	tabelas: IntegracaoComErpServicoWizardOption[];
+};
+
+export type IntegracaoComErpServicoWizardPayload = {
+	escopo: 'compartilhado' | 'especifico';
+	idTemplate: string;
+	tipoObjeto: 'query';
+	nomeServico: string;
+	nomeObjeto: string;
+	intervaloExecucao: string;
+	obrigatorio: boolean;
+	auxiliar: {
+		modo: 'existente' | 'novo';
+		id?: string;
+		nome?: string;
+		query?: string;
+	};
+};
+
+export type IntegracaoComErpServicoWizardResult = {
+	idServico: string;
+	resumoIds: Record<string, { id: string } | null>;
+	message?: string;
+};
+
+export type IntegracaoComErpServicoWizardQueryContextItem = {
+	id: string;
+	label: string;
+	description: string;
+	kind: 'field' | 'parameter';
+	required?: boolean;
+	primaryKey?: boolean;
+	dataType?: string;
+	defaultValue?: string;
+};
+
+export type IntegracaoComErpServicoWizardQueryContext = {
+	fields: IntegracaoComErpServicoWizardQueryContextItem[];
+	parameters: IntegracaoComErpServicoWizardQueryContextItem[];
+};

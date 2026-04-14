@@ -1,4 +1,9 @@
-export const INTEGRACAO_COM_ERP_SCHEMA_MODULES = {
+type IntegracaoComErpSchemaModuleConfig = {
+	parameterGroupId: number;
+	exactTemplateForOmie?: boolean;
+};
+
+export const INTEGRACAO_COM_ERP_SCHEMA_MODULES: Record<string, IntegracaoComErpSchemaModuleConfig> = {
 	parametros: { parameterGroupId: 2 },
 	imagens: { parameterGroupId: 7 },
 	api: { parameterGroupId: 8, exactTemplateForOmie: true },

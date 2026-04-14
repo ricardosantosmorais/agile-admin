@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Pie, PieChart, ResponsiveContainer, Tooltip, Cell } from 'recharts';
 import { AlertTriangle, Building2, RefreshCcw } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import type { ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import { AsyncState } from '@/src/components/ui/async-state';
 import { OverlayModal } from '@/src/components/ui/overlay-modal';
 import { PageHeader } from '@/src/components/ui/page-header';
@@ -102,7 +103,7 @@ function IntegratorStatusChart({ snapshot, t }: { snapshot: IntegracaoComErpDash
 								<Cell key={item.id} fill={item.color} />
 							))}
 						</Pie>
-						<Tooltip formatter={(value: number) => formatNumber(value)} />
+						<Tooltip formatter={(value?: ValueType) => formatNumber(typeof value === 'number' ? value : Number(value ?? 0))} />
 					</PieChart>
 				</ResponsiveContainer>
 			</div>
