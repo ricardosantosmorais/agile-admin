@@ -255,11 +255,14 @@ export function DateRangeComparativePicker({ value, onChange, previousValue, onP
 						<p className="text-xs leading-5 text-slate-500">{t('dashboard.dateRange.subtitle', 'Selecione um intervalo de ate {{maxDays}} dias.', { maxDays })}</p>
 					</div>
 
-					<div className="mb-4 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/30">
+					<div className="app-control mb-4 flex items-center gap-3 rounded-xl p-3 shadow-none">
 						<button
 							type="button"
 							onClick={() => handleToggleComparison(!isComparisonMode)}
-							className={['relative inline-flex h-6 w-11 items-center rounded-full transition-all', isComparisonMode ? 'bg-accent' : 'bg-slate-300 dark:bg-slate-600'].join(' ')}
+							className={[
+								'relative inline-flex h-6 w-11 items-center rounded-full border transition-all',
+								isComparisonMode ? 'border-accent bg-accent' : 'border-(--app-control-border) bg-(--app-button-secondary-bg)',
+							].join(' ')}
 							aria-label={t('dashboard.dateRange.compareWithPrevious', 'Comparar com período anterior')}
 						>
 							<span
@@ -269,7 +272,7 @@ export function DateRangeComparativePicker({ value, onChange, previousValue, onP
 								].join(' ')}
 							/>
 						</button>
-						<label className="flex-1 cursor-pointer select-none text-sm font-medium text-slate-700 dark:text-slate-300">
+						<label className="flex-1 cursor-pointer select-none text-sm font-medium text-(--app-text) dark:text-slate-300">
 							{t('dashboard.dateRange.compareWithPrevious', 'Comparar com período anterior')}
 						</label>
 					</div>
