@@ -261,6 +261,12 @@ ObservaÃ§Ã£o:
   - gravaÃ§Ã£o em lote pela bridge com manutenÃ§Ã£o de `id_pai` e exclusÃ£o de dependentes removidos;
   - bridges dedicadas via `app/api/excecoes-produtos` sem fallback para `/legacy/...`.
 
+- `ConteÃƒÂºdo > Arquivos` jÃƒÂ¡ possui:
+  - listagem server-side com filtros por `id`, `arquivo` e perÃƒÂ­odo de envio;
+  - upload para o bucket pÃƒÂºblico do tenant em `arquivos/`, com pasta opcional, via modal no padrÃƒÂ£o do v2;
+  - exclusÃƒÂ£o em lote e abertura direta do arquivo, respeitando preview para formatos compatÃƒÂ­veis;
+  - bridge dedicada via `app/api/arquivos` sem fallback para `/legacy/...`.
+
 ## Estado arquitetural da cobertura
 
 ### CRUDs simples
