@@ -29,16 +29,18 @@ type ToastState = {
   message: string
 }
 
+type TranslateFn = ReturnType<typeof useI18n>['t']
+
 function getStatusBadgeTone(status: DicionarioComponenteCampo['status']) {
   if (status === 'encontrado') return 'success'
   if (status === 'ignorado') return 'info'
   return 'warning'
 }
 
-function getStatusLabel(status: DicionarioComponenteCampo['status']) {
-  if (status === 'encontrado') return 'Encontrado'
-  if (status === 'ignorado') return 'Ignorado'
-  return 'Não disponível'
+function getStatusLabel(status: DicionarioComponenteCampo['status'], t: TranslateFn) {
+  if (status === 'encontrado') return t('dataDictionary.status.found', 'Encontrado')
+  if (status === 'ignorado') return t('dataDictionary.status.ignored', 'Ignorado')
+  return t('dataDictionary.status.unavailable', 'Não disponível')
 }
 
 export function DicionarioDadosPage() {
@@ -105,7 +107,7 @@ export function DicionarioDadosPage() {
           } catch (detailError) {
             setTableDetailState({
               loading: false,
-              error: detailError instanceof Error ? detailError.message : 'Não foi possível carregar os detalhes da tabela.',
+              error: detailError instanceof Error ? detailError.message : t('dataDictionary.feedback.loadTableDetailsError', 'Não foi possível carregar os detalhes da tabela.'),
               data: null,
             })
           }
@@ -113,12 +115,12 @@ export function DicionarioDadosPage() {
       } catch (error) {
         setTablesState({
           loading: false,
-          error: error instanceof Error ? error.message : 'Não foi possível carregar as tabelas do dicionário.',
+          error: error instanceof Error ? error.message : t('dataDictionary.feedback.loadTablesError', 'Não foi possível carregar as tabelas do dicionário.'),
           data: [],
         })
       }
     })()
-  }, [])
+  }, [t])
 
   const filteredTables = useMemo(() => {
     const normalizedSearch = tableSearch.trim().toLowerCase()
@@ -143,7 +145,7 @@ export function DicionarioDadosPage() {
     } catch (error) {
       setTableDetailState({
         loading: false,
-        error: error instanceof Error ? error.message : 'Não foi possível carregar os detalhes da tabela.',
+        error: error instanceof Error ? error.message : t('dataDictionary.feedback.loadTableDetailsError', 'Não foi possível carregar os detalhes da tabela.'),
         data: null,
       })
     }
@@ -160,7 +162,7 @@ export function DicionarioDadosPage() {
     } catch (error) {
       setComponentFieldsState({
         loading: false,
-        error: error instanceof Error ? error.message : 'Não foi possível carregar os campos do componente.',
+        error: error instanceof Error ? error.message : t('dataDictionary.feedback.loadComponentFieldsError', 'Não foi possível carregar os campos do componente.'),
         data: null,
       })
     }
@@ -186,11 +188,11 @@ export function DicionarioDadosPage() {
         }
       })
       setTableEditModal(null)
-      setToast({ tone: 'success', message: 'Tabela atualizada com sucesso.' })
+      setToast({ tone: 'success', message: t('dataDictionary.feedback.tableUpdated', 'Tabela atualizada com sucesso.') })
     } catch (error) {
       setToast({
         tone: 'error',
-        message: error instanceof Error ? error.message : 'Não foi possível salvar a tabela.',
+        message: error instanceof Error ? error.message : t('dataDictionary.feedback.saveTableError', 'Não foi possível salvar a tabela.'),
       })
     } finally {
       setSaving(false)
@@ -205,11 +207,11 @@ export function DicionarioDadosPage() {
       if (selectedComponentId) {
         await loadComponentFields(selectedComponentId)
       }
-      setToast({ tone: 'success', message: 'Campo atualizado com sucesso.' })
+      setToast({ tone: 'success', message: t('dataDictionary.feedback.fieldUpdated', 'Campo atualizado com sucesso.') })
     } catch (error) {
       setToast({
         tone: 'error',
-        message: error instanceof Error ? error.message : 'Não foi possível salvar o campo.',
+        message: error instanceof Error ? error.message : t('dataDictionary.feedback.saveFieldError', 'Não foi possível salvar o campo.'),
       })
     } finally {
       setSaving(false)
@@ -235,11 +237,11 @@ export function DicionarioDadosPage() {
       if (selectedComponentId) {
         await loadComponentFields(selectedComponentId)
       }
-      setToast({ tone: 'success', message: 'Campo marcado como ignorado.' })
+      setToast({ tone: 'success', message: t('dataDictionary.feedback.fieldIgnored', 'Campo marcado como ignorado.') })
     } catch (error) {
       setToast({
         tone: 'error',
-        message: error instanceof Error ? error.message : 'Não foi possível ignorar o campo.',
+        message: error instanceof Error ? error.message : t('dataDictionary.feedback.ignoreFieldError', 'Não foi possível ignorar o campo.'),
       })
     } finally {
       setSaving(false)
@@ -258,11 +260,11 @@ export function DicionarioDadosPage() {
       if (selectedComponentId) {
         await loadComponentFields(selectedComponentId)
       }
-      setToast({ tone: 'success', message: 'Status removido com sucesso.' })
+      setToast({ tone: 'success', message: t('dataDictionary.feedback.statusRemoved', 'Status removido com sucesso.') })
     } catch (error) {
       setToast({
         tone: 'error',
-        message: error instanceof Error ? error.message : 'Não foi possível remover o status.',
+        message: error instanceof Error ? error.message : t('dataDictionary.feedback.removeStatusError', 'Não foi possível remover o status.'),
       })
     } finally {
       setSaving(false)
@@ -281,7 +283,7 @@ export function DicionarioDadosPage() {
     } catch (error) {
       setToast({
         tone: 'error',
-        message: error instanceof Error ? error.message : 'Não foi possível exportar o dicionário.',
+        message: error instanceof Error ? error.message : t('dataDictionary.feedback.exportError', 'Não foi possível exportar o dicionário.'),
       })
     } finally {
       setSaving(false)
@@ -344,7 +346,7 @@ export function DicionarioDadosPage() {
                       <Table2 className="h-4 w-4 shrink-0" />
                       {table.nome}
                     </span>
-                    {table.hasComponents ? <StatusBadge tone="info">Componente</StatusBadge> : null}
+                    {table.hasComponents ? <StatusBadge tone="info">{t('dataDictionary.componentBadge', 'Componente')}</StatusBadge> : null}
                   </button>
 
                   {table.fields.length ? (
@@ -355,7 +357,7 @@ export function DicionarioDadosPage() {
                         </div>
                       ))}
                       {table.fields.length > 8 ? (
-                        <div className="text-xs text-slate-400">+{table.fields.length - 8} campos</div>
+                        <div className="text-xs text-slate-400">{t('dataDictionary.moreFields', '+{{count}} campos', { count: table.fields.length - 8 })}</div>
                       ) : null}
                     </div>
                   ) : null}
@@ -382,7 +384,7 @@ export function DicionarioDadosPage() {
                         activeTab === 'componentes' ? 'bg-slate-950 text-white' : 'text-slate-600',
                       ].join(' ')}
                     >
-                      Componentes
+                      {t('dataDictionary.tabs.components', 'Componentes')}
                     </button>
                     <button
                       type="button"
@@ -392,7 +394,7 @@ export function DicionarioDadosPage() {
                         activeTab === 'descricao' ? 'bg-slate-950 text-white' : 'text-slate-600',
                       ].join(' ')}
                     >
-                      Descrição
+                      {t('dataDictionary.tabs.description', 'Descrição')}
                     </button>
                     <button
                       type="button"
@@ -402,7 +404,7 @@ export function DicionarioDadosPage() {
                         activeTab === 'regras' ? 'bg-slate-950 text-white' : 'text-slate-600',
                       ].join(' ')}
                     >
-                      Regras
+                      {t('dataDictionary.tabs.rules', 'Regras')}
                     </button>
                   </div>
                 </div>
@@ -413,11 +415,11 @@ export function DicionarioDadosPage() {
                       <table className="min-w-full text-left text-sm">
                         <thead className="bg-[#f8f4ec] text-xs uppercase text-slate-600">
                           <tr>
-                            <th className="px-3 py-2">ID</th>
-                            <th className="px-3 py-2">Nome</th>
-                            <th className="px-3 py-2">Arquivo</th>
-                            <th className="px-3 py-2">Ativo</th>
-                            <th className="px-3 py-2 text-right">Ações</th>
+                            <th className="px-3 py-2">{t('dataDictionary.columns.id', 'ID')}</th>
+                            <th className="px-3 py-2">{t('dataDictionary.columns.name', 'Nome')}</th>
+                            <th className="px-3 py-2">{t('dataDictionary.columns.file', 'Arquivo')}</th>
+                            <th className="px-3 py-2">{t('dataDictionary.columns.active', 'Ativo')}</th>
+                            <th className="px-3 py-2 text-right">{t('dataDictionary.columns.actions', 'Ações')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -426,7 +428,7 @@ export function DicionarioDadosPage() {
                               <td className="px-3 py-2">{component.id}</td>
                               <td className="px-3 py-2 font-semibold">{component.nome}</td>
                               <td className="px-3 py-2">{component.arquivo}</td>
-                              <td className="px-3 py-2">{component.ativo ? 'Sim' : 'Não'}</td>
+                              <td className="px-3 py-2">{component.ativo ? t('common.yes', 'Sim') : t('common.no', 'Não')}</td>
                               <td className="px-3 py-2 text-right">
                                 <button
                                   type="button"
@@ -434,7 +436,7 @@ export function DicionarioDadosPage() {
                                   className="inline-flex items-center gap-1 rounded-full bg-slate-950 px-3 py-1.5 text-xs font-semibold text-white"
                                 >
                                   <Search className="h-3.5 w-3.5" />
-                                  Detalhes
+                                  {t('dataDictionary.actions.details', 'Detalhes')}
                                 </button>
                               </td>
                             </tr>
@@ -448,16 +450,16 @@ export function DicionarioDadosPage() {
                         {componentFieldsState.data ? (
                           <div className="space-y-3">
                             <h3 className="text-base font-semibold text-slate-900">
-                              Campos do componente {componentFieldsState.data.componente.arquivo}
+                              {t('dataDictionary.componentFieldsTitle', 'Campos do componente {{file}}', { file: componentFieldsState.data.componente.arquivo })}
                             </h3>
                             <div className="overflow-x-auto rounded-[1rem] border border-[#ece3d6] bg-white">
                               <table className="min-w-full text-left text-sm">
                                 <thead className="bg-[#f8f4ec] text-xs uppercase text-slate-600">
                                   <tr>
-                                    <th className="px-3 py-2">Campo</th>
-                                    <th className="px-3 py-2">Posição</th>
-                                    <th className="px-3 py-2">Status</th>
-                                    <th className="px-3 py-2 text-right">Ações</th>
+                                    <th className="px-3 py-2">{t('dataDictionary.columns.field', 'Campo')}</th>
+                                    <th className="px-3 py-2">{t('dataDictionary.columns.position', 'Posição')}</th>
+                                    <th className="px-3 py-2">{t('dataDictionary.columns.status', 'Status')}</th>
+                                    <th className="px-3 py-2 text-right">{t('dataDictionary.columns.actions', 'Ações')}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -467,7 +469,7 @@ export function DicionarioDadosPage() {
                                       <td className="px-3 py-2">{field.posicao}</td>
                                       <td className="px-3 py-2">
                                         <StatusBadge tone={getStatusBadgeTone(field.status)}>
-                                          {getStatusLabel(field.status)}
+                                          {getStatusLabel(field.status, t)}
                                         </StatusBadge>
                                       </td>
                                       <td className="px-3 py-2 text-right">
@@ -478,7 +480,7 @@ export function DicionarioDadosPage() {
                                               onClick={() => void removeIgnoredField(field)}
                                               className="rounded-full border border-[#eadfce] px-2.5 py-1 text-xs font-semibold text-slate-600"
                                             >
-                                              Remover status
+                                              {t('dataDictionary.actions.removeStatus', 'Remover status')}
                                             </button>
                                           ) : null}
 
@@ -488,7 +490,7 @@ export function DicionarioDadosPage() {
                                               onClick={() => setIgnoreModalField(field)}
                                               className="rounded-full border border-[#eadfce] px-2.5 py-1 text-xs font-semibold text-slate-600"
                                             >
-                                              Ignorar
+                                              {t('dataDictionary.actions.ignore', 'Ignorar')}
                                             </button>
                                           ) : null}
 
@@ -497,14 +499,14 @@ export function DicionarioDadosPage() {
                                             onClick={() => setFieldEditModal({ mode: 'descricao', field })}
                                             className="rounded-full border border-[#eadfce] px-2.5 py-1 text-xs font-semibold text-slate-600"
                                           >
-                                            Descrição
+                                            {t('dataDictionary.tabs.description', 'Descrição')}
                                           </button>
                                           <button
                                             type="button"
                                             onClick={() => setFieldEditModal({ mode: 'regra', field })}
                                             className="rounded-full border border-[#eadfce] px-2.5 py-1 text-xs font-semibold text-slate-600"
                                           >
-                                            Regra
+                                            {t('dataDictionary.actions.rule', 'Regra')}
                                           </button>
                                         </div>
                                       </td>
@@ -534,7 +536,7 @@ export function DicionarioDadosPage() {
                         className="inline-flex items-center gap-2 rounded-full border border-[#e5dbc9] bg-white px-3 py-2 text-xs font-semibold text-slate-700"
                       >
                         <FileText className="h-3.5 w-3.5" />
-                        Editar
+                        {t('common.edit', 'Editar')}
                       </button>
                     </div>
                     <div
@@ -558,7 +560,7 @@ export function DicionarioDadosPage() {
                         className="inline-flex items-center gap-2 rounded-full border border-[#e5dbc9] bg-white px-3 py-2 text-xs font-semibold text-slate-700"
                       >
                         <FileText className="h-3.5 w-3.5" />
-                        Editar
+                        {t('common.edit', 'Editar')}
                       </button>
                     </div>
                     <div
@@ -580,12 +582,12 @@ export function DicionarioDadosPage() {
       <OverlayModal
         open={Boolean(ignoreModalField)}
         onClose={() => setIgnoreModalField(null)}
-        title="Ignorar campo"
+        title={t('dataDictionary.modals.ignoreFieldTitle', 'Ignorar campo')}
         maxWidthClassName="max-w-2xl"
       >
         <div className="space-y-4">
           <p className="text-sm text-slate-600">
-            Informe a justificativa para ignorar o campo <strong>{ignoreModalField?.nome}</strong>.
+            {t('dataDictionary.modals.ignoreFieldDescription', 'Informe a justificativa para ignorar o campo {{field}}.', { field: ignoreModalField?.nome ?? '' })}
           </p>
           <textarea
             value={ignoreObservation}
@@ -617,7 +619,7 @@ export function DicionarioDadosPage() {
       <OverlayModal
         open={Boolean(fieldEditModal)}
         onClose={() => setFieldEditModal(null)}
-        title={fieldEditModal?.mode === 'descricao' ? 'Descrição do campo' : 'Regra do campo'}
+        title={fieldEditModal?.mode === 'descricao' ? t('dataDictionary.modals.fieldDescriptionTitle', 'Descrição do campo') : t('dataDictionary.modals.fieldRuleTitle', 'Regra do campo')}
         maxWidthClassName="max-w-6xl"
       >
         {fieldEditModal ? (
@@ -633,7 +635,7 @@ export function DicionarioDadosPage() {
       <OverlayModal
         open={Boolean(tableEditModal)}
         onClose={() => setTableEditModal(null)}
-        title={tableEditModal?.mode === 'descricao' ? 'Descrição da tabela' : 'Regra da tabela'}
+        title={tableEditModal?.mode === 'descricao' ? t('dataDictionary.modals.tableDescriptionTitle', 'Descrição da tabela') : t('dataDictionary.modals.tableRuleTitle', 'Regra da tabela')}
         maxWidthClassName="max-w-6xl"
       >
         {tableEditModal ? (
@@ -662,6 +664,7 @@ function FieldEditor({
   onSave: (value: string) => void
   saving: boolean
 }) {
+  const { t } = useI18n()
   const [value, setValue] = useState(initialValue)
 
   return (
@@ -673,7 +676,7 @@ function FieldEditor({
           onClick={onCancel}
           className="rounded-full border border-[#e5dbc9] bg-white px-4 py-2 text-sm font-semibold text-slate-700"
         >
-          Cancelar
+          {t('common.cancel', 'Cancelar')}
         </button>
         <button
           type="button"
@@ -682,7 +685,7 @@ function FieldEditor({
           className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-          Salvar
+          {t('common.save', 'Salvar')}
         </button>
       </div>
     </div>

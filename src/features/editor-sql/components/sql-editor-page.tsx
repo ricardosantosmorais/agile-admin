@@ -1,7 +1,7 @@
 'use client';
 
 import { Copy, Database, Download, Expand, FileCode2, FolderOpen, Loader2, Play, Plus, Save, Search, Table2, X } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { AsyncState } from '@/src/components/ui/async-state';
 import { BooleanSegmentedField } from '@/src/components/ui/boolean-segmented-field';
@@ -229,7 +229,7 @@ export function SqlEditorPage() {
 	const activePagination = activeTab?.result?.pagination;
 	useEffect(() => {
 		if (savedQueriesOpen) void loadSavedQueries();
-	}, [savedQueriesOpen]);
+	}, [loadSavedQueries, savedQueriesOpen]);
 
 	useEffect(() => {
 		setWorkspaceHydrated(false);
@@ -287,17 +287,17 @@ export function SqlEditorPage() {
 		});
 	}, [activeTabId, hydratedWorkspaceKey, resultMode, splitFullscreen, splitNormal, tabs, workspaceHydrated, workspaceStorageKey]);
 
-	async function loadSavedQueries() {
+	const loadSavedQueries = useCallback(async () => {
 		setSavedQueriesLoading(true);
 		setSavedQueriesError('');
 		try {
 			setSavedQueries(await sqlEditorClient.listSavedQueries());
 		} catch (error) {
-			setSavedQueriesError(error instanceof Error ? error.message : 'Não foi possível carregar as consultas salvas.');
+			setSavedQueriesError(error instanceof Error ? error.message : t('sqlEditor.messages.loadSavedQueriesError', 'Não foi possível carregar as consultas salvas.'));
 		} finally {
 			setSavedQueriesLoading(false);
 		}
-	}
+	}, [t]);
 
 	function patchActiveTab(patch: Partial<WorkspaceTab>) {
 		if (!activeTab) return;
@@ -346,7 +346,7 @@ export function SqlEditorPage() {
 			patchActiveTab({ result, isExecuting: false });
 		} catch (error) {
 			patchActiveTab({ isExecuting: false });
-			setToast({ message: error instanceof Error ? error.message : 'Não foi possível navegar pelos resultados.', tone: 'error' });
+			setToast({ message: error instanceof Error ? error.message : t('sqlEditor.messages.navigateResultsError', 'Não foi possível navegar pelos resultados.'), tone: 'error' });
 		}
 	}
 
@@ -373,7 +373,7 @@ export function SqlEditorPage() {
 			setToast({ message: saved.message, tone: 'success' });
 			if (savedQueriesOpen) await loadSavedQueries();
 		} catch (error) {
-			setToast({ message: error instanceof Error ? error.message : 'Não foi possível salvar a consulta.', tone: 'error' });
+			setToast({ message: error instanceof Error ? error.message : t('sqlEditor.messages.saveQueryError', 'Não foi possível salvar a consulta.'), tone: 'error' });
 		} finally {
 			setSaveLoading(false);
 		}
@@ -458,11 +458,11 @@ export function SqlEditorPage() {
 									<StatusBadge tone="warning">
 										<span className="inline-flex items-center gap-1.5">
 											<Loader2 className="h-3.5 w-3.5 animate-spin" />
-											Executando
+												{t('sqlEditor.status.executing', 'Executando')}
 										</span>
 									</StatusBadge>
 								) : null}
-								<span className="shrink-0">Ctrl/Cmd + Enter</span>
+									<span className="shrink-0">{t('sqlEditor.shortcut.runQuery', 'Ctrl/Cmd + Enter')}</span>
 							</div>
 						</div>
 						<div className="min-h-0 flex-1 overflow-hidden">
@@ -490,7 +490,7 @@ export function SqlEditorPage() {
 								<div className="app-control-muted m-4 rounded-[1rem] border border-dashed px-5 py-8 text-sm text-[color:var(--app-muted)]">
 									<div className="flex items-center gap-2 font-medium text-[color:var(--app-text)]">
 										<Loader2 className="h-4 w-4 animate-spin" />
-										Executando consulta...
+										{t('sqlEditor.status.executingQuery', 'Executando consulta...')}
 									</div>
 								</div>
 							) : !activeTab.result ? (
@@ -586,7 +586,7 @@ export function SqlEditorPage() {
 													setToast({ message: t('sqlEditor.messages.resultCopied', 'Resultado copiado para a área de transferência.'), tone: 'success' });
 												})
 												.catch((error) => {
-													setToast({ message: error instanceof Error ? error.message : 'Não foi possível copiar o resultado.', tone: 'error' });
+												setToast({ message: error instanceof Error ? error.message : t('sqlEditor.messages.copyResultError', 'Não foi possível copiar o resultado.'), tone: 'error' });
 												})
 										}
 										disabled={!activeTab.result}
@@ -686,7 +686,7 @@ export function SqlEditorPage() {
 											setToast({ message: t('sqlEditor.messages.sqlCopied', 'SQL copiado para a área de transferência.'), tone: 'success' });
 										})
 										.catch((error) => {
-											setToast({ message: error instanceof Error ? error.message : 'Não foi possível copiar o SQL.', tone: 'error' });
+											setToast({ message: error instanceof Error ? error.message : t('sqlEditor.messages.copySqlError', 'Não foi possível copiar o SQL.'), tone: 'error' });
 										})
 								}
 							>
@@ -817,7 +817,7 @@ export function SqlEditorPage() {
 				headerActions={
 					activeTab ? (
 						<>
-							<div className="text-xs text-[color:var(--app-muted)]">{activeTab.isExecuting ? 'Executando...' : 'Ctrl/Cmd + Enter'}</div>
+							<div className="text-xs text-[color:var(--app-muted)]">{activeTab.isExecuting ? t('sqlEditor.status.executingEllipsis', 'Executando...') : t('sqlEditor.shortcut.runQuery', 'Ctrl/Cmd + Enter')}</div>
 							<button
 								type="button"
 								onClick={() => void runQuery()}

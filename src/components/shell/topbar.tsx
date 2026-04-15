@@ -39,10 +39,6 @@ function getTenantOptionLabel(nome: string, id: string, isMaster: boolean) {
   return isMaster && id ? `${nome} - ${id}` : nome
 }
 
-function getTenantStatusLabel(status: string) {
-  return status || 'Operando'
-}
-
 function IconTooltipButton({
   label,
   onClick,
@@ -75,6 +71,7 @@ function IconTooltipButton({
 }
 
 function InfoCopyRow({ label, value }: { label: string; value?: string }) {
+  const { t } = useI18n()
   const [copied, setCopied] = useState(false)
 
   if (!value) {
@@ -95,8 +92,8 @@ function InfoCopyRow({ label, value }: { label: string; value?: string }) {
           window.setTimeout(() => setCopied(false), 1200)
         }}
         className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 text-slate-200 transition hover:border-white/30 hover:bg-white/10"
-        aria-label={`Copiar ${label}`}
-        title={copied ? 'Copiado' : `Copiar ${label}`}
+        aria-label={t('shell.copyLabel', 'Copiar {{label}}', { label })}
+        title={copied ? t('shell.copied', 'Copiado') : t('shell.copyLabel', 'Copiar {{label}}', { label })}
       >
         <Copy className="h-3.5 w-3.5" />
       </button>
@@ -207,7 +204,7 @@ export function Topbar() {
 
         setNotifications([])
         setPendingReadReceipts([])
-        setNotificationsError(error instanceof Error ? error.message : 'Não foi possível carregar as notificações.')
+        setNotificationsError(error instanceof Error ? error.message : t('shell.notificationsLoadError', 'Não foi possível carregar as notificações.'))
       } finally {
         if (isMounted) {
           setNotificationsLoading(false)
@@ -220,7 +217,7 @@ export function Topbar() {
     return () => {
       isMounted = false
     }
-  }, [activePanel, currentTenant.id, session, shouldBlockUnauthenticatedRedirect])
+  }, [activePanel, currentTenant.id, session, shouldBlockUnauthenticatedRedirect, t])
 
   useEffect(() => {
     if (activePanel !== 'tenant') {
@@ -342,7 +339,7 @@ export function Topbar() {
                           <div className="min-w-0">
                             <p className="truncate font-semibold text-slate-900">{getTenantOptionLabel(tenant.nome, tenant.id, user?.master ?? false)}</p>
                             <p className="truncate text-xs text-slate-500">
-                              {tenant.codigo} · {getTenantStatusLabel(tenant.status)}
+                              {tenant.codigo} · {(tenant.status || t('shell.operating', 'Operando'))}
                             </p>
                           </div>
                           {isActive ? <Check className="h-4 w-4 shrink-0" /> : null}

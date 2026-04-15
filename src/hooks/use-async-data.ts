@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useReducer, useRef, useState, type DependencyList } from 'react'
+import { translateCurrentLocale } from '@/src/i18n/utils'
 
 type AsyncState<T> = {
   data: T | null
@@ -73,7 +74,7 @@ export function useAsyncData<T>(load: () => Promise<T>, deps: DependencyList) {
 
         dispatch({
           type: 'load-error',
-          error: error instanceof Error ? error.message : 'Não foi possível carregar os dados.',
+          error: error instanceof Error ? error.message : translateCurrentLocale('async.errorTitle', 'Não foi possível carregar os dados'),
         })
       })
 

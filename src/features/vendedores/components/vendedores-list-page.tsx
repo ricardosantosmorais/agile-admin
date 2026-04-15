@@ -63,7 +63,7 @@ export function VendedoresListPage() {
         }
         if (column.id === 'ativo' || column.id === 'bloqueado') {
           const checked = record[column.id] === true || record[column.id] === 1 || record[column.id] === '1'
-          return <StatusBadge tone={checked ? 'success' : 'warning'}>{checked ? t('common.yes', 'Sim') : t('common.no', 'N?o')}</StatusBadge>
+          return <StatusBadge tone={checked ? 'success' : 'warning'}>{checked ? t('common.yes', 'Sim') : t('common.no', 'Não')}</StatusBadge>
         }
         const value = column.valueKey ? record[column.valueKey] : record[column.id]
         return <span className="truncate">{String(value ?? '-')}</span>
@@ -81,7 +81,7 @@ export function VendedoresListPage() {
       const users = await getVendedorLinkedUsers(record.id)
       setLinkedUsers(users)
     } catch (error) {
-      setLinkedUsersError(error instanceof Error ? error.message : t('people.sellers.modals.loadLinkedUsersError', 'N?o foi poss?vel carregar os usu?rios vinculados.'))
+      setLinkedUsersError(error instanceof Error ? error.message : t('people.sellers.modals.loadLinkedUsersError', 'Não foi possível carregar os usuários vinculados.'))
     } finally {
       setLinkedUsersLoading(false)
     }
@@ -95,7 +95,7 @@ export function VendedoresListPage() {
       setLinkedUsers(users)
       controller.refreshList()
     } catch (error) {
-      setLinkedUsersError(error instanceof Error ? error.message : t('people.sellers.modals.unlinkError', 'N?o foi poss?vel desvincular o usu?rio.'))
+      setLinkedUsersError(error instanceof Error ? error.message : t('people.sellers.modals.unlinkError', 'Não foi possível desvincular o usuário.'))
     }
   }
 
@@ -107,7 +107,7 @@ export function VendedoresListPage() {
     <div className="space-y-5">
       <PageHeader
         breadcrumbs={[
-          { label: t('routes.dashboard', 'In?cio'), href: '/dashboard' },
+          { label: t('routes.dashboard', 'Início'), href: '/dashboard' },
           { label: t('routes.people', 'Pessoas') },
           { label: t('people.sellers.title', 'Vendedores'), href: '/vendedores' },
         ]}
@@ -151,7 +151,7 @@ export function VendedoresListPage() {
             sort={{ activeColumn: controller.filters.orderBy, direction: controller.filters.sort, onToggle: controller.tableState.toggleSort }}
             rowActions={(record) => [
               { id: 'edit', label: access.canEdit ? t('simpleCrud.actions.edit', 'Editar') : t('simpleCrud.actions.view', 'Visualizar'), icon: access.canEdit ? Pencil : SearchIcon, href: `/vendedores/${record.id}/editar`, visible: access.canEdit || access.canView },
-              { id: 'users', label: t('people.sellers.actions.linkedUsers', 'Usu?rios vinculados'), icon: Users, onClick: () => void openLinkedUsers(record), visible: access.canEdit || access.canView },
+              { id: 'users', label: t('people.sellers.actions.linkedUsers', 'Usuários vinculados'), icon: Users, onClick: () => void openLinkedUsers(record), visible: access.canEdit || access.canView },
               { id: 'delete', label: t('simpleCrud.actions.delete', 'Excluir'), icon: Trash2, onClick: () => controller.setConfirmDeleteIds([record.id]), tone: 'danger', visible: access.canDelete },
             ]}
             selectable
@@ -217,8 +217,8 @@ export function VendedoresListPage() {
         open={Boolean(controller.confirmDeleteIds?.length)}
         title={t('simpleCrud.confirmDeleteTitle', 'Delete record?')}
         description={controller.confirmDeleteIds && controller.confirmDeleteIds.length > 1
-          ? t('simpleCrud.confirmDeleteMany', 'Os registros selecionados ser?o exclu?dos. Esta a??o n?o pode ser desfeita.')
-          : t('simpleCrud.confirmDeleteSingle', 'O registro selecionado ser? exclu?do. Esta a??o n?o pode ser desfeita.')}
+          ? t('simpleCrud.confirmDeleteMany', 'Os registros selecionados serão excluídos. Esta ação não pode ser desfeita.')
+          : t('simpleCrud.confirmDeleteSingle', 'O registro selecionado será excluído. Esta ação não pode ser desfeita.')}
         confirmLabel={t('simpleCrud.actions.delete', 'Excluir')}
         cancelLabel={t('common.cancel', 'Cancelar')}
         onClose={() => controller.setConfirmDeleteIds(null)}

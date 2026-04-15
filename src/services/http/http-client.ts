@@ -1,5 +1,6 @@
 import { isAuthenticatedSessionRecentlyEstablished } from '@/src/features/auth/services/auth-tab-storage'
 import { getSessionClientPhase } from '@/src/features/auth/services/session-client-gate'
+import { translateCurrentLocale } from '@/src/i18n/utils'
 import { captureOperationalClientError } from '@/src/lib/sentry'
 
 export class HttpError extends Error {
@@ -126,10 +127,11 @@ export async function httpClient<T>(input: RequestInfo | URL, init?: RequestInit
   const path = getRequestPath(input)
   const method = String(init?.method || 'GET').toUpperCase()
   const phase = getSessionClientPhase()
+  const sessionEndedMessage = translateCurrentLocale('http.sessionEnded', 'Sessão encerrada. Faça login novamente para continuar.')
 
   if ((phase === 'warning' || phase === 'ended') && !canRequestWhileSessionBlocked(path)) {
-    throw new HttpError('Sessão encerrada. Faça login novamente para continuar.', 401, {
-      message: 'Sessão encerrada. Faça login novamente para continuar.',
+    throw new HttpError(sessionEndedMessage, 401, {
+      message: sessionEndedMessage,
       blockedByClientSessionGate: true,
       path,
       phase,
@@ -150,7 +152,7 @@ export async function httpClient<T>(input: RequestInfo | URL, init?: RequestInit
       (typeof payload === 'object' && payload !== null && 'message' in payload && typeof payload.message === 'string'
         ? payload.message
         : null)
-      ?? 'Não foi possível concluir a requisição.'
+      ?? translateCurrentLocale('http.requestError', 'Não foi possível concluir a requisição.')
 
     if (response.status === 401 && shouldNotifySessionLoss(path)) {
       notifySessionLost(inferSessionLostReason(response.status, message), message, response.status, path)

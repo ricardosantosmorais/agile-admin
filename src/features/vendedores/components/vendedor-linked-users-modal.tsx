@@ -32,7 +32,7 @@ export function VendedorLinkedUsersModal({
   return (
     <OverlayModal
       open={open}
-      title={vendedorNome ? `${t('people.sellers.modals.linkedUsersTitle', 'Usu?rios vinculados')} - ${vendedorNome}` : t('people.sellers.modals.linkedUsersTitle', 'Usu?rios vinculados')}
+      title={vendedorNome ? `${t('people.sellers.modals.linkedUsersTitle', 'Usuários vinculados')} - ${vendedorNome}` : t('people.sellers.modals.linkedUsersTitle', 'Usuários vinculados')}
       onClose={onClose}
     >
       <AsyncState isLoading={isLoading} error={error}>
@@ -59,7 +59,7 @@ export function VendedorLinkedUsersModal({
             </div>
           )) : (
             <div className="rounded-[1rem] border border-dashed border-[var(--app-border)] px-4 py-6 text-center text-sm text-[var(--app-muted)]">
-              {t('people.sellers.modals.linkedUsersEmpty', 'N?o h? usu?rios vinculados a este vendedor.')}
+              {t('people.sellers.modals.linkedUsersEmpty', 'Não há usuários vinculados a este vendedor.')}
             </div>
           )}
         </div>
