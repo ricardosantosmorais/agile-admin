@@ -227,6 +227,18 @@ export function SqlEditorPage() {
 	const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0];
 	const activeRows = activeTab?.result?.rows ?? EMPTY_ROWS;
 	const activePagination = activeTab?.result?.pagination;
+	const loadSavedQueries = useCallback(async () => {
+		setSavedQueriesLoading(true);
+		setSavedQueriesError('');
+		try {
+			setSavedQueries(await sqlEditorClient.listSavedQueries());
+		} catch (error) {
+			setSavedQueriesError(error instanceof Error ? error.message : t('sqlEditor.messages.loadSavedQueriesError', 'Não foi possível carregar as consultas salvas.'));
+		} finally {
+			setSavedQueriesLoading(false);
+		}
+	}, [t]);
+
 	useEffect(() => {
 		if (savedQueriesOpen) void loadSavedQueries();
 	}, [loadSavedQueries, savedQueriesOpen]);
@@ -286,18 +298,6 @@ export function SqlEditorPage() {
 			})),
 		});
 	}, [activeTabId, hydratedWorkspaceKey, resultMode, splitFullscreen, splitNormal, tabs, workspaceHydrated, workspaceStorageKey]);
-
-	const loadSavedQueries = useCallback(async () => {
-		setSavedQueriesLoading(true);
-		setSavedQueriesError('');
-		try {
-			setSavedQueries(await sqlEditorClient.listSavedQueries());
-		} catch (error) {
-			setSavedQueriesError(error instanceof Error ? error.message : t('sqlEditor.messages.loadSavedQueriesError', 'Não foi possível carregar as consultas salvas.'));
-		} finally {
-			setSavedQueriesLoading(false);
-		}
-	}, [t]);
 
 	function patchActiveTab(patch: Partial<WorkspaceTab>) {
 		if (!activeTab) return;
