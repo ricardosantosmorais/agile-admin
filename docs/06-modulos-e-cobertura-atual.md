@@ -210,6 +210,10 @@ ObservaÃ§Ã£o:
   - bridge dedicada em `app/api/integracao-com-erp/*` para configuração e leitura operacional do dashboard ERP;
   - `Gateways de Pagamento` com listagem, formulário novo, edição por id e regras condicionais do legado reaproveitadas no CRUD do v2;
   - cobertura E2E do fluxo principal para `Atendimento`, `Clientes`, `Login Social`, `Logística`, `Marketing`, `Notificações`, `Promoções`, `Scripts`, `Segurança`, `Financeiro` e `Gateways de Pagamento`.
+- `Menu do cliente` agora já possui no v2:
+  - `Meus atendimentos` com listagem server-side, filtros por protocolo, status e período, detalhe do atendimento em modal e subpágina de `Vínculo Intercom`;
+  - `Base de conhecimento` com listagem server-side de artigos do Intercom, filtro textual e leitura do HTML no overlay do shell;
+  - `Atualizações gerais` com bridge dedicada para o changelog público, filtros por plataforma, tipo, mês e título, agrupamento por mês e leitura inline no shell.
 - `ManutenÃ§Ã£o > Termos de pesquisa` jÃ¡ possui:
   - listagem server-side com filtros por `id`, `termos`, `resultado` e `ativo`;
   - criaÃ§Ã£o e ediÃ§Ã£o com os campos `ativo`, `termos` e `resultado`;
