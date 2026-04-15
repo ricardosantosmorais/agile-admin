@@ -131,6 +131,7 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 	'emails-templates-list': '/templates-de-emails',
 	'paginas-list': '/paginas',
 	'areas-pagina-list': '/areas-paginas',
+	'arquivos-list': '/conteudo/arquivos',
 	'colecoes-list': '/colecoes',
 	'listas-list': '/listas',
 	'marcas-list': '/marcas',

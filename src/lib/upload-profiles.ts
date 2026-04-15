@@ -32,7 +32,7 @@ export const UPLOAD_PROFILES: UploadProfile[] = [
     visibility: 'public',
     legacyController: 'controllers/arquivos-controller.php',
     keyPattern: '{tenant_bucket}/arquivos/{pasta?}/{file_name}',
-    acceptedFormats: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'zip'],
+    acceptedFormats: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'csv', 'html', 'txt', 'zip'],
     currentV2Modules: ['Arquivos'],
   },
   {

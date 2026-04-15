@@ -6,6 +6,7 @@ export type FeatureKey =
 	| 'consultasSimuladorPrecos'
 	| 'consultasEnviosFormularios'
 	| 'consultasAvaliacoesPedidos'
+	| 'conteudoArquivos'
 	| 'editorSql'
 	| 'httpClient'
 	| 'dicionarioDados'
@@ -146,6 +147,10 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
 	consultasAvaliacoesPedidos: {
 		label: 'Consultas > Avaliações de Pedidos',
 		matchers: ['pedidos-avaliacoes', 'pedidos avaliacoes', 'pedidos avaliações', 'avaliacoes de pedidos', 'avaliações de pedidos'],
+	},
+	conteudoArquivos: {
+		label: 'Conteúdo > Arquivos',
+		matchers: ['arquivos-list', 'arquivos list', 'conteudo arquivos', 'conteúdo arquivos'],
 	},
 	editorSql: {
 		label: 'Editor SQL',
