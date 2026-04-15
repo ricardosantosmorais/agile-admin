@@ -1,5 +1,5 @@
-import { DashboardPage } from '@/src/features/dashboard/components/dashboard-page'
+import { DashboardRouteSwitcher } from '@/src/features/dashboard-root-agileecommerce/components/dashboard-route-switcher';
 
 export default function DashboardRoutePage() {
-  return <DashboardPage />
+	return <DashboardRouteSwitcher />;
 }
