@@ -28,6 +28,15 @@ import { formatDate, formatNumber } from '@/src/lib/formatters';
 
 const chartPalette = ['#195f4d', '#0f766e', '#0284c7', '#f59e0b', '#e11d48', '#334155'];
 const MAX_DAYS = 365;
+const STORAGE_KEY = 'dashboard_agileecommerce';
+
+type StoredDashboardRange = {
+	label?: string;
+	start: string;
+	end: string;
+	previousStart?: string | null;
+	previousEnd?: string | null;
+};
 
 function formatDateInput(date: Date) {
 	return date.toISOString().slice(0, 10);
@@ -62,6 +71,34 @@ function getPresets(t: ReturnType<typeof useI18n>['t']): DateRangePreset[] {
 		{ id: 'ultimos_30_dias', label: t('dashboardRoot.presets.last30Days', 'Últimos 30 dias'), range: { start: formatDateInput(last30Start), end: formatDateInput(today) } },
 		{ id: 'ultimos_90_dias', label: t('dashboardRoot.presets.last90Days', 'Últimos 90 dias'), range: { start: formatDateInput(last90Start), end: formatDateInput(today) } },
 	];
+}
+
+function readStoredDashboardRange() {
+	if (typeof window === 'undefined') {
+		return null;
+	}
+
+	try {
+		const raw = window.localStorage.getItem(STORAGE_KEY);
+		if (!raw) {
+			return null;
+		}
+
+		const parsed = JSON.parse(raw) as Partial<StoredDashboardRange>;
+		if (!parsed.start || !parsed.end) {
+			return null;
+		}
+
+		return {
+			label: parsed.label,
+			start: parsed.start,
+			end: parsed.end,
+			previousStart: parsed.previousStart ?? null,
+			previousEnd: parsed.previousEnd ?? null,
+		} satisfies StoredDashboardRange;
+	} catch {
+		return null;
+	}
 }
 
 function parseNumber(value: unknown) {
@@ -352,8 +389,48 @@ function buildExecutiveCards(snapshot: DashboardRootSnapshot, t: ReturnType<type
 export function DashboardRootAgileecommercePage() {
 	const { t } = useI18n();
 	const presets = useMemo(() => getPresets(t), [t]);
-	const [selectedRange, setSelectedRange] = useState<DateRangeValue>(presets[1].range);
-	const [selectedPreviousRange, setSelectedPreviousRange] = useState<DateRangeValue | null>(createPreviousRange(presets[1].range));
+	const [selectedRange, setSelectedRange] = useState<DateRangeValue>(() => {
+		const stored = readStoredDashboardRange();
+		return stored ? { start: stored.start, end: stored.end } : presets[1].range;
+	});
+	const [selectedPreviousRange, setSelectedPreviousRange] = useState<DateRangeValue | null>(() => {
+		const stored = readStoredDashboardRange();
+		if (stored?.previousStart && stored?.previousEnd) {
+			return {
+				start: stored.previousStart,
+				end: stored.previousEnd,
+			};
+		}
+
+		const baseRange = stored ? { start: stored.start, end: stored.end } : presets[1].range;
+		return createPreviousRange(baseRange);
+	});
+
+	const selectedRangeLabel = useMemo(() => {
+		const preset = presets.find((item) => item.range.start === selectedRange.start && item.range.end === selectedRange.end);
+		if (preset) {
+			return preset.label;
+		}
+
+		return `${selectedRange.start} a ${selectedRange.end}`;
+	}, [presets, selectedRange.end, selectedRange.start]);
+
+	useEffect(() => {
+		if (typeof window === 'undefined') {
+			return;
+		}
+
+		const stored: StoredDashboardRange = {
+			label: selectedRangeLabel,
+			start: selectedRange.start,
+			end: selectedRange.end,
+			previousStart: selectedPreviousRange?.start ?? null,
+			previousEnd: selectedPreviousRange?.end ?? null,
+		};
+
+		window.localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+	}, [selectedPreviousRange, selectedRange.end, selectedRange.start, selectedRangeLabel]);
+
 	const { snapshot, completedPhases, error, requestPhases, refreshSnapshot } = useDashboardRootSequencedSnapshot({
 		startDate: selectedRange.start,
 		endDate: selectedRange.end,

@@ -42,7 +42,7 @@ function createTab(baseUrl: string, index: number): TabState {
 	const id = `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
 	return {
 		id,
-		title: `Requisicao ${index}`,
+		title: `Request ${index}`,
 		request: createDefaultHttpClientRequest(baseUrl),
 		response: null,
 		catalogId: '',
@@ -57,10 +57,16 @@ function KeyValueTable({
 	rows,
 	onChange,
 	addLabel,
+	keyPlaceholder,
+	valuePlaceholder,
+	removeLabel,
 }: {
 	rows: Array<{ key: string; value: string }>;
 	onChange: (rows: Array<{ key: string; value: string }>) => void;
 	addLabel: string;
+	keyPlaceholder: string;
+	valuePlaceholder: string;
+	removeLabel: string;
 }) {
 	return (
 		<div className="space-y-2 min-w-0">
@@ -75,7 +81,7 @@ function KeyValueTable({
 								onChange(next);
 							}}
 							className={`${fieldClassName} min-w-0`}
-							placeholder="Chave"
+							placeholder={keyPlaceholder}
 						/>
 						<input
 							value={row.value}
@@ -85,7 +91,7 @@ function KeyValueTable({
 								onChange(next);
 							}}
 							className={`${fieldClassName} min-w-0`}
-							placeholder="Valor"
+							placeholder={valuePlaceholder}
 						/>
 						<button
 							type="button"
@@ -94,7 +100,7 @@ function KeyValueTable({
 								onChange(next.length ? next : [{ key: '', value: '' }]);
 							}}
 							className="app-button-secondary inline-flex h-10 w-10 items-center justify-center rounded-full text-(--app-muted) transition hover:border-red-300 hover:text-red-600"
-							aria-label="Remover linha"
+							aria-label={removeLabel}
 						>
 							<Trash2 className="h-4 w-4" />
 						</button>
@@ -125,6 +131,7 @@ function getResponseBody(response: HttpClientResponsePayload | null) {
 
 export function HttpClientPage() {
 	const { t } = useI18n();
+	const requestTitle = t('httpClient.requestTitle', 'Request');
 	const access = useFeatureAccess('httpClient');
 	const [contextState, setContextState] = useState<{
 		isLoading: boolean;
@@ -156,12 +163,12 @@ export function HttpClientPage() {
 			} catch (error) {
 				setContextState({
 					isLoading: false,
-					error: error instanceof Error ? error.message : 'Nao foi possivel carregar o contexto do HTTP Client.',
+					error: error instanceof Error ? error.message : t('httpClient.feedback.loadContextError', 'Could not load the HTTP Client context.'),
 					data: null,
 				});
 			}
 		})();
-	}, []);
+	}, [t]);
 
 	const activeTab = tabs.find((tab) => tab.id === activeTabId) || tabs[0];
 	const filteredCatalogRows = useMemo(() => {
@@ -177,7 +184,7 @@ export function HttpClientPage() {
 	}, [catalogRows, catalogSearch]);
 
 	if (!access.canOpen) {
-		return <AccessDeniedState title="HTTP Client" />;
+		return <AccessDeniedState title={t('httpClient.title', 'HTTP Client')} />;
 	}
 
 	function patchActiveTab(patch: Partial<TabState>) {
@@ -218,7 +225,7 @@ export function HttpClientPage() {
 			patchActiveTab({ response, isSending: false });
 		} catch (error) {
 			patchActiveTab({ isSending: false });
-			setToast({ message: error instanceof Error ? error.message : 'Nao foi possivel enviar a requisicao.', tone: 'error' });
+			setToast({ message: error instanceof Error ? error.message : t('httpClient.feedback.sendError', 'Could not send the request.'), tone: 'error' });
 		}
 	}
 
@@ -230,7 +237,7 @@ export function HttpClientPage() {
 			const response = await httpClientToolClient.listCatalog();
 			setCatalogRows(response.data || []);
 		} catch (error) {
-			setToast({ message: error instanceof Error ? error.message : 'Nao foi possivel carregar o catalogo.', tone: 'error' });
+			setToast({ message: error instanceof Error ? error.message : t('httpClient.feedback.loadCatalogError', 'Could not load the catalog.'), tone: 'error' });
 		} finally {
 			setCatalogLoading(false);
 		}
@@ -242,7 +249,7 @@ export function HttpClientPage() {
 			const loaded = response.data;
 			const nextTab: TabState = {
 				...createTab(contextState.data?.baseUrl || '', tabs.length + 1),
-				title: loaded.nome || `Requisicao ${tabs.length + 1}`,
+				title: loaded.nome || `${requestTitle} ${tabs.length + 1}`,
 				request: loaded.request,
 				catalogId: loaded.id,
 				catalogName: loaded.nome,
@@ -253,7 +260,7 @@ export function HttpClientPage() {
 			setActiveTabId(nextTab.id);
 			setCatalogModalOpen(false);
 		} catch (error) {
-			setToast({ message: error instanceof Error ? error.message : 'Nao foi possivel carregar a requisicao.', tone: 'error' });
+			setToast({ message: error instanceof Error ? error.message : t('httpClient.feedback.loadRequestError', 'Could not load the request.'), tone: 'error' });
 		}
 	}
 
@@ -275,7 +282,7 @@ export function HttpClientPage() {
 			setToast({ message: response.message, tone: 'success' });
 			setSaveModalOpen(false);
 		} catch (error) {
-			setToast({ message: error instanceof Error ? error.message : 'Nao foi possivel salvar a requisicao.', tone: 'error' });
+			setToast({ message: error instanceof Error ? error.message : t('httpClient.feedback.saveRequestError', 'Could not save the request.'), tone: 'error' });
 		} finally {
 			setSaveLoading(false);
 		}
@@ -284,8 +291,8 @@ export function HttpClientPage() {
 	return (
 		<div className="space-y-5">
 			<PageHeader
-				title="HTTP Client"
-				breadcrumbs={[{ label: t('routes.dashboard', 'Home'), href: '/dashboard' }, { label: t('menuKeys.ferramentas', 'Ferramentas') }, { label: 'HTTP Client' }]}
+				title={t('httpClient.title', 'HTTP Client')}
+				breadcrumbs={[{ label: t('routes.dashboard', 'Home'), href: '/dashboard' }, { label: t('menuKeys.ferramentas', 'Ferramentas') }, { label: t('httpClient.title', 'HTTP Client') }]}
 				actions={
 					<div className="flex flex-wrap items-center gap-2">
 						<button type="button" onClick={createNewTab} className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-semibold">
@@ -298,7 +305,7 @@ export function HttpClientPage() {
 							className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-semibold"
 						>
 							<FolderOpen className="h-4 w-4" />
-							Catalogo
+							{t('httpClient.actions.catalog', 'Catalog')}
 						</button>
 						<button
 							type="button"
@@ -306,7 +313,7 @@ export function HttpClientPage() {
 							className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-semibold"
 						>
 							<Save className="h-4 w-4" />
-							Salvar
+							{t('common.save', 'Save')}
 						</button>
 						<button
 							type="button"
@@ -315,7 +322,7 @@ export function HttpClientPage() {
 							className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
 						>
 							{activeTab?.isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-							Enviar
+							{t('httpClient.actions.send', 'Send')}
 						</button>
 					</div>
 				}
@@ -332,7 +339,7 @@ export function HttpClientPage() {
 								{tab.title}
 							</button>
 							{tabs.length > 1 ? (
-								<button type="button" onClick={() => closeTab(tab.id)} aria-label="Fechar aba" className={tab.id === activeTab?.id ? 'text-white/80' : 'text-(--app-muted)'}>
+								<button type="button" onClick={() => closeTab(tab.id)} aria-label={t('httpClient.actions.closeTab', 'Close tab')} className={tab.id === activeTab?.id ? 'text-white/80' : 'text-(--app-muted)'}>
 									<X className="h-3.5 w-3.5" />
 								</button>
 							) : null}
@@ -346,18 +353,18 @@ export function HttpClientPage() {
 							<div className={cardPanelClassName}>
 								<div className="grid gap-3 md:grid-cols-[180px_1fr]">
 									<label className="space-y-1">
-										<span className="text-xs font-semibold text-(--app-muted)">Origem do endpoint</span>
+										<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.endpointSource', 'Endpoint source')}</span>
 										<select
 											value={activeTab.request.endpointMode}
 											onChange={(event) => patchActiveRequest({ endpointMode: event.target.value === 'custom' ? 'custom' : 'agile' })}
 											className={fieldClassName}
 										>
-											<option value="agile">Agile API (catalogo)</option>
-											<option value="custom">Custom</option>
+											<option value="agile">{t('httpClient.options.agileCatalog', 'Agile API (catalog)')}</option>
+											<option value="custom">{t('httpClient.options.custom', 'Custom')}</option>
 										</select>
 									</label>
 									<label className="space-y-1">
-										<span className="text-xs font-semibold text-(--app-muted)">Metodo</span>
+										<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.method', 'Method')}</span>
 										<select
 											value={activeTab.request.method}
 											onChange={(event) => patchActiveRequest({ method: event.target.value as HttpClientRequestDraft['method'] })}
@@ -372,7 +379,7 @@ export function HttpClientPage() {
 									</label>
 								</div>
 								<label className="space-y-1">
-									<span className="text-xs font-semibold text-(--app-muted)">Base URL</span>
+									<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.baseUrl', 'Base URL')}</span>
 									<input
 										value={activeTab.request.baseUrl}
 										onChange={(event) => patchActiveRequest({ baseUrl: event.target.value })}
@@ -382,7 +389,7 @@ export function HttpClientPage() {
 								</label>
 								{activeTab.request.endpointMode === 'agile' ? (
 									<label className="space-y-1">
-										<span className="text-xs font-semibold text-(--app-muted)">Endpoint Agile API</span>
+										<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.agileEndpoint', 'Agile API endpoint')}</span>
 										<select
 											value={activeTab.request.endpointCatalogValue}
 											onChange={(event) => {
@@ -395,7 +402,7 @@ export function HttpClientPage() {
 											}}
 											className={fieldClassName}
 										>
-											<option value="">Selecione o endpoint</option>
+											<option value="">{t('httpClient.placeholders.selectEndpoint', 'Select the endpoint')}</option>
 											{(contextState.data?.endpointCatalog || []).map((item) => (
 												<option key={item.label} value={item.label}>
 													{item.label}
@@ -405,7 +412,7 @@ export function HttpClientPage() {
 									</label>
 								) : (
 									<label className="space-y-1">
-										<span className="text-xs font-semibold text-(--app-muted)">Endpoint custom</span>
+										<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.customEndpoint', 'Custom endpoint')}</span>
 										<input
 											value={activeTab.request.endpointCustom}
 											onChange={(event) => patchActiveRequest({ endpointCustom: event.target.value })}
@@ -416,16 +423,16 @@ export function HttpClientPage() {
 								)}
 								<div className="grid gap-3 md:grid-cols-2">
 									<label className="space-y-1">
-										<span className="text-xs font-semibold text-(--app-muted)">Filtros (querystring)</span>
+										<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.queryFilters', 'Filters (querystring)')}</span>
 										<input
 											value={activeTab.request.filtersQuery}
 											onChange={(event) => patchActiveRequest({ filtersQuery: event.target.value })}
 											className={fieldClassName}
-											placeholder="id=123&status=ativo"
+											placeholder={t('httpClient.placeholders.queryFilters', 'id=123&status=active')}
 										/>
 									</label>
 									<label className="space-y-1">
-										<span className="text-xs font-semibold text-(--app-muted)">Timeout (segundos)</span>
+										<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.timeout', 'Timeout (seconds)')}</span>
 										<input
 											type="number"
 											min={1}
@@ -438,7 +445,7 @@ export function HttpClientPage() {
 								</div>
 								<div className="grid gap-3 md:grid-cols-2">
 									<label className="space-y-1">
-										<span className="text-xs font-semibold text-(--app-muted)">Tipo do body</span>
+										<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.bodyType', 'Body type')}</span>
 										<select
 											value={activeTab.request.bodyType}
 											onChange={(event) => patchActiveRequest({ bodyType: event.target.value as HttpClientRequestDraft['bodyType'] })}
@@ -452,53 +459,53 @@ export function HttpClientPage() {
 										</select>
 									</label>
 									<label className="space-y-1">
-										<span className="text-xs font-semibold text-(--app-muted)">Autenticacao</span>
+										<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.authentication', 'Authentication')}</span>
 										<select
 											value={activeTab.request.authType}
 											onChange={(event) => patchActiveRequest({ authType: event.target.value as HttpClientRequestDraft['authType'] })}
 											className={fieldClassName}
 										>
-											<option value="platform">Plataforma (padrao)</option>
+											<option value="platform">{t('httpClient.options.platformDefault', 'Platform (default)')}</option>
 											<option value="bearer">Bearer token</option>
 											<option value="basic">Basic auth</option>
-											<option value="none">Sem autenticacao</option>
+											<option value="none">{t('httpClient.options.noAuthentication', 'No authentication')}</option>
 										</select>
 									</label>
 								</div>
 								<div className="grid gap-3 md:grid-cols-2">
 									<div className="app-control space-y-2 rounded-[0.9rem] px-3 py-2">
-										<span className="text-xs font-semibold text-(--app-muted)">Incluir header Empresa automaticamente</span>
+										<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.includeCompanyHeader', 'Include Company header automatically')}</span>
 										<BooleanChoice value={activeTab.request.includeEmpresaHeader} onChange={(value) => patchActiveRequest({ includeEmpresaHeader: value })} />
 									</div>
 									<div className="app-control space-y-1 rounded-[0.9rem] px-3 py-2 text-(--app-muted) text-xs">
 										<p>
-											Empresa: <strong>{contextState.data?.empresaHeader || '-'}</strong>
+											{t('httpClient.labels.company', 'Company')}: <strong>{contextState.data?.empresaHeader || '-'}</strong>
 										</p>
 										<p>
-											Token plataforma: <strong>{contextState.data?.tokenMasked || '-'}</strong>
+											{t('httpClient.labels.platformToken', 'Platform token')}: <strong>{contextState.data?.tokenMasked || '-'}</strong>
 										</p>
 									</div>
 								</div>
 								{activeTab.request.authType === 'bearer' ? (
 									<label className="space-y-1">
-										<span className="text-xs font-semibold text-(--app-muted)">Bearer token custom</span>
+										<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.customBearerToken', 'Custom bearer token')}</span>
 										<input
 											type="password"
 											value={activeTab.request.bearerToken}
 											onChange={(event) => patchActiveRequest({ bearerToken: event.target.value })}
 											className={fieldClassName}
-											placeholder="Informe o token"
+											placeholder={t('httpClient.placeholders.token', 'Enter the token')}
 										/>
 									</label>
 								) : null}
 								{activeTab.request.authType === 'basic' ? (
 									<div className="grid gap-3 md:grid-cols-2">
 										<label className="space-y-1">
-											<span className="text-xs font-semibold text-(--app-muted)">Usuario</span>
+											<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.username', 'Username')}</span>
 											<input value={activeTab.request.basicUser} onChange={(event) => patchActiveRequest({ basicUser: event.target.value })} className={fieldClassName} />
 										</label>
 										<label className="space-y-1">
-											<span className="text-xs font-semibold text-(--app-muted)">Senha</span>
+											<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.password', 'Password')}</span>
 											<input
 												type="password"
 												value={activeTab.request.basicPass}
@@ -511,17 +518,31 @@ export function HttpClientPage() {
 
 								<div className="grid gap-4 lg:grid-cols-2">
 									<div className="space-y-2">
-										<p className="text-xs font-semibold text-(--app-muted)">Query Params adicionais</p>
-										<KeyValueTable rows={activeTab.request.queryRows} onChange={(rows) => patchActiveRequest({ queryRows: rows })} addLabel="Adicionar param" />
+										<p className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.additionalQueryParams', 'Additional query params')}</p>
+										<KeyValueTable
+											rows={activeTab.request.queryRows}
+											onChange={(rows) => patchActiveRequest({ queryRows: rows })}
+											addLabel={t('httpClient.actions.addParam', 'Add param')}
+											keyPlaceholder={t('httpClient.placeholders.key', 'Key')}
+											valuePlaceholder={t('httpClient.placeholders.value', 'Value')}
+											removeLabel={t('httpClient.actions.removeRow', 'Remove row')}
+										/>
 									</div>
 									<div className="space-y-2">
-										<p className="text-xs font-semibold text-(--app-muted)">Headers customizados</p>
-										<KeyValueTable rows={activeTab.request.headers} onChange={(rows) => patchActiveRequest({ headers: rows })} addLabel="Adicionar header" />
+										<p className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.customHeaders', 'Custom headers')}</p>
+										<KeyValueTable
+											rows={activeTab.request.headers}
+											onChange={(rows) => patchActiveRequest({ headers: rows })}
+											addLabel={t('httpClient.actions.addHeader', 'Add header')}
+											keyPlaceholder={t('httpClient.placeholders.key', 'Key')}
+											valuePlaceholder={t('httpClient.placeholders.value', 'Value')}
+											removeLabel={t('httpClient.actions.removeRow', 'Remove row')}
+										/>
 									</div>
 								</div>
 
 								<label className="space-y-1">
-									<span className="text-xs font-semibold text-(--app-muted)">Body da requisicao</span>
+									<span className="text-xs font-semibold text-(--app-muted)">{t('httpClient.fields.requestBody', 'Request body')}</span>
 									<textarea
 										value={activeTab.request.body}
 										onChange={(event) => patchActiveRequest({ body: event.target.value })}
@@ -533,36 +554,36 @@ export function HttpClientPage() {
 
 							<div className={cardPanelClassName}>
 								<div className="flex flex-wrap items-center justify-between gap-2">
-									<h2 className="text-(--app-text) text-base font-semibold">Resposta</h2>
+									<h2 className="text-(--app-text) text-base font-semibold">{t('httpClient.response.title', 'Response')}</h2>
 									<button
 										type="button"
 										onClick={() =>
 											void copyTextToClipboard(getResponseBody(activeTab.response))
-												.then(() => setToast({ message: 'Resposta copiada para a area de transferencia.', tone: 'success' }))
-												.catch(() => setToast({ message: 'Nao foi possivel copiar a resposta.', tone: 'error' }))
+												.then(() => setToast({ message: t('httpClient.feedback.copyResponseSuccess', 'Response copied to the clipboard.'), tone: 'success' }))
+												.catch(() => setToast({ message: t('httpClient.feedback.copyResponseError', 'Could not copy the response.'), tone: 'error' }))
 										}
 										className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold"
 									>
 										<Copy className="h-3.5 w-3.5" />
-										Copiar resposta
+										{t('httpClient.actions.copyResponse', 'Copy response')}
 									</button>
 								</div>
 								<div className="grid grid-cols-3 gap-2 text-xs">
 									<div className="app-control rounded-[0.9rem] px-3 py-2">
-										<p className="text-(--app-muted)">Status</p>
+										<p className="text-(--app-muted)">{t('httpClient.response.status', 'Status')}</p>
 										<p className="text-(--app-text) font-semibold">{activeTab.response?.response.status ?? '-'}</p>
 									</div>
 									<div className="app-control rounded-[0.9rem] px-3 py-2">
-										<p className="text-(--app-muted)">Tempo</p>
+										<p className="text-(--app-muted)">{t('httpClient.response.time', 'Time')}</p>
 										<p className="text-(--app-text) font-semibold">{activeTab.response ? `${activeTab.response.response.durationMs} ms` : '-'}</p>
 									</div>
 									<div className="app-control rounded-[0.9rem] px-3 py-2">
-										<p className="text-(--app-muted)">Content-Type</p>
+										<p className="text-(--app-muted)">{t('httpClient.response.contentType', 'Content-Type')}</p>
 										<p className="text-(--app-text) line-clamp-1 font-semibold">{activeTab.response?.response.contentType || '-'}</p>
 									</div>
 								</div>
 								<div className="space-y-2">
-									<p className="text-xs font-semibold text-(--app-muted)">Response Headers</p>
+									<p className="text-xs font-semibold text-(--app-muted)">{t('httpClient.response.headers', 'Response Headers')}</p>
 									<textarea
 										readOnly
 										value={
@@ -577,7 +598,7 @@ export function HttpClientPage() {
 									/>
 								</div>
 								<div className="space-y-2">
-									<p className="text-xs font-semibold text-(--app-muted)">Body</p>
+									<p className="text-xs font-semibold text-(--app-muted)">{t('httpClient.response.body', 'Body')}</p>
 									<textarea
 										readOnly
 										value={getResponseBody(activeTab.response)}
@@ -591,13 +612,13 @@ export function HttpClientPage() {
 				</AsyncState>
 			</SectionCard>
 
-			<OverlayModal open={catalogModalOpen} onClose={() => setCatalogModalOpen(false)} title="Catalogo de requisicoes" maxWidthClassName="max-w-5xl">
+			<OverlayModal open={catalogModalOpen} onClose={() => setCatalogModalOpen(false)} title={t('httpClient.catalog.title', 'Request catalog')} maxWidthClassName="max-w-5xl">
 				<div className="space-y-3">
 					<input
 						value={catalogSearch}
 						onChange={(event) => setCatalogSearch(event.target.value)}
 						className="app-control w-full rounded-[0.85rem] px-3 py-2 text-sm"
-						placeholder="Buscar no catalogo"
+						placeholder={t('httpClient.catalog.searchPlaceholder', 'Search catalog')}
 					/>
 					<AsyncState isLoading={catalogLoading} error="">
 						<div className="app-pane max-h-[60vh] overflow-auto rounded-2xl">
@@ -605,11 +626,11 @@ export function HttpClientPage() {
 								<thead className="app-table-muted sticky top-0 text-(--app-muted) text-xs uppercase">
 									<tr>
 										<th className="px-3 py-2">ID</th>
-										<th className="px-3 py-2">Nome</th>
-										<th className="px-3 py-2">Descricao</th>
-										<th className="px-3 py-2">Publico</th>
-										<th className="px-3 py-2">Usuario</th>
-										<th className="px-3 py-2 text-right">Acoes</th>
+										<th className="px-3 py-2">{t('sqlEditor.fields.name', 'Name')}</th>
+										<th className="px-3 py-2">{t('sqlEditor.fields.description', 'Description')}</th>
+										<th className="px-3 py-2">{t('sqlEditor.fields.public', 'Public')}</th>
+										<th className="px-3 py-2">{t('httpClient.catalog.user', 'User')}</th>
+										<th className="px-3 py-2 text-right">{t('common.actions', 'Actions')}</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -619,7 +640,7 @@ export function HttpClientPage() {
 												<td className="px-3 py-2 text-(--app-muted) text-xs">{item.id}</td>
 												<td className="text-(--app-text) px-3 py-2 font-semibold">{item.nome}</td>
 												<td className="px-3 py-2 text-(--app-muted)">{item.descricao || '-'}</td>
-												<td className="px-3 py-2 text-(--app-muted)">{item.publico ? 'Sim' : 'Nao'}</td>
+												<td className="px-3 py-2 text-(--app-muted)">{item.publico ? t('common.yes', 'Yes') : t('common.no', 'No')}</td>
 												<td className="px-3 py-2 text-(--app-muted)">{item.usuario || '-'}</td>
 												<td className="px-3 py-2 text-right">
 													<button
@@ -628,7 +649,7 @@ export function HttpClientPage() {
 														className="inline-flex items-center gap-1 rounded-full bg-slate-950 px-3 py-1.5 text-xs font-semibold text-white"
 													>
 														<FolderOpen className="h-3.5 w-3.5" />
-														Carregar
+														{t('common.open', 'Open')}
 													</button>
 												</td>
 											</tr>
@@ -636,7 +657,7 @@ export function HttpClientPage() {
 									) : (
 										<tr>
 											<td colSpan={6} className="px-3 py-6 text-center text-(--app-muted) text-sm">
-												Nenhuma requisicao salva.
+												{t('httpClient.catalog.empty', 'No saved requests.')}
 											</td>
 										</tr>
 									)}
@@ -647,20 +668,20 @@ export function HttpClientPage() {
 				</div>
 			</OverlayModal>
 
-			<OverlayModal open={saveModalOpen} onClose={() => setSaveModalOpen(false)} title="Salvar requisicao" maxWidthClassName="max-w-2xl">
+			<OverlayModal open={saveModalOpen} onClose={() => setSaveModalOpen(false)} title={t('httpClient.saveModal.title', 'Save request')} maxWidthClassName="max-w-2xl">
 				{activeTab ? (
 					<div className="space-y-4">
 						<label className="space-y-1">
-							<span className="text-(--app-text) text-sm font-semibold">Nome</span>
+							<span className="text-(--app-text) text-sm font-semibold">{t('sqlEditor.fields.name', 'Name')}</span>
 							<input
 								value={activeTab.catalogName}
 								onChange={(event) => patchActiveTab({ catalogName: event.target.value })}
 								className="app-control w-full rounded-[0.85rem] px-3 py-2 text-sm"
-								placeholder="Ex.: Buscar clientes ativos"
+								placeholder={t('httpClient.saveModal.namePlaceholder', 'Example: Search active customers')}
 							/>
 						</label>
 						<label className="space-y-1">
-							<span className="text-(--app-text) text-sm font-semibold">Descricao</span>
+							<span className="text-(--app-text) text-sm font-semibold">{t('sqlEditor.fields.description', 'Description')}</span>
 							<textarea
 								value={activeTab.catalogDescription}
 								onChange={(event) => patchActiveTab({ catalogDescription: event.target.value })}
@@ -669,7 +690,7 @@ export function HttpClientPage() {
 							/>
 						</label>
 						<div className="space-y-1">
-							<span className="text-(--app-text) text-sm font-semibold">Publico</span>
+							<span className="text-(--app-text) text-sm font-semibold">{t('sqlEditor.fields.public', 'Public')}</span>
 							<BooleanChoice value={activeTab.catalogPublic} onChange={(value) => patchActiveTab({ catalogPublic: value })} />
 						</div>
 						<div className="flex justify-end gap-2">

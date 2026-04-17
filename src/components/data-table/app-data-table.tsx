@@ -130,7 +130,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
   mobileCard,
   sort,
   rowActions,
-  actionsLabel = 'Acoes',
+  actionsLabel,
   actionsColumnClassName = 'w-[232px] whitespace-nowrap',
   expandedRowIds = [],
   onToggleExpandedRow,
@@ -146,6 +146,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
   pageSize,
 }: AppDataTableProps<TItem, TColumn, TFilters>) {
   const { t } = useI18n()
+  const resolvedActionsLabel = actionsLabel ?? t('common.actions', 'Actions')
   const selectableRows = selectable && isRowSelectable
     ? rows.filter((item) => isRowSelectable(item))
     : rows
@@ -242,7 +243,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                 })}
                 {rowActions ? (
                   <th className={`overflow-hidden whitespace-nowrap border-b border-line/50 px-3 py-3 ${actionsColumnClassName}`.trim()}>
-                    {actionsLabel}
+                    {resolvedActionsLabel}
                   </th>
                 ) : null}
               </tr>

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import type { LucideIcon } from 'lucide-react'
 import { SlidersHorizontal } from 'lucide-react'
+import { useI18n } from '@/src/i18n/use-i18n'
 
 type DataTableToolbarButtonProps = {
   label: string
@@ -95,10 +96,15 @@ type DataTableFilterToggleActionProps = {
 export function DataTableFilterToggleAction({
   expanded,
   onClick,
-  collapsedLabel = 'Filtros',
-  expandedLabel = 'Ocultar filtros',
-  hint = 'Refinar listagem',
+  collapsedLabel,
+  expandedLabel,
+  hint,
 }: DataTableFilterToggleActionProps) {
+  const { t } = useI18n()
+  const resolvedCollapsedLabel = collapsedLabel ?? t('filters.button', 'Filters')
+  const resolvedExpandedLabel = expandedLabel ?? t('filters.hide', 'Hide filters')
+  const resolvedHint = hint ?? t('filters.hint', 'Refine listing')
+
   return (
     <button
       type="button"
@@ -106,8 +112,8 @@ export function DataTableFilterToggleAction({
       className="app-button-secondary inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-full px-4 text-sm font-semibold"
     >
       <SlidersHorizontal className="h-4 w-4" />
-      <span>{expanded ? expandedLabel : collapsedLabel}</span>
-      <span className="hidden text-[11px] font-medium text-slate-400 lg:inline">{hint}</span>
+      <span>{expanded ? resolvedExpandedLabel : resolvedCollapsedLabel}</span>
+      <span className="hidden text-[11px] font-medium text-slate-400 lg:inline">{resolvedHint}</span>
     </button>
   )
 }
