@@ -1,0 +1,575 @@
+{
+	"dashboard_agileecommerce_metrics": {
+		"metadata": {
+			"source_file": "app/Http/Controllers/DashboardAgileecommerceController.php",
+			"schema_version": 1,
+			"cache_ttl_minutes": 10,
+			"last_updated": "2026-04-17"
+		},
+		"metrics": {
+			"empresas_sem_app": {
+				"nome_no_api": "top_empresas_sem_app",
+				"blocos": ["empresas", "apps"],
+				"tabelas_fonte": {
+					"principal": "empresas AS e",
+					"exclusao": {
+						"tabela": "apps AS a",
+						"condicao": "NOT EXISTS (SELECT 1 FROM apps WHERE id_empresa = e.id AND deleted_at IS NULL)"
+					}
+				},
+				"periodo": {
+					"tipo": "filtravel",
+					"parametros": ["data_inicio", "data_fim"],
+					"default": "definido_pelo_usuario"
+				},
+				"consulta_sql": {
+					"select": ["e.id", "e.nome_fantasia", "e.status"],
+					"from": "empresas AS e",
+					"where": ["e.deleted_at IS NULL", "NOT EXISTS (SELECT 1 FROM apps a WHERE a.id_empresa = e.id AND a.deleted_at IS NULL)"],
+					"order_by": "e.nome_fantasia ASC",
+					"limit": 20
+				},
+				"metricas_calculadas": {
+					"total_empresas_sem_app": {
+						"formula": "COUNT(DISTINCT e.id)",
+						"onde_aparece": "cards_atencao.empresas_sem_app no dashboardEmpresas"
+					}
+				},
+				"retorno": {
+					"tipo": "array",
+					"fields": ["id", "nome_fantasia", "status"]
+				}
+			},
+			"top_empresas_problemas_publicacao_build": {
+				"nome_no_api": "top_empresas_problemas_publicacao_build",
+				"blocos": ["empresas", "apps"],
+				"tabelas_fonte": {
+					"principal": "apps_logs AS l",
+					"joins": ["INNER JOIN apps AS a ON a.id = l.id_app", "INNER JOIN empresas AS e ON e.id = a.id_empresa"]
+				},
+				"periodo": {
+					"parametros": ["data_inicio", "data_fim"],
+					"campo_data": "l.created_at",
+					"tipo_filtro": "BETWEEN"
+				},
+				"filtros": {
+					"deletados": ["l.deleted_at IS NULL", "a.deleted_at IS NULL", "e.deleted_at IS NULL"],
+					"status": {
+						"valores": ["error", "queued", "building"],
+						"condicao": "l.status IN ('error', 'queued', 'building')"
+					}
+				},
+				"consulta_sql": {
+					"select": ["e.id", "e.nome_fantasia", "l.plataforma", "l.status", "COUNT(*) AS total_logs", "MAX(l.created_at) AS ultima_ocorrencia"],
+					"from": "apps_logs AS l",
+					"joins": ["INNER JOIN apps AS a ON a.id = l.id_app", "INNER JOIN empresas AS e ON e.id = a.id_empresa"],
+					"where": ["l.deleted_at IS NULL", "a.deleted_at IS NULL", "e.deleted_at IS NULL", "l.created_at BETWEEN ? AND ?", "l.status IN ('error', 'queued', 'building')"],
+					"group_by": ["e.id", "e.nome_fantasia", "l.plataforma", "l.status"],
+					"order_by": "ultima_ocorrencia DESC",
+					"limit": 20
+				},
+				"metricas": {
+					"total_logs": {
+						"tipo": "integer",
+						"descricao": "Quantidade de logs com erro, queued ou em construção"
+					},
+					"ultima_ocorrencia": {
+						"tipo": "timestamp",
+						"descricao": "Última vez que o problema ocorreu"
+					}
+				},
+				"retorno": {
+					"tipo": "array",
+					"fields": ["id", "nome_fantasia", "plataforma", "status", "total_logs", "ultima_ocorrencia"]
+				}
+			},
+			"execucoes_agente": {
+				"nome_no_api": "execucoes_agente (dentro de agent)",
+				"bloco": "agent",
+				"tabelas_fonte": {
+					"principal": "agente_execucoes"
+				},
+				"periodo": {
+					"parametros": ["data_inicio", "data_fim"],
+					"campo_data": "criado_em",
+					"tipo_filtro": "BETWEEN"
+				},
+				"consultas": {
+					"metricas_resumo": {
+						"select": [
+							"COUNT(*) AS execucoes",
+							"SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) AS execucoes_erro",
+							"SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) / COUNT(*) * 100 AS taxa_erro_execucoes"
+						],
+						"from": "agente_execucoes",
+						"where": "criado_em BETWEEN ? AND ?",
+						"metodo": "metricasAgentPeriodo()"
+					},
+					"status_distribuicao": {
+						"select": ["status", "COUNT(*) AS total"],
+						"from": "agente_execucoes",
+						"where": "criado_em BETWEEN ? AND ?",
+						"group_by": "status",
+						"order_by": "total DESC",
+						"retorno": "execucoes_status"
+					},
+					"serie_diaria": {
+						"select": ["DATE(criado_em) AS data", "COUNT(*) AS total"],
+						"from": "agente_execucoes",
+						"where": "criado_em BETWEEN ? AND ?",
+						"group_by": "DATE(criado_em)",
+						"order_by": "data ASC",
+						"retorno": "execucoes_serie_diaria"
+					}
+				},
+				"metricas": {
+					"execucoes": {
+						"formula": "COUNT(*) WHERE criado_em BETWEEN data_inicio AND data_fim",
+						"tipo": "integer"
+					},
+					"execucoes_erro": {
+						"formula": "COUNT(*) WHERE status = 'error' AND criado_em BETWEEN data_inicio AND data_fim",
+						"tipo": "integer"
+					},
+					"taxa_erro_execucoes": {
+						"formula": "(execucoes_erro / execucoes) * 100",
+						"tipo": "percentage",
+						"descricao": "Percentual de execuções com erro"
+					}
+				}
+			},
+			"auditoria_mcp": {
+				"nome_no_api": "auditoria_mcp (dentro de audit)",
+				"bloco": "audit",
+				"tabelas_fonte": {
+					"principal": "mcp_audit_log"
+				},
+				"periodo": {
+					"parametros": ["data_inicio", "data_fim"],
+					"campo_data": "created_at",
+					"tipo_filtro": "BETWEEN"
+				},
+				"consultas": {
+					"metricas_resumo": {
+						"select": [
+							"COUNT(*) AS total",
+							"SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) AS erro",
+							"SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) AS sucesso",
+							"AVG(duration_ms) AS duracao_media_ms",
+							"SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) / COUNT(*) * 100 AS taxa_erro"
+						],
+						"from": "mcp_audit_log",
+						"where": "created_at BETWEEN ? AND ?",
+						"metodo": "metricasAuditPeriodo()"
+					},
+					"status_distribuicao": {
+						"select": ["status", "COUNT(*) AS total", "AVG(duration_ms) AS duracao_media_ms"],
+						"from": "mcp_audit_log",
+						"where": "created_at BETWEEN ? AND ?",
+						"group_by": "status",
+						"order_by": "total DESC",
+						"retorno": "status"
+					},
+					"serie_diaria": {
+						"select": ["DATE(created_at) AS data", "COUNT(*) AS total"],
+						"from": "mcp_audit_log",
+						"where": "created_at BETWEEN ? AND ?",
+						"group_by": "DATE(created_at)",
+						"order_by": "data ASC",
+						"retorno": "serie"
+					}
+				},
+				"metricas": {
+					"total": {
+						"formula": "COUNT(*) WHERE created_at BETWEEN data_inicio AND data_fim",
+						"tipo": "integer",
+						"descricao": "Total de chamadas MCP"
+					},
+					"erro": {
+						"formula": "COUNT(*) WHERE status = 'error' AND created_at BETWEEN data_inicio AND data_fim",
+						"tipo": "integer"
+					},
+					"sucesso": {
+						"formula": "COUNT(*) WHERE status = 'success' AND created_at BETWEEN data_inicio AND data_fim",
+						"tipo": "integer"
+					},
+					"taxa_erro_mcp": {
+						"formula": "(erro / total) * 100",
+						"tipo": "percentage",
+						"descricao": "Percentual de erros nas chamadas MCP"
+					},
+					"duracao_media_ms": {
+						"formula": "AVG(duration_ms)",
+						"tipo": "float",
+						"unidade": "milissegundos"
+					}
+				}
+			},
+			"top_tools": {
+				"nome_no_api": "top_tools",
+				"bloco": "audit",
+				"tabelas_fonte": {
+					"principal": "mcp_audit_log"
+				},
+				"periodo": {
+					"parametros": ["data_inicio", "data_fim"],
+					"campo_data": "created_at",
+					"tipo_filtro": "BETWEEN"
+				},
+				"consulta_sql": {
+					"select": ["tool_name", "COUNT(*) AS total", "AVG(duration_ms) AS duracao_media_ms"],
+					"from": "mcp_audit_log",
+					"where": "created_at BETWEEN ? AND ?",
+					"group_by": "tool_name",
+					"order_by": "total DESC",
+					"limit": 20
+				},
+				"metricas": {
+					"tool_name": {
+						"tipo": "string",
+						"descricao": "Nome da ferramenta/tool MCP"
+					},
+					"total": {
+						"tipo": "integer",
+						"descricao": "Número de vezes que a tool foi chamada"
+					},
+					"duracao_media_ms": {
+						"tipo": "float",
+						"unidade": "milissegundos",
+						"descricao": "Tempo médio de execução da tool"
+					}
+				},
+				"retorno": {
+					"tipo": "array",
+					"tamanho": "até 20",
+					"fields": ["tool_name", "total", "duracao_media_ms"]
+				}
+			},
+			"alertas_tools": {
+				"nome_no_api": "alertas_tools",
+				"bloco": "audit",
+				"tabelas_fonte": {
+					"principal": "mcp_audit_log"
+				},
+				"periodo": {
+					"parametros": ["data_inicio", "data_fim"],
+					"campo_data": "created_at",
+					"tipo_filtro": "BETWEEN"
+				},
+				"filtros": {
+					"criterios": {
+						"condicao": "OR",
+						"opcoes": [
+							{
+								"nome": "tem_erros",
+								"formula": "SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) > 0"
+							},
+							{
+								"nome": "execucao_lenta",
+								"formula": "AVG(duration_ms) >= 1000",
+								"unidade": "milissegundos",
+								"descricao": "Média de execução maior ou igual a 1 segundo"
+							}
+						]
+					}
+				},
+				"consulta_sql": {
+					"select": ["tool_name", "COUNT(*) AS total", "SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) AS erros", "AVG(duration_ms) AS duracao_media_ms"],
+					"from": "mcp_audit_log",
+					"where": "created_at BETWEEN ? AND ?",
+					"group_by": "tool_name",
+					"having": ["SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) > 0 OR AVG(duration_ms) >= 1000"],
+					"order_by": ["erros DESC", "duracao_media_ms DESC"],
+					"limit": 20
+				},
+				"metricas": {
+					"tool_name": {
+						"tipo": "string",
+						"descricao": "Nome da ferramenta/tool MCP em alerta"
+					},
+					"total": {
+						"tipo": "integer",
+						"descricao": "Total de execuções da tool"
+					},
+					"erros": {
+						"tipo": "integer",
+						"descricao": "Quantidade de erros"
+					},
+					"taxa_erro_tools": {
+						"formula": "(erros / total) * 100",
+						"tipo": "percentage",
+						"descricao": "Percentual de erros"
+					},
+					"duracao_media_ms": {
+						"tipo": "float",
+						"unidade": "milissegundos",
+						"descricao": "Tempo médio de execução"
+					}
+				},
+				"retorno": {
+					"tipo": "array",
+					"tamanho": "até 20",
+					"fields": ["tool_name", "total", "erros", "duracao_media_ms"]
+				}
+			},
+			"taxa_erro_processos": {
+				"nome_no_api": "taxa_erro_processos (dentro de resumo e processos)",
+				"blocos": ["resumo", "processos"],
+				"tabelas_fonte": {
+					"principal": "processos"
+				},
+				"periodo": {
+					"parametros": ["data_inicio", "data_fim"],
+					"campo_data": "created_at",
+					"tipo_filtro": "BETWEEN"
+				},
+				"consulta_sql": {
+					"total_processos": {
+						"select": "COUNT(*) AS processos_total",
+						"from": "processos",
+						"where": ["deleted_at IS NULL", "created_at BETWEEN ? AND ?"]
+					},
+					"processos_erro": {
+						"select": "COUNT(*) AS processos_erro",
+						"from": "processos",
+						"where": ["deleted_at IS NULL", "created_at BETWEEN ? AND ?", "status = 'erro'"]
+					}
+				},
+				"metricas": {
+					"processos_total": {
+						"tipo": "integer",
+						"descricao": "Total de processos no período"
+					},
+					"processos_erro": {
+						"tipo": "integer",
+						"descricao": "Processos que falharam"
+					},
+					"taxa_erro_processos": {
+						"formula": "(processos_erro / processos_total) * 100",
+						"tipo": "percentage",
+						"descricao": "Percentual de processos com erro",
+						"condicao_divisao_zero": "se processos_total = 0, retorna 0"
+					}
+				}
+			},
+			"taxa_erro_mcp": {
+				"nome_no_api": "taxa_erro_mcp (dentro de resumo e audit)",
+				"blocos": ["resumo", "audit"],
+				"tabelas_fonte": {
+					"principal": "mcp_audit_log"
+				},
+				"periodo": {
+					"parametros": ["data_inicio", "data_fim"],
+					"campo_data": "created_at",
+					"tipo_filtro": "BETWEEN"
+				},
+				"consulta_sql": {
+					"total_auditorias": {
+						"select": "COUNT(*) AS auditorias_mcp",
+						"from": "mcp_audit_log",
+						"where": "created_at BETWEEN ? AND ?"
+					},
+					"auditorias_erro": {
+						"select": "COUNT(*) AS auditorias_mcp_erro",
+						"from": "mcp_audit_log",
+						"where": ["created_at BETWEEN ? AND ?", "status = 'error'"]
+					}
+				},
+				"metricas": {
+					"auditorias_mcp": {
+						"tipo": "integer",
+						"descricao": "Total de execuções MCP"
+					},
+					"auditorias_mcp_erro": {
+						"tipo": "integer",
+						"descricao": "Execuções MCP com erro"
+					},
+					"taxa_erro_mcp": {
+						"formula": "(auditorias_mcp_erro / auditorias_mcp) * 100",
+						"tipo": "percentage",
+						"descricao": "Percentual de execuções MCP com erro",
+						"condicao_divisao_zero": "se auditorias_mcp = 0, retorna 0"
+					}
+				}
+			},
+			"cobertura_apps_percentual": {
+				"nome_no_api": "cobertura_apps_percentual (dentro de resumo)",
+				"bloco": "resumo",
+				"tabelas_fonte": {
+					"total_empresas": "empresas",
+					"empresas_com_app": "apps"
+				},
+				"periodo": {
+					"tipo": "snapshot",
+					"descricao": "Não usa período de data, é um valor total atual"
+				},
+				"consulta_sql": {
+					"empresas_total": {
+						"select": "COUNT(*) AS empresas_total",
+						"from": "empresas",
+						"where": "deleted_at IS NULL"
+					},
+					"empresas_com_app": {
+						"select": "COUNT(DISTINCT id_empresa) AS empresas_com_app",
+						"from": "apps",
+						"where": "deleted_at IS NULL"
+					}
+				},
+				"metricas": {
+					"empresas_total": {
+						"tipo": "integer",
+						"descricao": "Total de empresas no sistema"
+					},
+					"empresas_com_app": {
+						"tipo": "integer",
+						"descricao": "Quantidade de empresas que têm pelo menos um app"
+					},
+					"cobertura_apps_percentual": {
+						"formula": "(empresas_com_app / empresas_total) * 100",
+						"tipo": "percentage",
+						"descricao": "Percentual de empresas com pelo menos um app",
+						"condicao_divisao_zero": "se empresas_total = 0, retorna 0"
+					}
+				}
+			}
+		},
+		"periodos_suportados": {
+			"tipo_filtro": "BETWEEN",
+			"parametros_entrada": {
+				"data_inicio": "STRING formato YYYY-MM-DD ou YYYY-MM-DD HH:MM:SS",
+				"data_fim": "STRING formato YYYY-MM-DD ou YYYY-MM-DD HH:MM:SS"
+			},
+			"normalizacao": {
+				"descricao": "As datas são normalizadas automaticamente",
+				"se_apenas_data": {
+					"data_inicio": "appenda ' 00:00:00'",
+					"data_fim": "appenda ' 23:59:59'"
+				}
+			},
+			"periodo_anterior": {
+				"parametros": ["data_inicio_anterior", "previousStart", "startDatePrev"],
+				"parametros_fim": ["data_fim_anterior", "previousEnd", "endDatePrev"],
+				"opcionalidade": "Opcional - apenas para relatórios comparativos",
+				"uso": "Calcula variação percentual entre período atual e anterior"
+			}
+		},
+		"cache_e_performance": {
+			"cache_ttl": "10 minutos",
+			"cache_key_componentes": ["schema_version", "data_inicio", "data_fim", "periodo_anterior", "blocos_solicitados"],
+			"parametro_bypass": "sem_cache=1 ou sem_cache=true ou sem_cache=sim",
+			"metricas_rastreadas": ["duracao_ms", "memoria_inicio_mb", "memoria_fim_mb", "memoria_pico_mb"]
+		},
+		"blocos_disponiveis": {
+			"resumo": {
+				"descricao": "Métricas de alto nível: carteira, cobertura de apps, fluxo geral",
+				"inclui": ["empresas_total", "empresas_ativas", "cobertura_apps_percentual", "taxa_erro_processos", "taxa_erro_mcp"]
+			},
+			"empresas": {
+				"descricao": "Análise de empresas, status, clusters, ERPs",
+				"inclui": ["top_empresas_sem_app", "top_empresas_problemas_app"]
+			},
+			"apps": {
+				"descricao": "Métricas de aplicativos, logs e builds",
+				"inclui": ["top_empresas_sem_app", "top_empresas_problemas_publicacao_build"]
+			},
+			"push": {
+				"descricao": "Notificações push enviadas e interações"
+			},
+			"processos": {
+				"descricao": "Execução de processos, erros, tipos",
+				"inclui": ["taxa_erro_processos"]
+			},
+			"agent": {
+				"descricao": "Execuções de agentes IA, mensagens, webhooks",
+				"inclui": ["execucoes_agente"]
+			},
+			"audit": {
+				"descricao": "Auditoria MCP, tools, alertas",
+				"inclui": ["auditoria_mcp", "top_tools", "alertas_tools", "taxa_erro_mcp"]
+			},
+			"leads": {
+				"descricao": "Leads por status e fonte"
+			}
+		},
+		"autenticacao_e_autorizacao": {
+			"endpoint": "POST /dashboard/agileecommerce/total",
+			"requerimentos": {
+				"usuario_autenticado": true,
+				"master_user": true,
+				"tenant_requerido": "agileecommerce (ROOT_TENANT_ID)",
+				"acesso_negado_se": ["não autenticado -> 401", "não é master -> 403", "tenant != agileecommerce -> 403"]
+			}
+		},
+		"exemplo_requisicao": {
+			"metodo": "POST",
+			"url": "/api/dashboard/agileecommerce/total",
+			"headers": {
+				"Content-Type": "application/json",
+				"Authorization": "Bearer {token}"
+			},
+			"body": {
+				"data_inicio": "2026-04-01",
+				"data_fim": "2026-04-17",
+				"blocos": ["resumo", "empresas", "apps", "agent", "audit"],
+				"data_inicio_anterior": "2026-03-01",
+				"data_fim_anterior": "2026-03-31",
+				"sem_cache": false
+			}
+		},
+		"exemplo_resposta": {
+			"meta": {
+				"versao": "agileecommerce-v1",
+				"schema": 1,
+				"cache_ttl_minutos": 10,
+				"cache_ignorado": false,
+				"cache_hit": true,
+				"tenant_id": "agileecommerce",
+				"blocos": ["resumo", "empresas", "apps", "agent", "audit"],
+				"periodo": {
+					"data_inicio": "2026-04-01 00:00:00",
+					"data_fim": "2026-04-17 23:59:59",
+					"data_inicio_anterior": "2026-03-01 00:00:00",
+					"data_fim_anterior": "2026-03-31 23:59:59"
+				}
+			},
+			"resumo": {
+				"carteira": {
+					"empresas_total": 1250,
+					"empresas_ativas": 1180,
+					"cobertura_apps_percentual": 78.5
+				},
+				"periodo_atual": {
+					"taxa_erro_processos": 2.3,
+					"taxa_erro_mcp": 1.8,
+					"execucoes_agente": 45230
+				}
+			},
+			"empresas": {
+				"top_empresas_sem_app": [
+					{
+						"id": "empresa-123",
+						"nome_fantasia": "Empresa XYZ",
+						"status": "producao"
+					}
+				]
+			},
+			"audit": {
+				"top_tools": [
+					{
+						"tool_name": "fetch_data",
+						"total": 5230,
+						"duracao_media_ms": 245.5
+					}
+				],
+				"alertas_tools": [
+					{
+						"tool_name": "slow_process",
+						"total": 890,
+						"erros": 45,
+						"duracao_media_ms": 1250
+					}
+				]
+			}
+		}
+	}
+}

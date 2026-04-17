@@ -72,6 +72,7 @@ function formatCellValue(value: unknown) {
 }
 
 function ResultTable({ rows, search }: { rows: SqlEditorResultRow[]; search: string }) {
+	const { t } = useI18n();
 	const viewportRef = useRef<HTMLDivElement | null>(null);
 	const scrollbarRef = useRef<HTMLDivElement | null>(null);
 	const [scrollWidth, setScrollWidth] = useState(0);
@@ -120,7 +121,9 @@ function ResultTable({ rows, search }: { rows: SqlEditorResultRow[]; search: str
 
 	if (!filteredRows.length) {
 		return (
-			<div className="app-control-muted rounded-[1rem] border border-dashed px-5 py-8 text-sm text-[color:var(--app-muted)]">Nenhum registro retornado para a consulta atual.</div>
+			<div className="app-control-muted rounded-[1rem] border border-dashed px-5 py-8 text-sm text-[color:var(--app-muted)]">
+				{t('sqlEditor.messages.noRowsForQuery', 'No records were returned for the current query.')}
+			</div>
 		);
 	}
 
