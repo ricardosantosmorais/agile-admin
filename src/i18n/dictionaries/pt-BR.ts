@@ -1278,7 +1278,6 @@ export const ptBR: TranslationDictionary = {
 			ordersTotal: 'Pedidos transacionados',
 			averageTicketConsolidated: 'Ticket médio consolidado',
 			activeCustomers: 'Clientes ativos',
-			syncErrorRate: 'Taxa de erro de sincronização',
 		},
 		charts: {
 			companyStatus: 'Empresas por status',

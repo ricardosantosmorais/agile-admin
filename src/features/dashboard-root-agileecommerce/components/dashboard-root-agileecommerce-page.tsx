@@ -759,7 +759,7 @@ export function DashboardRootAgileecommercePage() {
 									title={t('dashboardRoot.analyticsTitle', 'Analytics comercial e operação')}
 									description={t('dashboardRoot.analyticsDescription', 'Consolidação de faturamento, pedidos, engajamento e sincronização analítica por empresa.')}
 								>
-									<div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+									<div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
 										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
 											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('dashboardRoot.cards.revenueTotal', 'Faturamento total')}</div>
 											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{formatCurrency(parseNumber(snapshot.analytics?.resumo?.valor_total_vendas))}</div>
@@ -779,14 +779,6 @@ export function DashboardRootAgileecommercePage() {
 										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
 											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('dashboardRoot.cards.activeCustomers', 'Clientes ativos')}</div>
 											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{formatNumber(parseNumber(snapshot.analytics?.resumo?.clientes_ativos))}</div>
-										</div>
-										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
-											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-												{t('dashboardRoot.cards.syncErrorRate', 'Taxa de erro de sincronização')}
-											</div>
-											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">
-												{formatNumber(parseNumber(snapshot.analytics?.sincronizacao_resumo?.taxa_erro))}%
-											</div>
 										</div>
 									</div>
 
