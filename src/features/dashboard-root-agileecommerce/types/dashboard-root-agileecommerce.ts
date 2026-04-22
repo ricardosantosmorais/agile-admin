@@ -120,4 +120,19 @@ export type DashboardRootSnapshot = {
 		fontes: DashboardRootSimpleRow[];
 		serie_mensal: DashboardRootSimpleRow[];
 	};
+	analytics?: {
+		resumo: Record<string, number>;
+		comparativo: DashboardRootComparativo;
+		vendas_series_mensal: DashboardRootSimpleRow[];
+		ranking_faturamento: DashboardRootSimpleRow[];
+		ranking_pedidos: DashboardRootSimpleRow[];
+		engajamento_empresas: DashboardRootSimpleRow[];
+		empresas_mais_produtos: DashboardRootSimpleRow[];
+		pedidos_status: DashboardRootSimpleRow[];
+		empresas_sinais_queda: DashboardRootSimpleRow[];
+		sincronizacao_resumo: DashboardRootSimpleRow;
+		sincronizacao_status: DashboardRootSimpleRow[];
+		sincronizacao_execucoes_recentes: DashboardRootSimpleRow[];
+		cobertura_dados: DashboardRootSimpleRow[];
+	};
 };

@@ -24,7 +24,7 @@ import {
 import type { DashboardRootSimpleRow, DashboardRootSnapshot } from '@/src/features/dashboard-root-agileecommerce/types/dashboard-root-agileecommerce';
 import { useIntersectionOnce } from '@/src/hooks/use-intersection-once';
 import { useI18n } from '@/src/i18n/use-i18n';
-import { formatDate, formatNumber } from '@/src/lib/formatters';
+import { formatCurrency, formatDate, formatNumber } from '@/src/lib/formatters';
 
 const chartPalette = ['#195f4d', '#0f766e', '#0284c7', '#f59e0b', '#e11d48', '#334155'];
 const MAX_DAYS = 365;
@@ -462,6 +462,8 @@ export function DashboardRootAgileecommercePage() {
 		[snapshot],
 	);
 	const auditStatusPie = useMemo(() => toNameValueSeries(snapshot?.audit?.status ?? [], 'status', 'total', (value) => formatDashboardRootBuildStatus(value, t)), [snapshot, t]);
+	const analyticsRevenueSeries = useMemo(() => toSeries(snapshot?.analytics?.vendas_series_mensal ?? [], 'mes', 'valor_total_vendas'), [snapshot]);
+	const analyticsOrderStatusPie = useMemo(() => toNameValueSeries(snapshot?.analytics?.pedidos_status ?? [], 'status_pedido', 'total_pedidos'), [snapshot]);
 	const topTools = snapshot?.audit?.top_tools ?? [];
 
 	return (
@@ -726,6 +728,114 @@ export function DashboardRootAgileecommercePage() {
 										</div>
 									</div>
 								</SectionCard>
+							</div>
+						</LazyDashboardSection>
+
+						<LazyDashboardSection
+							phaseIds={['analytics']}
+							isReady={hasPhase('analytics')}
+							requestPhases={requestPhases}
+							fallback={
+								<div className="space-y-4">
+									<SectionCard
+										title={t('dashboardRoot.analyticsTitle', 'Analytics comercial e operação')}
+										description={t('dashboardRoot.analyticsDescription', 'Consolidação de faturamento, pedidos, engajamento e sincronização analítica por empresa.')}
+									>
+										<SectionSkeleton lines={4} chart />
+									</SectionCard>
+									<div className="grid gap-4 xl:grid-cols-2">
+										<SectionCard title={t('dashboardRoot.tables.revenueRanking', 'Ranking de faturamento')}>
+											<SectionSkeleton lines={6} />
+										</SectionCard>
+										<SectionCard title={t('dashboardRoot.tables.declineSignals', 'Sinais de queda de faturamento')}>
+											<SectionSkeleton lines={6} />
+										</SectionCard>
+									</div>
+								</div>
+							}
+						>
+							<div className="space-y-4">
+								<SectionCard
+									title={t('dashboardRoot.analyticsTitle', 'Analytics comercial e operação')}
+									description={t('dashboardRoot.analyticsDescription', 'Consolidação de faturamento, pedidos, engajamento e sincronização analítica por empresa.')}
+								>
+									<div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
+											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('dashboardRoot.cards.revenueTotal', 'Faturamento total')}</div>
+											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{formatCurrency(parseNumber(snapshot.analytics?.resumo?.valor_total_vendas))}</div>
+										</div>
+										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
+											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('dashboardRoot.cards.ordersTotal', 'Pedidos transacionados')}</div>
+											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{formatNumber(parseNumber(snapshot.analytics?.resumo?.total_pedidos))}</div>
+										</div>
+										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
+											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+												{t('dashboardRoot.cards.averageTicketConsolidated', 'Ticket médio consolidado')}
+											</div>
+											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+												{formatCurrency(parseNumber(snapshot.analytics?.resumo?.ticket_medio_consolidado))}
+											</div>
+										</div>
+										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
+											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('dashboardRoot.cards.activeCustomers', 'Clientes ativos')}</div>
+											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{formatNumber(parseNumber(snapshot.analytics?.resumo?.clientes_ativos))}</div>
+										</div>
+										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
+											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+												{t('dashboardRoot.cards.syncErrorRate', 'Taxa de erro de sincronização')}
+											</div>
+											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+												{formatNumber(parseNumber(snapshot.analytics?.sincronizacao_resumo?.taxa_erro))}%
+											</div>
+										</div>
+									</div>
+
+									<div className="mt-4 grid gap-4 xl:grid-cols-2">
+										<div>
+											<h3 className="mb-3 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.transactedVolumeMonthly', 'Volume transacionado por mês')}</h3>
+											<LineChartCard data={analyticsRevenueSeries} dataKey="value" titleKey="dashboardRoot.charts.transactedVolumeMonthly" formatValue={formatCurrency} />
+										</div>
+										<div>
+											<h3 className="mb-3 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.ordersByStatus', 'Pedidos por status')}</h3>
+											<PieChartCard data={analyticsOrderStatusPie} />
+										</div>
+									</div>
+								</SectionCard>
+
+								<div className="grid gap-4 xl:grid-cols-2">
+									<SectionCard title={t('dashboardRoot.tables.revenueRanking', 'Ranking de faturamento')}>
+										<SimpleTable
+											rows={snapshot.analytics?.ranking_faturamento ?? []}
+											maxHeightClass="max-h-[360px]"
+											columns={[
+												{ key: 'empresa_nome', label: t('dashboardRoot.table.company', 'Empresa') },
+												{ key: 'valor_total_vendas', label: t('dashboardRoot.table.revenue', 'Faturamento'), formatter: (value) => formatCurrency(parseNumber(value)) },
+												{ key: 'total_pedidos', label: t('dashboardRoot.table.orderCount', 'Pedidos'), formatter: (value) => formatNumber(parseNumber(value)) },
+											]}
+										/>
+									</SectionCard>
+
+									<SectionCard title={t('dashboardRoot.tables.declineSignals', 'Sinais de queda de faturamento')}>
+										<SimpleTable
+											rows={snapshot.analytics?.empresas_sinais_queda ?? []}
+											maxHeightClass="max-h-[360px]"
+											columns={[
+												{ key: 'empresa_nome', label: t('dashboardRoot.table.company', 'Empresa') },
+												{
+													key: 'valor_anterior',
+													label: t('dashboardRoot.table.previousRevenue', 'Faturamento anterior'),
+													formatter: (value) => formatCurrency(parseNumber(value)),
+												},
+												{ key: 'valor_atual', label: t('dashboardRoot.table.currentRevenue', 'Faturamento atual'), formatter: (value) => formatCurrency(parseNumber(value)) },
+												{
+													key: 'variacao_percentual',
+													label: t('dashboardRoot.table.variation', 'Variação'),
+													formatter: (value) => `${formatNumber(parseNumber(value))}%`,
+												},
+											]}
+										/>
+									</SectionCard>
+								</div>
 							</div>
 						</LazyDashboardSection>
 
