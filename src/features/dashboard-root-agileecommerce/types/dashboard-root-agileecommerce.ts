@@ -123,13 +123,17 @@ export type DashboardRootSnapshot = {
 	analytics?: {
 		resumo: Record<string, number>;
 		comparativo: DashboardRootComparativo;
+		confianca: DashboardRootSimpleRow;
 		vendas_series_mensal: DashboardRootSimpleRow[];
 		ranking_faturamento: DashboardRootSimpleRow[];
 		ranking_pedidos: DashboardRootSimpleRow[];
+		ranking_usuarios_ativos: DashboardRootSimpleRow[];
 		engajamento_empresas: DashboardRootSimpleRow[];
+		empresas_base_saudavel: DashboardRootSimpleRow[];
 		empresas_mais_produtos: DashboardRootSimpleRow[];
 		pedidos_status: DashboardRootSimpleRow[];
 		empresas_sinais_queda: DashboardRootSimpleRow[];
+		frescor_analytics_por_empresa: DashboardRootSimpleRow[];
 		sincronizacao_resumo: DashboardRootSimpleRow;
 		sincronizacao_status: DashboardRootSimpleRow[];
 		sincronizacao_execucoes_recentes: DashboardRootSimpleRow[];

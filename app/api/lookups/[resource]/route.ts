@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readAuthSession } from '@/src/features/auth/services/auth-session'
 import { mapLookupResponse } from '@/src/features/clientes/services/clientes-mappers'
+import { externalAdminApiFetch } from '@/src/services/http/external-admin-api'
 import { serverApiFetch } from '@/src/services/http/server-api'
 
-const lookupConfig: Record<string, { path: string; labelKeys: string[]; searchField: string; order?: string }> = {
+const lookupConfig: Record<string, { path: string; labelKeys: string[]; searchField: string; order?: string; extraQuery?: Record<string, string> }> = {
   clientes: { path: 'clientes', labelKeys: ['nome_fantasia', 'razao_social'], searchField: 'nome_fantasia::like', order: 'nome_fantasia' },
+  empresas: { path: 'empresas', labelKeys: ['nome_fantasia', 'razao_social'], searchField: 'nome_fantasia::like', order: 'nome_fantasia' },
   grupos: { path: 'grupos', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   redes: { path: 'redes', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   segmentos: { path: 'segmentos', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   canais_distribuicao: { path: 'canais_distribuicao', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   filiais: { path: 'filiais', labelKeys: ['nome_fantasia', 'nome'], searchField: 'nome_fantasia::like', order: 'nome_fantasia' },
+  templates_integracao: { path: 'templates', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   grupos_filiais: { path: 'grupos_filiais', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   vendedores: { path: 'vendedores', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   supervisores: { path: 'supervisores', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
@@ -24,6 +27,8 @@ const lookupConfig: Record<string, { path: string; labelKeys: string[]; searchFi
   grupos_promocao: { path: 'grupos_promocao', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   pracas: { path: 'pracas', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   rotas: { path: 'rotas', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
+  clusters: { path: 'clusters', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
+  administradores_master: { path: 'administradores', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome', extraQuery: { master: '1' } },
   promocoes: { path: 'promocoes', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   brindes: { path: 'brindes', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   tabelas_preco: { path: 'tabelas_preco', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
@@ -52,12 +57,36 @@ export async function GET(
   const id = (request.nextUrl.searchParams.get('id') || '').trim()
   const page = request.nextUrl.searchParams.get('page') || '1'
   const perPage = request.nextUrl.searchParams.get('perPage') || '15'
+
+  if (resource === 'templates_integracao') {
+    const result = await externalAdminApiFetch('painelb2b', 'templates', {
+      method: 'GET',
+      query: {
+        page: id ? '1' : page,
+        perpage: id ? '1' : perPage,
+        order: 'nome',
+        sort: 'asc',
+        ...(id ? { id } : {}),
+      },
+    })
+
+    if (!result.ok) {
+      return NextResponse.json({ message: 'Nao foi possivel carregar as opcoes.' }, { status: result.status || 400 })
+    }
+
+    return NextResponse.json(mapLookupResponse(result.payload, ['nome']))
+  }
+
   const params = new URLSearchParams({
     page: id ? '1' : page,
     perpage: id ? '1' : perPage,
     order: config.order || 'nome',
     sort: 'asc',
   })
+
+  for (const [key, value] of Object.entries(config.extraQuery || {})) {
+    params.set(key, value)
+  }
 
   if (id) {
     params.set('id', id)

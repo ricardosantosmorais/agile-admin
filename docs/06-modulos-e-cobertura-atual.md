@@ -27,6 +27,7 @@
 ### Pessoas
 
 - Clientes
+- Empresas
 - Supervisores
 - Contatos
 - Grupos de Clientes

@@ -1,5 +1,6 @@
 import { ArrowDownRight, ArrowUpRight, BadgePercent, DollarSign, ReceiptText, ShoppingCart } from 'lucide-react';
 import { translateDashboardMetricDescription, translateDashboardMetricLabel } from '@/src/features/dashboard/services/dashboard-i18n';
+import { TooltipIconButton } from '@/src/components/ui/tooltip-icon-button';
 import { useI18n } from '@/src/i18n/use-i18n';
 import { formatCompactCurrency, formatNumber, formatPercent } from '@/src/lib/formatters';
 
@@ -13,6 +14,7 @@ type StatCardProps = {
 	description?: string;
 	descriptionKey?: string;
 	tone?: 'emerald' | 'sky' | 'amber' | 'rose';
+	tooltip?: string;
 };
 
 const toneStyles = {
@@ -51,7 +53,7 @@ function renderMetricIcon(type: 'currency' | 'number' | 'percent', tone: 'emeral
 	return <ShoppingCart className="h-4 w-4" />;
 }
 
-export function StatCard({ label, labelKey, value, variation, showComparison = true, type = 'number', description, descriptionKey, tone = 'emerald' }: StatCardProps) {
+export function StatCard({ label, labelKey, value, variation, showComparison = true, type = 'number', description, descriptionKey, tone = 'emerald', tooltip }: StatCardProps) {
 	const { t } = useI18n();
 	const variationPositive = variation > 0;
 	const VariationIcon = variationPositive ? ArrowUpRight : ArrowDownRight;
@@ -64,7 +66,20 @@ export function StatCard({ label, labelKey, value, variation, showComparison = t
 
 			<div className="flex items-start justify-between gap-2.5">
 				<div>
-					<p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">{translatedLabel}</p>
+					<div className="flex items-center gap-1.5">
+						<p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">{translatedLabel}</p>
+						{tooltip ? (
+							<TooltipIconButton label={tooltip}>
+								<button
+									type="button"
+									className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-line/80 text-[10px] font-bold text-slate-500"
+									aria-label={translatedLabel}
+								>
+									i
+								</button>
+							</TooltipIconButton>
+						) : null}
+					</div>
 					<strong className="mt-2 block text-[1.7rem] font-black tracking-tight text-[color:var(--app-text)]">{formatValue(value, type)}</strong>
 				</div>
 

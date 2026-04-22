@@ -9,11 +9,23 @@ export function fieldRow(page: Page, label: RegExp): Locator {
   return formRoot(page)
     .getByText(label, { exact: true })
     .first()
-    .locator('xpath=ancestor::div[contains(@class,"grid")][1]')
+    .locator('xpath=ancestor::div[.//input or .//select or .//textarea or .//button][1]')
 }
 
 export function fieldInput(page: Page, label: RegExp): Locator {
   return fieldRow(page, label).locator('input').first()
+}
+
+export function fieldSelect(page: Page, label: RegExp): Locator {
+  return fieldRow(page, label).locator('select').first()
+}
+
+export function fieldDateInput(page: Page, label: RegExp): Locator {
+  return fieldRow(page, label).locator('input[type="date"]').first()
+}
+
+export function fieldNumberInput(page: Page, label: RegExp): Locator {
+  return fieldRow(page, label).locator('input[type="number"]').first()
 }
 
 export function fieldButton(page: Page, label: RegExp): Locator {

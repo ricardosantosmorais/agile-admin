@@ -220,7 +220,7 @@ export function CrudFormPage({ config, client, id }: { config: CrudModuleConfig;
       <AsyncState isLoading={isLoading} error={error?.message}>
         <form id={formId} className="space-y-6" onSubmit={(event) => void handleSubmit(event)}>
           <PageToast message={feedback || null} onClose={() => setFeedback('')} />
-          <CrudFormSections config={config} form={form} readOnly={readOnly} patch={patch} optionsMap={optionsMap} />
+          <CrudFormSections config={config} form={form} isEditing={isEditing} readOnly={readOnly} patch={patch} optionsMap={optionsMap} />
           <div ref={footerRef} className="flex flex-wrap justify-center gap-2.5 pt-1">
             {!readOnly ? <button type="submit" disabled={isSaving} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4.5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"><Save className="h-4 w-4" />{isSaving ? t('common.loading', 'Loading...') : t('common.save', 'Save')}</button> : null}
             <Link href={config.routeBase} className="inline-flex items-center rounded-full border border-line bg-white px-4.5 py-2.5 text-sm font-semibold text-slate-700">{t('common.cancel', 'Cancel')}</Link>

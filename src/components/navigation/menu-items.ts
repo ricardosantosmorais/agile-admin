@@ -103,6 +103,7 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 	'artigos-list': '/base-de-conhecimento',
 	'changelog-publico-list': '/atualizacoes-gerais',
 	'pedidos-list': '/pedidos',
+	'empresas-list': '/empresas',
 	'produtos-list': '/produtos',
 	'produtos-precificadores-list': '/produtos-x-precificadores',
 	'restricoes-produtos-list': '/restricoes-produtos',
