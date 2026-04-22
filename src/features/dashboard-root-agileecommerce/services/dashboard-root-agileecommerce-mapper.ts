@@ -239,5 +239,25 @@ export function mapDashboardRootAgileecommercePayload(payload: unknown): Dashboa
 						serie_mensal: mapSimpleRows((record.leads as Record<string, unknown>).serie_mensal),
 					}
 				: undefined,
+		analytics:
+			record.analytics && typeof record.analytics === 'object' && !Array.isArray(record.analytics)
+				? {
+						resumo: Object.fromEntries(
+							Object.entries(((record.analytics as Record<string, unknown>).resumo as Record<string, unknown>) ?? {}).map(([key, value]) => [key, toNumber(value)]),
+						),
+						comparativo: mapComparativo((record.analytics as Record<string, unknown>).comparativo),
+						vendas_series_mensal: mapSimpleRows((record.analytics as Record<string, unknown>).vendas_series_mensal),
+						ranking_faturamento: mapSimpleRows((record.analytics as Record<string, unknown>).ranking_faturamento),
+						ranking_pedidos: mapSimpleRows((record.analytics as Record<string, unknown>).ranking_pedidos),
+						engajamento_empresas: mapSimpleRows((record.analytics as Record<string, unknown>).engajamento_empresas),
+						empresas_mais_produtos: mapSimpleRows((record.analytics as Record<string, unknown>).empresas_mais_produtos),
+						pedidos_status: mapSimpleRows((record.analytics as Record<string, unknown>).pedidos_status),
+						empresas_sinais_queda: mapSimpleRows((record.analytics as Record<string, unknown>).empresas_sinais_queda),
+						sincronizacao_resumo: mapSimpleRow((record.analytics as Record<string, unknown>).sincronizacao_resumo),
+						sincronizacao_status: mapSimpleRows((record.analytics as Record<string, unknown>).sincronizacao_status),
+						sincronizacao_execucoes_recentes: mapSimpleRows((record.analytics as Record<string, unknown>).sincronizacao_execucoes_recentes),
+						cobertura_dados: mapSimpleRows((record.analytics as Record<string, unknown>).cobertura_dados),
+					}
+				: undefined,
 	};
 }

@@ -208,3 +208,13 @@ export function formatDashboardRootPlatform(value: unknown, translate: Dashboard
 		nao_informado: 'Não informado',
 	});
 }
+
+export function formatDashboardRootSyncStatus(value: unknown, translate: DashboardTranslate) {
+	return translateMappedValue(value, translate, 'dashboardRoot.status.sync', {
+		sucesso: 'Sucesso',
+		erro: 'Erro',
+		em_andamento: 'Em andamento',
+		pendente: 'Pendente',
+		nao_informado: 'Não informado',
+	});
+}
