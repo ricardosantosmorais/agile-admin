@@ -1,0 +1,87 @@
+import { describe, expect, it } from 'vitest'
+import { buildEmpresaPayload, mapEmpresaDetail } from '@/src/features/empresas/services/empresas-form'
+
+describe('empresas-form', () => {
+  it('normaliza detalhe para o formulário com máscaras e prefixos removidos', () => {
+    expect(mapEmpresaDetail({
+      id: '55',
+      ativo: 1,
+      manutencao: 0,
+      bloqueado: 1,
+      intercom: 1,
+      fatura_totvs: 0,
+      cnpj: '12345678000199',
+      cep: '29160000',
+      ddd: '27',
+      telefone: '33334444',
+      ddd_celular: '27',
+      celular: '999999999',
+      url: 'https://empresa.exemplo.com.br',
+      s3_bucket: 'https://bucket-root.agilecdn.com.br',
+      data_inicio_implantacao: '2026-04-10 00:00:00',
+      data_fim_implantacao: '2026-04-20 00:00:00',
+    })).toMatchObject({
+      id: '55',
+      ativo: true,
+      manutencao: false,
+      bloqueado: true,
+      intercom: true,
+      fatura_totvs: false,
+      cnpj: '12.345.678/0001-99',
+      cep: '29160-000',
+      telefone: '(27) 3333-4444',
+      celular: '(27) 99999-9999',
+      url: 'empresa.exemplo.com.br',
+      s3_bucket: 'bucket-root',
+      data_inicio_implantacao: '2026-04-10',
+      data_fim_implantacao: '2026-04-20',
+    })
+  })
+
+  it('serializa payload seguindo o contrato legado de empresas', () => {
+    expect(buildEmpresaPayload({
+      id: '55',
+      ativo: true,
+      manutencao: false,
+      bloqueado: true,
+      intercom: true,
+      fatura_totvs: false,
+      cnpj: '12.345.678/0001-99',
+      cep: '29160-000',
+      telefone: '(27) 3333-4444',
+      celular: '(27) 99999-9999',
+      telefone_comercial: '(27) 98888-7777',
+      telefone_financeiro: '(27) 97777-6666',
+      telefone_tecnico: '(27) 96666-5555',
+      url: 'empresa.exemplo.com.br',
+      s3_bucket: 'bucket-root',
+      data_inicio_implantacao: '2026-04-10',
+      data_fim_implantacao: '2026-04-20',
+      dias_previsao_implantacao: '45',
+    })).toMatchObject({
+      id: '55',
+      ativo: true,
+      manutencao: false,
+      bloqueado: true,
+      intercom: true,
+      fatura_totvs: false,
+      cnpj: '12345678000199',
+      cep: '29160000',
+      ddd: '27',
+      telefone: '33334444',
+      ddd_celular: '27',
+      celular: '999999999',
+      ddd_comercial: '27',
+      telefone_comercial: '988887777',
+      ddd_financeiro: '27',
+      telefone_financeiro: '977776666',
+      ddd_tecnico: '27',
+      telefone_tecnico: '966665555',
+      url: 'https://empresa.exemplo.com.br',
+      s3_bucket: 'https://bucket-root.agilecdn.com.br',
+      data_inicio_implantacao: '2026-04-10 00:00:00',
+      data_fim_implantacao: '2026-04-20 00:00:00',
+      dias_previsao_implantacao: '45',
+    })
+  })
+})

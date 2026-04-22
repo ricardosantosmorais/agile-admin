@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { dashboardRootAgileecommerceClient } from '@/src/features/dashboard-root-agileecommerce/services/dashboard-root-agileecommerce-client';
 import type { DashboardRootSnapshot } from '@/src/features/dashboard-root-agileecommerce/types/dashboard-root-agileecommerce';
 
-export type DashboardRootPhaseId = 'summary' | 'platform' | 'product' | 'engagement' | 'analytics' | 'operations' | 'ai';
+export type DashboardRootPhaseId = 'summary' | 'analytics' | 'platform' | 'product' | 'engagement' | 'operations' | 'ai';
 
 type UseDashboardRootSequencedSnapshotOptions = {
 	startDate: string;
@@ -28,11 +28,11 @@ type DashboardRootSequenceState = {
 };
 
 const phaseDefinitions: DashboardRootPhaseDefinition[] = [
-	{ id: 'summary', blocks: ['resumo'] },
+	{ id: 'summary', blocks: ['resumo', 'analytics'] },
+	{ id: 'analytics', blocks: ['analytics'] },
 	{ id: 'platform', blocks: ['empresas'] },
 	{ id: 'product', blocks: ['apps'] },
 	{ id: 'engagement', blocks: ['push'] },
-	{ id: 'analytics', blocks: ['analytics'] },
 	{ id: 'operations', blocks: ['processos'] },
 	{ id: 'ai', blocks: ['agent', 'audit'] },
 ];
@@ -64,6 +64,7 @@ function mergePhaseSnapshot(current: DashboardRootSnapshot | null, partial: Dash
 				...base,
 				meta: partial.meta,
 				resumo: partial.resumo,
+				analytics: partial.analytics,
 			};
 		case 'platform':
 			return {
