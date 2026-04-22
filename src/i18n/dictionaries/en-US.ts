@@ -1277,7 +1277,6 @@ export const enUS: TranslationDictionary = {
 			ordersTotal: 'Transacted orders',
 			averageTicketConsolidated: 'Consolidated average ticket',
 			activeCustomers: 'Active customers',
-			syncErrorRate: 'Sync error rate',
 		},
 		charts: {
 			companyStatus: 'Companies by status',
