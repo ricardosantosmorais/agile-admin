@@ -63,6 +63,7 @@ export type FeatureKey =
 	| 'pracas'
 	| 'rotas'
 	| 'clientes'
+	| 'empresas'
 	| 'usuarios'
 	| 'vendedores'
 	| 'supervisores'
@@ -377,6 +378,10 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
 	clientes: {
 		label: 'Clientes',
 		matchers: ['cliente', 'clientes'],
+	},
+	empresas: {
+		label: 'Empresas',
+		matchers: ['empresa', 'empresas', 'empresas-list', 'empresas-form'],
 	},
 	usuarios: {
 		label: 'Usuarios',

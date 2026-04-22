@@ -218,3 +218,35 @@ export function formatDashboardRootSyncStatus(value: unknown, translate: Dashboa
 		nao_informado: 'Não informado',
 	});
 }
+export function formatDashboardRootOrderStatus(value: unknown, translate: DashboardTranslate) {
+	return translateMappedValue(value, translate, 'dashboardRoot.status.order', {
+		pago: 'Pago',
+		pagamento_aprovado: 'Pagamento aprovado',
+		aguardando_pagamento: 'Aguardando pagamento',
+		pendente: 'Pendente',
+		processando: 'Em processamento',
+		em_separacao: 'Em separacao',
+		separado: 'Separado',
+		faturado: 'Faturado',
+		enviado: 'Enviado',
+		entregue: 'Entregue',
+		cancelado: 'Cancelado',
+		cancelada: 'Cancelado',
+		cancelled: 'Cancelado',
+		devolvido: 'Devolvido',
+		finalizado: 'Finalizado',
+		nao_informado: 'Nao informado',
+	});
+}
+
+export function formatDashboardRootFreshnessStatus(value: unknown, translate: DashboardTranslate) {
+	return translateMappedValue(value, translate, 'dashboardRoot.status.freshness', {
+		ok: 'Atualizado',
+		alerta: 'Atencao',
+		critico: 'Critico',
+		critical: 'Critico',
+		outdated: 'Defasado',
+		stale: 'Defasado',
+		nao_informado: 'Nao informado',
+	});
+}

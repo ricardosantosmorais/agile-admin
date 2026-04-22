@@ -70,17 +70,19 @@ function withAdornment(control: React.ReactNode, prefixText?: string, suffixText
 type CrudFormSectionsProps = {
 	config: CrudModuleConfig;
 	form: CrudRecord;
+	isEditing?: boolean;
 	readOnly: boolean;
 	patch: (key: string, value: unknown) => void;
 	optionsMap: Record<string, CrudOption[]>;
 	sectionIds?: string[];
 };
 
-export function CrudFormSections({ config, form, readOnly, patch, optionsMap, sectionIds }: CrudFormSectionsProps) {
+export function CrudFormSections({ config, form, isEditing, readOnly, patch, optionsMap, sectionIds }: CrudFormSectionsProps) {
 	const { t } = useI18n();
 	const { session } = useAuth();
 	const tenantBucketUrl = session?.currentTenant.assetsBucketUrl ?? '';
 	const sections = sectionIds?.length ? config.sections.filter((section) => sectionIds.includes(section.id)) : config.sections;
+	const editingState = isEditing ?? Boolean(form.id);
 
 	return (
 		<>
@@ -98,7 +100,7 @@ export function CrudFormSections({ config, form, readOnly, patch, optionsMap, se
 								const label = t(field.labelKey, field.label);
 								const helperText = field.helperTextKey ? t(field.helperTextKey, field.helperText || '') : field.helperText;
 								const value = form[field.key];
-								const disabled = typeof field.disabled === 'function' ? field.disabled({ form, isEditing: Boolean(form.id) }) : Boolean(field.disabled);
+								const disabled = typeof field.disabled === 'function' ? field.disabled({ form, isEditing: editingState }) : Boolean(field.disabled);
 								const uploadHandler = field.uploadProfileId
 									? createProfileUploadHandler({
 											profileId: field.uploadProfileId,
@@ -162,7 +164,7 @@ export function CrudFormSections({ config, form, readOnly, patch, optionsMap, se
 										field.render({
 											value,
 											form,
-											isEditing: Boolean(form.id),
+											isEditing: editingState,
 											readOnly,
 											disabled,
 											patch,

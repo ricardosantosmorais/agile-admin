@@ -298,6 +298,7 @@ export function TabbedCatalogFormPage({
             <CrudFormSections
               config={config}
               form={form}
+              isEditing={isEditing}
               readOnly={readOnly}
               patch={patch}
               optionsMap={optionsMap}

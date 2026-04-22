@@ -15,6 +15,7 @@ import {
 	formatDashboardRootAttentionLabel,
 	formatDashboardRootBuildStatus,
 	formatDashboardRootCompanyStatus,
+	formatDashboardRootOrderStatus,
 	formatDashboardRootPlatform,
 	formatDashboardRootProcessStatus,
 	formatDashboardRootProcessType,
@@ -25,6 +26,7 @@ import type { DashboardRootSimpleRow, DashboardRootSnapshot } from '@/src/featur
 import { useIntersectionOnce } from '@/src/hooks/use-intersection-once';
 import { useI18n } from '@/src/i18n/use-i18n';
 import { formatCurrency, formatDate, formatNumber } from '@/src/lib/formatters';
+import { TooltipIconButton } from '@/src/components/ui/tooltip-icon-button';
 
 const chartPalette = ['#195f4d', '#0f766e', '#0284c7', '#f59e0b', '#e11d48', '#334155'];
 const MAX_DAYS = 365;
@@ -166,6 +168,164 @@ function LazyDashboardSection({
 	}, [hasIntersected, phaseIds, requestPhases]);
 
 	return <div ref={ref}>{isReady ? children : fallback}</div>;
+}
+
+function InfoTooltipButton({ label }: { label: string }) {
+	return (
+		<TooltipIconButton label={label}>
+			<button
+				type="button"
+				className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-line/80 bg-white text-xs font-bold text-slate-500 shadow-sm"
+				aria-label={label}
+			>
+				i
+			</button>
+		</TooltipIconButton>
+	);
+}
+
+function MetricTile({
+	label,
+	value,
+	helper,
+	tooltip,
+	tone = 'slate',
+}: {
+	label: string;
+	value: string;
+	helper: string;
+	tooltip?: string;
+	tone?: 'slate' | 'emerald' | 'sky' | 'amber' | 'rose';
+}) {
+	const toneMap = {
+		slate: 'border-slate-200 bg-slate-50/90',
+		emerald: 'border-emerald-200/80 bg-emerald-50/70',
+		sky: 'border-sky-200/80 bg-sky-50/70',
+		amber: 'border-amber-200/80 bg-amber-50/70',
+		rose: 'border-rose-200/80 bg-rose-50/70',
+	};
+
+	return (
+		<div className={`rounded-3xl border px-4 py-4 ${toneMap[tone]}`}>
+			<div className="flex items-start justify-between gap-2">
+				<div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">{label}</div>
+				{tooltip ? <InfoTooltipButton label={tooltip} /> : null}
+			</div>
+			<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{value}</div>
+			<div className="mt-2 text-[11px] leading-4 text-slate-500">{helper}</div>
+		</div>
+	);
+}
+
+function buildAttentionCardCopy(key: string, t: ReturnType<typeof useI18n>['t']) {
+	switch (key) {
+		case 'empresas_bloqueadas':
+			return {
+				helper: t('dashboardRoot.attention.empresasBloqueadasHelper', 'Empresas bloqueadas e potencialmente impedidas de operar normalmente no ambiente root.'),
+				tooltip: t('dashboardRoot.attention.empresasBloqueadasTooltip', 'Ajuda a dimensionar impacto operacional imediato na carteira administrada.'),
+			};
+		case 'empresas_manutencao':
+			return {
+				helper: t('dashboardRoot.attention.empresasManutencaoHelper', 'Empresas em manutenção que exigem leitura de estabilidade e acompanhamento técnico.'),
+				tooltip: t('dashboardRoot.attention.empresasManutencaoTooltip', 'Indica contas que podem estar com experiência degradada ou operação temporariamente limitada.'),
+			};
+		case 'empresas_sem_app':
+			return {
+				helper: t('dashboardRoot.attention.empresasSemAppHelper', 'Empresas da carteira sem aplicativo publicado ou vinculado no momento.'),
+				tooltip: t('dashboardRoot.attention.empresasSemAppTooltip', 'Serve para priorizar oportunidades de implantação, publicação ou retomada do canal mobile.'),
+			};
+		case 'empresas_com_build_falho_recente':
+			return {
+				helper: t('dashboardRoot.attention.empresasComBuildFalhoHelper', 'Empresas com falha recente de build ou publicação em seus aplicativos.'),
+				tooltip: t('dashboardRoot.attention.empresasComBuildFalhoTooltip', 'Leitura rápida para triagem de incidentes de entrega e publicação do app.'),
+			};
+		default:
+			return {
+				helper: t('dashboardRoot.attention.defaultHelper', 'Indicador de atenção operacional da carteira root.'),
+				tooltip: t('dashboardRoot.attention.defaultTooltip', 'Sinal complementar para leitura da saúde operacional da plataforma.'),
+			};
+	}
+}
+
+function aggregateLegendData(data: Array<{ name: string; value: number }>, limit = 5) {
+	const sorted = [...data].sort((left, right) => right.value - left.value);
+	if (sorted.length <= limit) {
+		return sorted;
+	}
+
+	const visible = sorted.slice(0, limit);
+	const othersValue = sorted.slice(limit).reduce((total, item) => total + item.value, 0);
+	if (othersValue > 0) {
+		visible.push({ name: 'Outros', value: othersValue });
+	}
+
+	return visible;
+}
+
+function StatusDonutCard({
+	data,
+	totalLabel,
+	tooltip,
+}: {
+	data: Array<{ name: string; value: number }>;
+	totalLabel: string;
+	tooltip?: string;
+}) {
+	const { t } = useI18n();
+	if (!data.length) {
+		return <div className="text-sm text-slate-500">{t('dashboardRoot.empty', 'Sem dados para este perÃ­odo.')}</div>;
+	}
+
+	const visibleData = aggregateLegendData(data, 5);
+	const total = visibleData.reduce((sum, item) => sum + item.value, 0);
+
+	return (
+		<div className="space-y-4">
+			<div className="relative mx-auto h-64 w-full max-w-[320px]">
+				<ResponsiveContainer width="100%" height="100%">
+					<PieChart>
+						<Pie data={visibleData} dataKey="value" nameKey="name" innerRadius={56} outerRadius={86} paddingAngle={3} stroke="#ffffff" strokeWidth={2}>
+							{visibleData.map((entry, index) => (
+								<Cell key={entry.name} fill={chartPalette[index % chartPalette.length]} />
+							))}
+						</Pie>
+						<Tooltip formatter={(value) => formatNumber(parseNumber(value))} />
+					</PieChart>
+				</ResponsiveContainer>
+				<div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+					<div className="rounded-full bg-white/95 px-4 py-3 text-center shadow-sm ring-1 ring-slate-100">
+						<div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-400">{totalLabel}</div>
+						<div className="mt-1 text-xl font-black tracking-tight text-slate-950">{formatNumber(total)}</div>
+					</div>
+				</div>
+			</div>
+
+			<div className="space-y-3">
+				<div className="flex items-center justify-between gap-2">
+					<div className="text-[11px] leading-5 text-slate-500">{t('dashboardRoot.ordersStatusLegend', 'Leitura dos principais status que compoem o volume de pedidos no periodo.')}</div>
+					{tooltip ? <InfoTooltipButton label={tooltip} /> : null}
+				</div>
+				<div className="grid gap-2 sm:grid-cols-2">
+					{visibleData.map((item, index) => {
+						const percentage = total > 0 ? (item.value / total) * 100 : 0;
+
+						return (
+							<div key={item.name} className="flex items-center justify-between gap-3 rounded-2xl border border-line/60 bg-slate-50/80 px-3 py-2.5">
+								<div className="flex min-w-0 items-center gap-2.5">
+									<span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: chartPalette[index % chartPalette.length] }} aria-hidden="true" />
+									<div className="min-w-0">
+										<div className="truncate text-sm font-semibold text-slate-700">{item.name}</div>
+										<div className="text-[11px] text-slate-500">{formatNumber(percentage)}%</div>
+									</div>
+								</div>
+								<div className="text-sm font-semibold text-slate-900">{formatNumber(item.value)}</div>
+							</div>
+						);
+					})}
+				</div>
+			</div>
+		</div>
+	);
 }
 
 function LineChartCard({
@@ -310,6 +470,7 @@ function toNameValueSeries(rows: DashboardRootSimpleRow[], labelKey: string, val
 	}));
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function buildExecutiveCards(snapshot: DashboardRootSnapshot, t: ReturnType<typeof useI18n>['t']) {
 	const resumo = snapshot.resumo;
 	if (!resumo) {
@@ -386,6 +547,186 @@ function buildExecutiveCards(snapshot: DashboardRootSnapshot, t: ReturnType<type
 	];
 }
 
+function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: ReturnType<typeof useI18n>['t'], hasComparison: boolean) {
+	const analytics = snapshot.analytics;
+	if (!analytics) {
+		return [];
+	}
+
+	const comparativo = analytics.comparativo?.variacoes ?? {};
+
+	const primaryCards = [
+		{
+			label: t('dashboardRoot.cards.revenueTotal', 'Faturamento consolidado'),
+			value: parseNumber(analytics.resumo?.valor_total_vendas),
+			variation: comparativo.valor_total_vendas ?? 0,
+			type: 'currency' as const,
+			tone: 'emerald' as const,
+			showComparison: hasComparison,
+			description: t('dashboardRoot.executive.revenueDescription', 'Soma de vendas registradas nas empresas com dados comerciais no período.'),
+			tooltip: t('dashboardRoot.executive.revenueTooltip', 'Considera os registros analíticos de vendas dentro do intervalo selecionado.'),
+		},
+		{
+			label: t('dashboardRoot.cards.ordersTotal', 'Pedidos consolidados'),
+			value: parseNumber(analytics.resumo?.total_pedidos),
+			variation: comparativo.total_pedidos ?? 0,
+			type: 'number' as const,
+			tone: 'sky' as const,
+			showComparison: hasComparison,
+			description: t('dashboardRoot.executive.ordersDescription', 'Quantidade total de pedidos registrados no período selecionado.'),
+			tooltip: t('dashboardRoot.executive.ordersTooltip', 'Soma de total_pedidos na camada analítica comercial do root.'),
+		},
+		{
+			label: t('dashboardRoot.cards.averageTicketConsolidated', 'Ticket médio consolidado'),
+			value: parseNumber(analytics.resumo?.ticket_medio_consolidado),
+			variation: comparativo.ticket_medio_consolidado ?? 0,
+			type: 'currency' as const,
+			tone: 'amber' as const,
+			showComparison: hasComparison,
+			description: t('dashboardRoot.executive.ticketDescription', 'Valor médio por pedido considerando a carteira consolidada.'),
+			tooltip: t('dashboardRoot.executive.ticketTooltip', 'Calculado como faturamento consolidado dividido pela quantidade total de pedidos.'),
+		},
+		{
+			label: t('dashboardRoot.cards.companiesWithSales', 'Empresas com venda no período'),
+			value: parseNumber(analytics.resumo?.empresas_com_dados),
+			variation: 0,
+			type: 'number' as const,
+			tone: 'sky' as const,
+			showComparison: false,
+			description: t('dashboardRoot.executive.companiesWithSalesDescription', 'Empresas distintas com vendas registradas no intervalo selecionado.'),
+			tooltip: t('dashboardRoot.executive.companiesWithSalesTooltip', 'Conta empresas presentes em analitico_vendas_diario no período.'),
+		},
+	];
+
+	if (!hasComparison) {
+		return [
+			...primaryCards,
+			{
+				label: t('dashboardRoot.cards.avgActiveCustomersDaily', 'Média diária de clientes ativos'),
+				value: parseNumber(analytics.resumo?.media_diaria_clientes_ativos),
+				variation: 0,
+				type: 'number' as const,
+				tone: 'sky' as const,
+				showComparison: false,
+				description: t('dashboardRoot.executiveNoComparison.avgActiveCustomersDescription', 'Média diária da base ativa observada nas empresas com dados de clientes no período.'),
+				tooltip: t('dashboardRoot.executiveNoComparison.avgActiveCustomersTooltip', 'Não é soma do período: representa o tamanho médio da base ativa durante o intervalo filtrado.'),
+			},
+			{
+				label: t('dashboardRoot.cards.avgBuyerCustomersDaily', 'Média diária de clientes compradores'),
+				value: parseNumber(analytics.resumo?.media_diaria_clientes_compradores),
+				variation: 0,
+				type: 'number' as const,
+				tone: 'emerald' as const,
+				showComparison: false,
+				description: t('dashboardRoot.executiveNoComparison.avgBuyerCustomersDescription', 'Média diária de clientes compradores para leitura de ativação comercial da base.'),
+				tooltip: t('dashboardRoot.executiveNoComparison.avgBuyerCustomersTooltip', 'Ajuda a entender quantos clientes, em média, compraram por dia entre as empresas com dado analítico disponível.'),
+			},
+			{
+				label: t('dashboardRoot.cards.avgProductsActiveDaily', 'Média diária de produtos ativos'),
+				value: parseNumber(analytics.resumo?.media_diaria_produtos_ativos),
+				variation: 0,
+				type: 'number' as const,
+				tone: 'amber' as const,
+				showComparison: false,
+				description: t('dashboardRoot.executiveNoComparison.avgProductsDescription', 'Média diária de produtos ativos para contextualizar oferta e catálogo no período.'),
+				tooltip: t('dashboardRoot.executiveNoComparison.avgProductsTooltip', 'Mostra a disponibilidade média do catálogo na camada analítica durante o intervalo.'),
+			},
+			{
+				label: t('dashboardRoot.cards.commercialCoverage', 'Cobertura comercial atual'),
+				value: parseNumber(analytics.confianca?.cobertura_vendas_frescas_percentual),
+				variation: 0,
+				type: 'percent' as const,
+				tone: 'amber' as const,
+				showComparison: false,
+				description: t('dashboardRoot.executive.commercialCoverageDescription', 'Percentual da carteira com dado comercial considerado fresco para leitura executiva.'),
+				tooltip: t('dashboardRoot.executive.commercialCoverageTooltip', 'Calculado com base na data máxima real de vendas por empresa, não apenas em checkpoints de sincronização.'),
+			},
+		];
+	}
+
+	return [
+		...primaryCards,
+		{
+			label: t('dashboardRoot.cards.salesGrowth', 'Crescimento de faturamento'),
+			value: comparativo.valor_total_vendas ?? 0,
+			variation: 0,
+			type: 'percent' as const,
+			tone: (comparativo.valor_total_vendas ?? 0) >= 0 ? ('emerald' as const) : ('rose' as const),
+			showComparison: false,
+			description: t('dashboardRoot.executive.salesGrowthDescription', 'Variação percentual do faturamento contra o período anterior equivalente.'),
+			tooltip: t('dashboardRoot.executive.salesGrowthTooltip', 'Ajuda a identificar aceleração ou retração da carteira no comparativo.'),
+		},
+		{
+			label: t('dashboardRoot.cards.ordersGrowth', 'Crescimento de pedidos'),
+			value: comparativo.total_pedidos ?? 0,
+			variation: 0,
+			type: 'percent' as const,
+			tone: (comparativo.total_pedidos ?? 0) >= 0 ? ('sky' as const) : ('rose' as const),
+			showComparison: false,
+			description: t('dashboardRoot.executive.ordersGrowthDescription', 'Variação percentual do volume de pedidos contra o período anterior.'),
+			tooltip: t('dashboardRoot.executive.ordersGrowthTooltip', 'Separa efeito de demanda do comportamento do ticket médio.'),
+		},
+		{
+			label: t('dashboardRoot.cards.companiesInDecline', 'Empresas em queda'),
+			value: parseNumber(analytics.resumo?.empresas_em_queda),
+			variation: 0,
+			type: 'number' as const,
+			tone: 'rose' as const,
+			showComparison: false,
+			description: t('dashboardRoot.executive.companiesInDeclineDescription', 'Empresas cujo faturamento caiu em relação ao período anterior equivalente.'),
+			tooltip: t('dashboardRoot.executive.companiesInDeclineTooltip', 'Usado para priorizar triagem comercial e acompanhamento da carteira.'),
+		},
+		{
+			label: t('dashboardRoot.cards.commercialCoverage', 'Cobertura comercial atual'),
+			value: parseNumber(analytics.confianca?.cobertura_vendas_frescas_percentual),
+			variation: 0,
+			type: 'percent' as const,
+			tone: 'amber' as const,
+			showComparison: false,
+			description: t('dashboardRoot.executive.commercialCoverageDescription', 'Percentual da carteira com dado comercial considerado fresco para leitura executiva.'),
+			tooltip: t('dashboardRoot.executive.commercialCoverageTooltip', 'Calculado com base na data máxima real de vendas por empresa, não apenas em checkpoints de sincronização.'),
+		},
+	];
+}
+
+function buildAnalyticsTrustCards(snapshot: DashboardRootSnapshot, t: ReturnType<typeof useI18n>['t']) {
+	const confianca = snapshot.analytics?.confianca;
+	if (!confianca) {
+		return [];
+	}
+
+	return [
+		{
+			label: t('dashboardRoot.trust.latestSalesUpdate', 'Última atualização real de vendas'),
+			value: parseText(confianca.ultima_data_vendas) !== '-' ? formatDate(parseText(confianca.ultima_data_vendas)) : '-',
+			tooltip: t('dashboardRoot.trust.latestSalesUpdateTooltip', 'Representa a data mais recente identificada diretamente nos registros consolidados de vendas.'),
+			tone: 'slate' as const,
+			helper: t('dashboardRoot.trust.latestSalesUpdateHelper', 'Última data máxima encontrada em analítico de vendas.'),
+		},
+		{
+			label: t('dashboardRoot.trust.salesCoverage', 'Cobertura de vendas frescas'),
+			value: `${formatNumber(parseNumber(confianca.empresas_com_vendas_frescas))}/${formatNumber(parseNumber(confianca.empresas_total_root))}`,
+			tooltip: t('dashboardRoot.trust.salesCoverageTooltip', 'Mostra quantas empresas possuem vendas consideradas atualizadas dentro da janela de confianca do dashboard.'),
+			tone: 'emerald' as const,
+			helper: `${formatNumber(parseNumber(confianca.cobertura_vendas_frescas_percentual))}% ${t('dashboardRoot.trust.salesCoverageHelper', 'da carteira com vendas frescas.')}`,
+		},
+		{
+			label: t('dashboardRoot.trust.ordersCoverage', 'Cobertura de pedidos por status'),
+			value: `${formatNumber(parseNumber(confianca.empresas_com_pedidos_frescos))}/${formatNumber(parseNumber(confianca.empresas_total_root))}`,
+			tooltip: t('dashboardRoot.trust.ordersCoverageTooltip', 'Indica a parcela da carteira com leitura recente de status de pedidos para analise operacional.'),
+			tone: 'sky' as const,
+			helper: `${formatNumber(parseNumber(confianca.cobertura_pedidos_frescos_percentual))}% ${t('dashboardRoot.trust.ordersCoverageHelper', 'da carteira com status de pedidos fresco.')}`,
+		},
+		{
+			label: t('dashboardRoot.trust.syncFailures', 'Falhas recentes de sincronização'),
+			value: formatNumber(parseNumber(confianca.falhas_sincronizacao_periodo)),
+			tooltip: t('dashboardRoot.trust.syncFailuresTooltip', 'Soma das execucoes analiticas encerradas com erro dentro do intervalo selecionado.'),
+			tone: parseNumber(confianca.falhas_sincronizacao_periodo) > 0 ? ('rose' as const) : ('amber' as const),
+			helper: t('dashboardRoot.trust.syncFailuresHelper', 'Erros de execução analítica dentro do período selecionado.'),
+		},
+	];
+}
+
 export function DashboardRootAgileecommercePage() {
 	const { t } = useI18n();
 	const presets = useMemo(() => getPresets(t), [t]);
@@ -439,8 +780,12 @@ export function DashboardRootAgileecommercePage() {
 	});
 	const hasPhase = (phase: DashboardRootPhaseId) => completedPhases.includes(phase);
 	const initialLoaded = hasPhase('summary');
+	const hasComparison = selectedPreviousRange !== null && snapshot?.analytics?.comparativo !== null;
 
-	const cards = useMemo(() => (snapshot ? buildExecutiveCards(snapshot, t) : []), [snapshot, t]);
+	const cards = useMemo(() => (snapshot ? buildCommercialExecutiveCards(snapshot, t, hasComparison) : []), [hasComparison, snapshot, t]);
+	const trustCards = useMemo(() => (snapshot ? buildAnalyticsTrustCards(snapshot, t) : []), [snapshot, t]);
+	const primaryCards = useMemo(() => cards.slice(0, 4), [cards]);
+	const secondaryCards = useMemo(() => cards.slice(4), [cards]);
 	const companyStatusPie = useMemo(
 		() => toNameValueSeries(snapshot?.empresas?.status ?? [], 'status', 'total', (value) => formatDashboardRootCompanyStatus(value, t)),
 		[snapshot, t],
@@ -463,7 +808,11 @@ export function DashboardRootAgileecommercePage() {
 	);
 	const auditStatusPie = useMemo(() => toNameValueSeries(snapshot?.audit?.status ?? [], 'status', 'total', (value) => formatDashboardRootBuildStatus(value, t)), [snapshot, t]);
 	const analyticsRevenueSeries = useMemo(() => toSeries(snapshot?.analytics?.vendas_series_mensal ?? [], 'mes', 'valor_total_vendas'), [snapshot]);
-	const analyticsOrderStatusPie = useMemo(() => toNameValueSeries(snapshot?.analytics?.pedidos_status ?? [], 'status_pedido', 'total_pedidos'), [snapshot]);
+	const analyticsOrderStatusPie = useMemo(
+		() => toNameValueSeries(snapshot?.analytics?.pedidos_status ?? [], 'status_pedido', 'total_pedidos', (value) => formatDashboardRootOrderStatus(value, t)),
+		[snapshot, t],
+	);
+	const analyticsOrdersSeries = useMemo(() => toSeries(snapshot?.analytics?.vendas_series_mensal ?? [], 'mes', 'total_pedidos'), [snapshot]);
 	const topTools = snapshot?.audit?.top_tools ?? [];
 
 	return (
@@ -494,7 +843,7 @@ export function DashboardRootAgileecommercePage() {
 						{error && initialLoaded ? <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{error}</div> : null}
 
 						<div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-							{cards.map((card) => (
+							{primaryCards.map((card) => (
 								<StatCard
 									key={card.label}
 									label={card.label}
@@ -503,45 +852,280 @@ export function DashboardRootAgileecommercePage() {
 									type={card.type}
 									tone={card.tone}
 									showComparison={card.showComparison}
+									description={card.description}
+									tooltip={card.tooltip}
 								/>
 							))}
 						</div>
+
+						<SectionCard
+							title={t('dashboardRoot.executiveStoryTitle', 'Pulso comercial da carteira')}
+							description={t('dashboardRoot.executiveStoryDescription', 'Uma leitura rapida do ritmo de faturamento e dos sinais que merecem atencao no periodo selecionado.')}
+							action={<InfoTooltipButton label={t('dashboardRoot.executiveStoryTooltip', 'O grafico centraliza a leitura do periodo e os cards laterais destacam crescimento, risco e cobertura do dado.')} />}
+						>
+							<div className="space-y-4">
+								<div className="rounded-[1.6rem] border border-line/70 bg-slate-50/80 p-4">
+									<div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+										<div>
+											<div className="text-sm font-semibold text-slate-800">{t('dashboardRoot.charts.transactedVolumeMonthly', 'Volume transacionado por mes')}</div>
+											<div className="text-[11px] leading-5 text-slate-500">{t('dashboardRoot.executiveStoryChartLegend', 'Evolucao do faturamento consolidado no intervalo escolhido para apoiar leitura de tendencia.')}</div>
+										</div>
+										<div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold text-slate-500">{selectedRangeLabel}</div>
+									</div>
+									<LineChartCard data={analyticsRevenueSeries} dataKey="value" titleKey="dashboardRoot.charts.transactedVolumeMonthly" formatValue={formatCurrency} />
+								</div>
+
+								<div className="grid gap-3 md:grid-cols-2">
+									{secondaryCards.map((card) => (
+										<MetricTile
+											key={card.label}
+											label={card.label}
+											value={card.type === 'currency' ? formatCurrency(card.value) : card.type === 'percent' ? `${formatNumber(card.value)}%` : formatNumber(card.value)}
+											helper={card.description ?? t('dashboardRoot.executiveStoryFallback', 'Indicador complementar da leitura comercial.')}
+											tooltip={card.tooltip}
+											tone={card.tone === 'sky' ? 'sky' : card.tone === 'amber' ? 'amber' : card.tone === 'rose' ? 'rose' : 'emerald'}
+										/>
+									))}
+								</div>
+							</div>
+						</SectionCard>
+
+						{trustCards.length ? (
+							<div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+								{trustCards.map((card) => (
+									<MetricTile key={card.label} label={card.label} value={card.value} helper={card.helper} tooltip={card.tooltip} tone={card.tone} />
+								))}
+							</div>
+						) : null}
+
+						<LazyDashboardSection
+							phaseIds={['analytics']}
+							isReady={hasPhase('analytics')}
+							requestPhases={requestPhases}
+							fallback={
+								<div className="space-y-4">
+									<SectionCard
+										title={t('dashboardRoot.analyticsExecutiveTitle', 'Visão executiva comercial')}
+										description={t('dashboardRoot.analyticsExecutiveDescription', 'Consolidado de vendas, pedidos, base ativa e confiabilidade do dado root.')}
+									>
+										<SectionSkeleton lines={4} chart />
+									</SectionCard>
+									<div className="grid gap-4 xl:grid-cols-2">
+										<SectionCard title={t('dashboardRoot.tables.revenueRanking', 'Ranking de faturamento')}>
+											<SectionSkeleton lines={6} />
+										</SectionCard>
+										<SectionCard title={t('dashboardRoot.tables.activeBaseRanking', 'Ranking de base ativa')}>
+											<SectionSkeleton lines={6} />
+										</SectionCard>
+									</div>
+								</div>
+							}
+						>
+							<div className="space-y-4">
+								<SectionCard
+									title={t('dashboardRoot.analyticsExecutiveTitle', 'Visão executiva comercial')}
+									description={t('dashboardRoot.analyticsExecutiveDescription', 'Consolidado de vendas, pedidos, base ativa e confiabilidade do dado root.')}
+								>
+									<div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.95fr)]">
+										<div className="space-y-4">
+											<div className="rounded-[1.4rem] border border-line/70 bg-slate-50/80 p-4">
+												<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.transactedVolumeMonthly', 'Volume transacionado por mês')}</h3>
+												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.chartLegend.revenueSeries', 'Mostra a evolução do faturamento consolidado para leitura rápida de tendência no período.')}</p>
+												<LineChartCard data={analyticsRevenueSeries} dataKey="value" titleKey="dashboardRoot.charts.transactedVolumeMonthly" formatValue={formatCurrency} />
+											</div>
+
+											<div className="rounded-[1.4rem] border border-line/70 bg-slate-50/80 p-4">
+												<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.ordersMonthly', 'Pedidos por mês')}</h3>
+												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.chartLegend.ordersSeries', 'Ajuda a separar ganho de demanda de ganho de ticket médio ao longo do intervalo.')}</p>
+												<LineChartCard data={analyticsOrdersSeries} dataKey="value" titleKey="dashboardRoot.charts.ordersMonthly" />
+											</div>
+										</div>
+
+										<div className="rounded-[1.4rem] border border-line/70 bg-white p-4">
+											<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.ordersByStatus', 'Pedidos por status')}</h3>
+											<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.chartLegend.ordersStatus', 'Distribui o total de pedidos entre os principais status do período com legenda consolidada.')}</p>
+											<StatusDonutCard
+												data={analyticsOrderStatusPie}
+												totalLabel={t('dashboardRoot.cards.ordersTotal', 'Pedidos consolidados')}
+												tooltip={t('dashboardRoot.chartTooltip.ordersStatusLegend', 'Legenda com peso percentual de cada status dentro do total de pedidos do intervalo.')}
+											/>
+										</div>
+									</div>
+								</SectionCard>
+
+								<div className="grid gap-4">
+									<SectionCard
+										title={t('dashboardRoot.tables.revenueRanking', 'Ranking de faturamento')}
+										description={t('dashboardRoot.tables.revenueRankingDescription', 'Mostra as empresas que mais contribuem para o faturamento consolidado no periodo escolhido.')}
+										action={<InfoTooltipButton label={t('dashboardRoot.tables.revenueRankingTooltip', 'Ajuda a identificar concentracao de receita e dependencia das principais contas da carteira.')} />}
+									>
+										<SimpleTable
+											rows={snapshot.analytics?.ranking_faturamento ?? []}
+											maxHeightClass="max-h-[320px]"
+											columns={[
+												{ key: 'empresa_nome', label: t('dashboardRoot.table.company', 'Empresa') },
+												{ key: 'valor_total_vendas', label: t('dashboardRoot.table.revenue', 'Faturamento'), formatter: (value) => formatCurrency(parseNumber(value)) },
+												{ key: 'total_pedidos', label: t('dashboardRoot.table.orderCount', 'Pedidos'), formatter: (value) => formatNumber(parseNumber(value)) },
+											]}
+										/>
+									</SectionCard>
+
+									<SectionCard
+										title={t('dashboardRoot.tables.activeBaseRanking', 'Ranking de base ativa')}
+										description={t('dashboardRoot.tables.activeBaseRankingDescription', 'Compara o tamanho da base ativa e o peso de compradores por empresa.')}
+										action={<InfoTooltipButton label={t('dashboardRoot.tables.activeBaseRankingTooltip', 'Quanto maior a taxa compradores/ativos, melhor tende a ser o engajamento comercial da base.')} />}
+									>
+										<SimpleTable
+											rows={snapshot.analytics?.ranking_usuarios_ativos ?? []}
+											maxHeightClass="max-h-[320px]"
+											columns={[
+												{ key: 'empresa_nome', label: t('dashboardRoot.table.company', 'Empresa') },
+												{ key: 'clientes_ativos', label: t('dashboardRoot.table.activeBase', 'Base ativa'), formatter: (value) => formatNumber(parseNumber(value)) },
+												{ key: 'clientes_compradores', label: t('dashboardRoot.table.buyers', 'Compradores'), formatter: (value) => formatNumber(parseNumber(value)) },
+												{ key: 'taxa_compradores_ativos', label: t('dashboardRoot.table.engagementRate', 'Taxa compradores/ativos'), formatter: (value) => `${formatNumber(parseNumber(value))}%` },
+											]}
+										/>
+									</SectionCard>
+								</div>
+
+								<div className={['grid gap-4', hasComparison ? 'xl:grid-cols-2' : ''].filter(Boolean).join(' ')}>
+									<SectionCard
+										title={t('dashboardRoot.tables.healthyBase', 'Empresas com base mais saudável')}
+										description={t('dashboardRoot.tables.healthyBaseDescription', 'Ranking combinado de engajamento, ritmo comercial e frescor do dado por empresa.')}
+										action={<InfoTooltipButton label={t('dashboardRoot.tables.healthyBaseTooltip', 'O score combina compradores ativos, sinais comerciais e frescor do dado para destacar empresas com base mais consistente.')} />}
+									>
+										<SimpleTable
+											rows={snapshot.analytics?.empresas_base_saudavel ?? []}
+											maxHeightClass="max-h-[320px]"
+											columns={[
+												{ key: 'empresa_nome', label: t('dashboardRoot.table.company', 'Empresa') },
+												{ key: 'score_saude', label: t('dashboardRoot.table.healthScore', 'Score'), formatter: (value) => formatNumber(parseNumber(value)) },
+												{ key: 'taxa_compradores_ativos', label: t('dashboardRoot.table.engagementRate', 'Taxa compradores/ativos'), formatter: (value) => `${formatNumber(parseNumber(value))}%` },
+												{ key: 'dias_defasagem_vendas', label: t('dashboardRoot.table.salesLagDays', 'Defasagem vendas'), formatter: (value) => `${formatNumber(parseNumber(value))}d` },
+											]}
+										/>
+									</SectionCard>
+
+									{hasComparison ? (
+										<SectionCard
+											title={t('dashboardRoot.tables.declineSignals', 'Sinais de queda de faturamento')}
+											description={t('dashboardRoot.tables.declineSignalsDescription', 'Empresas que perderam faturamento no comparativo com o período anterior equivalente.')}
+											action={<InfoTooltipButton label={t('dashboardRoot.tables.declineSignalsTooltip', 'Use esta leitura para priorizar análise comercial nas contas que encolheram em relação ao período anterior.')} />}
+										>
+											<SimpleTable
+												rows={snapshot.analytics?.empresas_sinais_queda ?? []}
+												maxHeightClass="max-h-[320px]"
+												columns={[
+													{ key: 'empresa_nome', label: t('dashboardRoot.table.company', 'Empresa') },
+													{ key: 'valor_anterior', label: t('dashboardRoot.table.previousRevenue', 'Faturamento anterior'), formatter: (value) => formatCurrency(parseNumber(value)) },
+													{ key: 'valor_atual', label: t('dashboardRoot.table.currentRevenue', 'Faturamento atual'), formatter: (value) => formatCurrency(parseNumber(value)) },
+													{ key: 'variacao_percentual', label: t('dashboardRoot.table.variation', 'Variação'), formatter: (value) => `${formatNumber(parseNumber(value))}%` },
+												]}
+											/>
+										</SectionCard>
+									) : null}
+								</div>
+
+								<div className="grid gap-4">
+									<SectionCard title={t('dashboardRoot.tables.analyticsFreshness', 'Frescor dos dados por empresa')} className="hidden">
+										<SimpleTable
+											rows={snapshot.analytics?.frescor_analytics_por_empresa ?? []}
+											maxHeightClass="max-h-[360px]"
+											columns={[
+												{ key: 'empresa_nome', label: t('dashboardRoot.table.company', 'Empresa') },
+												{ key: 'max_vendas_data', label: t('dashboardRoot.table.latestSales', 'Última venda'), formatter: (value) => parseText(value) },
+												{ key: 'dias_defasagem_vendas', label: t('dashboardRoot.table.salesLagDays', 'Defasagem vendas'), formatter: (value) => `${formatNumber(parseNumber(value))}d` },
+												{ key: 'situacao_frescor', label: t('dashboardRoot.table.freshnessStatus', 'Situação'), formatter: (value) => parseText(value) },
+											]}
+										/>
+									</SectionCard>
+
+									<SectionCard
+										title={t('dashboardRoot.analyticsOpsTitle', 'Operação analítica')}
+										description={t('dashboardRoot.analyticsOpsDescription', 'Indicadores operacionais que ajudam a avaliar a consistência e o ritmo de atualização da base analítica.')}
+										action={<InfoTooltipButton label={t('dashboardRoot.analyticsOpsTooltip', 'Mostra sinais de uso da base analítica e da saúde das sincronizações que alimentam o dashboard root.')} />}
+									>
+										<div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+											<MetricTile
+												label={t('dashboardRoot.cards.avgActiveCustomersDaily', 'Média diária de clientes ativos')}
+												value={formatNumber(parseNumber(snapshot.analytics?.resumo?.media_diaria_clientes_ativos))}
+												helper={t('dashboardRoot.analyticsOps.avgActiveCustomersHelper', 'Média diária observada da base ativa entre as empresas com dados de clientes no período.')}
+												tooltip={t('dashboardRoot.analyticsOps.avgActiveCustomersTooltip', 'Não representa soma do período: é uma média operacional usada para leitura de uso da base.')}
+												tone="sky"
+											/>
+											<MetricTile
+												label={t('dashboardRoot.cards.avgProductsActiveDaily', 'Média diária de produtos ativos')}
+												value={formatNumber(parseNumber(snapshot.analytics?.resumo?.media_diaria_produtos_ativos))}
+												helper={t('dashboardRoot.analyticsOps.avgProductsHelper', 'Média diária de produtos ativos disponíveis na camada analítica durante o intervalo.')}
+												tooltip={t('dashboardRoot.analyticsOps.avgProductsTooltip', 'Ajuda a diferenciar mudança de catálogo de mudança de demanda.')}
+												tone="emerald"
+											/>
+											<MetricTile
+												label={t('dashboardRoot.cards.syncExecutions', 'Execuções de sincronização')}
+												value={formatNumber(parseNumber(snapshot.analytics?.sincronizacao_resumo?.total_execucoes))}
+												helper={t('dashboardRoot.analyticsOps.syncExecutionsHelper', 'Volume de execuções analíticas registradas no período selecionado.')}
+												tooltip={t('dashboardRoot.analyticsOps.syncExecutionsTooltip', 'Conta as rotinas que atualizaram ou tentaram atualizar a base analítica root.')}
+												tone="amber"
+											/>
+											<MetricTile
+												label={t('dashboardRoot.cards.syncErrors', 'Erros de sincronização')}
+												value={formatNumber(parseNumber(snapshot.analytics?.sincronizacao_resumo?.erro))}
+												helper={t('dashboardRoot.analyticsOps.syncErrorsHelper', 'Falhas acumuladas nas execuções da camada analítica dentro do intervalo.')}
+												tooltip={t('dashboardRoot.analyticsOps.syncErrorsTooltip', 'Se este número cresce, a confiabilidade da leitura comercial tende a cair.')}
+												tone={parseNumber(snapshot.analytics?.sincronizacao_resumo?.erro) > 0 ? 'rose' : 'slate'}
+											/>
+										</div>
+										<div className="mt-4 hidden">
+											<h3 className="mb-3 text-sm font-semibold text-slate-700">{t('dashboardRoot.tables.analyticsCoverage', 'Cobertura por tabela analítica')}</h3>
+											<SimpleTable
+												rows={snapshot.analytics?.cobertura_dados ?? []}
+												maxHeightClass="max-h-[260px]"
+												columns={[
+													{ key: 'tabela', label: t('dashboardRoot.table.table', 'Tabela') },
+													{ key: 'empresas', label: t('dashboardRoot.table.companyCount', 'Empresas'), formatter: (value) => formatNumber(parseNumber(value)) },
+													{ key: 'data_max', label: t('dashboardRoot.table.lastReference', 'Última referência'), formatter: (value) => parseText(value) },
+												]}
+											/>
+										</div>
+									</SectionCard>
+								</div>
+							</div>
+						</LazyDashboardSection>
 
 						<LazyDashboardSection
 							phaseIds={['platform']}
 							isReady={hasPhase('platform')}
 							requestPhases={requestPhases}
 							fallback={
-								<div className="grid gap-4 xl:grid-cols-12">
+								<div className="space-y-4">
 									<SectionCard
 										title={t('dashboardRoot.platformHealthTitle', 'Saúde da plataforma')}
 										description={t('dashboardRoot.platformHealthDescription', 'Distribuição da carteira e sinais de atenção do ambiente root.')}
-										className="xl:col-span-6"
 									>
 										<SectionSkeleton lines={4} chart />
 									</SectionCard>
-									<SectionCard
-										title={t('dashboardRoot.charts.clusterDistribution', 'Empresas por cluster')}
-										description={t('dashboardRoot.clusterDescription', 'Capacidade distribuída entre clusters e ERPs da carteira.')}
-										className="xl:col-span-3"
-									>
-										<SectionSkeleton lines={2} chart />
-									</SectionCard>
-									<SectionCard
-										title={t('dashboardRoot.charts.erpDistribution', 'Empresas por ERP')}
-										description={t('dashboardRoot.erpDescription', 'Concentração da base por ERP para leitura operacional.')}
-										className="xl:col-span-3"
-									>
-										<SectionSkeleton lines={2} chart />
-									</SectionCard>
+									<div className="grid gap-4 xl:grid-cols-2">
+										<SectionCard
+											title={t('dashboardRoot.charts.clusterDistribution', 'Empresas por cluster')}
+											description={t('dashboardRoot.clusterDescription', 'Capacidade distribuída entre clusters e ERPs da carteira.')}
+										>
+											<SectionSkeleton lines={2} chart />
+										</SectionCard>
+										<SectionCard
+											title={t('dashboardRoot.charts.erpDistribution', 'Empresas por ERP')}
+											description={t('dashboardRoot.erpDescription', 'Concentração da base por ERP para leitura operacional.')}
+										>
+											<SectionSkeleton lines={2} chart />
+										</SectionCard>
+									</div>
 								</div>
 							}
 						>
-							<div className="grid gap-4 xl:grid-cols-12">
+							<div className="space-y-4">
 								<SectionCard
 									title={t('dashboardRoot.platformHealthTitle', 'Saúde da plataforma')}
 									description={t('dashboardRoot.platformHealthDescription', 'Distribuição da carteira e sinais de atenção do ambiente root.')}
-									className="xl:col-span-6"
+									action={<InfoTooltipButton label={t('dashboardRoot.platformHealthTooltip', 'Consolida a distribuição da carteira e os principais alertas operacionais do ambiente root.')} />}
 								>
 									<div className="grid gap-4 lg:grid-cols-2">
 										<div>
@@ -549,31 +1133,40 @@ export function DashboardRootAgileecommercePage() {
 											<PieChartCard data={companyStatusPie} />
 										</div>
 										<div className="grid gap-3 sm:grid-cols-2">
-											{Object.entries(snapshot.empresas?.cards_atencao ?? {}).map(([key, value]) => (
-												<div key={key} className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
-													<div className="text-sm font-semibold leading-5 text-slate-600">{formatDashboardRootAttentionLabel(key, t)}</div>
-													<div className="mt-3 text-3xl font-black tracking-tight text-slate-950">{formatNumber(Number(value))}</div>
-												</div>
-											))}
+											{Object.entries(snapshot.empresas?.cards_atencao ?? {}).map(([key, value]) => {
+												const copy = buildAttentionCardCopy(key, t);
+												return (
+													<MetricTile
+														key={key}
+														label={formatDashboardRootAttentionLabel(key, t)}
+														value={formatNumber(Number(value))}
+														helper={copy.helper}
+														tooltip={copy.tooltip}
+														tone={key === 'empresas_com_build_falho_recente' || key === 'empresas_bloqueadas' ? 'rose' : 'amber'}
+													/>
+												);
+											})}
 										</div>
 									</div>
 								</SectionCard>
 
-								<SectionCard
-									title={t('dashboardRoot.charts.clusterDistribution', 'Empresas por cluster')}
-									description={t('dashboardRoot.clusterDescription', 'Capacidade distribuída entre clusters e ERPs da carteira.')}
-									className="xl:col-span-3"
-								>
-									<BarChartCard data={clusterBars} dataKey="value" />
-								</SectionCard>
+								<div className="grid gap-4 xl:grid-cols-2">
+									<SectionCard
+										title={t('dashboardRoot.charts.clusterDistribution', 'Empresas por cluster')}
+										description={t('dashboardRoot.clusterDescription', 'Capacidade distribuída entre clusters e ERPs da carteira.')}
+										action={<InfoTooltipButton label={t('dashboardRoot.clusterTooltip', 'Mostra como a carteira está distribuída entre os clusters de infraestrutura e operação.')} />}
+									>
+										<BarChartCard data={clusterBars} dataKey="value" />
+									</SectionCard>
 
-								<SectionCard
-									title={t('dashboardRoot.charts.erpDistribution', 'Empresas por ERP')}
-									description={t('dashboardRoot.erpDescription', 'Concentração da base por ERP para leitura operacional.')}
-									className="xl:col-span-3"
-								>
-									<BarChartCard data={erpBars} dataKey="value" />
-								</SectionCard>
+									<SectionCard
+										title={t('dashboardRoot.charts.erpDistribution', 'Empresas por ERP')}
+										description={t('dashboardRoot.erpDescription', 'Concentração da base por ERP para leitura operacional.')}
+										action={<InfoTooltipButton label={t('dashboardRoot.erpTooltip', 'Ajuda a entender a concentração da carteira por ERP e possíveis dependências operacionais.')} />}
+									>
+										<BarChartCard data={erpBars} dataKey="value" />
+									</SectionCard>
+								</div>
 							</div>
 						</LazyDashboardSection>
 
@@ -602,6 +1195,7 @@ export function DashboardRootAgileecommercePage() {
 								<SectionCard
 									title={t('dashboardRoot.productOperationTitle', 'Operação de produto')}
 									description={t('dashboardRoot.productOperationDescription', 'Crescimento de apps, builds e notificações publicadas.')}
+									action={<InfoTooltipButton label={t('dashboardRoot.productOperationTooltip', 'Leitura consolidada da evolução de apps, publicações e estabilidade operacional da frente de produto.')} />}
 								>
 									<div className="grid gap-4 lg:grid-cols-2">
 										<div>
@@ -630,6 +1224,7 @@ export function DashboardRootAgileecommercePage() {
 								<SectionCard
 									title={t('dashboardRoot.tables.productAttention', 'Empresas sem app ou com problema de publicação/build')}
 									description={t('dashboardRoot.productAttentionDescription', 'Lista operacional para priorização do time da plataforma.')}
+									action={<InfoTooltipButton label={t('dashboardRoot.productAttentionTooltip', 'Agrupa contas sem app e contas com falhas recentes de build ou publicação para priorização operacional.')} />}
 								>
 									<div className="space-y-4">
 										<div>
@@ -693,6 +1288,7 @@ export function DashboardRootAgileecommercePage() {
 								<SectionCard
 									title={t('dashboardRoot.engagementTitle', 'Engajamento e comunicação')}
 									description={t('dashboardRoot.engagementDescription', 'Volume e resposta das comunicações enviadas pela plataforma.')}
+									action={<InfoTooltipButton label={t('dashboardRoot.engagementTooltip', 'Acompanha o ritmo de envios e o retorno das interações geradas pelas comunicações da plataforma.')} />}
 								>
 									<div className="grid gap-4 lg:grid-cols-2">
 										<div>
@@ -709,6 +1305,7 @@ export function DashboardRootAgileecommercePage() {
 								<SectionCard
 									title={t('dashboardRoot.communicationDeliveryTitle', 'Entrega e resposta das mensagens')}
 									description={t('dashboardRoot.communicationDeliveryDescription', 'Leitura operacional dos canais e do transporte das mensagens.')}
+									action={<InfoTooltipButton label={t('dashboardRoot.communicationDeliveryTooltip', 'Mostra como os envios se distribuem por tipo e quais status de transporte predominam na operação.')} />}
 								>
 									<div className="grid gap-4 lg:grid-cols-2">
 										<div>
@@ -733,102 +1330,11 @@ export function DashboardRootAgileecommercePage() {
 
 						<LazyDashboardSection
 							phaseIds={['analytics']}
-							isReady={hasPhase('analytics')}
+							isReady={false}
 							requestPhases={requestPhases}
-							fallback={
-								<div className="space-y-4">
-									<SectionCard
-										title={t('dashboardRoot.analyticsTitle', 'Analytics comercial e operação')}
-										description={t('dashboardRoot.analyticsDescription', 'Consolidação de faturamento, pedidos, engajamento e sincronização analítica por empresa.')}
-									>
-										<SectionSkeleton lines={4} chart />
-									</SectionCard>
-									<div className="grid gap-4 xl:grid-cols-2">
-										<SectionCard title={t('dashboardRoot.tables.revenueRanking', 'Ranking de faturamento')}>
-											<SectionSkeleton lines={6} />
-										</SectionCard>
-										<SectionCard title={t('dashboardRoot.tables.declineSignals', 'Sinais de queda de faturamento')}>
-											<SectionSkeleton lines={6} />
-										</SectionCard>
-									</div>
-								</div>
-							}
+							fallback={null}
 						>
-							<div className="space-y-4">
-								<SectionCard
-									title={t('dashboardRoot.analyticsTitle', 'Analytics comercial e operação')}
-									description={t('dashboardRoot.analyticsDescription', 'Consolidação de faturamento, pedidos, engajamento e sincronização analítica por empresa.')}
-								>
-									<div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
-											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('dashboardRoot.cards.revenueTotal', 'Faturamento total')}</div>
-											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{formatCurrency(parseNumber(snapshot.analytics?.resumo?.valor_total_vendas))}</div>
-										</div>
-										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
-											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('dashboardRoot.cards.ordersTotal', 'Pedidos transacionados')}</div>
-											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{formatNumber(parseNumber(snapshot.analytics?.resumo?.total_pedidos))}</div>
-										</div>
-										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
-											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-												{t('dashboardRoot.cards.averageTicketConsolidated', 'Ticket médio consolidado')}
-											</div>
-											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">
-												{formatCurrency(parseNumber(snapshot.analytics?.resumo?.ticket_medio_consolidado))}
-											</div>
-										</div>
-										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
-											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('dashboardRoot.cards.activeCustomers', 'Clientes ativos')}</div>
-											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{formatNumber(parseNumber(snapshot.analytics?.resumo?.clientes_ativos))}</div>
-										</div>
-									</div>
-
-									<div className="mt-4 grid gap-4 xl:grid-cols-2">
-										<div>
-											<h3 className="mb-3 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.transactedVolumeMonthly', 'Volume transacionado por mês')}</h3>
-											<LineChartCard data={analyticsRevenueSeries} dataKey="value" titleKey="dashboardRoot.charts.transactedVolumeMonthly" formatValue={formatCurrency} />
-										</div>
-										<div>
-											<h3 className="mb-3 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.ordersByStatus', 'Pedidos por status')}</h3>
-											<PieChartCard data={analyticsOrderStatusPie} />
-										</div>
-									</div>
-								</SectionCard>
-
-								<div className="grid gap-4 xl:grid-cols-2">
-									<SectionCard title={t('dashboardRoot.tables.revenueRanking', 'Ranking de faturamento')}>
-										<SimpleTable
-											rows={snapshot.analytics?.ranking_faturamento ?? []}
-											maxHeightClass="max-h-[360px]"
-											columns={[
-												{ key: 'empresa_nome', label: t('dashboardRoot.table.company', 'Empresa') },
-												{ key: 'valor_total_vendas', label: t('dashboardRoot.table.revenue', 'Faturamento'), formatter: (value) => formatCurrency(parseNumber(value)) },
-												{ key: 'total_pedidos', label: t('dashboardRoot.table.orderCount', 'Pedidos'), formatter: (value) => formatNumber(parseNumber(value)) },
-											]}
-										/>
-									</SectionCard>
-
-									<SectionCard title={t('dashboardRoot.tables.declineSignals', 'Sinais de queda de faturamento')}>
-										<SimpleTable
-											rows={snapshot.analytics?.empresas_sinais_queda ?? []}
-											maxHeightClass="max-h-[360px]"
-											columns={[
-												{ key: 'empresa_nome', label: t('dashboardRoot.table.company', 'Empresa') },
-												{
-													key: 'valor_anterior',
-													label: t('dashboardRoot.table.previousRevenue', 'Faturamento anterior'),
-													formatter: (value) => formatCurrency(parseNumber(value)),
-												},
-												{ key: 'valor_atual', label: t('dashboardRoot.table.currentRevenue', 'Faturamento atual'), formatter: (value) => formatCurrency(parseNumber(value)) },
-												{
-													key: 'variacao_percentual',
-													label: t('dashboardRoot.table.variation', 'Variação'),
-													formatter: (value) => `${formatNumber(parseNumber(value))}%`,
-												},
-											]}
-										/>
-									</SectionCard>
-								</div>
-							</div>
+							{null}
 						</LazyDashboardSection>
 
 						<LazyDashboardSection
@@ -856,6 +1362,7 @@ export function DashboardRootAgileecommercePage() {
 								<SectionCard
 									title={t('dashboardRoot.internalOperationTitle', 'Operação interna')}
 									description={t('dashboardRoot.internalOperationDescription', 'Throughput, falhas e tipos de processos internos do admin.')}
+									action={<InfoTooltipButton label={t('dashboardRoot.internalOperationTooltip', 'Resume volume, status e tipos de processos internos para acompanhamento operacional do admin root.')} />}
 								>
 									<div className="grid gap-4 lg:grid-cols-2">
 										<div>
@@ -872,20 +1379,27 @@ export function DashboardRootAgileecommercePage() {
 										<BarChartCard data={processTypesBars} dataKey="value" />
 									</div>
 									<div className="mt-4 grid gap-4 lg:grid-cols-2">
-										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
-											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('dashboardRoot.cards.processLogsErrors', 'Logs de erro')}</div>
-											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{formatNumber(parseNumber(snapshot.processos?.logs_resumo?.erros))}</div>
-										</div>
-										<div className="rounded-2xl border border-line/70 bg-slate-50 px-4 py-3">
-											<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('dashboardRoot.cards.processLogsInfo', 'Logs de informação')}</div>
-											<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{formatNumber(parseNumber(snapshot.processos?.logs_resumo?.informacoes))}</div>
-										</div>
+										<MetricTile
+											label={t('dashboardRoot.cards.processLogsErrors', 'Logs de erro')}
+											value={formatNumber(parseNumber(snapshot.processos?.logs_resumo?.erros))}
+											helper={t('dashboardRoot.processLogsErrorsHelper', 'Quantidade de logs operacionais classificados como erro dentro do período selecionado.')}
+											tooltip={t('dashboardRoot.processLogsErrorsTooltip', 'Ajuda a medir pressão operacional e concentração de falhas internas do admin.')}
+											tone="rose"
+										/>
+										<MetricTile
+											label={t('dashboardRoot.cards.processLogsInfo', 'Logs de informação')}
+											value={formatNumber(parseNumber(snapshot.processos?.logs_resumo?.informacoes))}
+											helper={t('dashboardRoot.processLogsInfoHelper', 'Quantidade de logs informativos gerados pelos processos internos no período.')}
+											tooltip={t('dashboardRoot.processLogsInfoTooltip', 'Ajuda a dimensionar o volume de processamento e telemetria operacional registrada.')}
+											tone="slate"
+										/>
 									</div>
 								</SectionCard>
 
 								<SectionCard
 									title={t('dashboardRoot.tables.processAlerts', 'Alertas de processos falhos recentes')}
 									description={t('dashboardRoot.processAlertsDescription', 'Concentre aqui as últimas falhas operacionais para triagem rápida.')}
+									action={<InfoTooltipButton label={t('dashboardRoot.processAlertsTooltip', 'Lista os processos com falha recente para apoiar diagnóstico e atuação rápida do time interno.')} />}
 								>
 									<SimpleTable
 										rows={snapshot.processos?.alertas_falha_recente ?? []}
@@ -939,6 +1453,7 @@ export function DashboardRootAgileecommercePage() {
 									<SectionCard
 										title={t('dashboardRoot.aiGovernanceTitle', 'IA e governança')}
 										description={t('dashboardRoot.aiGovernanceDescription', 'Adoção do agente, eventos e saúde das tools do ambiente root.')}
+										action={<InfoTooltipButton label={t('dashboardRoot.aiGovernanceTooltip', 'Consolida uso do agente, auditoria MCP e sinais gerais de governança do ecossistema de IA.')} />}
 									>
 										<div className="grid gap-4 lg:grid-cols-2">
 											<div>
@@ -955,6 +1470,7 @@ export function DashboardRootAgileecommercePage() {
 									<SectionCard
 										title={t('dashboardRoot.aiOperationsTitle', 'Uso do agente')}
 										description={t('dashboardRoot.aiOperationsDescription', 'Papéis de mensagem e tipos de evento com leitura amigável.')}
+										action={<InfoTooltipButton label={t('dashboardRoot.aiOperationsTooltip', 'Mostra como o agente está sendo utilizado e quais tipos de eventos aparecem com mais frequência.')} />}
 									>
 										<div className="grid gap-4 lg:grid-cols-2">
 											<div>
@@ -983,10 +1499,11 @@ export function DashboardRootAgileecommercePage() {
 									</SectionCard>
 								</div>
 
-								<SectionCard
-									title={t('dashboardRoot.toolsObservabilityTitle', 'Tools e observabilidade')}
-									description={t('dashboardRoot.toolsObservabilityDescription', 'Uso das tools com latência média e alertas de erro ou lentidão.')}
-								>
+									<SectionCard
+										title={t('dashboardRoot.toolsObservabilityTitle', 'Tools e observabilidade')}
+										description={t('dashboardRoot.toolsObservabilityDescription', 'Uso das tools com latência média e alertas de erro ou lentidão.')}
+										action={<InfoTooltipButton label={t('dashboardRoot.toolsObservabilityTooltip', 'Ajuda a identificar tools mais usadas, gargalos de latência e pontos de instabilidade operacional.')} />}
+									>
 									<div className="grid gap-4 xl:grid-cols-2">
 										<div>
 											<h3 className="mb-3 text-sm font-semibold text-slate-700">{t('dashboardRoot.tables.topTools', 'Top tools usadas e latência média')}</h3>
