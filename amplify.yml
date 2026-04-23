@@ -43,6 +43,7 @@ frontend:
             fi
           done
         - npm run build
+        - rm -rf .next/cache
   artifacts:
     baseDirectory: .next
     files:
