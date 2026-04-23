@@ -3,14 +3,10 @@ import { createHmac } from 'node:crypto'
 import { join } from 'node:path'
 import { NextRequest, NextResponse } from 'next/server'
 import { readAuthSession } from '@/src/features/auth/services/auth-session'
-
-type AssistenteTokenPayload = {
-  id_empresa?: string
-  id_usuario: string
-  email_usuario: string
-  apiv3_token_usuario: string
-  rota: string
-}
+import {
+  buildAssistenteVendasIaPayload,
+  type AssistenteTokenPayload,
+} from '@/src/features/configuracoes-assistente-vendas-ia/services/assistente-vendas-ia-embed'
 
 function toBase64Url(input: string | Buffer) {
   return Buffer.from(input)
@@ -72,13 +68,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Usuário inválido para abrir o assistente de vendas IA.' }, { status: 400 })
   }
 
-  const token = createJwt({
-    id_empresa: session.currentTenantId,
-    id_usuario: userId,
-    email_usuario: userEmail,
-    apiv3_token_usuario: session.token,
-    rota: `/company/${session.currentTenantId}`,
-  }, jwtSecret)
+  const token = createJwt(
+    buildAssistenteVendasIaPayload(
+      {
+        token: session.token,
+        currentTenantId: session.currentTenantId,
+      },
+      {
+        userId,
+        userEmail,
+      },
+    ),
+    jwtSecret,
+  )
 
   return NextResponse.json({
     embedUrl: `${baseUrl}/embed?token=${encodeURIComponent(token)}`,

@@ -24,6 +24,12 @@ export type FeatureKey =
 	| 'integracoesMarketing'
 	| 'integracoesPromocoes'
 	| 'erpDashboard'
+	| 'erpCadastrosErps'
+	| 'erpCadastrosTemplates'
+	| 'erpCadastrosParametrosGrupo'
+	| 'erpCadastrosParametrosCadastro'
+	| 'erpCadastrosQueries'
+	| 'erpCadastrosScripts'
 	| 'erpRotinasIntegradas'
 	| 'erpServicos'
 	| 'erpServicosFalha'
@@ -83,6 +89,7 @@ export type FeatureKey =
 	| 'configuracoesLayout'
 	| 'configuracoesAssistenteVirtual'
 	| 'configuracoesAssistenteVendasIa'
+	| 'changelog'
 	| 'configuracoesPedidos'
 	| 'parametros'
 	| 'configuracoesPrecos'
@@ -220,6 +227,30 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
 	erpDashboard: {
 		label: 'ERP > Dashboard',
 		matchers: ['integracao-dashboard-form', 'integracao dashboard', 'integração dashboard', 'erp dashboard', 'dashboard erp'],
+	},
+	erpCadastrosErps: {
+		label: 'ERP > Cadastros > ERPs',
+		matchers: ['cadastro-erps-list', 'cadastro-erps-form', 'integracao-com-erp cadastros erps', 'erp cadastros erps', 'erps'],
+	},
+	erpCadastrosTemplates: {
+		label: 'ERP > Cadastros > Templates',
+		matchers: ['cadastro-templates-list', 'cadastro-templates-form', 'integracao-com-erp cadastros templates', 'erp cadastros templates', 'templates'],
+	},
+	erpCadastrosParametrosGrupo: {
+		label: 'ERP > Cadastros > Parâmetros Grupo',
+		matchers: ['cadastro-parametros-grupo-list', 'cadastro-parametros-grupo-form', 'integracao-com-erp cadastros parametros grupo', 'erp cadastros parametros grupo', 'parametros grupo'],
+	},
+	erpCadastrosParametrosCadastro: {
+		label: 'ERP > Cadastros > Parâmetros Cadastro',
+		matchers: ['cadastro-parametros-cadastro-list', 'cadastro-parametros-cadastro-form', 'integracao-com-erp cadastros parametros cadastro', 'erp cadastros parametros cadastro', 'parametros cadastro'],
+	},
+	erpCadastrosQueries: {
+		label: 'ERP > Cadastros > Queries',
+		matchers: ['querys-list', 'querys-form', 'integracao-com-erp cadastros queries', 'erp cadastros queries', 'queries'],
+	},
+	erpCadastrosScripts: {
+		label: 'ERP > Cadastros > Scripts',
+		matchers: ['cadastro-scripts-list', 'cadastro-scripts-form', 'integracao-com-erp cadastros scripts', 'erp cadastros scripts', 'scripts'],
 	},
 	erpRotinasIntegradas: {
 		label: 'ERP > Rotinas Integradas',
@@ -458,6 +489,10 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
 	configuracoesAssistenteVendasIa: {
 		label: 'Assistente de Vendas IA',
 		matchers: ['chatbot-empresas-list', 'assistente de vendas ia', 'assistente vendas ia', 'assistente-vendas-ia'],
+	},
+	changelog: {
+		label: 'Atualizações gerais',
+		matchers: ['changelog-list', 'atualizacoes gerais', 'atualizações gerais', 'changelog'],
 	},
 	configuracoesPedidos: {
 		label: 'Configurações de Pedidos',

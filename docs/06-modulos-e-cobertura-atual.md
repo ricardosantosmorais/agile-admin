@@ -206,7 +206,15 @@ ObservaÃ§Ã£o:
   - rota dedicada para permissÃµes de acesso por aplicativo, no lugar do modal legado.
 - `Integrações` já possui:
   - páginas diretas para `Atendimento`, `Clientes`, `Aplicativos`, `Notificações`, `Segurança`, `Scripts`, `Marketing`, `Login Social`, `Promoções`, `Logística` e `Financeiro`;
-  - `Integração com ERP` com páginas diretas para `Parâmetros`, `Imagens`, `API`, `Banco de Dados`, `Instalação do Integrador`, `Dashboard ERP`, `Rotinas Integradas`, `Serviços` e `Serviços com Falha`;
+  - `Integração com ERP` alinhada ao menu root atual do legado, com os três blocos principais: `Cadastros`, `Dashboard ERP` e `Serviços com Falha`;
+  - `Cadastros` já possui página-hub própria no v2 em `/integracao-com-erp/cadastros`, servindo como ponto de entrada da migração dos cadastros ERP ainda mantidos no legado;
+  - `Cadastros > ERPs` agora já possui CRUD próprio no v2 em `/integracao-com-erp/cadastros/erps`, com listagem server-side, formulário linear e bridge root-only fiel ao contrato do legado;
+  - `Cadastros > Templates` agora já possui CRUD próprio no v2 em `/integracao-com-erp/cadastros/templates`, com vínculo ao cadastro de `ERPs`, listagem server-side e bridge root-only fiel ao contrato do legado;
+  - `Cadastros > Parâmetros Grupo` agora já possui CRUD próprio no v2 em `/integracao-com-erp/cadastros/parametros-grupo`, com listagem server-side, formulário linear e bridge root-only fiel ao contrato do legado;
+  - `Cadastros > Parâmetros Cadastro` agora já possui CRUD próprio no v2 em `/integracao-com-erp/cadastros/parametros-cadastro`, com lookups lazy para `Parâmetros Grupo` e `Templates`, regras condicionais por `tipo_entrada` e bridge root-only fiel ao contrato do legado;
+  - `Cadastros > Queries` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/queries`, com listagem server-side, formulário em abas, editor SQL Monaco, execução contra integradores ativos e aba de mapeamento em edição;
+  - `Cadastros > Scripts` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/scripts`, com listagem server-side e formulário em abas com editor Monaco cuja linguagem acompanha o select do legado;
+  - páginas diretas já disponíveis no v2 para `Parâmetros`, `Imagens`, `API`, `Banco de Dados`, `Instalação do Integrador`, `Dashboard ERP`, `Rotinas Integradas`, `Serviços` e `Serviços com Falha`;
   - bridges dedicadas em `app/api/integracoes/*` para todos os módulos do menu;
   - bridge dedicada em `app/api/integracao-com-erp/*` para configuração e leitura operacional do dashboard ERP;
   - `Gateways de Pagamento` com listagem, formulário novo, edição por id e regras condicionais do legado reaproveitadas no CRUD do v2;
@@ -214,7 +222,8 @@ ObservaÃ§Ã£o:
 - `Menu do cliente` agora já possui no v2:
   - `Meus atendimentos` com listagem server-side, filtros por protocolo, status e período, detalhe do atendimento em modal e subpágina de `Vínculo Intercom`;
   - `Base de conhecimento` com listagem server-side de artigos do Intercom, filtro textual e leitura do HTML no overlay do shell;
-  - `Atualizações gerais` com bridge dedicada para o changelog público, filtros por plataforma, tipo, mês e título, agrupamento por mês e leitura inline no shell.
+  - `Atualizações gerais` dos tenants seguem como timeline pública em `/atualizacoes-gerais`.
+  - `Changelog` administrativo do root `agileecommerce` agora é um módulo próprio, separado, em `/changelog`.
 - `ManutenÃ§Ã£o > Termos de pesquisa` jÃ¡ possui:
   - listagem server-side com filtros por `id`, `termos`, `resultado` e `ativo`;
   - criaÃ§Ã£o e ediÃ§Ã£o com os campos `ativo`, `termos` e `resultado`;

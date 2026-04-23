@@ -32,6 +32,10 @@ function toStringOrNull(value: unknown) {
 	return null;
 }
 
+function hasOwn(record: Record<string, unknown>, key: string) {
+	return Object.prototype.hasOwnProperty.call(record, key);
+}
+
 function mapSimpleRow(row: unknown): DashboardRootSimpleRow {
 	if (!row || typeof row !== 'object' || Array.isArray(row)) {
 		return {};
@@ -113,6 +117,36 @@ export function mapDashboardRootAgileecommercePayload(payload: unknown): Dashboa
 	const meta = record.meta && typeof record.meta === 'object' && !Array.isArray(record.meta) ? (record.meta as Record<string, unknown>) : {};
 	const metaPeriod = meta.periodo && typeof meta.periodo === 'object' && !Array.isArray(meta.periodo) ? meta.periodo : {};
 	const resumo = record.resumo && typeof record.resumo === 'object' && !Array.isArray(record.resumo) ? (record.resumo as Record<string, unknown>) : null;
+
+	const analyticsRecord = record.analytics && typeof record.analytics === 'object' && !Array.isArray(record.analytics) ? (record.analytics as Record<string, unknown>) : null;
+	const analytics = analyticsRecord
+		? {
+				...(hasOwn(analyticsRecord, 'resumo')
+					? {
+							resumo: Object.fromEntries(
+								Object.entries((analyticsRecord.resumo as Record<string, unknown> | undefined) ?? {}).map(([key, value]) => [key, toNumber(value)]),
+							),
+						}
+					: {}),
+				...(hasOwn(analyticsRecord, 'comparativo') ? { comparativo: mapComparativo(analyticsRecord.comparativo) } : {}),
+				...(hasOwn(analyticsRecord, 'confianca') ? { confianca: mapSimpleRow(analyticsRecord.confianca) } : {}),
+				...(hasOwn(analyticsRecord, 'vendas_series_diaria') ? { vendas_series_diaria: mapSimpleRows(analyticsRecord.vendas_series_diaria) } : {}),
+				...(hasOwn(analyticsRecord, 'vendas_series_mensal') ? { vendas_series_mensal: mapSimpleRows(analyticsRecord.vendas_series_mensal) } : {}),
+				...(hasOwn(analyticsRecord, 'ranking_faturamento') ? { ranking_faturamento: mapSimpleRows(analyticsRecord.ranking_faturamento) } : {}),
+				...(hasOwn(analyticsRecord, 'ranking_pedidos') ? { ranking_pedidos: mapSimpleRows(analyticsRecord.ranking_pedidos) } : {}),
+				...(hasOwn(analyticsRecord, 'ranking_usuarios_ativos') ? { ranking_usuarios_ativos: mapSimpleRows(analyticsRecord.ranking_usuarios_ativos) } : {}),
+				...(hasOwn(analyticsRecord, 'engajamento_empresas') ? { engajamento_empresas: mapSimpleRows(analyticsRecord.engajamento_empresas) } : {}),
+				...(hasOwn(analyticsRecord, 'empresas_base_saudavel') ? { empresas_base_saudavel: mapSimpleRows(analyticsRecord.empresas_base_saudavel) } : {}),
+				...(hasOwn(analyticsRecord, 'empresas_mais_produtos') ? { empresas_mais_produtos: mapSimpleRows(analyticsRecord.empresas_mais_produtos) } : {}),
+				...(hasOwn(analyticsRecord, 'pedidos_status') ? { pedidos_status: mapSimpleRows(analyticsRecord.pedidos_status) } : {}),
+				...(hasOwn(analyticsRecord, 'empresas_sinais_queda') ? { empresas_sinais_queda: mapSimpleRows(analyticsRecord.empresas_sinais_queda) } : {}),
+				...(hasOwn(analyticsRecord, 'frescor_analytics_por_empresa') ? { frescor_analytics_por_empresa: mapSimpleRows(analyticsRecord.frescor_analytics_por_empresa) } : {}),
+				...(hasOwn(analyticsRecord, 'sincronizacao_resumo') ? { sincronizacao_resumo: mapSimpleRow(analyticsRecord.sincronizacao_resumo) } : {}),
+				...(hasOwn(analyticsRecord, 'sincronizacao_status') ? { sincronizacao_status: mapSimpleRows(analyticsRecord.sincronizacao_status) } : {}),
+				...(hasOwn(analyticsRecord, 'sincronizacao_execucoes_recentes') ? { sincronizacao_execucoes_recentes: mapSimpleRows(analyticsRecord.sincronizacao_execucoes_recentes) } : {}),
+				...(hasOwn(analyticsRecord, 'cobertura_dados') ? { cobertura_dados: mapSimpleRows(analyticsRecord.cobertura_dados) } : {}),
+			}
+		: undefined;
 
 	return {
 		meta: {
@@ -239,29 +273,6 @@ export function mapDashboardRootAgileecommercePayload(payload: unknown): Dashboa
 						serie_mensal: mapSimpleRows((record.leads as Record<string, unknown>).serie_mensal),
 					}
 				: undefined,
-		analytics:
-			record.analytics && typeof record.analytics === 'object' && !Array.isArray(record.analytics)
-				? {
-						resumo: Object.fromEntries(
-							Object.entries(((record.analytics as Record<string, unknown>).resumo as Record<string, unknown>) ?? {}).map(([key, value]) => [key, toNumber(value)]),
-						),
-						comparativo: mapComparativo((record.analytics as Record<string, unknown>).comparativo),
-						confianca: mapSimpleRow((record.analytics as Record<string, unknown>).confianca),
-						vendas_series_mensal: mapSimpleRows((record.analytics as Record<string, unknown>).vendas_series_mensal),
-						ranking_faturamento: mapSimpleRows((record.analytics as Record<string, unknown>).ranking_faturamento),
-						ranking_pedidos: mapSimpleRows((record.analytics as Record<string, unknown>).ranking_pedidos),
-						ranking_usuarios_ativos: mapSimpleRows((record.analytics as Record<string, unknown>).ranking_usuarios_ativos),
-						engajamento_empresas: mapSimpleRows((record.analytics as Record<string, unknown>).engajamento_empresas),
-						empresas_base_saudavel: mapSimpleRows((record.analytics as Record<string, unknown>).empresas_base_saudavel),
-						empresas_mais_produtos: mapSimpleRows((record.analytics as Record<string, unknown>).empresas_mais_produtos),
-						pedidos_status: mapSimpleRows((record.analytics as Record<string, unknown>).pedidos_status),
-						empresas_sinais_queda: mapSimpleRows((record.analytics as Record<string, unknown>).empresas_sinais_queda),
-						frescor_analytics_por_empresa: mapSimpleRows((record.analytics as Record<string, unknown>).frescor_analytics_por_empresa),
-						sincronizacao_resumo: mapSimpleRow((record.analytics as Record<string, unknown>).sincronizacao_resumo),
-						sincronizacao_status: mapSimpleRows((record.analytics as Record<string, unknown>).sincronizacao_status),
-						sincronizacao_execucoes_recentes: mapSimpleRows((record.analytics as Record<string, unknown>).sincronizacao_execucoes_recentes),
-						cobertura_dados: mapSimpleRows((record.analytics as Record<string, unknown>).cobertura_dados),
-					}
-				: undefined,
+		analytics,
 	};
 }

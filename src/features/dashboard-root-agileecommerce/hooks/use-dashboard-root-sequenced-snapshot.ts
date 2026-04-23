@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { dashboardRootAgileecommerceClient } from '@/src/features/dashboard-root-agileecommerce/services/dashboard-root-agileecommerce-client';
 import type { DashboardRootSnapshot } from '@/src/features/dashboard-root-agileecommerce/types/dashboard-root-agileecommerce';
 
-export type DashboardRootPhaseId = 'summary' | 'analytics' | 'platform' | 'product' | 'engagement' | 'operations' | 'ai';
+export type DashboardRootPhaseId = 'summary' | 'commercial' | 'analytics' | 'platform' | 'product' | 'engagement' | 'operations' | 'ai';
 
 type UseDashboardRootSequencedSnapshotOptions = {
 	startDate: string;
@@ -28,8 +28,9 @@ type DashboardRootSequenceState = {
 };
 
 const phaseDefinitions: DashboardRootPhaseDefinition[] = [
-	{ id: 'summary', blocks: ['resumo', 'analytics'] },
-	{ id: 'analytics', blocks: ['analytics'] },
+	{ id: 'summary', blocks: ['analytics_summary'] },
+	{ id: 'commercial', blocks: ['analytics_pulse'] },
+	{ id: 'analytics', blocks: ['analytics_detail'] },
 	{ id: 'platform', blocks: ['empresas'] },
 	{ id: 'product', blocks: ['apps'] },
 	{ id: 'engagement', blocks: ['push'] },
@@ -57,6 +58,12 @@ function createSequenceState(key: string): DashboardRootSequenceState {
 
 function mergePhaseSnapshot(current: DashboardRootSnapshot | null, partial: DashboardRootSnapshot, phaseId: DashboardRootPhaseId) {
 	const base = current ?? partial;
+	const mergedAnalytics = partial.analytics
+		? ({
+				...(current?.analytics ?? {}),
+				...partial.analytics,
+			} as DashboardRootSnapshot['analytics'])
+		: current?.analytics;
 
 	switch (phaseId) {
 		case 'summary':
@@ -64,7 +71,12 @@ function mergePhaseSnapshot(current: DashboardRootSnapshot | null, partial: Dash
 				...base,
 				meta: partial.meta,
 				resumo: partial.resumo,
-				analytics: partial.analytics,
+				analytics: mergedAnalytics,
+			};
+		case 'commercial':
+			return {
+				...base,
+				analytics: mergedAnalytics,
 			};
 		case 'platform':
 			return {
@@ -84,7 +96,7 @@ function mergePhaseSnapshot(current: DashboardRootSnapshot | null, partial: Dash
 		case 'analytics':
 			return {
 				...base,
-				analytics: partial.analytics,
+				analytics: mergedAnalytics,
 			};
 		case 'operations':
 			return {

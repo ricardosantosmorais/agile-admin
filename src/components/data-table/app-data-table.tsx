@@ -93,7 +93,7 @@ function DataTableActions<TItem>({
   }
 
   return (
-    <div className="flex flex-nowrap items-center justify-end gap-2 whitespace-nowrap">
+    <div className="flex flex-nowrap items-center justify-center gap-2 whitespace-nowrap">
       {visibleActions.map((action) => {
         const Icon = action.icon
 
@@ -207,7 +207,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
 
       <div className="hidden md:block">
         <div className="app-table-shell min-w-0 overflow-x-auto rounded-[1.25rem]">
-          <table className="min-w-full w-max border-separate border-spacing-0">
+          <table className="w-full table-fixed border-separate border-spacing-0">
             <thead>
               <tr className="app-table-muted text-left text-sm text-slate-500">
                 {selectable ? (
@@ -226,7 +226,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                   const visibilityClasses = getVisibilityClasses(column.visibility)
 
                   return (
-                  <th key={column.id} className={`whitespace-nowrap border-b border-line/50 px-3 py-3 ${visibilityClasses.th} ${column.thClassName ?? ''}`.trim()}>
+                  <th key={column.id} className={`overflow-hidden whitespace-nowrap border-b border-line/50 px-3 py-3 ${visibilityClasses.th} ${column.thClassName ?? ''}`.trim()}>
                       {column.header ?? (column.sortKey && sort && column.label ? (
                         <SortableHeader
                           label={column.label}
@@ -242,7 +242,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                   )
                 })}
                 {rowActions ? (
-                  <th className={`whitespace-nowrap border-b border-line/50 px-3 py-3 ${actionsColumnClassName}`.trim()}>
+                  <th className={`overflow-hidden whitespace-nowrap border-b border-line/50 px-3 py-3 text-center ${actionsColumnClassName}`.trim()}>
                     {resolvedActionsLabel}
                   </th>
                 ) : null}
@@ -286,7 +286,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                           const visibilityClasses = getVisibilityClasses(column.visibility)
 
                           return (
-                            <td key={`${rowId}-${column.id}`} className={`border-b border-line/40 px-3 py-4 align-middle ${visibilityClasses.td} ${column.tdClassName ?? ''}`.trim()}>
+                            <td key={`${rowId}-${column.id}`} className={`overflow-hidden border-b border-line/40 px-3 py-4 align-middle ${visibilityClasses.td} ${column.tdClassName ?? ''}`.trim()}>
                               <div className="min-w-0 overflow-hidden">
                                 {column.cell(item)}
                               </div>
@@ -294,7 +294,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                           )
                         })}
                         {rowActions ? (
-                          <td className={`border-b border-line/40 px-3 py-4 ${actionsColumnClassName}`.trim()}>
+                          <td className={`border-b border-line/40 px-3 py-4 text-center ${actionsColumnClassName}`.trim()}>
                             <DataTableActions item={item} actions={rowActions(item)} />
                           </td>
                         ) : null}

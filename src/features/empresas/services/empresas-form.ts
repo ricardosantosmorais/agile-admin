@@ -1,5 +1,6 @@
 import { cnpjMask, cepMask, phoneMask } from '@/src/lib/input-masks'
 import { formatCpfCnpj } from '@/src/lib/formatters'
+import { nullableLookupId, toLookupOption } from '@/src/lib/lookup-options'
 import { digitsOnly, splitPhone } from '@/src/lib/value-parsers'
 
 function toDateInputValue(value: unknown) {
@@ -29,8 +30,24 @@ function trimBucket(value: unknown) {
   return trimUrlPrefix(String(value ?? '').replace(/\.agilecdn\.com\.br\/?$/i, ''), 'https?://')
 }
 
+function resolveLookupId(value: unknown) {
+  return nullableLookupId(value) || ''
+}
+
 export function mapEmpresaDetail(payload: unknown) {
   const record = payload && typeof payload === 'object' ? payload as Record<string, unknown> : {}
+  const clusterLookup = toLookupOption(record.cluster, ['nome'], record.id_cluster)
+  const templateLookup = toLookupOption(record.template, ['nome', 'titulo'], record.id_template)
+  const gerenteLookup = toLookupOption(
+    record.implantacao_gerente ?? record.gerente_implantacao ?? record.administrador_implantacao_gerente,
+    ['nome', 'email'],
+    record.id_implantacao_gerente,
+  )
+  const analistaLookup = toLookupOption(
+    record.implantacao_analista ?? record.analista_implantacao ?? record.administrador_implantacao_analista,
+    ['nome', 'email'],
+    record.id_implantacao_analista,
+  )
 
   return {
     id: String(record.id || ''),
@@ -65,13 +82,17 @@ export function mapEmpresaDetail(payload: unknown) {
     email_tecnico: String(record.email_tecnico || ''),
     telefone_tecnico: phoneMask(`${String(record.ddd_tecnico || '')}${String(record.telefone_tecnico || '')}`, true),
     url: trimUrlPrefix(record.url, 'https?://'),
-    id_cluster: String(record.id_cluster || ''),
+    id_cluster: resolveLookupId(record.id_cluster || record.cluster),
+    id_cluster_lookup: clusterLookup,
     s3_bucket: trimBucket(record.s3_bucket),
     erp: String(record.erp || ''),
-    id_template: String(record.id_template || ''),
+    id_template: resolveLookupId(record.id_template || record.template),
+    id_template_lookup: templateLookup,
     token_integrador: String(record.token_integrador || ''),
-    id_implantacao_gerente: String(record.id_implantacao_gerente || ''),
-    id_implantacao_analista: String(record.id_implantacao_analista || ''),
+    id_implantacao_gerente: resolveLookupId(record.id_implantacao_gerente || record.implantacao_gerente || record.gerente_implantacao || record.administrador_implantacao_gerente),
+    id_implantacao_gerente_lookup: gerenteLookup,
+    id_implantacao_analista: resolveLookupId(record.id_implantacao_analista || record.implantacao_analista || record.analista_implantacao || record.administrador_implantacao_analista),
+    id_implantacao_analista_lookup: analistaLookup,
     monday_url: String(record.monday_url || ''),
     data_inicio_implantacao: toDateInputValue(record.data_inicio_implantacao),
     dias_previsao_implantacao: String(record.dias_previsao_implantacao || ''),
@@ -147,13 +168,13 @@ export function buildEmpresaPayload(payload: Record<string, unknown>) {
     ddd_tecnico: telefoneTecnico.ddd,
     telefone_tecnico: telefoneTecnico.number,
     url: payload.url ? `https://${trimUrlPrefix(payload.url, 'https?://')}` : null,
-    id_cluster: normalizeOptionalText(payload.id_cluster),
+    id_cluster: nullableLookupId(payload.id_cluster_lookup ?? payload.id_cluster),
     s3_bucket: payload.s3_bucket ? `https://${trimBucket(payload.s3_bucket)}.agilecdn.com.br` : null,
     erp: normalizeOptionalText(payload.erp),
-    id_template: normalizeOptionalText(payload.id_template),
+    id_template: nullableLookupId(payload.id_template_lookup ?? payload.id_template),
     token_integrador: normalizeOptionalText(payload.token_integrador),
-    id_implantacao_gerente: normalizeOptionalText(payload.id_implantacao_gerente),
-    id_implantacao_analista: normalizeOptionalText(payload.id_implantacao_analista),
+    id_implantacao_gerente: nullableLookupId(payload.id_implantacao_gerente_lookup ?? payload.id_implantacao_gerente),
+    id_implantacao_analista: nullableLookupId(payload.id_implantacao_analista_lookup ?? payload.id_implantacao_analista),
     monday_url: normalizeOptionalText(payload.monday_url),
     data_inicio_implantacao: formatDatePayload(payload.data_inicio_implantacao),
     dias_previsao_implantacao: normalizeOptionalDigits(payload.dias_previsao_implantacao),

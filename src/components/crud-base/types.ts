@@ -58,8 +58,15 @@ export type CrudResource =
 	| 'clusters'
 	| 'templates_integracao'
 	| 'administradores_master'
+	| 'erps'
+	| 'templates'
+	| 'parametros_grupo'
+	| 'parametros_cadastro'
+	| 'querys'
+	| 'scripts'
 	| 'canais_distribuicao'
 	| 'perfis_administradores'
+	| 'changelog'
 	| 'integracao-aplicativos'
 	| 'gateways_pagamento'
 	| 'produtos'
@@ -250,8 +257,15 @@ export type CrudModuleConfig = {
 	listDescription: string;
 	formTitleKey: string;
 	formTitle: string;
+	breadcrumbParents?: Array<{
+		labelKey: string;
+		label: string;
+		href?: string;
+	}>;
+	hideBreadcrumbSection?: boolean;
 	breadcrumbSectionKey: string;
 	breadcrumbSection: string;
+	breadcrumbSectionHref?: string;
 	breadcrumbModuleKey: string;
 	breadcrumbModule: string;
 	defaultFilters: CrudListFilters;
@@ -260,6 +274,7 @@ export type CrudModuleConfig = {
 	mobileSubtitle?: (record: CrudRecord) => React.ReactNode;
 	mobileMeta?: (record: CrudRecord) => React.ReactNode;
 	details?: CrudDetailsItem[];
+	selectable?: boolean;
 	actionsColumnClassName?: string;
 	extraFilters?: CrudColumnFilterConfig[];
 	sections: CrudSectionConfig[];

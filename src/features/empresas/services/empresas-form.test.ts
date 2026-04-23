@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { buildEmpresaPayload, mapEmpresaDetail } from '@/src/features/empresas/services/empresas-form'
 
 describe('empresas-form', () => {
-  it('normaliza detalhe para o formulário com máscaras e prefixos removidos', () => {
+  it('normaliza detalhe para o formulário com máscaras, relações e prefixos removidos', () => {
     expect(mapEmpresaDetail({
       id: '55',
       ativo: 1,
@@ -18,6 +18,10 @@ describe('empresas-form', () => {
       celular: '999999999',
       url: 'https://empresa.exemplo.com.br',
       s3_bucket: 'https://bucket-root.agilecdn.com.br',
+      cluster: { id: 13, nome: 'Cluster Principal' },
+      template: { id: 9, nome: 'Template Winthor' },
+      implantacao_gerente: { id: 1, nome: 'Ana Gerente' },
+      implantacao_analista: { id: 2, nome: 'Bruno Analista' },
       data_inicio_implantacao: '2026-04-10 00:00:00',
       data_fim_implantacao: '2026-04-20 00:00:00',
     })).toMatchObject({
@@ -33,6 +37,10 @@ describe('empresas-form', () => {
       celular: '(27) 99999-9999',
       url: 'empresa.exemplo.com.br',
       s3_bucket: 'bucket-root',
+      id_cluster: '13',
+      id_template: '9',
+      id_implantacao_gerente: '1',
+      id_implantacao_analista: '2',
       data_inicio_implantacao: '2026-04-10',
       data_fim_implantacao: '2026-04-20',
     })
@@ -55,6 +63,10 @@ describe('empresas-form', () => {
       telefone_tecnico: '(27) 96666-5555',
       url: 'empresa.exemplo.com.br',
       s3_bucket: 'bucket-root',
+      id_cluster_lookup: { id: '13', label: 'Cluster Principal' },
+      id_template_lookup: { id: '9', label: 'Template Winthor' },
+      id_implantacao_gerente_lookup: { id: '1', label: 'Ana Gerente' },
+      id_implantacao_analista_lookup: { id: '2', label: 'Bruno Analista' },
       data_inicio_implantacao: '2026-04-10',
       data_fim_implantacao: '2026-04-20',
       dias_previsao_implantacao: '45',
@@ -79,6 +91,10 @@ describe('empresas-form', () => {
       telefone_tecnico: '966665555',
       url: 'https://empresa.exemplo.com.br',
       s3_bucket: 'https://bucket-root.agilecdn.com.br',
+      id_cluster: '13',
+      id_template: '9',
+      id_implantacao_gerente: '1',
+      id_implantacao_analista: '2',
       data_inicio_implantacao: '2026-04-10 00:00:00',
       data_fim_implantacao: '2026-04-20 00:00:00',
       dias_previsao_implantacao: '45',

@@ -1,0 +1,82 @@
+import type { CrudModuleConfig } from '@/src/components/crud-base/types'
+import { buildParametroGrupoPayload, normalizeParametroGrupoRecord } from '@/src/features/integracao-com-erp-parametros-grupo/services/integracao-com-erp-parametros-grupo'
+
+export const INTEGRACAO_COM_ERP_PARAMETROS_GRUPO_CONFIG: CrudModuleConfig = {
+	key: 'integracao-com-erp-parametros-grupo',
+	resource: 'parametros_grupo',
+	routeBase: '/integracao-com-erp/cadastros/parametros-grupo',
+	featureKey: 'erpCadastrosParametrosGrupo',
+	listTitleKey: 'maintenance.erpIntegration.catalogs.items.parametrosGrupo.title',
+	listTitle: 'Parâmetros Grupo',
+	listDescriptionKey: 'maintenance.erpIntegration.catalogs.items.parametrosGrupo.listDescription',
+	listDescription: 'Gerencie os agrupadores de parâmetros usados pelos cadastros de ERP.',
+	formTitleKey: 'maintenance.erpIntegration.catalogs.items.parametrosGrupo.formTitle',
+	formTitle: 'Parâmetros Grupo',
+	breadcrumbParents: [
+		{
+			labelKey: 'menuKeys.integracao-erp',
+			label: 'Integração com ERP',
+			href: '/integracao-com-erp/dashboard',
+		},
+	],
+	breadcrumbSectionKey: 'menuKeys.integracao-erp-cadastros-list',
+	breadcrumbSection: 'Cadastros',
+	breadcrumbSectionHref: '/integracao-com-erp/cadastros',
+	breadcrumbModuleKey: 'maintenance.erpIntegration.catalogs.items.parametrosGrupo.title',
+	breadcrumbModule: 'Parâmetros Grupo',
+	defaultFilters: {
+		page: 1,
+		perPage: 15,
+		orderBy: 'nome',
+		sort: 'asc',
+		id: '',
+		'nome::lk': '',
+		ordem: '',
+	},
+	columns: [
+		{
+			id: 'id',
+			labelKey: 'simpleCrud.fields.id',
+			label: 'ID',
+			sortKey: 'id',
+			thClassName: 'w-[96px]',
+			filter: { kind: 'text', key: 'id', inputMode: 'numeric' },
+		},
+		{
+			id: 'nome',
+			labelKey: 'simpleCrud.fields.name',
+			label: 'Nome',
+			sortKey: 'nome',
+			tdClassName: 'font-semibold text-[color:var(--app-text)]',
+			filter: { kind: 'text', key: 'nome::lk' },
+		},
+		{
+			id: 'ordem',
+			labelKey: 'simpleCrud.fields.order',
+			label: 'Ordem',
+			sortKey: 'ordem',
+			thClassName: 'w-[140px]',
+			tdClassName: 'whitespace-nowrap',
+			filter: { kind: 'text', key: 'ordem', inputMode: 'numeric' },
+		},
+	],
+	mobileTitle: (record) => String(record.nome || '-'),
+	mobileSubtitle: (record) => `ID: ${String(record.id || '-')}`,
+	mobileMeta: (record) => `Ordem: ${String(record.ordem || '-')}`,
+	selectable: false,
+	canDeleteRow: () => false,
+	sections: [
+		{
+			id: 'main',
+			titleKey: 'simpleCrud.sections.main',
+			title: 'Dados principais',
+			layout: 'rows',
+			fields: [
+				{ key: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', type: 'text', required: true, maxLength: 255 },
+				{ key: 'ordem', labelKey: 'simpleCrud.fields.order', label: 'Ordem', type: 'number', inputMode: 'numeric' },
+			],
+		},
+	],
+	normalizeRecord: normalizeParametroGrupoRecord,
+	beforeSave: buildParametroGrupoPayload,
+}

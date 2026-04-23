@@ -199,6 +199,7 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 	'integracao-logistica-form': '/integracoes/logistica',
 	'integracao-financeiro-form': '/integracoes/financeiro',
 	'integracao-dashboard-form': '/integracao-com-erp/dashboard',
+	'integracao-erp-cadastros-list': '/integracao-com-erp/cadastros',
 	'integracao-erp-rotinas-list': '/integracao-com-erp/rotinas-integradas',
 	'servicos-integracao-list': '/integracao-com-erp/servicos',
 	'servicos-integracao-falha-list': '/integracao-com-erp/servicos-com-falha',
@@ -215,6 +216,7 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 	'cadastro-parametros-form': '/configuracoes/parametros',
 	'parametros-empresa-list': '/configuracoes/parametros',
 	'chatbot-empresas-list': '/configuracoes/assistente-vendas-ia',
+	'changelog-list': '/changelog',
 	'notificacoes-painel-list': '/legacy/notificacoes-painel-list',
 };
 
@@ -239,14 +241,8 @@ const ROOT_MENU: LegacyRootDefinition[] = [
 		label: 'Integracao com ERP',
 		icon: Waypoints,
 		children: [
+			{ key: 'integracao-erp-cadastros-list', label: 'Cadastros', icon: PanelsTopLeft, component: 'integracao-erp-cadastros-list' },
 			{ key: 'integracao-dashboard-form', label: 'Dashboard', icon: ChartColumnBig, component: 'integracao-dashboard-form' },
-			{ key: 'integracao-erp-rotinas-list', label: 'Rotinas Integradas', icon: Waypoints, component: 'integracao-erp-rotinas-list' },
-			{ key: 'servicos-integracao-list', label: 'Servicos', icon: CircleHelp, component: 'servicos-integracao-list' },
-			{ key: 'parametros-erp-form', label: 'Parametros', icon: List, component: 'parametros-erp-form' },
-			{ key: 'imagens-erp-form', label: 'Imagens', icon: Image, component: 'imagens-erp-form' },
-			{ key: 'api-erp-form', label: 'API', icon: Cable, component: 'api-erp-form' },
-			{ key: 'banco-dados-erp-form', label: 'Banco de Dados', icon: Database, component: 'banco-dados-erp-form' },
-			{ key: 'ativacao-integrador-view', label: 'Instalacao do Integrador', icon: ClipboardCheck, component: 'ativacao-integrador-view' },
 			{ key: 'servicos-integracao-falha-list', label: 'Servicos com Falha', icon: CircleHelp, component: 'servicos-integracao-falha-list' },
 		],
 	},

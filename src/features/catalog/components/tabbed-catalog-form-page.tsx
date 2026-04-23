@@ -9,6 +9,7 @@ import { PageHeader } from '@/src/components/ui/page-header'
 import { PageToast } from '@/src/components/ui/page-toast'
 import { SectionCard } from '@/src/components/ui/section-card'
 import { TabButton } from '@/src/components/ui/tab-button'
+import { resolveCrudLookupOption } from '@/src/components/crud-base/crud-client'
 import { CrudFormSections } from '@/src/components/crud-base/crud-form-sections'
 import type { CrudDataClient, CrudModuleConfig, CrudOption, CrudRecord } from '@/src/components/crud-base/types'
 import { AccessDeniedState } from '@/src/features/auth/components/access-denied-state'
@@ -55,6 +56,45 @@ function buildInitialRecord(config: CrudModuleConfig) {
     }
   }
   return record
+}
+
+async function hydrateLookupFields(config: CrudModuleConfig, record: CrudRecord) {
+  const lookupFields = config.sections.flatMap((section) => section.fields).filter((field) => field.type === 'lookup' && field.optionsResource)
+  if (!lookupFields.length) {
+    return record
+  }
+
+  const lookupEntries = await Promise.all(lookupFields.map(async (field) => {
+    const stateKey = field.lookupStateKey ?? `${field.key}_lookup`
+    const currentLookup = record[stateKey]
+    const currentId = String(record[field.key] ?? '').trim()
+
+    if (!currentId) {
+      return [stateKey, null] as const
+    }
+
+    if (currentLookup && typeof currentLookup === 'object' && currentLookup !== null && 'label' in currentLookup) {
+      const currentLabel = String((currentLookup as { label?: unknown }).label ?? '').trim()
+      if (currentLabel && currentLabel !== currentId) {
+        return [stateKey, currentLookup] as const
+      }
+    }
+
+    try {
+      const resolved = await resolveCrudLookupOption(field.optionsResource!, currentId)
+      return [
+        stateKey,
+        resolved ? { id: resolved.value, label: resolved.label } : currentLookup ?? { id: currentId, label: currentId },
+      ] as const
+    } catch {
+      return [stateKey, currentLookup ?? { id: currentId, label: currentId }] as const
+    }
+  }))
+
+  return {
+    ...record,
+    ...Object.fromEntries(lookupEntries.filter(([, value]) => value)),
+  }
 }
 
 type TabbedCatalogFormPageProps = {
@@ -138,7 +178,12 @@ export function TabbedCatalogFormPage({
         if (!alive) {
           return
         }
-        setForm(config.normalizeRecord ? config.normalizeRecord(loaded) : loaded)
+        const normalized = config.normalizeRecord ? config.normalizeRecord(loaded) : loaded
+        const hydrated = await hydrateLookupFields(config, normalized)
+        if (!alive) {
+          return
+        }
+        setForm(hydrated)
       } catch (loadError) {
         if (!alive) {
           return
@@ -163,7 +208,9 @@ export function TabbedCatalogFormPage({
     }
 
     const loaded = await client.getById(id, formEmbed ?? config.formEmbed)
-    setForm(config.normalizeRecord ? config.normalizeRecord(loaded) : loaded)
+    const normalized = config.normalizeRecord ? config.normalizeRecord(loaded) : loaded
+    const hydrated = await hydrateLookupFields(config, normalized)
+    setForm(hydrated)
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -226,18 +273,26 @@ export function TabbedCatalogFormPage({
     }
   }
 
+  const baseBreadcrumbs = [
+    { label: t('routes.dashboard', 'Home'), href: '/dashboard' },
+    ...(config.breadcrumbParents?.map((item) => ({
+      label: t(item.labelKey, item.label),
+      href: item.href,
+    })) ?? []),
+    ...(config.hideBreadcrumbSection
+      ? []
+      : [{ label: t(config.breadcrumbSectionKey, config.breadcrumbSection), href: config.breadcrumbSectionHref }]),
+    { label: t(config.breadcrumbModuleKey, config.breadcrumbModule), href: config.routeBase },
+  ]
+
   const breadcrumbs = isEditing
     ? [
-        { label: t('routes.dashboard', 'Home'), href: '/dashboard' },
-        { label: t(config.breadcrumbSectionKey, config.breadcrumbSection) },
-        { label: t(config.breadcrumbModuleKey, config.breadcrumbModule), href: config.routeBase },
+        ...baseBreadcrumbs,
         { label: t('routes.editar', 'Edit') },
         { label: `ID #${id}` },
       ]
     : [
-        { label: t('routes.dashboard', 'Home'), href: '/dashboard' },
-        { label: t(config.breadcrumbSectionKey, config.breadcrumbSection) },
-        { label: t(config.breadcrumbModuleKey, config.breadcrumbModule), href: config.routeBase },
+        ...baseBreadcrumbs,
         { label: t('routes.novo', 'New') },
       ]
 

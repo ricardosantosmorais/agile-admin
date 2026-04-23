@@ -132,7 +132,7 @@ function renderFilterField<TFilters>(
     case 'date-range':
       return (
         <FormField label={filter.label}>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <DateInput
               value={toInputValue(draft[filter.fromKey])}
               onChange={(event) => patchDraft(filter.fromKey, event.target.value as TFilters[typeof filter.fromKey])}
@@ -147,7 +147,7 @@ function renderFilterField<TFilters>(
     case 'number-range':
       return (
         <FormField label={filter.label}>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <InputWithAffix
               type={filter.mask ? 'text' : 'number'}
               prefix={filter.prefixText}

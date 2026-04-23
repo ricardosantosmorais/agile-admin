@@ -113,15 +113,23 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
   const mobileBadges = config.renderMobileBadges
     ? (record: CrudListRecord): ReactNode => config.renderMobileBadges?.(record, { t })
     : undefined
+  const selectable = config.selectable !== false
+  const breadcrumbs = [
+    { label: t('routes.dashboard', 'Home'), href: '/dashboard' },
+    ...(config.breadcrumbParents?.map((item) => ({
+      label: t(item.labelKey, item.label),
+      href: item.href,
+    })) ?? []),
+    ...(config.hideBreadcrumbSection
+      ? []
+      : [{ label: t(config.breadcrumbSectionKey, config.breadcrumbSection), href: config.breadcrumbSectionHref }]),
+    { label: t(config.breadcrumbModuleKey, config.breadcrumbModule), href: config.routeBase },
+  ]
 
   return (
     <div className="space-y-5">
       <PageHeader
-        breadcrumbs={[
-          { label: t('routes.dashboard', 'Home'), href: '/dashboard' },
-          { label: t(config.breadcrumbSectionKey, config.breadcrumbSection) },
-          { label: t(config.breadcrumbModuleKey, config.breadcrumbModule), href: config.routeBase },
-        ]}
+        breadcrumbs={breadcrumbs}
         actions={<DataTableSectionAction label={t('simpleCrud.refresh', 'Refresh')} icon={RefreshCcw} onClick={controller.refreshList} />}
       />
 
@@ -186,7 +194,7 @@ export function CrudListPage({ config, client }: { config: CrudModuleConfig; cli
               return [...defaults, ...extras]
             }}
             actionsColumnClassName={config.actionsColumnClassName}
-            selectable
+            selectable={selectable}
             isRowSelectable={config.canSelectRow}
             selectedIds={controller.tableState.selectedIds}
             allSelected={controller.tableState.allSelected}

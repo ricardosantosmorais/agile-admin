@@ -136,9 +136,9 @@ function parseText(value: unknown, fallback = '-') {
 function SectionSkeleton({ lines = 3, chart = false }: { lines?: number; chart?: boolean }) {
 	return (
 		<div className="space-y-3">
-			{chart ? <div className="h-56 animate-pulse rounded-2xl border border-line/70 bg-slate-100" /> : null}
+			{chart ? <div className="app-pane-muted h-56 animate-pulse rounded-2xl" /> : null}
 			{Array.from({ length: lines }).map((_, index) => (
-				<div key={index} className="h-10 animate-pulse rounded-2xl border border-line/70 bg-slate-100" />
+				<div key={index} className="app-pane-muted h-10 animate-pulse rounded-2xl" />
 			))}
 		</div>
 	);
@@ -175,7 +175,7 @@ function InfoTooltipButton({ label }: { label: string }) {
 		<TooltipIconButton label={label}>
 			<button
 				type="button"
-				className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-line/80 bg-white text-xs font-bold text-slate-500 shadow-sm"
+				className="app-button-secondary inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold text-[color:var(--app-muted)] shadow-sm"
 				aria-label={label}
 			>
 				i
@@ -198,21 +198,54 @@ function MetricTile({
 	tone?: 'slate' | 'emerald' | 'sky' | 'amber' | 'rose';
 }) {
 	const toneMap = {
-		slate: 'border-slate-200 bg-slate-50/90',
-		emerald: 'border-emerald-200/80 bg-emerald-50/70',
-		sky: 'border-sky-200/80 bg-sky-50/70',
-		amber: 'border-amber-200/80 bg-amber-50/70',
-		rose: 'border-rose-200/80 bg-rose-50/70',
+		slate: 'app-pane-muted border-line/70',
+		emerald: 'border-emerald-200/80 bg-emerald-50/70 dark:border-emerald-400/35 dark:bg-emerald-500/12',
+		sky: 'border-sky-200/80 bg-sky-50/70 dark:border-sky-400/35 dark:bg-sky-500/12',
+		amber: 'border-amber-200/80 bg-amber-50/70 dark:border-amber-400/35 dark:bg-amber-500/12',
+		rose: 'border-rose-200/80 bg-rose-50/70 dark:border-rose-400/35 dark:bg-rose-500/12',
 	};
 
 	return (
 		<div className={`rounded-3xl border px-4 py-4 ${toneMap[tone]}`}>
 			<div className="flex items-start justify-between gap-2">
-				<div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">{label}</div>
+				<div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--app-muted)]">{label}</div>
 				{tooltip ? <InfoTooltipButton label={tooltip} /> : null}
 			</div>
-			<div className="mt-2 text-2xl font-black tracking-tight text-slate-950">{value}</div>
-			<div className="mt-2 text-[11px] leading-4 text-slate-500">{helper}</div>
+			<div className="mt-2 text-2xl font-black tracking-tight text-[color:var(--app-text)]">{value}</div>
+			<div className="mt-2 text-[11px] leading-4 text-[color:var(--app-muted)]">{helper}</div>
+		</div>
+	);
+}
+
+function ChartTooltip({
+	active,
+	payload,
+	label,
+	formatter,
+	labelFormatter,
+}: {
+	active?: boolean;
+	payload?: Array<{ name?: string; value?: unknown; color?: string }>;
+	label?: string | number;
+	formatter?: (value: unknown) => string;
+	labelFormatter?: (label: string | number) => string;
+}) {
+	if (!active || !payload?.length) {
+		return null;
+	}
+
+	return (
+		<div className="app-card-modern rounded-[1rem] px-3 py-2.5 text-[12px] shadow-xl">
+			{typeof label !== 'undefined' ? <div className="mb-1 font-semibold text-[color:var(--app-text)]">{labelFormatter ? labelFormatter(label) : label}</div> : null}
+			<div className="space-y-1">
+				{payload.map((entry, index) => (
+					<div key={`${entry.name ?? 'value'}-${index}`} className="flex items-center gap-2 text-[color:var(--app-muted)]">
+						<span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color ?? chartPalette[index % chartPalette.length] }} aria-hidden="true" />
+						<span className="font-medium text-[color:var(--app-text)]">{entry.name ?? 'value'}:</span>
+						<span>{formatter ? formatter(entry.value) : formatChartValue(entry.value)}</span>
+					</div>
+				))}
+			</div>
 		</div>
 	);
 }
@@ -284,25 +317,25 @@ function StatusDonutCard({
 			<div className="relative mx-auto h-64 w-full max-w-[320px]">
 				<ResponsiveContainer width="100%" height="100%">
 					<PieChart>
-						<Pie data={visibleData} dataKey="value" nameKey="name" innerRadius={56} outerRadius={86} paddingAngle={3} stroke="#ffffff" strokeWidth={2}>
+						<Pie data={visibleData} dataKey="value" nameKey="name" innerRadius={56} outerRadius={86} paddingAngle={3} stroke="var(--app-panel-solid)" strokeWidth={2}>
 							{visibleData.map((entry, index) => (
 								<Cell key={entry.name} fill={chartPalette[index % chartPalette.length]} />
 							))}
 						</Pie>
-						<Tooltip formatter={(value) => formatNumber(parseNumber(value))} />
+						<Tooltip content={<ChartTooltip formatter={(value) => formatNumber(parseNumber(value))} />} />
 					</PieChart>
 				</ResponsiveContainer>
 				<div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-					<div className="rounded-full bg-white/95 px-4 py-3 text-center shadow-sm ring-1 ring-slate-100">
-						<div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-400">{totalLabel}</div>
-						<div className="mt-1 text-xl font-black tracking-tight text-slate-950">{formatNumber(total)}</div>
+					<div className="app-card-modern rounded-full px-4 py-3 text-center shadow-sm">
+						<div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--app-muted)]">{totalLabel}</div>
+						<div className="mt-1 text-xl font-black tracking-tight text-[color:var(--app-text)]">{formatNumber(total)}</div>
 					</div>
 				</div>
 			</div>
 
 			<div className="space-y-3">
 				<div className="flex items-center justify-between gap-2">
-					<div className="text-[11px] leading-5 text-slate-500">{t('dashboardRoot.ordersStatusLegend', 'Leitura dos principais status que compoem o volume de pedidos no periodo.')}</div>
+					<div className="text-[11px] leading-5 text-[color:var(--app-muted)]">{t('dashboardRoot.ordersStatusLegend', 'Leitura dos principais status que compoem o volume de pedidos no periodo.')}</div>
 					{tooltip ? <InfoTooltipButton label={tooltip} /> : null}
 				</div>
 				<div className="grid gap-2 sm:grid-cols-2">
@@ -310,15 +343,15 @@ function StatusDonutCard({
 						const percentage = total > 0 ? (item.value / total) * 100 : 0;
 
 						return (
-							<div key={item.name} className="flex items-center justify-between gap-3 rounded-2xl border border-line/60 bg-slate-50/80 px-3 py-2.5">
+							<div key={item.name} className="app-pane-muted flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5">
 								<div className="flex min-w-0 items-center gap-2.5">
 									<span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: chartPalette[index % chartPalette.length] }} aria-hidden="true" />
 									<div className="min-w-0">
-										<div className="truncate text-sm font-semibold text-slate-700">{item.name}</div>
-										<div className="text-[11px] text-slate-500">{formatNumber(percentage)}%</div>
+										<div className="truncate text-sm font-semibold text-[color:var(--app-text)]">{item.name}</div>
+										<div className="text-[11px] text-[color:var(--app-muted)]">{formatNumber(percentage)}%</div>
 									</div>
 								</div>
-								<div className="text-sm font-semibold text-slate-900">{formatNumber(item.value)}</div>
+								<div className="text-sm font-semibold text-[color:var(--app-text)]">{formatNumber(item.value)}</div>
 							</div>
 						);
 					})}
@@ -350,10 +383,10 @@ function LineChartCard({
 		<div className="h-64 w-full">
 			<ResponsiveContainer width="100%" height="100%">
 				<LineChart data={data}>
-					<CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-					<XAxis dataKey="label" tick={{ fontSize: 12 }} stroke="#64748b" />
-					<YAxis tick={{ fontSize: 12 }} stroke="#64748b" tickFormatter={(value) => formatChartValue(value, formatValue)} />
-					<Tooltip formatter={(value) => formatChartValue(value, formatValue)} labelFormatter={(label) => `${t(titleKey, titleKey)}: ${label}`} />
+					<CartesianGrid strokeDasharray="3 3" stroke="var(--app-border)" />
+					<XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--app-muted)' }} stroke="var(--app-border)" />
+					<YAxis tick={{ fontSize: 12, fill: 'var(--app-muted)' }} stroke="var(--app-border)" tickFormatter={(value) => formatChartValue(value, formatValue)} />
+					<Tooltip content={<ChartTooltip formatter={(value) => formatChartValue(value, formatValue)} labelFormatter={(label) => `${t(titleKey, titleKey)}: ${label}`} />} />
 					<Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2.5} dot={false} />
 				</LineChart>
 			</ResponsiveContainer>
@@ -381,10 +414,10 @@ function BarChartCard({
 		<div className="h-64 w-full">
 			<ResponsiveContainer width="100%" height="100%">
 				<BarChart data={data}>
-					<CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-					<XAxis dataKey={categoryKey} tick={{ fontSize: 12 }} stroke="#64748b" />
-					<YAxis tick={{ fontSize: 12 }} stroke="#64748b" tickFormatter={(value) => formatChartValue(value, formatValue)} />
-					<Tooltip formatter={(value) => formatChartValue(value, formatValue)} />
+					<CartesianGrid strokeDasharray="3 3" stroke="var(--app-border)" />
+					<XAxis dataKey={categoryKey} tick={{ fontSize: 12, fill: 'var(--app-muted)' }} stroke="var(--app-border)" />
+					<YAxis tick={{ fontSize: 12, fill: 'var(--app-muted)' }} stroke="var(--app-border)" tickFormatter={(value) => formatChartValue(value, formatValue)} />
+					<Tooltip content={<ChartTooltip formatter={(value) => formatChartValue(value, formatValue)} />} />
 					<Bar dataKey={dataKey} radius={[8, 8, 0, 0]} fill={chartPalette[0]} />
 				</BarChart>
 			</ResponsiveContainer>
@@ -402,12 +435,12 @@ function PieChartCard({ data }: { data: Array<{ name: string; value: number }> }
 		<div className="h-64 w-full">
 			<ResponsiveContainer width="100%" height="100%">
 				<PieChart>
-					<Pie data={data} dataKey="value" nameKey="name" innerRadius={48} outerRadius={78} paddingAngle={2} strokeWidth={0}>
+					<Pie data={data} dataKey="value" nameKey="name" innerRadius={48} outerRadius={78} paddingAngle={2} stroke="var(--app-panel-solid)" strokeWidth={2}>
 						{data.map((entry, index) => (
 							<Cell key={entry.name} fill={chartPalette[index % chartPalette.length]} />
 						))}
 					</Pie>
-					<Tooltip formatter={(value) => formatChartValue(value)} />
+					<Tooltip content={<ChartTooltip formatter={(value) => formatChartValue(value)} />} />
 				</PieChart>
 			</ResponsiveContainer>
 		</div>
@@ -429,9 +462,9 @@ function SimpleTable({
 	}
 
 	return (
-		<div className={['overflow-auto rounded-2xl border border-line/70', maxHeightClass ?? ''].filter(Boolean).join(' ')}>
+		<div className={['app-table-shell overflow-auto rounded-2xl', maxHeightClass ?? ''].filter(Boolean).join(' ')}>
 			<table className="min-w-full text-left text-sm">
-				<thead className="sticky top-0 bg-slate-50 text-slate-500">
+				<thead className="app-table-muted sticky top-0 text-[color:var(--app-muted)]">
 					<tr>
 						{columns.map((column) => (
 							<th key={column.key} className="px-3 py-2.5 font-semibold">
@@ -442,7 +475,7 @@ function SimpleTable({
 				</thead>
 				<tbody>
 					{rows.map((row, index) => (
-						<tr key={`${index}-${parseText(row.id, String(index))}`} className="border-t border-line/60 text-slate-700">
+						<tr key={`${index}-${parseText(row.id, String(index))}`} className="border-t border-line/60 text-[color:var(--app-text)]">
 							{columns.map((column) => (
 								<td key={column.key} className="px-3 py-2.5 align-top">
 									{column.formatter ? column.formatter(row[column.key], row) : parseText(row[column.key])}
@@ -807,6 +840,10 @@ export function DashboardRootAgileecommercePage() {
 		[snapshot],
 	);
 	const auditStatusPie = useMemo(() => toNameValueSeries(snapshot?.audit?.status ?? [], 'status', 'total', (value) => formatDashboardRootBuildStatus(value, t)), [snapshot, t]);
+	const analyticsRevenueDailySeries = useMemo(
+		() => toSeries(snapshot?.analytics?.vendas_series_diaria ?? [], 'data', 'valor_total_vendas').map((item) => ({ ...item, label: item.label ? formatDate(item.label) : item.label })),
+		[snapshot],
+	);
 	const analyticsRevenueSeries = useMemo(() => toSeries(snapshot?.analytics?.vendas_series_mensal ?? [], 'mes', 'valor_total_vendas'), [snapshot]);
 	const analyticsOrderStatusPie = useMemo(
 		() => toNameValueSeries(snapshot?.analytics?.pedidos_status ?? [], 'status_pedido', 'total_pedidos', (value) => formatDashboardRootOrderStatus(value, t)),
@@ -840,7 +877,7 @@ export function DashboardRootAgileecommercePage() {
 			<AsyncState isLoading={!initialLoaded && !error} error={!initialLoaded ? error : ''}>
 				{snapshot ? (
 					<>
-						{error && initialLoaded ? <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{error}</div> : null}
+						{error && initialLoaded ? <div className="app-warning-panel rounded-2xl px-4 py-3 text-sm">{error}</div> : null}
 
 						<div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
 							{primaryCards.map((card) => (
@@ -858,37 +895,51 @@ export function DashboardRootAgileecommercePage() {
 							))}
 						</div>
 
-						<SectionCard
-							title={t('dashboardRoot.executiveStoryTitle', 'Pulso comercial da carteira')}
-							description={t('dashboardRoot.executiveStoryDescription', 'Uma leitura rapida do ritmo de faturamento e dos sinais que merecem atencao no periodo selecionado.')}
-							action={<InfoTooltipButton label={t('dashboardRoot.executiveStoryTooltip', 'O grafico centraliza a leitura do periodo e os cards laterais destacam crescimento, risco e cobertura do dado.')} />}
+						<LazyDashboardSection
+							phaseIds={['commercial']}
+							isReady={hasPhase('commercial')}
+							requestPhases={requestPhases}
+							fallback={
+								<SectionCard
+									title={t('dashboardRoot.executiveStoryTitle', 'Pulso comercial da carteira')}
+									description={t('dashboardRoot.executiveStoryDescription', 'Uma leitura rapida do ritmo de faturamento e dos sinais que merecem atencao no periodo selecionado.')}
+								>
+									<SectionSkeleton lines={4} chart />
+								</SectionCard>
+							}
 						>
-							<div className="space-y-4">
-								<div className="rounded-[1.6rem] border border-line/70 bg-slate-50/80 p-4">
-									<div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-										<div>
-											<div className="text-sm font-semibold text-slate-800">{t('dashboardRoot.charts.transactedVolumeMonthly', 'Volume transacionado por mes')}</div>
-											<div className="text-[11px] leading-5 text-slate-500">{t('dashboardRoot.executiveStoryChartLegend', 'Evolucao do faturamento consolidado no intervalo escolhido para apoiar leitura de tendencia.')}</div>
+							<SectionCard
+								title={t('dashboardRoot.executiveStoryTitle', 'Pulso comercial da carteira')}
+								description={t('dashboardRoot.executiveStoryDescription', 'Uma leitura rapida do ritmo de faturamento e dos sinais que merecem atencao no periodo selecionado.')}
+								action={<InfoTooltipButton label={t('dashboardRoot.executiveStoryTooltip', 'O grafico centraliza a leitura do periodo e os cards laterais destacam crescimento, risco e cobertura do dado.')} />}
+							>
+								<div className="space-y-4">
+									<div className="app-pane-muted rounded-[1.6rem] p-4">
+										<div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+											<div>
+												<div className="text-sm font-semibold text-slate-800">{t('dashboardRoot.charts.transactedVolumeDaily', 'Volume transacionado por dia')}</div>
+												<div className="text-[11px] leading-5 text-slate-500">{t('dashboardRoot.executiveStoryChartLegendDaily', 'Evolução diária do faturamento consolidado para mostrar o ritmo recente da carteira no intervalo selecionado.')}</div>
+											</div>
+											<div className="app-button-secondary rounded-full px-3 py-1 text-[11px] font-semibold text-[color:var(--app-muted)]">{selectedRangeLabel}</div>
 										</div>
-										<div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold text-slate-500">{selectedRangeLabel}</div>
+										<LineChartCard data={analyticsRevenueDailySeries} dataKey="value" titleKey="dashboardRoot.charts.transactedVolumeDaily" formatValue={formatCurrency} />
 									</div>
-									<LineChartCard data={analyticsRevenueSeries} dataKey="value" titleKey="dashboardRoot.charts.transactedVolumeMonthly" formatValue={formatCurrency} />
-								</div>
 
-								<div className="grid gap-3 md:grid-cols-2">
-									{secondaryCards.map((card) => (
-										<MetricTile
-											key={card.label}
-											label={card.label}
-											value={card.type === 'currency' ? formatCurrency(card.value) : card.type === 'percent' ? `${formatNumber(card.value)}%` : formatNumber(card.value)}
-											helper={card.description ?? t('dashboardRoot.executiveStoryFallback', 'Indicador complementar da leitura comercial.')}
-											tooltip={card.tooltip}
-											tone={card.tone === 'sky' ? 'sky' : card.tone === 'amber' ? 'amber' : card.tone === 'rose' ? 'rose' : 'emerald'}
-										/>
-									))}
+									<div className="grid gap-3 md:grid-cols-2">
+										{secondaryCards.map((card) => (
+											<MetricTile
+												key={card.label}
+												label={card.label}
+												value={card.type === 'currency' ? formatCurrency(card.value) : card.type === 'percent' ? `${formatNumber(card.value)}%` : formatNumber(card.value)}
+												helper={card.description ?? t('dashboardRoot.executiveStoryFallback', 'Indicador complementar da leitura comercial.')}
+												tooltip={card.tooltip}
+												tone={card.tone === 'sky' ? 'sky' : card.tone === 'amber' ? 'amber' : card.tone === 'rose' ? 'rose' : 'emerald'}
+											/>
+										))}
+									</div>
 								</div>
-							</div>
-						</SectionCard>
+							</SectionCard>
+						</LazyDashboardSection>
 
 						{trustCards.length ? (
 							<div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -928,20 +979,20 @@ export function DashboardRootAgileecommercePage() {
 								>
 									<div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.95fr)]">
 										<div className="space-y-4">
-											<div className="rounded-[1.4rem] border border-line/70 bg-slate-50/80 p-4">
+											<div className="app-pane-muted rounded-[1.4rem] p-4">
 												<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.transactedVolumeMonthly', 'Volume transacionado por mês')}</h3>
 												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.chartLegend.revenueSeries', 'Mostra a evolução do faturamento consolidado para leitura rápida de tendência no período.')}</p>
 												<LineChartCard data={analyticsRevenueSeries} dataKey="value" titleKey="dashboardRoot.charts.transactedVolumeMonthly" formatValue={formatCurrency} />
 											</div>
 
-											<div className="rounded-[1.4rem] border border-line/70 bg-slate-50/80 p-4">
+											<div className="app-pane-muted rounded-[1.4rem] p-4">
 												<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.ordersMonthly', 'Pedidos por mês')}</h3>
 												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.chartLegend.ordersSeries', 'Ajuda a separar ganho de demanda de ganho de ticket médio ao longo do intervalo.')}</p>
 												<LineChartCard data={analyticsOrdersSeries} dataKey="value" titleKey="dashboardRoot.charts.ordersMonthly" />
 											</div>
 										</div>
 
-										<div className="rounded-[1.4rem] border border-line/70 bg-white p-4">
+										<div className="app-pane rounded-[1.4rem] p-4">
 											<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.ordersByStatus', 'Pedidos por status')}</h3>
 											<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.chartLegend.ordersStatus', 'Distribui o total de pedidos entre os principais status do período com legenda consolidada.')}</p>
 											<StatusDonutCard

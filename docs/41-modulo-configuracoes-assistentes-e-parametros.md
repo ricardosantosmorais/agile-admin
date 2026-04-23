@@ -65,6 +65,8 @@ No v2, este modulo segue `empresas/parametros` na `api-v3`, com `componente=1` e
 ### Comportamento
 - o assistente externo e carregado dentro do v2, em iframe;
 - o token JWT e gerado server-side no Admin v2;
+- quando o tenant ativo e `agileecommerce` no perfil root, o token usa `rota=/admin`, reproduzindo a listagem administrativa do legado;
+- para tenants comuns, o token usa `id_empresa` e `rota=/company/{id}`, reproduzindo a visao isolada por empresa;
 - em ambiente local, se `ASSISTENTE_VENDAS_IA_JWT_SECRET` nao estiver definido, o v2 tenta reaproveitar o `JWT_SECRET` do legado para manter compatibilidade de desenvolvimento;
 - o iframe permanece embutido na experiencia do painel;
 - o usuario ainda pode abrir o ambiente externo em nova guia quando precisar.
@@ -79,6 +81,7 @@ No v2, este modulo segue `empresas/parametros` na `api-v3`, com `componente=1` e
 - unitario de mapeadores:
   - `src/features/configuracoes-assistente-virtual/services/configuracoes-assistente-virtual-mappers.test.ts`
   - `src/features/parametros/services/parametros-mappers.test.ts`
+  - `src/features/configuracoes-assistente-vendas-ia/services/assistente-vendas-ia-embed.test.ts`
 
 ### Gap atual
 - ainda nao entrou E2E dedicado para `Assistente virtual`, `Parametros` e `Assistente de vendas IA`;

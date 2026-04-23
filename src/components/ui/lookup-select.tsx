@@ -11,6 +11,23 @@ export type LookupOption = {
   description?: string
 }
 
+function dedupeLookupOptions<TOption extends LookupOption>(options: TOption[]) {
+  const seen = new Set<string>()
+  const deduped: TOption[] = []
+
+  for (const option of options) {
+    const key = `${option.id}::${option.label}::${option.description ?? ''}`
+    if (seen.has(key)) {
+      continue
+    }
+
+    seen.add(key)
+    deduped.push(option)
+  }
+
+  return deduped
+}
+
 type LookupSelectProps<TOption extends LookupOption> = {
   label: string
   value: TOption | null
@@ -71,7 +88,7 @@ export function LookupSelect<TOption extends LookupOption>({
     const timeoutId = window.setTimeout(async () => {
       setIsLoading(true)
       try {
-        const result = await loadOptions(query, 1, pageSize)
+        const result = dedupeLookupOptions(await loadOptions(query, 1, pageSize))
         setOptions(result)
         setPage(1)
         setHasMore(result.length >= pageSize)
@@ -130,8 +147,8 @@ export function LookupSelect<TOption extends LookupOption>({
     setIsLoading(true)
     try {
       const nextPage = page + 1
-      const result = await loadOptions(query, nextPage, pageSize)
-      setOptions((current) => [...current, ...result])
+      const result = dedupeLookupOptions(await loadOptions(query, nextPage, pageSize))
+      setOptions((current) => dedupeLookupOptions([...current, ...result]))
       setPage(nextPage)
       setHasMore(result.length >= pageSize)
       setHighlightedIndex((current) => (current >= 0 ? current : result.length ? 0 : -1))

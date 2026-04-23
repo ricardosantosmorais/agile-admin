@@ -132,19 +132,27 @@ export function CrudFormPage({ config, client, id }: { config: CrudModuleConfig;
   }, [client, config, resolvedId, setForm])
 
   const breadcrumbs = useMemo(() => {
+    const baseItems = [
+      { label: t('routes.dashboard', 'Home'), href: '/dashboard' },
+      ...(config.breadcrumbParents?.map((item) => ({
+        label: t(item.labelKey, item.label),
+        href: item.href,
+      })) ?? []),
+      ...(config.hideBreadcrumbSection
+        ? []
+        : [{ label: t(config.breadcrumbSectionKey, config.breadcrumbSection), href: config.breadcrumbSectionHref }]),
+      { label: t(config.breadcrumbModuleKey, config.breadcrumbModule), href: config.routeBase },
+    ]
+
     if (resolvedId) {
       return [
-        { label: t('routes.dashboard', 'Home'), href: '/dashboard' },
-        { label: t(config.breadcrumbSectionKey, config.breadcrumbSection) },
-        { label: t(config.breadcrumbModuleKey, config.breadcrumbModule), href: config.routeBase },
+        ...baseItems,
         { label: t('routes.editar', 'Edit') },
         { label: `ID #${resolvedId}` },
       ]
     }
     return [
-      { label: t('routes.dashboard', 'Home'), href: '/dashboard' },
-      { label: t(config.breadcrumbSectionKey, config.breadcrumbSection) },
-      { label: t(config.breadcrumbModuleKey, config.breadcrumbModule), href: config.routeBase },
+      ...baseItems,
       { label: t('routes.novo', 'New') },
     ]
   }, [config, resolvedId, t])

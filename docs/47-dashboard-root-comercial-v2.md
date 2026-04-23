@@ -131,6 +131,16 @@ Componentes:
 Observacao:
 para intervalos curtos, preferir granularidade diaria ou semanal; para intervalos longos, mensal.
 
+### Estrategia de carregamento
+
+Para reduzir o tempo de primeira dobra e melhorar a percepcao de velocidade:
+
+- a primeira consulta deve trazer apenas KPI, comparativo e confiabilidade do dado;
+- o bloco `Pulso comercial da carteira` pode carregar em seguida, em request separado;
+- rankings e tabelas detalhadas devem ficar fora da primeira resposta;
+- o grafico de `Pulso comercial da carteira` deve usar granularidade diaria;
+- a `Visao executiva comercial` permanece com leitura mensal para tendencia consolidada.
+
 ### 2. Carteira e rankings
 
 Objetivo:

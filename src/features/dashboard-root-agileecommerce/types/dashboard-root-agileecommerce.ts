@@ -44,6 +44,27 @@ export type DashboardRootResumo = {
 
 export type DashboardRootSimpleRow = Record<string, string | number | null>;
 
+export type DashboardRootAnalytics = {
+	resumo: Record<string, number>;
+	comparativo: DashboardRootComparativo;
+	confianca: DashboardRootSimpleRow;
+	vendas_series_diaria: DashboardRootSimpleRow[];
+	vendas_series_mensal: DashboardRootSimpleRow[];
+	ranking_faturamento: DashboardRootSimpleRow[];
+	ranking_pedidos: DashboardRootSimpleRow[];
+	ranking_usuarios_ativos: DashboardRootSimpleRow[];
+	engajamento_empresas: DashboardRootSimpleRow[];
+	empresas_base_saudavel: DashboardRootSimpleRow[];
+	empresas_mais_produtos: DashboardRootSimpleRow[];
+	pedidos_status: DashboardRootSimpleRow[];
+	empresas_sinais_queda: DashboardRootSimpleRow[];
+	frescor_analytics_por_empresa: DashboardRootSimpleRow[];
+	sincronizacao_resumo: DashboardRootSimpleRow;
+	sincronizacao_status: DashboardRootSimpleRow[];
+	sincronizacao_execucoes_recentes: DashboardRootSimpleRow[];
+	cobertura_dados: DashboardRootSimpleRow[];
+};
+
 export type DashboardRootSnapshot = {
 	meta: {
 		versao: string;
@@ -120,23 +141,5 @@ export type DashboardRootSnapshot = {
 		fontes: DashboardRootSimpleRow[];
 		serie_mensal: DashboardRootSimpleRow[];
 	};
-	analytics?: {
-		resumo: Record<string, number>;
-		comparativo: DashboardRootComparativo;
-		confianca: DashboardRootSimpleRow;
-		vendas_series_mensal: DashboardRootSimpleRow[];
-		ranking_faturamento: DashboardRootSimpleRow[];
-		ranking_pedidos: DashboardRootSimpleRow[];
-		ranking_usuarios_ativos: DashboardRootSimpleRow[];
-		engajamento_empresas: DashboardRootSimpleRow[];
-		empresas_base_saudavel: DashboardRootSimpleRow[];
-		empresas_mais_produtos: DashboardRootSimpleRow[];
-		pedidos_status: DashboardRootSimpleRow[];
-		empresas_sinais_queda: DashboardRootSimpleRow[];
-		frescor_analytics_por_empresa: DashboardRootSimpleRow[];
-		sincronizacao_resumo: DashboardRootSimpleRow;
-		sincronizacao_status: DashboardRootSimpleRow[];
-		sincronizacao_execucoes_recentes: DashboardRootSimpleRow[];
-		cobertura_dados: DashboardRootSimpleRow[];
-	};
+	analytics?: Partial<DashboardRootAnalytics>;
 };

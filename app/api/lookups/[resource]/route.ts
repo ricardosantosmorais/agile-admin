@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { agileV2Fetch } from '@/app/api/consultas/_shared'
 import { readAuthSession } from '@/src/features/auth/services/auth-session'
 import { mapLookupResponse } from '@/src/features/clientes/services/clientes-mappers'
 import { externalAdminApiFetch } from '@/src/services/http/external-admin-api'
@@ -13,6 +14,10 @@ const lookupConfig: Record<string, { path: string; labelKeys: string[]; searchFi
   canais_distribuicao: { path: 'canais_distribuicao', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   filiais: { path: 'filiais', labelKeys: ['nome_fantasia', 'nome'], searchField: 'nome_fantasia::like', order: 'nome_fantasia' },
   templates_integracao: { path: 'templates', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
+  erps: { path: 'erps', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
+  templates: { path: 'templates', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
+  parametros_grupo: { path: 'parametros_grupo', labelKeys: ['nome'], searchField: 'nome::like', order: 'ordem,nome' },
+  querys: { path: 'querys', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   grupos_filiais: { path: 'grupos_filiais', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   vendedores: { path: 'vendedores', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   supervisores: { path: 'supervisores', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
@@ -64,8 +69,6 @@ export async function GET(
       query: {
         page: id ? '1' : page,
         perpage: id ? '1' : perPage,
-        order: 'nome',
-        sort: 'asc',
         ...(id ? { id } : {}),
       },
     })
@@ -74,7 +77,32 @@ export async function GET(
       return NextResponse.json({ message: 'Nao foi possivel carregar as opcoes.' }, { status: result.status || 400 })
     }
 
-    return NextResponse.json(mapLookupResponse(result.payload, ['nome']))
+    const options = mapLookupResponse(result.payload, ['nome'])
+    const filtered = q
+      ? options.filter((option) => option.label.toLowerCase().includes(q.toLowerCase()))
+      : options
+
+    return NextResponse.json(filtered)
+  }
+
+  if (resource === 'erps' || resource === 'templates' || resource === 'parametros_grupo' || resource === 'querys') {
+    const result = await agileV2Fetch(config.path, {
+      method: 'GET',
+      query: {
+        page: id ? '1' : page,
+        perpage: id ? '1' : perPage,
+        order: config.order || 'nome',
+        sort: 'asc',
+        ...(id ? { id } : {}),
+        ...(!id && q ? { [config.searchField.replace('::like', ':lk')]: q } : {}),
+      },
+    })
+
+    if (!result.ok) {
+      return NextResponse.json({ message: 'Nao foi possivel carregar as opcoes.' }, { status: result.status || 400 })
+    }
+
+    return NextResponse.json(mapLookupResponse(result.payload, config.labelKeys))
   }
 
   const params = new URLSearchParams({

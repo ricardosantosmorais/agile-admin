@@ -29,7 +29,6 @@ export function ConfiguracoesAssistenteVendasIaPage() {
   const breadcrumbs = useMemo(
     () => [
       { label: t('routes.dashboard', 'Início'), href: '/dashboard' },
-      { label: t('routes.configuracoes', 'Configurações'), href: '/configuracoes' },
       { label: t('configuracoes.salesAssistant.title', 'Assistente de vendas IA'), href: '/configuracoes/assistente-vendas-ia' },
     ],
     [t],

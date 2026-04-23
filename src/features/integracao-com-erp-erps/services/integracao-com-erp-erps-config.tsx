@@ -1,0 +1,81 @@
+import type { CrudModuleConfig } from '@/src/components/crud-base/types'
+import { buildErpPayload, normalizeErpRecord } from '@/src/features/integracao-com-erp-erps/services/integracao-com-erp-erps'
+
+export const INTEGRACAO_COM_ERP_ERPS_CONFIG: CrudModuleConfig = {
+	key: 'integracao-com-erp-erps',
+	resource: 'erps',
+	routeBase: '/integracao-com-erp/cadastros/erps',
+	featureKey: 'erpCadastrosErps',
+	listTitleKey: 'maintenance.erpIntegration.catalogs.items.erps.title',
+	listTitle: 'ERPs',
+	listDescriptionKey: 'maintenance.erpIntegration.catalogs.items.erps.listDescription',
+	listDescription: 'Gerencie os cadastros de ERP usados pela integração.',
+	formTitleKey: 'maintenance.erpIntegration.catalogs.items.erps.formTitle',
+	formTitle: 'ERP',
+	breadcrumbParents: [
+		{
+			labelKey: 'menuKeys.integracao-erp',
+			label: 'Integração com ERP',
+			href: '/integracao-com-erp/dashboard',
+		},
+	],
+	breadcrumbSectionKey: 'menuKeys.integracao-erp-cadastros-list',
+	breadcrumbSection: 'Cadastros',
+	breadcrumbSectionHref: '/integracao-com-erp/cadastros',
+	breadcrumbModuleKey: 'maintenance.erpIntegration.catalogs.items.erps.title',
+	breadcrumbModule: 'ERPs',
+	defaultFilters: {
+		page: 1,
+		perPage: 15,
+		orderBy: 'nome',
+		sort: 'asc',
+		id: '',
+		'codigo::lk': '',
+		'nome::lk': '',
+	},
+	columns: [
+		{
+			id: 'id',
+			labelKey: 'simpleCrud.fields.id',
+			label: 'ID',
+			sortKey: 'id',
+			thClassName: 'w-[120px]',
+			filter: { kind: 'text', key: 'id', inputMode: 'numeric' },
+		},
+		{
+			id: 'codigo',
+			labelKey: 'simpleCrud.fields.code',
+			label: 'Código',
+			sortKey: 'codigo',
+			thClassName: 'w-[180px]',
+			filter: { kind: 'text', key: 'codigo::lk' },
+		},
+		{
+			id: 'nome',
+			labelKey: 'simpleCrud.fields.name',
+			label: 'Nome',
+			sortKey: 'nome',
+			tdClassName: 'font-semibold text-[color:var(--app-text)]',
+			filter: { kind: 'text', key: 'nome::lk' },
+		},
+	],
+	mobileTitle: (record) => String(record.nome || '-'),
+	mobileSubtitle: (record) => String(record.codigo || '-'),
+	mobileMeta: (record) => `ID: ${record.id}`,
+	selectable: false,
+	canDeleteRow: () => false,
+	sections: [
+		{
+			id: 'main',
+			titleKey: 'simpleCrud.sections.main',
+			title: 'Dados principais',
+			layout: 'rows',
+			fields: [
+				{ key: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Código', type: 'text', required: true, maxLength: 50 },
+				{ key: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', type: 'text', required: true, maxLength: 255 },
+			],
+		},
+	],
+	normalizeRecord: normalizeErpRecord,
+	beforeSave: buildErpPayload,
+}

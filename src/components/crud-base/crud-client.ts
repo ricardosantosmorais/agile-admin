@@ -54,8 +54,15 @@ const CRUD_OPTIONS_PATHS: Record<CrudResource, string> = {
 	clusters: '/api/lookups/clusters',
 	templates_integracao: '/api/lookups/templates_integracao',
 	administradores_master: '/api/lookups/administradores_master',
+	erps: '/api/erps',
+	templates: '/api/templates',
+	parametros_grupo: '/api/parametros-grupo',
+	parametros_cadastro: '/api/parametros-cadastro',
+	querys: '/api/querys',
+	scripts: '/api/scripts',
 	canais_distribuicao: '/api/lookups/canais_distribuicao',
 	perfis_administradores: '/api/administradores/perfis',
+	changelog: '/api/changelog',
 	'integracao-aplicativos': '/api/integracao-aplicativos',
 	gateways_pagamento: '/api/integracoes/gateways-pagamento',
 	produtos: '/api/lookups/produtos',
@@ -153,6 +160,23 @@ function cloneCrudOptions(options: CrudOption[]) {
 	return options.map((option) => ({ ...option }));
 }
 
+function dedupeCrudOptions(options: CrudOption[]) {
+	const seen = new Set<string>();
+	const deduped: CrudOption[] = [];
+
+	for (const option of options) {
+		const key = `${option.value}::${option.label}`;
+		if (seen.has(key)) {
+			continue;
+		}
+
+		seen.add(key);
+		deduped.push(option);
+	}
+
+	return deduped;
+}
+
 function getLookupCacheKey(resource: CrudResource, query: string, page: number, perPage: number) {
 	return `${resource}::${query.trim().toLowerCase()}::${page}::${perPage}`;
 }
@@ -190,13 +214,13 @@ export async function loadCrudLookupOptions(resource: CrudResource, query: strin
 		cache: 'no-store',
 	});
 
-	const normalized = response.map((item) => {
+	const normalized = dedupeCrudOptions(response.map((item) => {
 		if ('value' in item && typeof item.value === 'string' && 'label' in item && typeof item.label === 'string') {
 			return { value: item.value, label: item.label };
 		}
 
 		return mapCrudOption(item);
-	});
+	}));
 
 	writeLookupCache(cacheKey, normalized);
 	return cloneCrudOptions(normalized);
@@ -280,7 +304,7 @@ export function createCrudClient(basePath: string): CrudDataClient {
 			});
 
 			const items = Array.isArray(response) ? response : response.data;
-			const options = items.map((item) => mapCrudOption(item)) satisfies CrudOption[];
+			const options = dedupeCrudOptions(items.map((item) => mapCrudOption(item)) satisfies CrudOption[]);
 			writeLookupCache(cacheKey, options);
 			return cloneCrudOptions(options);
 		},
