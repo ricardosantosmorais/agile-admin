@@ -44,6 +44,7 @@ frontend:
           done
         - npm run build
         - rm -rf .next/cache
+        - find .next -type f -name '*.map' -delete
   artifacts:
     baseDirectory: .next
     files:
