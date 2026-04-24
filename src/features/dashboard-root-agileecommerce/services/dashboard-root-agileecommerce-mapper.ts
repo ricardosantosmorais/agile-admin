@@ -131,6 +131,7 @@ export function mapDashboardRootAgileecommercePayload(payload: unknown): Dashboa
 				...(hasOwn(analyticsRecord, 'comparativo') ? { comparativo: mapComparativo(analyticsRecord.comparativo) } : {}),
 				...(hasOwn(analyticsRecord, 'confianca') ? { confianca: mapSimpleRow(analyticsRecord.confianca) } : {}),
 				...(hasOwn(analyticsRecord, 'vendas_series_diaria') ? { vendas_series_diaria: mapSimpleRows(analyticsRecord.vendas_series_diaria) } : {}),
+				...(hasOwn(analyticsRecord, 'vendas_series_diaria_anterior') ? { vendas_series_diaria_anterior: mapSimpleRows(analyticsRecord.vendas_series_diaria_anterior) } : {}),
 				...(hasOwn(analyticsRecord, 'vendas_series_mensal') ? { vendas_series_mensal: mapSimpleRows(analyticsRecord.vendas_series_mensal) } : {}),
 				...(hasOwn(analyticsRecord, 'ranking_faturamento') ? { ranking_faturamento: mapSimpleRows(analyticsRecord.ranking_faturamento) } : {}),
 				...(hasOwn(analyticsRecord, 'ranking_pedidos') ? { ranking_pedidos: mapSimpleRows(analyticsRecord.ranking_pedidos) } : {}),

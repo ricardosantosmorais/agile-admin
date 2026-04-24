@@ -4,7 +4,19 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { dashboardRootAgileecommerceClient } from '@/src/features/dashboard-root-agileecommerce/services/dashboard-root-agileecommerce-client';
 import type { DashboardRootSnapshot } from '@/src/features/dashboard-root-agileecommerce/types/dashboard-root-agileecommerce';
 
-export type DashboardRootPhaseId = 'summary' | 'commercial' | 'analytics' | 'platform' | 'product' | 'engagement' | 'operations' | 'ai';
+export type DashboardRootPhaseId =
+	| 'summary'
+	| 'commercial'
+	| 'analyticsCommercial'
+	| 'analyticsOps'
+	| 'platform'
+	| 'productSummary'
+	| 'productDetail'
+	| 'engagementSummary'
+	| 'engagementDetail'
+	| 'operationsSummary'
+	| 'operationsDetail'
+	| 'ai';
 
 type UseDashboardRootSequencedSnapshotOptions = {
 	startDate: string;
@@ -28,13 +40,17 @@ type DashboardRootSequenceState = {
 };
 
 const phaseDefinitions: DashboardRootPhaseDefinition[] = [
-	{ id: 'summary', blocks: ['analytics_summary'] },
-	{ id: 'commercial', blocks: ['analytics_pulse'] },
-	{ id: 'analytics', blocks: ['analytics_detail'] },
+	{ id: 'summary', blocks: ['analytics_headline'] },
+	{ id: 'commercial', blocks: ['analytics_trust', 'analytics_pulse'] },
+	{ id: 'analyticsCommercial', blocks: ['analytics_commercial'] },
+	{ id: 'analyticsOps', blocks: ['analytics_operations'] },
 	{ id: 'platform', blocks: ['empresas'] },
-	{ id: 'product', blocks: ['apps'] },
-	{ id: 'engagement', blocks: ['push'] },
-	{ id: 'operations', blocks: ['processos'] },
+	{ id: 'productSummary', blocks: ['apps_headline'] },
+	{ id: 'productDetail', blocks: ['apps_detail'] },
+	{ id: 'engagementSummary', blocks: ['push_headline'] },
+	{ id: 'engagementDetail', blocks: ['push_detail'] },
+	{ id: 'operationsSummary', blocks: ['processos_headline'] },
+	{ id: 'operationsDetail', blocks: ['processos_detail'] },
 	{ id: 'ai', blocks: ['agent', 'audit'] },
 ];
 
@@ -58,12 +74,40 @@ function createSequenceState(key: string): DashboardRootSequenceState {
 
 function mergePhaseSnapshot(current: DashboardRootSnapshot | null, partial: DashboardRootSnapshot, phaseId: DashboardRootPhaseId) {
 	const base = current ?? partial;
-	const mergedAnalytics = partial.analytics
-		? ({
-				...(current?.analytics ?? {}),
-				...partial.analytics,
-			} as DashboardRootSnapshot['analytics'])
-		: current?.analytics;
+	const mergeAnalytics = () => {
+		if (!partial.analytics) {
+			return current?.analytics;
+		}
+
+		const currentAnalytics = current?.analytics ?? {};
+		return {
+			...currentAnalytics,
+			...partial.analytics,
+			resumo:
+				currentAnalytics.resumo || partial.analytics.resumo
+					? {
+							...(currentAnalytics.resumo ?? {}),
+							...(partial.analytics.resumo ?? {}),
+						}
+					: undefined,
+			comparativo: partial.analytics.comparativo ?? currentAnalytics.comparativo,
+			confianca:
+				currentAnalytics.confianca || partial.analytics.confianca
+					? {
+							...(currentAnalytics.confianca ?? {}),
+							...(partial.analytics.confianca ?? {}),
+						}
+					: undefined,
+			sincronizacao_resumo:
+				currentAnalytics.sincronizacao_resumo || partial.analytics.sincronizacao_resumo
+					? {
+							...(currentAnalytics.sincronizacao_resumo ?? {}),
+							...(partial.analytics.sincronizacao_resumo ?? {}),
+						}
+					: undefined,
+		} as DashboardRootSnapshot['analytics'];
+	};
+	const mergedAnalytics = mergeAnalytics();
 
 	switch (phaseId) {
 		case 'summary':
@@ -83,25 +127,38 @@ function mergePhaseSnapshot(current: DashboardRootSnapshot | null, partial: Dash
 				...base,
 				empresas: partial.empresas,
 			};
-		case 'product':
+		case 'productSummary':
+		case 'productDetail':
 			return {
 				...base,
-				apps: partial.apps,
+				apps: {
+					...(current?.apps ?? {}),
+					...(partial.apps ?? {}),
+				},
 			};
-		case 'engagement':
+		case 'engagementSummary':
+		case 'engagementDetail':
 			return {
 				...base,
-				push: partial.push,
+				push: {
+					...(current?.push ?? {}),
+					...(partial.push ?? {}),
+				},
 			};
-		case 'analytics':
+		case 'analyticsCommercial':
+		case 'analyticsOps':
 			return {
 				...base,
 				analytics: mergedAnalytics,
 			};
-		case 'operations':
+		case 'operationsSummary':
+		case 'operationsDetail':
 			return {
 				...base,
-				processos: partial.processos,
+				processos: {
+					...(current?.processos ?? {}),
+					...(partial.processos ?? {}),
+				},
 			};
 		case 'ai':
 			return {

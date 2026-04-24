@@ -49,6 +49,7 @@ export type DashboardRootAnalytics = {
 	comparativo: DashboardRootComparativo;
 	confianca: DashboardRootSimpleRow;
 	vendas_series_diaria: DashboardRootSimpleRow[];
+	vendas_series_diaria_anterior: DashboardRootSimpleRow[];
 	vendas_series_mensal: DashboardRootSimpleRow[];
 	ranking_faturamento: DashboardRootSimpleRow[];
 	ranking_pedidos: DashboardRootSimpleRow[];
@@ -77,7 +78,7 @@ export type DashboardRootSnapshot = {
 		periodo: DashboardRootPeriod;
 	};
 	resumo?: DashboardRootResumo;
-	empresas?: {
+	empresas?: Partial<{
 		status: DashboardRootSimpleRow[];
 		clusters: DashboardRootSimpleRow[];
 		erps: DashboardRootSimpleRow[];
@@ -86,8 +87,8 @@ export type DashboardRootSnapshot = {
 		cards_atencao: Record<string, number>;
 		top_empresas_sem_app: DashboardRootSimpleRow[];
 		top_empresas_problemas_app: DashboardRootSimpleRow[];
-	};
-	apps?: {
+	}>;
+	apps?: Partial<{
 		resumo: DashboardRootSimpleRow;
 		criacao_serie: DashboardRootSimpleRow[];
 		criacao_serie_mensal: DashboardRootSimpleRow[];
@@ -95,8 +96,8 @@ export type DashboardRootSnapshot = {
 		notificacoes_publicadas_serie_mensal: DashboardRootSimpleRow[];
 		top_empresas_sem_app: DashboardRootSimpleRow[];
 		top_empresas_problemas_publicacao_build: DashboardRootSimpleRow[];
-	};
-	push?: {
+	}>;
+	push?: Partial<{
 		resumo: Record<string, number>;
 		comparativo: DashboardRootComparativo;
 		tipos: DashboardRootSimpleRow[];
@@ -105,8 +106,8 @@ export type DashboardRootSnapshot = {
 		serie_interacoes: DashboardRootSimpleRow[];
 		serie_interacoes_mensal: DashboardRootSimpleRow[];
 		mensagens_externas_status: DashboardRootSimpleRow[];
-	};
-	processos?: {
+	}>;
+	processos?: Partial<{
 		resumo: Record<string, number>;
 		comparativo: DashboardRootComparativo;
 		status: DashboardRootSimpleRow[];
@@ -116,8 +117,8 @@ export type DashboardRootSnapshot = {
 		logs_tipos: DashboardRootSimpleRow[];
 		logs_resumo: DashboardRootSimpleRow;
 		alertas_falha_recente: DashboardRootSimpleRow[];
-	};
-	agent?: {
+	}>;
+	agent?: Partial<{
 		resumo: Record<string, number>;
 		comparativo: DashboardRootComparativo;
 		execucoes_status: DashboardRootSimpleRow[];
@@ -127,19 +128,19 @@ export type DashboardRootSnapshot = {
 		canais_direcao: DashboardRootSimpleRow[];
 		canais_status: DashboardRootSimpleRow[];
 		webhook_event_types: DashboardRootSimpleRow[];
-	};
-	audit?: {
+	}>;
+	audit?: Partial<{
 		resumo: Record<string, number>;
 		comparativo: DashboardRootComparativo;
 		status: DashboardRootSimpleRow[];
 		top_tools: DashboardRootSimpleRow[];
 		serie: DashboardRootSimpleRow[];
 		alertas_tools: DashboardRootSimpleRow[];
-	};
-	leads?: {
+	}>;
+	leads?: Partial<{
 		status: DashboardRootSimpleRow[];
 		fontes: DashboardRootSimpleRow[];
 		serie_mensal: DashboardRootSimpleRow[];
-	};
+	}>;
 	analytics?: Partial<DashboardRootAnalytics>;
 };

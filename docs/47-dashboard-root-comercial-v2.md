@@ -135,11 +135,77 @@ para intervalos curtos, preferir granularidade diaria ou semanal; para intervalo
 
 Para reduzir o tempo de primeira dobra e melhorar a percepcao de velocidade:
 
-- a primeira consulta deve trazer apenas KPI, comparativo e confiabilidade do dado;
-- o bloco `Pulso comercial da carteira` pode carregar em seguida, em request separado;
+- a primeira consulta deve trazer apenas KPI e comparativo do topo, via bloco leve dedicado;
+- a confiabilidade do dado e o risco comercial devem carregar em seguida, em request separado;
+- o bloco `Pulso comercial da carteira` pode carregar junto dessa segunda fase comercial;
 - rankings e tabelas detalhadas devem ficar fora da primeira resposta;
 - o grafico de `Pulso comercial da carteira` deve usar granularidade diaria;
 - a `Visao executiva comercial` permanece com leitura mensal para tendencia consolidada.
+
+### Blocos recomendados para a API
+
+- `analytics_headline`: resumo comercial principal e comparativo do periodo;
+- `analytics_trust`: confiabilidade do dado e empresas em queda;
+- `analytics_pulse`: serie diaria de vendas e distribuicao de pedidos por status;
+- `analytics_commercial`: rankings e leituras comerciais visiveis na narrativa principal;
+- `analytics_operations`: operacao analitica e governanca operacional visivel;
+- `analytics_detail`: composicao retrocompativel de `analytics_commercial` + `analytics_operations`.
+- `analytics_diagnostics`: dados auxiliares e diagnósticos pesados, fora do fluxo principal da tela.
+
+Observacao:
+o bloco `analytics_summary` continua existindo por retrocompatibilidade, mas a tela v2 deve preferir `analytics_headline` na primeira carga para reduzir o custo da chamada fria.
+
+## Regra de performance para analytics
+
+Os blocos `analytics_commercial` e `analytics_operations` devem conter apenas o que esta efetivamente visivel na experiencia principal:
+
+- serie mensal de vendas;
+- ranking de faturamento;
+- sinais de queda;
+- resumo de sincronizacao.
+
+Para priorizar a percepcao de velocidade da tela, o frontend deve pedir:
+
+- `analytics_headline`
+- `analytics_trust` + `analytics_pulse`
+- `analytics_commercial`
+- `analytics_operations`
+
+Dados de diagnostico pesado ou atualmente ocultos nao devem sair em `analytics_commercial` nem em `analytics_operations`:
+
+- frescor por empresa;
+- cobertura por tabela;
+- execucoes recentes detalhadas;
+- distribuicoes auxiliares sem uso na UI atual.
+
+Quando esses dados forem necessarios, devem ser buscados por `analytics_diagnostics` em fluxo sob demanda.
+
+## Regra de verdade para KPI comercial
+
+No curto prazo, o dashboard root deve usar uma estrategia hibrida:
+
+- `analitico_pedidos_status_diario` como fonte de verdade para KPI comercial valido;
+- `analitico_vendas_diario` apenas como apoio transicional para campos legados que ainda nao foram reprojetados;
+- `analitico_sincronizacao_checkpoint` e `analitico_sincronizacao_execucao` para frescor, cobertura e governanca operacional.
+
+Aplicacao pratica:
+
+- `Faturamento consolidado`, `Pedidos consolidados`, `Ticket medio`, series de vendas, ranking de faturamento e sinais de queda devem considerar apenas status comerciais validos;
+- a distribuicao por status continua mostrando o quadro completo da operacao;
+- metricas derivadas de clientes e produtos permanecem em observacao ate a correcao do pipeline analitico de origem.
+- os cards de sincronizacao devem refletir uma janela tecnica recente, independente do periodo comercial filtrado.
+
+Enquanto o pipeline upstream de clientes e produtos nao for corrigido, a tela v2 deve:
+
+- remover da narrativa principal cards e rankings de clientes e produtos;
+- evitar score comercial que dependa dessas dimensoes;
+- explicar no proprio card ou secao que os indicadores comerciais sao computados apenas com pedidos em status comerciais validos.
+
+Objetivo:
+
+- alinhar o root ao criterio de leitura ja usado nos dashboards das empresas;
+- eliminar outliers de `carrinho`, `rascunho` e similares da narrativa executiva;
+- evitar um redesenho estrutural completo antes da correcao do gerador analitico upstream.
 
 ### 2. Carteira e rankings
 
