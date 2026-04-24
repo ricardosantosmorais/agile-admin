@@ -196,46 +196,73 @@ export function mapDashboardRootAgileecommercePayload(payload: unknown): Dashboa
 				: undefined,
 		apps:
 			record.apps && typeof record.apps === 'object' && !Array.isArray(record.apps)
-				? {
-						resumo: mapSimpleRow((record.apps as Record<string, unknown>).resumo),
-						criacao_serie: mapSimpleRows((record.apps as Record<string, unknown>).criacao_serie),
-						criacao_serie_mensal: mapSimpleRows((record.apps as Record<string, unknown>).criacao_serie_mensal),
-						logs_status: mapSimpleRows((record.apps as Record<string, unknown>).logs_status),
-						notificacoes_publicadas_serie_mensal: mapSimpleRows((record.apps as Record<string, unknown>).notificacoes_publicadas_serie_mensal),
-						top_empresas_sem_app: mapSimpleRows((record.apps as Record<string, unknown>).top_empresas_sem_app),
-						top_empresas_problemas_publicacao_build: mapSimpleRows((record.apps as Record<string, unknown>).top_empresas_problemas_publicacao_build),
-					}
+				? (() => {
+						const appsRecord = record.apps as Record<string, unknown>;
+						return {
+							...(hasOwn(appsRecord, 'resumo') ? { resumo: mapSimpleRow(appsRecord.resumo) } : {}),
+							...(hasOwn(appsRecord, 'criacao_serie') ? { criacao_serie: mapSimpleRows(appsRecord.criacao_serie) } : {}),
+							...(hasOwn(appsRecord, 'criacao_serie_mensal') ? { criacao_serie_mensal: mapSimpleRows(appsRecord.criacao_serie_mensal) } : {}),
+							...(hasOwn(appsRecord, 'logs_status') ? { logs_status: mapSimpleRows(appsRecord.logs_status) } : {}),
+							...(hasOwn(appsRecord, 'notificacoes_publicadas_serie_mensal')
+								? { notificacoes_publicadas_serie_mensal: mapSimpleRows(appsRecord.notificacoes_publicadas_serie_mensal) }
+								: {}),
+							...(hasOwn(appsRecord, 'top_empresas_sem_app') ? { top_empresas_sem_app: mapSimpleRows(appsRecord.top_empresas_sem_app) } : {}),
+							...(hasOwn(appsRecord, 'top_empresas_problemas_publicacao_build')
+								? { top_empresas_problemas_publicacao_build: mapSimpleRows(appsRecord.top_empresas_problemas_publicacao_build) }
+								: {}),
+						};
+					})()
 				: undefined,
 		push:
 			record.push && typeof record.push === 'object' && !Array.isArray(record.push)
-				? {
-						resumo: Object.fromEntries(
-							Object.entries(((record.push as Record<string, unknown>).resumo as Record<string, unknown>) ?? {}).map(([key, value]) => [key, toNumber(value)]),
-						),
-						comparativo: mapComparativo((record.push as Record<string, unknown>).comparativo),
-						tipos: mapSimpleRows((record.push as Record<string, unknown>).tipos),
-						serie_envios: mapSimpleRows((record.push as Record<string, unknown>).serie_envios),
-						serie_envios_mensal: mapSimpleRows((record.push as Record<string, unknown>).serie_envios_mensal),
-						serie_interacoes: mapSimpleRows((record.push as Record<string, unknown>).serie_interacoes),
-						serie_interacoes_mensal: mapSimpleRows((record.push as Record<string, unknown>).serie_interacoes_mensal),
-						mensagens_externas_status: mapSimpleRows((record.push as Record<string, unknown>).mensagens_externas_status),
-					}
+				? (() => {
+						const pushRecord = record.push as Record<string, unknown>;
+						return {
+							...(hasOwn(pushRecord, 'resumo')
+								? {
+										resumo: Object.fromEntries(
+											Object.entries((pushRecord.resumo as Record<string, unknown> | undefined) ?? {}).map(([key, value]) => [key, toNumber(value)]),
+										),
+									}
+								: {}),
+							...(hasOwn(pushRecord, 'comparativo') ? { comparativo: mapComparativo(pushRecord.comparativo) } : {}),
+							...(hasOwn(pushRecord, 'tipos') ? { tipos: mapSimpleRows(pushRecord.tipos) } : {}),
+							...(hasOwn(pushRecord, 'serie_envios') ? { serie_envios: mapSimpleRows(pushRecord.serie_envios) } : {}),
+							...(hasOwn(pushRecord, 'serie_envios_mensal') ? { serie_envios_mensal: mapSimpleRows(pushRecord.serie_envios_mensal) } : {}),
+							...(hasOwn(pushRecord, 'serie_interacoes') ? { serie_interacoes: mapSimpleRows(pushRecord.serie_interacoes) } : {}),
+							...(hasOwn(pushRecord, 'serie_interacoes_mensal')
+								? { serie_interacoes_mensal: mapSimpleRows(pushRecord.serie_interacoes_mensal) }
+								: {}),
+							...(hasOwn(pushRecord, 'mensagens_externas_status')
+								? { mensagens_externas_status: mapSimpleRows(pushRecord.mensagens_externas_status) }
+								: {}),
+						};
+					})()
 				: undefined,
 		processos:
 			record.processos && typeof record.processos === 'object' && !Array.isArray(record.processos)
-				? {
-						resumo: Object.fromEntries(
-							Object.entries(((record.processos as Record<string, unknown>).resumo as Record<string, unknown>) ?? {}).map(([key, value]) => [key, toNumber(value)]),
-						),
-						comparativo: mapComparativo((record.processos as Record<string, unknown>).comparativo),
-						status: mapSimpleRows((record.processos as Record<string, unknown>).status),
-						tipos: mapSimpleRows((record.processos as Record<string, unknown>).tipos),
-						serie: mapSimpleRows((record.processos as Record<string, unknown>).serie),
-						serie_mensal: mapSimpleRows((record.processos as Record<string, unknown>).serie_mensal),
-						logs_tipos: mapSimpleRows((record.processos as Record<string, unknown>).logs_tipos),
-						logs_resumo: mapSimpleRow((record.processos as Record<string, unknown>).logs_resumo),
-						alertas_falha_recente: mapSimpleRows((record.processos as Record<string, unknown>).alertas_falha_recente),
-					}
+				? (() => {
+						const processosRecord = record.processos as Record<string, unknown>;
+						return {
+							...(hasOwn(processosRecord, 'resumo')
+								? {
+										resumo: Object.fromEntries(
+											Object.entries((processosRecord.resumo as Record<string, unknown> | undefined) ?? {}).map(([key, value]) => [key, toNumber(value)]),
+										),
+									}
+								: {}),
+							...(hasOwn(processosRecord, 'comparativo') ? { comparativo: mapComparativo(processosRecord.comparativo) } : {}),
+							...(hasOwn(processosRecord, 'status') ? { status: mapSimpleRows(processosRecord.status) } : {}),
+							...(hasOwn(processosRecord, 'tipos') ? { tipos: mapSimpleRows(processosRecord.tipos) } : {}),
+							...(hasOwn(processosRecord, 'serie') ? { serie: mapSimpleRows(processosRecord.serie) } : {}),
+							...(hasOwn(processosRecord, 'serie_mensal') ? { serie_mensal: mapSimpleRows(processosRecord.serie_mensal) } : {}),
+							...(hasOwn(processosRecord, 'logs_tipos') ? { logs_tipos: mapSimpleRows(processosRecord.logs_tipos) } : {}),
+							...(hasOwn(processosRecord, 'logs_resumo') ? { logs_resumo: mapSimpleRow(processosRecord.logs_resumo) } : {}),
+							...(hasOwn(processosRecord, 'alertas_falha_recente')
+								? { alertas_falha_recente: mapSimpleRows(processosRecord.alertas_falha_recente) }
+								: {}),
+						};
+					})()
 				: undefined,
 		agent:
 			record.agent && typeof record.agent === 'object' && !Array.isArray(record.agent)
