@@ -74,7 +74,7 @@ describe('integracao-com-erp-endpoints', () => {
 				publico: '1',
 				ativo: '0',
 			}).toString(),
-		).toBe('page=2&perpage=30&order=nome&sort=desc&id=8&nome%3Alk=pedido&tipo_retorno%3Alk=view&publico=1&ativo=0')
+		).toBe('page=2&perpage=30&field=nome&sort=desc&id=8&nome%3Alk=pedido&tipo_retorno%3Alk=view&publico=1&ativo=0')
 	})
 
 	it('resolve labels dos tipos de retorno conhecidos', () => {

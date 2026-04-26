@@ -79,7 +79,7 @@ export function buildEndpointCollectionParams(filters: CrudListFilters) {
 	const params = new URLSearchParams({
 		page: String(filters.page || 1),
 		perpage: String(filters.perPage || 15),
-		order: String(filters.orderBy || 'id'),
+		field: String(filters.orderBy || 'id'),
 		sort: String(filters.sort || 'asc'),
 	})
 
