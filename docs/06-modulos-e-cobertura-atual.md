@@ -213,7 +213,8 @@ ObservaÃ§Ã£o:
   - `Cadastros > Parâmetros Grupo` agora já possui CRUD próprio no v2 em `/integracao-com-erp/cadastros/parametros-grupo`, com listagem server-side, formulário linear e bridge root-only fiel ao contrato do legado;
   - `Cadastros > Parâmetros Cadastro` agora já possui CRUD próprio no v2 em `/integracao-com-erp/cadastros/parametros-cadastro`, com lookups lazy para `Parâmetros Grupo` e `Templates`, regras condicionais por `tipo_entrada` e bridge root-only fiel ao contrato do legado;
   - `Cadastros > Queries` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/queries`, com listagem server-side, formulário em abas, editor SQL Monaco, execução contra integradores ativos e aba de mapeamento em edição;
-  - `Cadastros > Scripts` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/scripts`, com listagem server-side e formulário em abas com editor Monaco cuja linguagem acompanha o select do legado;
+  - `Cadastros > Scripts` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/scripts`, com listagem server-side e formulário direto com editor Monaco cuja linguagem acompanha o select do legado;
+  - `Cadastros > Endpoints` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/endpoints`, com listagem server-side, campos condicionais por `tipo_retorno` e aba de perfis em edição;
   - páginas diretas já disponíveis no v2 para `Parâmetros`, `Imagens`, `API`, `Banco de Dados`, `Instalação do Integrador`, `Dashboard ERP`, `Rotinas Integradas`, `Serviços` e `Serviços com Falha`;
   - bridges dedicadas em `app/api/integracoes/*` para todos os módulos do menu;
   - bridge dedicada em `app/api/integracao-com-erp/*` para configuração e leitura operacional do dashboard ERP;

@@ -26,6 +26,8 @@ const lookupConfig: Record<string, { path: string; labelKeys: string[]; searchFi
   departamentos: { path: 'departamentos', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   colecoes: { path: 'colecoes', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   listas: { path: 'listas', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
+  linhas: { path: 'linhas', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome', extraQuery: { ativo: '1' } },
+  cores: { path: 'cores', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome', extraQuery: { ativo: '1' } },
   marcas: { path: 'marcas', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   fornecedores: { path: 'fornecedores', labelKeys: ['nome_fantasia', 'razao_social'], searchField: 'nome_fantasia::like', order: 'nome_fantasia' },
   grades: { path: 'grades', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },

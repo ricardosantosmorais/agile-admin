@@ -142,18 +142,20 @@ export function TabbedIntegrationFormPage({
 
 					{currentTab?.content ?? null}
 
-					<div ref={footerRef} className="flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-line pt-5">
-						<Link href={backHref} className="app-button-secondary inline-flex items-center rounded-full px-4 py-2.5 text-sm font-semibold">
-							{t('common.back', 'Voltar')}
+					<div ref={footerRef} className="flex flex-wrap justify-center gap-2.5 pt-1">
+						{canSave ? (
+							<button
+								type="submit"
+								className="app-button-primary inline-flex items-center gap-2 rounded-full px-4.5 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
+								disabled={saving || !hasChanges}
+							>
+								<Save className="h-4 w-4" />
+								{saving ? t('common.saving', 'Salvando...') : t('common.save', 'Salvar')}
+							</button>
+						) : null}
+						<Link href={backHref} className="app-button-secondary inline-flex items-center rounded-full px-4.5 py-2.5 text-sm font-semibold">
+							{t('common.cancel', 'Cancelar')}
 						</Link>
-						<button
-							type="submit"
-							className="app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
-							disabled={!canSave || saving || !hasChanges}
-						>
-							<Save className="h-4 w-4" />
-							{saving ? t('common.saving', 'Salvando...') : t('common.save', 'Salvar')}
-						</button>
 					</div>
 				</form>
 			</AsyncState>

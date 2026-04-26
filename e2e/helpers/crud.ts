@@ -32,6 +32,16 @@ export function fieldButton(page: Page, label: RegExp): Locator {
   return fieldRow(page, label).locator('button').first()
 }
 
+async function lookupPanel(page: Page) {
+  const search = page.getByRole('combobox', { name: /buscar|search/i }).last()
+  await expect(search).toBeVisible({ timeout: 10_000 })
+
+  const panel = page.getByRole('listbox').last()
+  await expect(panel).toBeVisible({ timeout: 10_000 })
+
+  return { search, panel }
+}
+
 export function textInputAt(page: Page, index: number): Locator {
   return formRoot(page).locator('input[type="text"]').nth(index)
 }
@@ -74,22 +84,21 @@ export async function deleteFirstFilteredRow(page: Page) {
 
 export async function pickLookupOption(page: Page, label: RegExp, optionText: RegExp) {
   await fieldButton(page, label).click()
-  const search = page.getByRole('textbox').last()
-  const panel = search.locator('xpath=ancestor::div[contains(@class,"fixed")][1]')
+  const { search, panel } = await lookupPanel(page)
   await search.fill('')
-  const option = panel.getByRole('button').filter({ hasText: optionText }).first()
+  const option = panel.getByRole('option', { name: optionText }).first()
+  await expect(option).toBeVisible({ timeout: 20_000 })
   await option.scrollIntoViewIfNeeded()
-  await option.dispatchEvent('pointerdown')
+  await option.click()
 }
 
 export async function pickFirstLookupOption(page: Page, label: RegExp, query = '') {
   await fieldButton(page, label).click()
-  const search = page.getByRole('textbox').last()
-  const panel = search.locator('xpath=ancestor::div[contains(@class,"fixed")][1]')
+  const { search, panel } = await lookupPanel(page)
   await search.fill(query)
   const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const directMatch = query
-    ? panel.getByRole('button', { name: new RegExp(escapedQuery, 'i') }).first()
+    ? panel.getByRole('option', { name: new RegExp(escapedQuery, 'i') }).first()
     : null
 
   if (directMatch && await directMatch.isVisible().catch(() => false)) {
@@ -98,11 +107,11 @@ export async function pickFirstLookupOption(page: Page, label: RegExp, query = '
     return text
   }
 
-  const option = panel.locator('p.font-medium').first().locator('xpath=ancestor::button[1]')
+  const option = panel.getByRole('option').first()
   await expect(option).toBeVisible({ timeout: 20_000 })
   await option.scrollIntoViewIfNeeded()
   const text = (await option.textContent())?.trim() || ''
-  await option.dispatchEvent('pointerdown')
+  await option.click()
   return text
 }
 

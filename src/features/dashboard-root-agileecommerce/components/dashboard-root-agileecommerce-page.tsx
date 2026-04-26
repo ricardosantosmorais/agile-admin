@@ -630,24 +630,24 @@ function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: Retur
 
 	const primaryCards = [
 		{
-			label: t('dashboardRoot.cards.revenueTotal', 'Faturamento consolidado'),
+			label: t('dashboardRoot.rootV2.cards.realizedGmv', 'Receita realizada'),
 			value: parseNumber(analytics.resumo?.valor_total_vendas),
 			variation: comparativo.valor_total_vendas ?? 0,
 			type: 'currency' as const,
 			tone: 'emerald' as const,
 			showComparison: hasComparison,
-			description: t('dashboardRoot.executive.revenueDescription', 'Soma dos pedidos em status comerciais válidos no intervalo selecionado.'),
-			tooltip: t('dashboardRoot.executive.revenueTooltip', 'Considera apenas pedidos que entram na leitura comercial do dashboard, excluindo status não realizados como carrinho e cancelamento.'),
+			description: t('dashboardRoot.rootV2.executive.revenueDescription', 'Soma dos pedidos realizados no intervalo selecionado.'),
+			tooltip: t('dashboardRoot.rootV2.executive.revenueTooltip', 'Considera apenas pedidos nos status faturado, entregue, em separação, em transporte, recebido e coletado.'),
 		},
 		{
-			label: t('dashboardRoot.cards.ordersTotal', 'Pedidos consolidados'),
+			label: t('dashboardRoot.rootV2.cards.realizedOrders', 'Pedidos realizados'),
 			value: parseNumber(analytics.resumo?.total_pedidos),
 			variation: comparativo.total_pedidos ?? 0,
 			type: 'number' as const,
 			tone: 'sky' as const,
 			showComparison: hasComparison,
-			description: t('dashboardRoot.executive.ordersDescription', 'Quantidade de pedidos em status comerciais válidos no intervalo selecionado.'),
-			tooltip: t('dashboardRoot.executive.ordersTooltip', 'Usa a mesma regra comercial do faturamento para manter consistência entre volume e receita.'),
+			description: t('dashboardRoot.rootV2.executive.ordersDescription', 'Quantidade de pedidos realizados no intervalo selecionado.'),
+			tooltip: t('dashboardRoot.rootV2.executive.ordersTooltip', 'Usa a mesma regra comercial do faturamento para manter consistência entre volume e receita.'),
 		},
 		{
 			label: t('dashboardRoot.cards.averageTicketConsolidated', 'Ticket médio consolidado'),
@@ -656,8 +656,8 @@ function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: Retur
 			type: 'currency' as const,
 			tone: 'amber' as const,
 			showComparison: hasComparison,
-			description: t('dashboardRoot.executive.ticketDescription', 'Valor médio por pedido comercial válido na carteira consolidada.'),
-			tooltip: t('dashboardRoot.executive.ticketTooltip', 'Calculado dividindo o faturamento comercial válido pelo total de pedidos comerciais válidos do período.'),
+			description: t('dashboardRoot.rootV2.executive.ticketDescription', 'Valor médio por pedido realizado na carteira consolidada.'),
+			tooltip: t('dashboardRoot.rootV2.executive.ticketTooltip', 'Calculado dividindo a receita realizada pelo total de pedidos realizados do período.'),
 		},
 		{
 			label: t('dashboardRoot.cards.companiesWithSales', 'Empresas com venda no período'),
@@ -675,14 +675,14 @@ function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: Retur
 		return [
 			...primaryCards,
 			{
-				label: t('dashboardRoot.cards.commercialCoverage', 'Cobertura comercial atual'),
-				value: parseNumber(analytics.confianca?.cobertura_vendas_frescas_percentual),
+				label: t('dashboardRoot.rootV2.cards.cancelledPercentage', 'Percentual cancelado'),
+				value: parseNumber(analytics.resumo?.percentual_cancelado),
 				variation: 0,
 				type: 'percent' as const,
-				tone: 'amber' as const,
+				tone: parseNumber(analytics.resumo?.percentual_cancelado) > 10 ? ('rose' as const) : ('amber' as const),
 				showComparison: false,
-				description: t('dashboardRoot.executive.commercialCoverageDescription', 'Percentual da carteira com atualização comercial recente o suficiente para sustentar a leitura executiva.'),
-				tooltip: t('dashboardRoot.executive.commercialCoverageTooltip', 'Calculado a partir da data comercial mais recente encontrada por empresa, para mostrar o quanto do resultado do topo está apoiado em leitura atualizada.'),
+				description: t('dashboardRoot.rootV2.executive.cancelledPercentageDescription', 'Pedidos cancelados em relação aos pedidos realizados mais cancelados no período.'),
+				tooltip: t('dashboardRoot.rootV2.executive.cancelledPercentageTooltip', 'Ajuda a acompanhar perda comercial sem misturar carrinho, rascunho e outros status não realizados.'),
 			},
 		];
 	}
@@ -720,14 +720,14 @@ function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: Retur
 			tooltip: t('dashboardRoot.executive.companiesInDeclineTooltip', 'Usado para priorizar triagem comercial e acompanhamento da carteira.'),
 		},
 		{
-			label: t('dashboardRoot.cards.commercialCoverage', 'Cobertura comercial atual'),
-			value: parseNumber(analytics.confianca?.cobertura_vendas_frescas_percentual),
+			label: t('dashboardRoot.rootV2.cards.cancelledPercentage', 'Percentual cancelado'),
+			value: parseNumber(analytics.resumo?.percentual_cancelado),
 			variation: 0,
 			type: 'percent' as const,
-			tone: 'amber' as const,
+			tone: parseNumber(analytics.resumo?.percentual_cancelado) > 10 ? ('rose' as const) : ('amber' as const),
 			showComparison: false,
-			description: t('dashboardRoot.executive.commercialCoverageDescription', 'Percentual da carteira com atualização comercial recente o suficiente para sustentar a leitura executiva.'),
-			tooltip: t('dashboardRoot.executive.commercialCoverageTooltip', 'Calculado a partir da data comercial mais recente encontrada por empresa, para mostrar o quanto do resultado do topo está apoiado em leitura atualizada.'),
+			description: t('dashboardRoot.rootV2.executive.cancelledPercentageDescription', 'Pedidos cancelados em relação aos pedidos realizados mais cancelados no período.'),
+			tooltip: t('dashboardRoot.rootV2.executive.cancelledPercentageTooltip', 'Ajuda a acompanhar perda comercial sem misturar carrinho, rascunho e outros status não realizados.'),
 		},
 	];
 }
@@ -1017,26 +1017,26 @@ export function DashboardRootAgileecommercePage() {
 							<div className="space-y-4">
 								<SectionCard
 									title={t('dashboardRoot.analyticsExecutiveTitle', 'Visão executiva comercial')}
-									description={t('dashboardRoot.analyticsExecutiveDescription', 'Consolidado de vendas, pedidos e confiabilidade do dado root.')}
+									description={t('dashboardRoot.rootV2.analyticsExecutiveDescription', 'Receita realizada, pedidos realizados e confiabilidade da leitura comercial root.')}
 								>
 									<div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.95fr)]">
 										<div className="space-y-4">
 											<div className="app-pane-muted rounded-[1.4rem] p-4">
 												<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.transactedVolumeMonthly', 'Volume transacionado por mês')}</h3>
-												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.chartLegend.revenueSeries', 'Mostra a evolução do faturamento comercial válido para leitura rápida de tendência no período.')}</p>
+												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.revenueSeries', 'Mostra a evolução da receita realizada, usando apenas os status comerciais definidos para o root.')}</p>
 												<LineChartCard data={analyticsRevenueSeries} dataKey="value" titleKey="dashboardRoot.charts.transactedVolumeMonthly" formatValue={formatCurrency} />
 											</div>
 
 											<div className="app-pane-muted rounded-[1.4rem] p-4">
 												<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.ordersMonthly', 'Pedidos por mês')}</h3>
-												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.chartLegend.ordersSeries', 'Ajuda a separar ganho de demanda de ganho de ticket médio ao longo do intervalo.')}</p>
+												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.ordersSeries', 'Mostra a evolução dos pedidos realizados com a mesma regra usada na receita realizada.')}</p>
 												<LineChartCard data={analyticsOrdersSeries} dataKey="value" titleKey="dashboardRoot.charts.ordersMonthly" />
 											</div>
 										</div>
 
 										<div className="app-pane rounded-[1.4rem] p-4">
 											<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.ordersByStatus', 'Pedidos por status')}</h3>
-											<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.chartLegend.ordersStatus', 'Distribui o total de pedidos entre os principais status do período com legenda consolidada.')}</p>
+											<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.ordersStatus', 'Mostra todos os status do período para explicar o funil operacional, inclusive os que não entram na receita realizada.')}</p>
 											<StatusDonutCard
 												data={analyticsOrderStatusPie}
 												totalLabel={t('dashboardRoot.cards.ordersTotal', 'Pedidos consolidados')}
@@ -1047,9 +1047,33 @@ export function DashboardRootAgileecommercePage() {
 								</SectionCard>
 
 								<div className="grid gap-4">
+									<div className="grid gap-3 md:grid-cols-3">
+										<MetricTile
+											label={t('dashboardRoot.rootV2.cards.companiesWithoutSales', 'Empresas sem venda')}
+											value={formatNumber(parseNumber(snapshot.analytics?.resumo?.empresas_sem_venda))}
+											helper={t('dashboardRoot.rootV2.portfolio.companiesWithoutSalesHelper', 'Carteira sem pedido realizado no período selecionado.')}
+											tooltip={t('dashboardRoot.rootV2.portfolio.companiesWithoutSalesTooltip', 'Total de empresas root menos as empresas com pelo menos um pedido nos status realizados.')}
+											tone="amber"
+										/>
+										<MetricTile
+											label={t('dashboardRoot.rootV2.cards.revenueConcentrationTop10', 'Concentração top 10')}
+											value={`${formatNumber(parseNumber(snapshot.analytics?.concentracao_faturamento?.top_10_percentual))}%`}
+											helper={t('dashboardRoot.rootV2.portfolio.revenueConcentrationTop10Helper', 'Participação das dez maiores empresas na receita realizada.')}
+											tooltip={t('dashboardRoot.rootV2.portfolio.revenueConcentrationTop10Tooltip', 'Calculado com a mesma whitelist de status da receita realizada, para medir dependência das maiores contas.')}
+											tone="sky"
+										/>
+										<MetricTile
+											label={t('dashboardRoot.cards.companiesInDecline', 'Empresas em queda')}
+											value={formatNumber(parseNumber(snapshot.analytics?.resumo?.empresas_em_queda))}
+											helper={t('dashboardRoot.rootV2.portfolio.companiesInDeclineHelper', 'Empresas que encolheram contra o período anterior equivalente.')}
+											tooltip={t('dashboardRoot.rootV2.portfolio.companiesInDeclineTooltip', 'A queda compara apenas a receita realizada dos dois períodos, usando a whitelist de status comerciais.')}
+											tone="rose"
+										/>
+									</div>
+
 									<SectionCard
 										title={t('dashboardRoot.tables.revenueRanking', 'Ranking de faturamento')}
-										description={t('dashboardRoot.tables.revenueRankingDescription', 'Mostra as empresas que mais contribuem para o faturamento comercial válido no período escolhido.')}
+										description={t('dashboardRoot.rootV2.tables.revenueRankingDescription', 'Mostra as empresas que mais contribuem para a receita realizada no período escolhido.')}
 										action={<InfoTooltipButton label={t('dashboardRoot.tables.revenueRankingTooltip', 'Ajuda a identificar concentração de receita e dependência das principais contas da carteira.')} />}
 									>
 										<SimpleTable

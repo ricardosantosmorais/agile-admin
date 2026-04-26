@@ -64,7 +64,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Playwright
-        run: npx playwright test --project=chromium
+        run: npx playwright test
 
       - name: Upload Playwright artifacts
         if: always()
@@ -85,6 +85,6 @@ jobs:
             echo "## Playwright artifacts"
             echo ""
             echo "- Job: \`Playwright E2E\`"
-            echo "- Videos, traces, screenshots and HTML report were uploaded as workflow artifacts."
+            echo "- Traces, screenshots and HTML report were uploaded as workflow artifacts."
             echo "- Artifact name: \`playwright-artifacts-${{ github.run_id }}\`"
           } >> "$GITHUB_STEP_SUMMARY"

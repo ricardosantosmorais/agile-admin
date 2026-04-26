@@ -211,9 +211,38 @@ export async function handleCrudItemGet(request: NextRequest, config: CrudRouteC
     tenantId: session.currentTenantId,
   })
 
-  if (!result.ok) {
-    return NextResponse.json({ message: getErrorMessage(result.payload, 'Nao foi possivel carregar o registro.') }, { status: result.status || 400 })
+  if (result.ok) {
+    return NextResponse.json(result.payload)
   }
 
-  return NextResponse.json(result.payload)
+  const fallbackParams = new URLSearchParams(params)
+  fallbackParams.set('id', id)
+  fallbackParams.set('perpage', '1')
+
+  const fallback = await serverApiFetch(`${config.resource}?${fallbackParams.toString()}`, {
+    method: 'GET',
+    token: session.token,
+    tenantId: session.currentTenantId,
+  })
+
+  if (!fallback.ok) {
+    return NextResponse.json({ message: getErrorMessage(fallback.payload, getErrorMessage(result.payload, 'Nao foi possivel carregar o registro.')) }, { status: fallback.status || result.status || 400 })
+  }
+
+  const fallbackPayload = fallback.payload
+  if (
+    typeof fallbackPayload === 'object'
+    && fallbackPayload !== null
+    && 'data' in fallbackPayload
+    && Array.isArray(fallbackPayload.data)
+  ) {
+    const [record] = fallbackPayload.data
+    if (record) {
+      return NextResponse.json(record)
+    }
+
+    return NextResponse.json({ message: 'Registro nao encontrado.' }, { status: 404 })
+  }
+
+  return NextResponse.json(fallbackPayload)
 }

@@ -64,6 +64,7 @@ export type CrudResource =
 	| 'parametros_cadastro'
 	| 'querys'
 	| 'scripts'
+	| 'endpoints'
 	| 'canais_distribuicao'
 	| 'perfis_administradores'
 	| 'changelog'

@@ -95,4 +95,38 @@ describe('EmailTemplateEditorTab', () => {
     expect(patch).toHaveBeenCalledWith('html', '<p>Alterado</p>')
     expect(onFeedback).not.toHaveBeenCalledWith(expect.stringMatching(/erro|error/i))
   })
+
+  it('does not call the preview api when the template is empty', async () => {
+    const onFeedback = vi.fn()
+    let toolbarApi: Parameters<NonNullable<React.ComponentProps<typeof EmailTemplateEditorTab>['onToolbarApiChange']>>[0] | null = null
+
+    renderWithProviders(
+      <EmailTemplateEditorTab
+        form={{
+          id: undefined,
+          tipo: 'pedido_aprovado',
+          modelo: 'twig',
+          html: '',
+        }}
+        readOnly={false}
+        patch={vi.fn()}
+        onFeedback={onFeedback}
+        onToolbarApiChange={(api) => {
+          toolbarApi = api
+        }}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(getPayloadExampleMock).toHaveBeenCalledWith('pedido_aprovado')
+    })
+
+    await act(async () => {
+      await toolbarApi?.openPreview()
+    })
+
+    expect(previewMock).not.toHaveBeenCalled()
+    expect(onFeedback).toHaveBeenCalledWith(expect.stringMatching(/template|preview|visualiza/i))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
 })

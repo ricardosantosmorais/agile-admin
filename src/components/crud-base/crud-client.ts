@@ -60,6 +60,7 @@ const CRUD_OPTIONS_PATHS: Record<CrudResource, string> = {
 	parametros_cadastro: '/api/parametros-cadastro',
 	querys: '/api/querys',
 	scripts: '/api/scripts',
+	endpoints: '/api/endpoints',
 	canais_distribuicao: '/api/lookups/canais_distribuicao',
 	perfis_administradores: '/api/administradores/perfis',
 	changelog: '/api/changelog',

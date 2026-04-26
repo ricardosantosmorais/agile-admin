@@ -11,6 +11,28 @@ Este documento define a proposta de evolucao do **Dashboard Root Agile E-commerc
 
 O publico desta tela continua sendo **root/master**, restrito a usuarios internos da propria Agile E-commerce.
 
+## Atualizacao de decisao
+
+O desenho atual do root passa a separar o dashboard em quatro leituras principais:
+
+- **Receita**: receita realizada, pedidos realizados, ticket medio, cancelamento e comparativo com periodo anterior.
+- **Carteira**: empresas com venda, empresas sem venda, empresas em queda, ranking de faturamento e concentracao nas maiores contas.
+- **Confiabilidade / qualidade do dado**: cobertura de atualizacao comercial, empresas defasadas, falhas recentes de sincronizacao e ultima data util de leitura.
+- **Plataforma / operacao**: apps, push, processos, agente e observabilidade operacional continuam visiveis para suporte e desenvolvimento.
+
+Clientes e produtos deixam de fazer parte do dashboard root neste momento. As cargas dessas dimensoes podem continuar existindo no worker ate a remocao upstream, mas a API e a tela root nao devem depender de `analitico_clientes_diario` nem de `analitico_produtos_diario`.
+
+A fonte comercial final do root passa a ser `analitico_pedidos_status_diario`, com whitelist inicial de venda realizada:
+
+- `faturado`
+- `entregue`
+- `em_separacao`
+- `em_transporte`
+- `recebido`
+- `coletado`
+
+Status fora dessa whitelist continuam aparecendo na distribuicao operacional de pedidos por status, mas nao entram em receita realizada, pedidos realizados, ticket medio, ranking de faturamento ou sinais de queda.
+
 ## Motivacao
 
 O dashboard atual entrega volume relevante de informacao, mas ainda concentra muito destaque em operacao interna da plataforma, apps, push, agente e auditoria.

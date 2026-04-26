@@ -3,7 +3,7 @@ import { captureOperationalServerError } from '@/src/lib/sentry'
 type ExternalAdminApiTarget = 'painelb2b' | 'agilesync'
 
 type ExternalAdminApiOptions = {
-  method?: 'GET' | 'POST'
+  method?: 'GET' | 'POST' | 'DELETE'
   query?: string | URLSearchParams | Record<string, string | number | boolean | null | undefined>
   body?: Record<string, string | number | boolean | null | undefined>
   tokenOverride?: string

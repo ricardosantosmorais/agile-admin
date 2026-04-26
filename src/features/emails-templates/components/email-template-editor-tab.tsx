@@ -241,6 +241,12 @@ export function EmailTemplateEditorTab({
     const payloadForPreview = payload ?? {}
 
     try {
+      if (!templateForPreview.trim()) {
+        setPreviewHtml(renderTwigPreviewFallback(templateForPreview, payloadForPreview))
+        onFeedback(t('maintenance.emailTemplates.editor.previewEmptyTemplate', 'Informe o template para gerar a pre-visualizacao.'))
+        return
+      }
+
       const rendered = await emailsTemplatesEditorClient.preview({
         template: templateForPreview,
         payload: payloadForPreview,

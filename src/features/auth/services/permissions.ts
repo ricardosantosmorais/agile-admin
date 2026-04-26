@@ -30,6 +30,7 @@ export type FeatureKey =
 	| 'erpCadastrosParametrosCadastro'
 	| 'erpCadastrosQueries'
 	| 'erpCadastrosScripts'
+	| 'erpCadastrosEndpoints'
 	| 'erpRotinasIntegradas'
 	| 'erpServicos'
 	| 'erpServicosFalha'
@@ -251,6 +252,10 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
 	erpCadastrosScripts: {
 		label: 'ERP > Cadastros > Scripts',
 		matchers: ['cadastro-scripts-list', 'cadastro-scripts-form', 'integracao-com-erp cadastros scripts', 'erp cadastros scripts', 'scripts'],
+	},
+	erpCadastrosEndpoints: {
+		label: 'ERP > Cadastros > Endpoints',
+		matchers: ['integracao-endpoints-list', 'integracao-endpoints-form', 'integracao-com-erp cadastros endpoints', 'erp cadastros endpoints', 'endpoints'],
 	},
 	erpRotinasIntegradas: {
 		label: 'ERP > Rotinas Integradas',

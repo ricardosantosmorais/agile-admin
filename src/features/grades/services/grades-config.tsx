@@ -1,5 +1,28 @@
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 
+function normalizeGradePayload(record: Record<string, unknown>) {
+  const normalized: Record<string, unknown> = {}
+
+  for (const [key, value] of Object.entries(record)) {
+    if (key === '__opcoes_count') {
+      continue
+    }
+
+    if (key === 'posicao') {
+      normalized[key] = value === '' || value === undefined ? null : value
+      continue
+    }
+
+    if (/^opcao\d+$/.test(key) && (value === '' || value === undefined || value === null)) {
+      continue
+    }
+
+    normalized[key] = value
+  }
+
+  return normalized
+}
+
 export const GRADES_CONFIG: CrudModuleConfig = {
   key: 'grades',
   resource: 'grades',
@@ -42,4 +65,5 @@ export const GRADES_CONFIG: CrudModuleConfig = {
       ],
     },
   ],
+  beforeSave: normalizeGradePayload,
 }

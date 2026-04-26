@@ -25,7 +25,7 @@ const ERP_CATALOGS: ErpCatalogCard[] = [
 	{ key: 'parametrosCadastro', icon: Settings2, href: '/integracao-com-erp/cadastros/parametros-cadastro', migrated: true },
 	{ key: 'queries', icon: FileCode2, href: '/integracao-com-erp/cadastros/queries', migrated: true },
 	{ key: 'scripts', icon: FileJson2, href: '/integracao-com-erp/cadastros/scripts', migrated: true },
-	{ key: 'endpoints', icon: Cable, legacyComponent: 'integracao-endpoints-list' },
+	{ key: 'endpoints', icon: Cable, href: '/integracao-com-erp/cadastros/endpoints', migrated: true },
 	{ key: 'gateways', icon: Network, legacyComponent: 'cadastro-gateways-list' },
 	{ key: 'gatewayEndpoints', icon: Puzzle, legacyComponent: 'cadastro-gateway-endpoints-list' },
 	{ key: 'interfacesConsulta', icon: Waypoints, legacyComponent: 'cadastro-interfaces-consulta-list' },

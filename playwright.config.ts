@@ -31,14 +31,18 @@ function loadLocalEnvFile(filename: string) {
 
 loadLocalEnvFile('.env.local')
 
-const port = Number(process.env.PLAYWRIGHT_PORT || 3000)
+const port = Number(process.env.PLAYWRIGHT_PORT || 3100)
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || `http://127.0.0.1:${port}`
+const retries = Number(process.env.PLAYWRIGHT_RETRIES || 0)
+const workers = Number(process.env.PLAYWRIGHT_WORKERS || 1)
+const video = process.env.PLAYWRIGHT_VIDEO === '1' ? 'retain-on-failure' : 'off'
+const actionTimeout = Number(process.env.PLAYWRIGHT_ACTION_TIMEOUT || 15_000)
 
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
-  workers: 1,
-  retries: process.env.CI ? 2 : 0,
+  workers,
+  retries,
   reporter: process.env.CI
     ? [
         ['list'],
@@ -46,10 +50,12 @@ export default defineConfig({
       ]
     : 'list',
   use: {
+    actionTimeout,
+    navigationTimeout: 60_000,
     baseURL,
-    trace: process.env.CI ? 'retain-on-failure' : 'on-first-retry',
+    trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: process.env.CI ? 'on' : 'retain-on-failure',
+    video,
   },
   projects: [
     {
@@ -62,15 +68,25 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
       },
+      grepInvert: /@agile/,
+      dependencies: ['setup'],
+    },
+    {
+      name: 'chromium-agile',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/user.json',
+      },
+      grep: /@agile/,
       dependencies: ['setup'],
     },
   ],
   webServer: process.env.PLAYWRIGHT_SKIP_WEBSERVER === '1'
     ? undefined
     : {
-        command: `npm run dev -- --hostname 127.0.0.1 --port ${port}`,
+        command: 'node e2e/start-playwright-server.mjs',
         url: baseURL,
         reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
+        timeout: 300_000,
       },
 })
