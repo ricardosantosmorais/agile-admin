@@ -490,9 +490,12 @@ function SimpleTable({
 		cell: (row: DashboardRootSimpleRow) => column.formatter ? column.formatter(row[column.key], row) : parseText(row[column.key]),
 		tdClassName: 'text-[color:var(--app-text)]',
 	})) satisfies AppDataTableColumn<DashboardRootSimpleRow>[];
+	const boundedTableClassName = maxHeightClass
+		? `relative z-0 min-w-0 overflow-x-hidden overflow-y-auto overscroll-contain rounded-[1.25rem] [scrollbar-gutter:stable] ${maxHeightClass}`
+		: 'relative z-0 min-w-0';
 
 	return (
-		<div className={maxHeightClass ?? ''}>
+		<div className={boundedTableClassName}>
 			<AppDataTable
 				rows={rows}
 				getRowId={(row) => `${parseText(row.id, '')}-${rows.indexOf(row)}`}
@@ -1244,7 +1247,7 @@ export function DashboardRootAgileecommercePage() {
 								</div>
 							}
 						>
-							<div className="grid gap-4 xl:grid-cols-2">
+							<div className="grid items-start gap-4 xl:grid-cols-2">
 								<SectionCard
 									title={t('dashboardRoot.productOperationTitle', 'Operação de produto')}
 									description={t('dashboardRoot.productOperationDescription', 'Crescimento de apps, builds e notificações publicadas.')}
@@ -1394,7 +1397,7 @@ export function DashboardRootAgileecommercePage() {
 							isReady={operationsSummaryLoaded}
 							requestPhases={requestPhases}
 							fallback={
-								<div className="grid gap-4 xl:grid-cols-2">
+								<div className="space-y-4">
 									<SectionCard
 										title={t('dashboardRoot.internalOperationTitle', 'Operação interna')}
 										description={t('dashboardRoot.internalOperationDescription', 'Throughput, falhas e tipos de processos internos do admin.')}
@@ -1410,13 +1413,13 @@ export function DashboardRootAgileecommercePage() {
 								</div>
 							}
 						>
-							<div className="grid gap-4 xl:grid-cols-2">
+							<div className="space-y-4">
 								<SectionCard
 									title={t('dashboardRoot.internalOperationTitle', 'Operação interna')}
 									description={t('dashboardRoot.internalOperationDescription', 'Throughput, falhas e tipos de processos internos do admin.')}
 									action={<InfoTooltipButton label={t('dashboardRoot.internalOperationTooltip', 'Resume volume, status e tipos de processos internos para acompanhamento operacional do admin root.')} />}
 								>
-									<div className="grid gap-4 lg:grid-cols-2">
+									<div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
 										<div>
 											<h3 className="mb-3 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.processesMonthly', 'Processos por mês')}</h3>
 												<LineChartCard data={processMonthlySeries} dataKey="value" titleKey="dashboardRoot.charts.processesMonthly" />
@@ -1425,26 +1428,26 @@ export function DashboardRootAgileecommercePage() {
 											<h3 className="mb-3 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.processStatus', 'Status dos processos')}</h3>
 											<PieChartCard data={processStatusPie} />
 										</div>
-									</div>
-									<div className="mt-4">
-										<h3 className="mb-3 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.processTypes', 'Tipos de processo')}</h3>
-										<BarChartCard data={processTypesBars} dataKey="value" />
-									</div>
-									<div className="mt-4 grid gap-4 lg:grid-cols-2">
-										<MetricTile
-											label={t('dashboardRoot.cards.processLogsErrors', 'Logs de erro')}
-											value={formatNumber(parseNumber(snapshot.processos?.logs_resumo?.erros))}
-											helper={t('dashboardRoot.processLogsErrorsHelper', 'Quantidade de logs operacionais classificados como erro dentro do período selecionado.')}
-											tooltip={t('dashboardRoot.processLogsErrorsTooltip', 'Ajuda a medir pressão operacional e concentração de falhas internas do admin.')}
-											tone="rose"
-										/>
-										<MetricTile
-											label={t('dashboardRoot.cards.processLogsInfo', 'Logs de informação')}
-											value={formatNumber(parseNumber(snapshot.processos?.logs_resumo?.informacoes))}
-											helper={t('dashboardRoot.processLogsInfoHelper', 'Quantidade de logs informativos gerados pelos processos internos no período.')}
-											tooltip={t('dashboardRoot.processLogsInfoTooltip', 'Ajuda a dimensionar o volume de processamento e telemetria operacional registrada.')}
-											tone="slate"
-										/>
+										<div>
+											<h3 className="mb-3 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.processTypes', 'Tipos de processo')}</h3>
+											<BarChartCard data={processTypesBars} dataKey="value" />
+										</div>
+										<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+											<MetricTile
+												label={t('dashboardRoot.cards.processLogsErrors', 'Logs de erro')}
+												value={formatNumber(parseNumber(snapshot.processos?.logs_resumo?.erros))}
+												helper={t('dashboardRoot.processLogsErrorsHelper', 'Quantidade de logs operacionais classificados como erro dentro do período selecionado.')}
+												tooltip={t('dashboardRoot.processLogsErrorsTooltip', 'Ajuda a medir pressão operacional e concentração de falhas internas do admin.')}
+												tone="rose"
+											/>
+											<MetricTile
+												label={t('dashboardRoot.cards.processLogsInfo', 'Logs de informação')}
+												value={formatNumber(parseNumber(snapshot.processos?.logs_resumo?.informacoes))}
+												helper={t('dashboardRoot.processLogsInfoHelper', 'Quantidade de logs informativos gerados pelos processos internos no período.')}
+												tooltip={t('dashboardRoot.processLogsInfoTooltip', 'Ajuda a dimensionar o volume de processamento e telemetria operacional registrada.')}
+												tone="slate"
+											/>
+										</div>
 									</div>
 								</SectionCard>
 
@@ -1456,7 +1459,7 @@ export function DashboardRootAgileecommercePage() {
 									{operationsDetailLoaded ? (
 										<SimpleTable
 											rows={snapshot.processos?.alertas_falha_recente ?? []}
-											maxHeightClass="max-h-[520px]"
+											maxHeightClass="max-h-[560px]"
 											columns={[
 												{ key: 'empresa_nome', label: t('dashboardRoot.table.company', 'Empresa') },
 												{ key: 'tipo', label: t('dashboardRoot.table.type', 'Tipo'), formatter: (value) => formatDashboardRootProcessType(value, t) },
