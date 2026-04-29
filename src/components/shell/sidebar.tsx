@@ -147,13 +147,13 @@ function SidebarNav({
                 ].join(' ')}
                 title={!mobile && isSidebarCollapsed ? item.label : undefined}
               >
-                <span className={['flex items-center', mobile || !isSidebarCollapsed ? 'gap-3' : 'justify-center'].join(' ')}>
+                <span className={['flex min-w-0 items-center', mobile || !isSidebarCollapsed ? 'flex-1 gap-3' : 'justify-center'].join(' ')}>
                   <Icon className="h-4 w-4 shrink-0" />
                   {mobile || !isSidebarCollapsed ? <span className={topLevelItemClass}>{item.label}</span> : null}
                 </span>
 
                 {mobile || !isSidebarCollapsed ? (
-                  <ChevronDown className={['h-4 w-4 transition-transform', groupIsOpen ? 'rotate-180' : ''].join(' ')} />
+                  <ChevronDown className={['h-4 w-4 shrink-0 transition-transform', groupIsOpen ? 'rotate-180' : ''].join(' ')} />
                 ) : null}
               </button>
 
@@ -232,8 +232,8 @@ export function Sidebar() {
       .map((item) => item.key)[0] ?? null
   ), [menuItems, pathname])
   const [openGroup, setOpenGroup] = useState<string | null>(activeGroup)
-  const topLevelItemClass = 'text-[15px] font-semibold leading-6 tracking-[-0.01em]'
-  const childItemClass = 'text-sm font-semibold leading-6 tracking-[-0.01em]'
+  const topLevelItemClass = 'min-w-0 flex-1 text-left text-[15px] font-semibold leading-6 tracking-[-0.01em]'
+  const childItemClass = 'min-w-0 flex-1 text-left text-sm font-semibold leading-6 tracking-[-0.01em]'
 
   useEffect(() => {
     setOpenGroup(activeGroup)

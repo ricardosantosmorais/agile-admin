@@ -4,6 +4,7 @@ import { RefreshCcw, X } from 'lucide-react';
 import { FieldUpdateMeta, formatFieldUpdateMeta } from '@/src/components/form-page/field-update-meta';
 import { BooleanChoice } from '@/src/components/ui/boolean-choice';
 import { FormField } from '@/src/components/ui/form-field';
+import { InlineDataTable, type InlineDataTableColumn } from '@/src/components/ui/inline-data-table';
 import { inputClasses } from '@/src/components/ui/input-styles';
 import type {
 	IntegracaoLogisticaBranchMetadata,
@@ -341,98 +342,112 @@ export function IntegracaoLogisticaIbolttTable({
 	onPatchBranch,
 	onSetBranchTokenEditable,
 }: IbolttProps) {
+	const columns: Array<InlineDataTableColumn<IntegracaoLogisticaRecord['branches'][number]>> = [
+		{
+			id: 'branch',
+			header: t('integrationsLogistics.iboltt.branch', 'Filial'),
+			cell: (branch) => (
+				<span className="font-medium text-(--app-text)">
+					{branch.name} - {branch.id}
+				</span>
+			),
+			cellClassName: 'min-w-[220px]',
+		},
+		{
+			id: 'companyId',
+			header: t('integrationsLogistics.iboltt.companyId', 'ID da Empresa'),
+			cell: (branch) => {
+				const branchValue = branchValues[branch.id] ?? { companyId: '', token: '' };
+				return (
+					<input
+						className={inputClasses()}
+						value={branchValue.companyId}
+						onChange={(event) => onPatchBranch(branch.id, 'companyId', event.target.value)}
+						disabled={saving || !canSave}
+					/>
+				);
+			},
+			cellClassName: 'min-w-[220px]',
+		},
+		{
+			id: 'token',
+			header: t('integrationsLogistics.iboltt.token', 'Token'),
+			cell: (branch) => {
+				const tokenKey = branchTokenKey(branch.id);
+				const branchValue = branchValues[branch.id] ?? { companyId: '', token: '' };
+				const hasToken = (initialRecord.branchValues[branch.id]?.token ?? '').trim().length > 0;
+				const tokenEditable = Boolean(editableSecrets[tokenKey]) || !hasToken;
+
+				return (
+					<div className="space-y-2">
+						<input
+							className={inputClasses()}
+							value={branchValue.token}
+							onChange={(event) => onPatchBranch(branch.id, 'token', event.target.value)}
+							disabled={saving || !canSave || (hasToken && !tokenEditable)}
+						/>
+						{canSave && hasToken ? (
+							!tokenEditable ? (
+								<button
+									type="button"
+									className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold"
+									onClick={() => onSetBranchTokenEditable(branch.id, true)}
+									disabled={saving}
+								>
+									<RefreshCcw className="h-3.5 w-3.5" />
+									{t('integrationsLogistics.actions.changeSecret', 'Alterar')}
+								</button>
+							) : (
+								<button
+									type="button"
+									className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold"
+									onClick={() => onSetBranchTokenEditable(branch.id, false)}
+									disabled={saving}
+								>
+									<X className="h-3.5 w-3.5" />
+									{t('integrationsLogistics.actions.cancelSecretChange', 'Cancelar alteração')}
+								</button>
+							)
+						) : null}
+					</div>
+				);
+			},
+			cellClassName: 'min-w-[320px]',
+		},
+		{
+			id: 'lastUpdate',
+			header: t('integrationsLogistics.iboltt.lastUpdate', 'Última alteração'),
+			cell: (branch) => {
+				const branchMeta: IntegracaoLogisticaBranchMetadata[string] = initialRecord.branchMetadata[branch.id] ?? {
+					companyId: { updatedAt: '', updatedBy: '' },
+					token: { updatedAt: '', updatedBy: '' },
+				};
+
+				return (
+					<span className="text-xs text-(--app-text-muted)">
+						{formatFieldUpdateMeta({
+							metadata: branchMeta.companyId,
+							t,
+							locale,
+							labelKey: 'integrationsLogistics.fields.lastUpdateValue',
+							fallback: 'Última alteração: {{date}} por {{user}}',
+						})}
+					</span>
+				);
+			},
+			cellClassName: 'min-w-[220px]',
+		},
+	];
+
 	return (
 		<div className="space-y-5">
-			<div className="app-table-shell overflow-x-auto rounded-[1.1rem]">
-				<table className="min-w-full border-separate border-spacing-0 text-sm">
-					<thead className="app-table-muted text-left text-xs font-semibold uppercase tracking-wide text-(--app-text-muted)">
-						<tr className="bg-transparent">
-							<th className="px-4 py-3">{t('integrationsLogistics.iboltt.branch', 'Filial')}</th>
-							<th className="px-4 py-3">{t('integrationsLogistics.iboltt.companyId', 'ID da Empresa')}</th>
-							<th className="px-4 py-3">{t('integrationsLogistics.iboltt.token', 'Token')}</th>
-							<th className="px-4 py-3">{t('integrationsLogistics.iboltt.lastUpdate', 'Última alteração')}</th>
-						</tr>
-					</thead>
-					<tbody className="bg-(--app-panel-solid)">
-						{initialRecord.branches.length ? (
-							initialRecord.branches.map((branch) => {
-								const tokenKey = branchTokenKey(branch.id);
-								const branchValue = branchValues[branch.id] ?? { companyId: '', token: '' };
-								const branchMeta: IntegracaoLogisticaBranchMetadata[string] = initialRecord.branchMetadata[branch.id] ?? {
-									companyId: { updatedAt: '', updatedBy: '' },
-									token: { updatedAt: '', updatedBy: '' },
-								};
-								const hasToken = (initialRecord.branchValues[branch.id]?.token ?? '').trim().length > 0;
-								const tokenEditable = Boolean(editableSecrets[tokenKey]) || !hasToken;
-
-								return (
-									<tr key={branch.id} className="app-table-row-hover align-top">
-										<td className="border-t border-line bg-transparent px-4 py-3 font-medium text-(--app-text)">
-											{branch.name} - {branch.id}
-										</td>
-										<td className="border-t border-line bg-transparent px-4 py-3">
-											<input
-												className={inputClasses()}
-												value={branchValue.companyId}
-												onChange={(event) => onPatchBranch(branch.id, 'companyId', event.target.value)}
-												disabled={saving || !canSave}
-											/>
-										</td>
-										<td className="border-t border-line bg-transparent px-4 py-3">
-											<div className="space-y-2">
-												<input
-													className={inputClasses()}
-													value={branchValue.token}
-													onChange={(event) => onPatchBranch(branch.id, 'token', event.target.value)}
-													disabled={saving || !canSave || (hasToken && !tokenEditable)}
-												/>
-												{canSave && hasToken ? (
-													!tokenEditable ? (
-														<button
-															type="button"
-															className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold"
-															onClick={() => onSetBranchTokenEditable(branch.id, true)}
-															disabled={saving}
-														>
-															<RefreshCcw className="h-3.5 w-3.5" />
-															{t('integrationsLogistics.actions.changeSecret', 'Alterar')}
-														</button>
-													) : (
-														<button
-															type="button"
-															className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold"
-															onClick={() => onSetBranchTokenEditable(branch.id, false)}
-															disabled={saving}
-														>
-															<X className="h-3.5 w-3.5" />
-															{t('integrationsLogistics.actions.cancelSecretChange', 'Cancelar alteração')}
-														</button>
-													)
-												) : null}
-											</div>
-										</td>
-										<td className="border-t border-line bg-transparent px-4 py-3 text-xs text-(--app-text-muted)">
-											{formatFieldUpdateMeta({
-												metadata: branchMeta.companyId,
-												t,
-												locale,
-												labelKey: 'integrationsLogistics.fields.lastUpdateValue',
-												fallback: 'Última alteração: {{date}} por {{user}}',
-											})}
-										</td>
-									</tr>
-								);
-							})
-						) : (
-							<tr className="bg-transparent">
-								<td colSpan={4} className="border-t border-line bg-transparent px-4 py-6 text-center text-sm text-(--app-text-muted)">
-									{t('integrationsLogistics.iboltt.empty', 'Nenhuma filial encontrada.')}
-								</td>
-							</tr>
-						)}
-					</tbody>
-				</table>
-			</div>
+			<InlineDataTable
+				rows={initialRecord.branches}
+				getRowId={(branch) => branch.id}
+				columns={columns}
+				emptyMessage={t('integrationsLogistics.iboltt.empty', 'Nenhuma filial encontrada.')}
+				minWidthClassName="min-w-[980px]"
+			/>
 			<p className="text-xs text-(--app-text-muted)">{t('integrationsLogistics.helpers.ibolttBranchCredentials', 'ID da empresa e token de integração fornecidos pelo IBoltt.')}</p>
 			<IntegracaoLogisticaSelectField
 				values={values}

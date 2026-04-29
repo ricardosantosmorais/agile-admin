@@ -22,7 +22,7 @@ export function BooleanChoice({
         disabled={disabled}
         onClick={() => onChange(true)}
         className={[
-          'rounded-[0.8rem] px-5 py-2 text-sm font-semibold transition',
+          'rounded-[0.8rem] px-5 py-2 text-[15px] font-semibold transition',
           value ? 'bg-emerald-600 text-white shadow-sm' : 'text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]',
           disabled ? 'cursor-not-allowed opacity-60' : '',
         ].join(' ')}
@@ -34,7 +34,7 @@ export function BooleanChoice({
         disabled={disabled}
         onClick={() => onChange(false)}
         className={[
-          'rounded-[0.8rem] px-5 py-2 text-sm font-semibold transition',
+          'rounded-[0.8rem] px-5 py-2 text-[15px] font-semibold transition',
           !value ? 'app-button-secondary text-[color:var(--app-text)] shadow-none' : 'text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]',
           disabled ? 'cursor-not-allowed opacity-60' : '',
         ].join(' ')}

@@ -92,4 +92,5 @@ export type AppDataTableRowAction<TItem> = {
   onClick?: (item: TItem) => void
   tone?: 'default' | 'danger'
   visible?: boolean
+  disabled?: boolean
 }

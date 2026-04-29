@@ -2,6 +2,7 @@
 
 import { FieldUpdateMeta, formatFieldUpdateMeta, type FieldUpdateMetadata } from '@/src/components/form-page/field-update-meta';
 import { FormField } from '@/src/components/ui/form-field';
+import { InlineDataTable, type InlineDataTableColumn } from '@/src/components/ui/inline-data-table';
 import { inputClasses } from '@/src/components/ui/input-styles';
 import { SectionCard } from '@/src/components/ui/section-card';
 import type { ClientesBranchRow, ClientesValues } from '@/src/features/integracoes-clientes/services/integracao-clientes-mappers';
@@ -42,80 +43,90 @@ function PortalBranchTable({
 		return <p className="text-sm text-slate-500">{t('common.noResults', 'Nenhuma filial cadastrada.')}</p>;
 	}
 
+	const columns: Array<InlineDataTableColumn<ClientesBranchRow>> = [
+		{
+			id: 'branch',
+			header: t('integrationsClients.fields.branchColumn', 'Filial'),
+			cell: (branch) => (
+				<span className="text-slate-700">
+					{branch.nome}
+					<span className="ml-1 text-slate-400">- {branch.id}</span>
+				</span>
+			),
+			cellClassName: 'min-w-[220px]',
+		},
+		{
+			id: 'token',
+			header: t('integrationsClients.fields.tokenColumn', 'Token *'),
+			cell: (branch) => {
+				const hasExisting = Boolean(initialBranches.find((item) => item.id === branch.id)?.portalToken);
+				const isUnlocked = !hasExisting || unlockedBranchIds.has(branch.id);
+				const initialToken = initialBranches.find((item) => item.id === branch.id)?.portalToken ?? '';
+
+				return (
+					<div className="space-y-2">
+						<input
+							type="text"
+							className={inputClasses()}
+							value={branch.portalToken}
+							onChange={(event) => onChangeBranchToken(branch.id, event.target.value)}
+							disabled={saving || !canEdit || !isUnlocked}
+						/>
+						{canEdit && hasExisting ? (
+							<div className="flex flex-wrap gap-2">
+								{!isUnlocked ? (
+									<button
+										type="button"
+										onClick={() => onUnlockBranch(branch.id)}
+										disabled={saving}
+										className="app-button-secondary inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold"
+									>
+										{t('integrationsClients.actionsLabel.changeField', 'Alterar')}
+									</button>
+								) : (
+									<button
+										type="button"
+										onClick={() => onLockBranch(branch.id, initialToken)}
+										disabled={saving}
+										className="app-button-secondary inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold"
+									>
+										{t('integrationsClients.actionsLabel.cancelChange', 'Cancelar alteração')}
+									</button>
+								)}
+							</div>
+						) : null}
+					</div>
+				);
+			},
+			cellClassName: 'min-w-[320px]',
+		},
+		{
+			id: 'lastChange',
+			header: t('integrationsClients.fields.lastChangeColumn', 'Última Alteração'),
+			cell: (branch) => (
+				<span className="text-xs text-slate-500">
+					{formatFieldUpdateMeta({
+						metadata: branch.portalTokenMeta,
+						t,
+						locale,
+						labelKey: 'integrationsClients.lastUpdateValue',
+						fallback: 'Última alteração: {{date}} por {{user}}',
+					}) ?? '-'}
+				</span>
+			),
+			cellClassName: 'min-w-[220px]',
+		},
+	];
+
 	return (
 		<>
-			<div className="overflow-x-auto">
-				<table className="w-full min-w-140 text-sm">
-					<thead>
-						<tr className="border-b border-line">
-							<th className="w-[30%] px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{t('integrationsClients.fields.branchColumn', 'Filial')}</th>
-							<th className="w-[45%] px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{t('integrationsClients.fields.tokenColumn', 'Token *')}</th>
-							<th className="w-[25%] px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-								{t('integrationsClients.fields.lastChangeColumn', 'Última Alteração')}
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{branches.map((branch) => {
-							const hasExisting = Boolean(initialBranches.find((item) => item.id === branch.id)?.portalToken);
-							const isUnlocked = !hasExisting || unlockedBranchIds.has(branch.id);
-							const initialToken = initialBranches.find((item) => item.id === branch.id)?.portalToken ?? '';
-
-							return (
-								<tr key={branch.id} className="border-b border-line/50">
-									<td className="px-3 py-3 text-slate-700">
-										{branch.nome}
-										<span className="ml-1 text-slate-400">- {branch.id}</span>
-									</td>
-									<td className="px-3 py-3">
-										<div className="space-y-2">
-											<input
-												type="text"
-												className={inputClasses()}
-												value={branch.portalToken}
-												onChange={(event) => onChangeBranchToken(branch.id, event.target.value)}
-												disabled={saving || !canEdit || !isUnlocked}
-											/>
-											{canEdit && hasExisting ? (
-												<div className="flex flex-wrap gap-2">
-													{!isUnlocked ? (
-														<button
-															type="button"
-															onClick={() => onUnlockBranch(branch.id)}
-															disabled={saving}
-															className="app-button-secondary inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold"
-														>
-															{t('integrationsClients.actionsLabel.changeField', 'Alterar')}
-														</button>
-													) : (
-														<button
-															type="button"
-															onClick={() => onLockBranch(branch.id, initialToken)}
-															disabled={saving}
-															className="app-button-secondary inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold"
-														>
-															{t('integrationsClients.actionsLabel.cancelChange', 'Cancelar alteração')}
-														</button>
-													)}
-												</div>
-											) : null}
-										</div>
-									</td>
-									<td className="px-3 py-3 text-xs text-slate-500">
-										{formatFieldUpdateMeta({
-											metadata: branch.portalTokenMeta,
-											t,
-											locale,
-											labelKey: 'integrationsClients.lastUpdateValue',
-											fallback: 'Última alteração: {{date}} por {{user}}',
-										}) ?? '-'}
-									</td>
-								</tr>
-							);
-						})}
-					</tbody>
-				</table>
-			</div>
+			<InlineDataTable
+				rows={branches}
+				getRowId={(branch) => branch.id}
+				columns={columns}
+				emptyMessage={t('common.noResults', 'Nenhuma filial cadastrada.')}
+				minWidthClassName="min-w-[860px]"
+			/>
 			<p className="mt-3 text-xs leading-5 text-slate-500">{t('integrationsClients.sections.portal.helper', '* Token de integração fornecido pela Agile E-commerce.')}</p>
 		</>
 	);

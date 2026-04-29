@@ -5,7 +5,7 @@ import type { editor as MonacoEditor } from 'monaco-editor';
 import { useEffect, useMemo, useRef } from 'react';
 import { useUi } from '@/src/contexts/ui-context';
 
-type CodeEditorLanguage = 'html' | 'css' | 'json';
+type CodeEditorLanguage = 'html' | 'css' | 'json' | 'sql';
 
 type CodeEditorProps = {
 	editorId: string;

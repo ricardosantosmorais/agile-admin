@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Loader2, Save } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { AsyncState } from '@/src/components/ui/async-state'
+import { InlineDataTable, type InlineDataTableColumn } from '@/src/components/ui/inline-data-table'
 import { PageHeader } from '@/src/components/ui/page-header'
 import { SectionCard } from '@/src/components/ui/section-card'
 import { AccessDeniedState } from '@/src/features/auth/components/access-denied-state'
@@ -70,6 +71,42 @@ export function AplicativoPermissoesPage({ id }: { id?: string }) {
     if (!normalizedSearch) return rows
     return rows.filter((row) => row.tabelaNome.toLowerCase().includes(normalizedSearch))
   }, [rows, search])
+
+  const permissionColumns = useMemo<Array<InlineDataTableColumn<AplicativoIntegracaoPermissaoRecord>>>(() => [
+    {
+      id: 'route',
+      header: t('integrationApps.permissions.routeColumn', 'Rota'),
+      cell: (row) => <span className="font-mono text-[13px] font-semibold text-slate-900">{row.tabelaNome}</span>,
+      cellClassName: 'min-w-[280px]',
+    },
+    ...VERB_COLUMNS.map<InlineDataTableColumn<AplicativoIntegracaoPermissaoRecord>>((column) => ({
+      id: column.key,
+      header: (
+        <label className="inline-flex items-center justify-center gap-2 whitespace-nowrap">
+          <input
+            type="checkbox"
+            checked={rows.length > 0 && rows.every((row) => row[column.key])}
+            disabled={!canSave}
+            onChange={(event) => setAllForColumn(column.key, event.target.checked)}
+          />
+          <span>{column.label}</span>
+        </label>
+      ),
+      cell: (row) => {
+        const rowIndex = rows.findIndex((item) => item.tabelaNome === row.tabelaNome)
+        return (
+          <input
+            type="checkbox"
+            checked={row[column.key]}
+            disabled={!canSave}
+            onChange={(event) => setSingleRow(rowIndex, column.key, event.target.checked)}
+          />
+        )
+      },
+      headerClassName: 'text-center',
+      cellClassName: 'min-w-[160px] text-center',
+    })),
+  ], [canSave, rows, t])
 
   if (!canOpen) {
     return <AccessDeniedState title={t('integrationApps.permissions.title', 'Permissoes de acesso')} backHref="/api-de-integracao/aplicativos" />
@@ -167,57 +204,13 @@ export function AplicativoPermissoesPage({ id }: { id?: string }) {
               className="w-full rounded-[0.9rem] border border-[#e5dccf] bg-white px-3.5 py-2.5 text-sm"
             />
 
-            <div className="overflow-hidden rounded-[1rem] border border-[#ece3d6] bg-white">
-              <table className="min-w-full text-left text-sm">
-                <thead className="bg-[#f8f4ec] text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
-                  <tr>
-                    <th className="px-4 py-3">{t('integrationApps.permissions.routeColumn', 'Rota')}</th>
-                    {VERB_COLUMNS.map((column) => {
-                      const allChecked = rows.length > 0 && rows.every((row) => row[column.key])
-                      return (
-                        <th key={column.key} className="px-4 py-3 text-center">
-                          <label className="inline-flex items-center gap-2 whitespace-nowrap">
-                            <input
-                              type="checkbox"
-                              checked={allChecked}
-                              disabled={!canSave}
-                              onChange={(event) => setAllForColumn(column.key, event.target.checked)}
-                            />
-                            <span>{column.label}</span>
-                          </label>
-                        </th>
-                      )
-                    })}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRows.length ? filteredRows.map((row) => {
-                    const rowIndex = rows.findIndex((item) => item.tabelaNome === row.tabelaNome)
-                    return (
-                      <tr key={row.tabelaNome} className="border-t border-[#efe8dc] transition hover:bg-[#fdf9f2]">
-                        <td className="px-4 py-3.5 font-mono text-[13px] font-semibold text-slate-900">{row.tabelaNome}</td>
-                        {VERB_COLUMNS.map((column) => (
-                          <td key={column.key} className="px-4 py-3.5 text-center">
-                            <input
-                              type="checkbox"
-                              checked={row[column.key]}
-                              disabled={!canSave}
-                              onChange={(event) => setSingleRow(rowIndex, column.key, event.target.checked)}
-                            />
-                          </td>
-                        ))}
-                      </tr>
-                    )
-                  }) : (
-                    <tr>
-                      <td colSpan={VERB_COLUMNS.length + 1} className="px-4 py-10 text-center text-sm text-slate-500">
-                        {t('integrationApps.permissions.empty', 'Nenhuma rota encontrada para o filtro informado.')}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <InlineDataTable
+              rows={filteredRows}
+              getRowId={(row) => row.tabelaNome}
+              columns={permissionColumns}
+              emptyMessage={t('integrationApps.permissions.empty', 'Nenhuma rota encontrada para o filtro informado.')}
+              minWidthClassName="min-w-[820px]"
+            />
           </div>
         </SectionCard>
       </AsyncState>

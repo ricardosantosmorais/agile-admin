@@ -5,7 +5,7 @@ import { AlertCircle, FileText, ImagePlus, LoaderCircle, Trash2, UploadCloud } f
 import { useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useI18n } from '@/src/i18n/use-i18n'
-import { normalizeUploadResult, type UploadAssetHandler } from '@/src/lib/uploads'
+import { getDisplayFileName, normalizeUploadResult, type UploadAssetHandler } from '@/src/lib/uploads'
 
 type AssetUploadFieldProps = {
   value: string
@@ -38,6 +38,7 @@ export function AssetUploadField({
   const [uploadError, setUploadError] = useState<string | null>(null)
   const hasAsset = value.trim().length > 0
   const isImage = kind === 'image'
+  const currentFileName = isImage ? '' : getDisplayFileName(value)
 
   useEffect(() => {
     setPreviewValue(value)
@@ -97,6 +98,16 @@ export function AssetUploadField({
             {hasAsset && isImage ? (
               <div className="app-pane relative h-[11rem] w-full">
                 <Image src={previewValue} alt="" fill className="object-contain object-center p-3" unoptimized />
+              </div>
+            ) : hasAsset && !isImage ? (
+              <div className="flex h-[11rem] w-full flex-col items-center justify-center gap-2 px-4 text-center text-[color:var(--app-muted)]">
+                <FileText className="h-9 w-9 text-[color:var(--app-muted)]/70" />
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--app-muted)]">
+                  {t('uploads.currentFile', 'Arquivo atual')}
+                </span>
+                <span className="max-w-full truncate text-sm font-semibold text-[color:var(--app-text)]">
+                  {currentFileName || value}
+                </span>
               </div>
             ) : (
               <div className="flex h-[11rem] w-full flex-col items-center justify-center gap-2 px-4 text-center text-[color:var(--app-muted)]">
@@ -160,7 +171,7 @@ export function AssetUploadField({
       </div>
 
       {uploadError ? (
-        <div className="flex items-center gap-2 rounded-[0.9rem] border border-rose-400/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+        <div className="flex items-center gap-2 rounded-[0.9rem] border border-rose-400/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-700 dark:text-rose-200">
           <AlertCircle className="h-4 w-4 shrink-0" />
           {uploadError}
         </div>

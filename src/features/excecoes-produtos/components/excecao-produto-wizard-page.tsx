@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, ChevronRight, LoaderCircle, Plus, Save, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import type { CrudResource } from '@/src/components/crud-base/types'
+import { AppDataTable } from '@/src/components/data-table/app-data-table'
 import { AsyncState } from '@/src/components/ui/async-state'
 import { LookupSelect } from '@/src/components/ui/lookup-select'
 import { PageHeader } from '@/src/components/ui/page-header'
@@ -820,23 +821,30 @@ export function ExcecaoProdutoWizardPage({ id }: { id?: string }) {
 
                     <div>
                       <h3 className="text-xl font-semibold text-[color:var(--app-text)]">Prévia do lote</h3>
-                      <div className="mt-3 overflow-x-auto rounded-[1rem] border border-[color:var(--app-card-border)]">
-                        <table className="min-w-full divide-y divide-[color:var(--app-card-border)] text-sm">
-                          <thead className="bg-[color:var(--app-control-muted-bg)] text-left text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--app-muted)]">
-                            <tr>
-                              <th className="px-4 py-3">Público-alvo</th>
-                              <th className="px-4 py-3">Produto</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-[color:var(--app-card-border)]">
-                            {previewRows.map((row) => (
-                              <tr key={row.key} className="bg-[color:var(--app-panel-solid)]">
-                                <td className="px-4 py-3 font-medium text-[color:var(--app-text)]">{row.audience}</td>
-                                <td className="px-4 py-3 text-[color:var(--app-muted)]">{row.product}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                      <div className="mt-3">
+                        <AppDataTable
+                          rows={previewRows}
+                          getRowId={(row) => row.key}
+                          columns={[
+                            {
+                              id: 'audience',
+                              label: t('maintenance.productExceptions.steps.audience', 'P\u00fablico-alvo'),
+                              cell: (row) => row.audience,
+                              tdClassName: 'font-medium text-[color:var(--app-text)]',
+                            },
+                            {
+                              id: 'product',
+                              label: t('maintenance.productExceptions.steps.products', 'Produtos'),
+                              cell: (row) => row.product,
+                              tdClassName: 'text-[color:var(--app-muted)]',
+                            },
+                          ]}
+                          emptyMessage={t('maintenance.productExceptions.emptyPreview', 'Nenhuma combina\u00e7\u00e3o gerada.')}
+                          mobileCard={{
+                            title: (row) => row.audience,
+                            subtitle: (row) => row.product,
+                          }}
+                        />
                       </div>
                       {flatRowsPreview.length > 12 ? (
                         <p className="mt-3 text-sm text-[color:var(--app-muted)]">

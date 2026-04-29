@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ChevronRight, LoaderCircle, Plus, Save, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { AppDataTable } from '@/src/components/data-table/app-data-table'
 import { AccessDeniedState } from '@/src/features/auth/components/access-denied-state'
 import { AsyncState } from '@/src/components/ui/async-state'
 import { InputWithAffix } from '@/src/components/ui/input-with-affix'
@@ -1155,29 +1156,24 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
 
                   <div>
                     <h3 className={`text-xl ${headingClasses}`}>Prévia do lote</h3>
-                    <div className="app-table-shell mt-3 overflow-x-auto rounded-[1rem]">
-                      <table className="min-w-full divide-y divide-line/60 text-sm">
-                        <thead className="app-table-muted text-left text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--app-muted)]">
-                          <tr>
-                            <th className="px-4 py-3">Público alvo</th>
-                            <th className="px-4 py-3">Produto</th>
-                            <th className="px-4 py-3">Definição</th>
-                            <th className="px-4 py-3">Preço</th>
-                            <th className="px-4 py-3">Desconto</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-line/50">
-                          {previewRows.map((row) => (
-                            <tr key={row.key} className="app-table-row-hover">
-                              <td className="px-4 py-3 font-medium text-[color:var(--app-text)]">{row.audience}</td>
-                              <td className="px-4 py-3 text-[color:var(--app-muted)]">{row.product}</td>
-                              <td className="px-4 py-3 text-[color:var(--app-muted)]">{row.definition}</td>
-                              <td className="px-4 py-3 text-[color:var(--app-muted)]">{row.price}</td>
-                              <td className="px-4 py-3 text-[color:var(--app-muted)]">{row.discount}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                    <div className="mt-3">
+                      <AppDataTable
+                        rows={previewRows}
+                        getRowId={(row) => row.key}
+                        columns={[
+                          { id: 'audience', label: 'P\u00fablico alvo', cell: (row) => row.audience, tdClassName: 'font-medium text-[color:var(--app-text)]' },
+                          { id: 'product', label: 'Produto', cell: (row) => row.product, tdClassName: 'text-[color:var(--app-muted)]' },
+                          { id: 'definition', label: 'Defini\u00e7\u00e3o', cell: (row) => row.definition, tdClassName: 'text-[color:var(--app-muted)]' },
+                          { id: 'price', label: 'Pre\u00e7o', cell: (row) => row.price, tdClassName: 'text-[color:var(--app-muted)]' },
+                          { id: 'discount', label: 'Desconto', cell: (row) => row.discount, tdClassName: 'text-[color:var(--app-muted)]' },
+                        ]}
+                        emptyMessage="Nenhuma combina\u00e7\u00e3o gerada."
+                        mobileCard={{
+                          title: (row) => row.audience,
+                          subtitle: (row) => row.product,
+                          meta: (row) => row.definition + ' | ' + row.price + ' | ' + row.discount,
+                        }}
+                      />
                     </div>
                     {flatRowsPreview.length > 12 ? <p className={`mt-3 text-sm ${mutedTextClasses}`}>Exibindo 12 de {flatRowsPreview.length} combinações geradas.</p> : null}
                   </div>

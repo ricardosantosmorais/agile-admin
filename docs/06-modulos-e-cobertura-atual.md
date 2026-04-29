@@ -10,6 +10,13 @@
 
 ### Cadastros BÃ¡sicos / ManutenÃ§Ã£o
 
+- Funcionalidades
+- Componentes
+- E-mails Payloads
+- Apps
+- Categorias de Tarefas
+- Tarefas
+- Grupos de Relatorios
 - Filiais
 - Canais de distribuiÃ§Ã£o
 - Grupos de filiais
@@ -154,6 +161,12 @@ ObservaÃ§Ã£o:
 ## ObservaÃ§Ãµes atuais de cobertura
 
 - `Dashboard` carrega fases e grÃ¡ficos sob demanda, mantendo a carga completa apenas na exportaÃ§Ã£o de PDF.
+- `Cadastros > Componentes` possui listagem, formulario em abas, upload para CDN publica de componentes, editor JSON e aba de campos com modal, opcoes personalizadas, exclusao e reordenacao.
+- `Cadastros > E-mails Payloads` possui CRUD linear v2 com listagem, filtros, formulario em linhas e editor JSON para o payload.
+- `Cadastros > Apps` possui listagem v2 com acoes de compilacao, publicacao Android/iOS e logs; formulario em linhas com arquivos privados S3 por empresa; e bridges server-side para sincronizar `config/clients.json` e disparar GitHub Actions sem expor token no client.
+- `Notificacoes` do painel possui rota v2 em `/notificacoes-painel`, com listagem server-side, filtros do legado, formulario em abas, vinculo por empresa, pre-visualizacao, duplicacao, publicacao e modal de usuarios visualizadores.
+- `Cadastros > Categorias de Tarefas`, `Tarefas` e `Grupos de Relatorios` possuem CRUDs v2 com bridges dedicadas, formularios em linhas e lookups lazy para fases, categorias e empresas quando aplicavel.
+- `Cadastros > Relatorios v2` possui rota de cadastro separada da execucao operacional, com dados gerais, editor SQL executavel e mapeamento de campos da query.
 - `ConfiguraÃ§Ãµes > Clientes` lÃª e grava parÃ¢metros do tenant direto em `empresas/parametros`, seguindo o contrato do legado.
 - `ConfiguraÃ§Ãµes > Entregas` usa o mesmo contrato de parÃ¢metros e complementa o carregamento com `formas_entrega` para o campo padrÃ£o.
 - `ConfiguraÃ§Ãµes > Geral` combina `empresas/parametros`, `configuracoes_empresa` e atualizaÃ§Ã£o parcial de `empresas` para os campos estruturais do tenant.
@@ -349,3 +362,4 @@ Continuam como pÃ¡ginas prÃ³prias, com mais regra de negÃ³cio:
 - `ConfiguraÃ§Ãµes` com teste de integraÃ§Ã£o validando o estado disabled/enabled do botÃ£o `Salvar` conforme o dirty state.
 - `Templates de E-mails` com teste de componente cobrindo a aba `Editor`, o carregamento de variÃ¡veis e a abertura da prÃ©-visualizaÃ§Ã£o.
 - `Clientes` com testes do controller da listagem e do modal de usuÃ¡rios vinculados.
+- `Cadastros ERP > Gateways`, `Gateway Endpoints`, `Interfaces de Consulta`, `Acoes` e `Servicos` com testes unitarios de mapeadores, payloads e filtros usados pelas bridges v2.

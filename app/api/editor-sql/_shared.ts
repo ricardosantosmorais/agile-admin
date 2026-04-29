@@ -86,20 +86,23 @@ export async function resolveSqlEditorContext() {
 export async function executeSqlAgainstExternalApi(
   context: ResolvedSqlEditorContext,
   requestBody: {
+    idEmpresa?: string
     fonteDados: string
     sql: string
     page: number
     perPage: number
   },
 ) {
-  const target = requestBody.fonteDados === 'erp' && context.useAgileSyncForErp
+  const target = requestBody.idEmpresa
+    ? 'painelb2b'
+    : requestBody.fonteDados === 'erp' && context.useAgileSyncForErp
     ? 'agilesync'
     : 'painelb2b'
 
   return externalAdminApiFetch(target, 'agilesync_editorsql', {
     method: 'POST',
     body: {
-      id_empresa: context.tenantCodigo,
+      id_empresa: requestBody.idEmpresa || context.tenantCodigo,
       fonte_dados: requestBody.fonteDados,
       sql: requestBody.sql,
       id_usuario: '',

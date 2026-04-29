@@ -2,6 +2,13 @@
 import { normalizeSearchValue } from '@/src/lib/text-normalization';
 
 export type FeatureKey =
+	| 'funcionalidades'
+	| 'componentes'
+	| 'emailsPayloads'
+	| 'apps'
+	| 'categoriasTarefas'
+	| 'tarefas'
+	| 'relatoriosGrupos'
 	| 'pedidos'
 	| 'consultasSimuladorPrecos'
 	| 'consultasEnviosFormularios'
@@ -10,6 +17,7 @@ export type FeatureKey =
 	| 'editorSql'
 	| 'httpClient'
 	| 'dicionarioDados'
+	| 'syncModules'
 	| 'integracaoAplicativos'
 	| 'integracoesAtendimento'
 	| 'integracoesClientes'
@@ -31,6 +39,11 @@ export type FeatureKey =
 	| 'erpCadastrosQueries'
 	| 'erpCadastrosScripts'
 	| 'erpCadastrosEndpoints'
+	| 'erpCadastrosGateways'
+	| 'erpCadastrosGatewayEndpoints'
+	| 'erpCadastrosInterfacesConsulta'
+	| 'erpCadastrosAcoes'
+	| 'erpCadastrosServicos'
 	| 'erpRotinasIntegradas'
 	| 'erpServicos'
 	| 'erpServicosFalha'
@@ -106,6 +119,7 @@ export type FeatureKey =
 	| 'descontoUnidade'
 	| 'compreJunto'
 	| 'cuponsDesconto'
+	| 'notificacoesPainel'
 	| 'notificacoesApp'
 	| 'templatesEmails'
 	| 'areasBanner'
@@ -141,6 +155,34 @@ type FeatureAccess = {
 };
 
 const featureConfigs: Record<FeatureKey, FeatureConfig> = {
+	funcionalidades: {
+		label: 'Funcionalidades',
+		matchers: ['funcionalidades', 'funcionalidade', 'funcionalidades-list', 'funcionalidades-form'],
+	},
+	componentes: {
+		label: 'Componentes',
+		matchers: ['componentes', 'componente', 'componentes-list', 'componentes-form', 'componentes-campos'],
+	},
+	emailsPayloads: {
+		label: 'E-mails Payloads',
+		matchers: ['emails-payloads', 'emails payloads', 'emails-payloads-list', 'emails-payloads-form'],
+	},
+	apps: {
+		label: 'Apps',
+		matchers: ['apps', 'apps-list', 'apps-form', 'cadastros apps'],
+	},
+	categoriasTarefas: {
+		label: 'Categorias de Tarefas',
+		matchers: ['categorias-tarefas', 'categorias tarefas', 'categorias-tarefas-list', 'categorias-tarefas-form'],
+	},
+	tarefas: {
+		label: 'Tarefas',
+		matchers: ['tarefas', 'tarefas-list', 'tarefas-form'],
+	},
+	relatoriosGrupos: {
+		label: 'Grupos de Relatórios',
+		matchers: ['relatorios-grupos', 'grupos de relatorios', 'grupos de relatórios', 'relatorios-grupos-list', 'relatorios-grupos-form'],
+	},
 	pedidos: {
 		label: 'Pedidos',
 		matchers: ['pedido', 'pedidos', 'pedidos-list', 'pedido-list'],
@@ -163,15 +205,20 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
 	},
 	editorSql: {
 		label: 'Editor SQL',
-		matchers: ['editor sql', 'editor-sql', 'editor-sql-form', 'editor-sql-tabed-form', 'tools-editor-sql'],
+		matchers: ['editor sql', 'editor-sql', 'editor-sql-form', 'editor-sql-tabed-form', 'agile-editor-sql-form', 'tools-editor-sql'],
 	},
 	httpClient: {
 		label: 'HTTP Client',
-		matchers: ['http client', 'http-client', 'http-client-form', 'tools-http-client'],
+		matchers: ['http client', 'http-client', 'http-client-form', 'agile-http-client-form', 'tools-http-client'],
 	},
 	dicionarioDados: {
 		label: 'Dicionário de Dados',
-		matchers: ['dicionario de dados', 'dicionário de dados', 'dicionario-modulos-list', 'dicionario-list', 'tools-dictionary'],
+		matchers: ['dicionario de dados', 'dicionário de dados', 'dicionario-modulos-list', 'agile-dicionario-modulos-list', 'dicionario-list', 'tools-dictionary'],
+	},
+	syncModules: {
+		label: 'Sincronizar Módulos',
+		matchers: ['sync-modules', 'agile-sync-modules', 'sincronizar modulos', 'sincronizar módulos'],
+		allowOpenWithoutAction: true,
 	},
 	integracaoAplicativos: {
 		label: 'Aplicativos',
@@ -256,6 +303,26 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
 	erpCadastrosEndpoints: {
 		label: 'ERP > Cadastros > Endpoints',
 		matchers: ['integracao-endpoints-list', 'integracao-endpoints-form', 'integracao-com-erp cadastros endpoints', 'erp cadastros endpoints', 'endpoints'],
+	},
+	erpCadastrosGateways: {
+		label: 'ERP > Cadastros > Gateways',
+		matchers: ['cadastro-gateways-list', 'cadastro-gateways-form', 'integracao-com-erp cadastros gateways', 'erp cadastros gateways', 'gateways'],
+	},
+	erpCadastrosGatewayEndpoints: {
+		label: 'ERP > Cadastros > Gateway Endpoints',
+		matchers: ['cadastro-gateway-endpoints-list', 'cadastro-gateway-endpoints-form', 'integracao-com-erp cadastros gateway endpoints', 'erp cadastros gateway endpoints', 'gateway endpoints'],
+	},
+	erpCadastrosInterfacesConsulta: {
+		label: 'ERP > Cadastros > Interfaces de Consulta',
+		matchers: ['cadastro-interfaces-consulta-list', 'cadastro-interfaces-consulta-form', 'integracao-com-erp cadastros interfaces consulta', 'erp cadastros interfaces consulta', 'interfaces de consulta'],
+	},
+	erpCadastrosAcoes: {
+		label: 'ERP > Cadastros > Ações',
+		matchers: ['cadastro-acoes-list', 'cadastro-acoes-form', 'integracao-com-erp cadastros acoes', 'erp cadastros acoes', 'ações', 'acoes'],
+	},
+	erpCadastrosServicos: {
+		label: 'ERP > Cadastros > Serviços',
+		matchers: ['cadastro-servicos-list', 'cadastro-servicos-form', 'integracao-com-erp cadastros servicos', 'erp cadastros servicos', 'serviços', 'servicos'],
 	},
 	erpRotinasIntegradas: {
 		label: 'ERP > Rotinas Integradas',
@@ -453,7 +520,7 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
 	},
 	administradores: {
 		label: 'Administradores',
-		matchers: ['administrador', 'administradores'],
+		matchers: ['administrador', 'administradores', 'administradores-master-list', 'administradores-master-form', 'administradores-master-senha'],
 	},
 	perfis: {
 		label: 'Perfis',
@@ -558,6 +625,10 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
 	cuponsDesconto: {
 		label: 'Cupons Desconto',
 		matchers: ['cupom desconto', 'cupons desconto', 'cupons-desconto', 'cupom-desconto'],
+	},
+	notificacoesPainel: {
+		label: 'Notificações',
+		matchers: ['notificacoes-painel', 'notificacoes-painel-list', 'notificacoes-painel-form', 'notificacoes painel', 'notificações painel'],
 	},
 	notificacoesApp: {
 		label: 'Notificacoes App',

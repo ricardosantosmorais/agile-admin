@@ -1,10 +1,12 @@
 'use client';
 
-import { Copy, Database, Download, Expand, FileCode2, FolderOpen, Loader2, Play, Plus, Save, Search, Table2, X } from 'lucide-react';
+import { Copy, Database, Download, Expand, FileCode2, FolderOpen, Loader2, Play, Plus, Save, Search, Table2, Warehouse, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { AsyncState } from '@/src/components/ui/async-state';
 import { BooleanSegmentedField } from '@/src/components/ui/boolean-segmented-field';
+import { DynamicResultGrid } from '@/src/components/ui/dynamic-result-grid';
+import { LookupSelect } from '@/src/components/ui/lookup-select';
 import { OverlayModal } from '@/src/components/ui/overlay-modal';
 import { PageHeader } from '@/src/components/ui/page-header';
 import { PageToast } from '@/src/components/ui/page-toast';
@@ -15,6 +17,7 @@ import { TooltipIconButton } from '@/src/components/ui/tooltip-icon-button';
 import { AccessDeniedState } from '@/src/features/auth/components/access-denied-state';
 import { useAuth } from '@/src/features/auth/hooks/use-auth';
 import { useFeatureAccess } from '@/src/features/auth/hooks/use-feature-access';
+import { agileSqlEditorClient, type AgileSqlEditorEmpresaOption } from '@/src/features/agile-ferramentas/services/agile-sql-editor-client';
 import { SqlEditorMonaco } from '@/src/features/editor-sql/components/sql-editor-monaco';
 import { sqlEditorClient } from '@/src/features/editor-sql/services/sql-editor-client';
 import type { SavedSqlQuery, SqlDataSource, SqlEditorExecuteResponse, SqlEditorResultRow } from '@/src/features/editor-sql/services/sql-editor-types';
@@ -25,6 +28,9 @@ import { copyTextToClipboard } from '@/src/lib/clipboard';
 import { formatDateTime } from '@/src/lib/date-time';
 
 type ToastTone = 'success' | 'error';
+type SqlEditorPageProps = {
+	variant?: 'default' | 'agile';
+};
 type WorkspaceTab = {
 	id: string;
 	title: string;
@@ -73,92 +79,14 @@ function formatCellValue(value: unknown) {
 
 function ResultTable({ rows, search }: { rows: SqlEditorResultRow[]; search: string }) {
 	const { t } = useI18n();
-	const viewportRef = useRef<HTMLDivElement | null>(null);
-	const scrollbarRef = useRef<HTMLDivElement | null>(null);
-	const [scrollWidth, setScrollWidth] = useState(0);
-	const columns = useMemo(() => inferColumns(rows), [rows]);
-	const normalizedSearch = search.trim().toLowerCase();
-	const filteredRows = useMemo(() => {
-		if (!normalizedSearch) return rows;
-		return rows.filter((row) => columns.some((column) => formatCellValue(row[column]).toLowerCase().includes(normalizedSearch)));
-	}, [columns, normalizedSearch, rows]);
-
-	useEffect(() => {
-		const viewport = viewportRef.current;
-		if (!viewport || typeof ResizeObserver === 'undefined') {
-			return;
-		}
-
-		const syncWidths = () => {
-			setScrollWidth(viewport.scrollWidth);
-		};
-
-		syncWidths();
-
-		const observer = new ResizeObserver(() => {
-			syncWidths();
-		});
-
-		observer.observe(viewport);
-
-		return () => {
-			observer.disconnect();
-		};
-	}, [filteredRows, columns]);
-
-	function syncScroll(source: 'viewport' | 'bar') {
-		const viewport = viewportRef.current;
-		const bar = scrollbarRef.current;
-		if (!viewport || !bar) return;
-
-		if (source === 'viewport') {
-			bar.scrollLeft = viewport.scrollLeft;
-			return;
-		}
-
-		viewport.scrollLeft = bar.scrollLeft;
-	}
-
-	if (!filteredRows.length) {
-		return (
-			<div className="app-control-muted rounded-[1rem] border border-dashed px-5 py-8 text-sm text-[color:var(--app-muted)]">
-				{t('sqlEditor.messages.noRowsForQuery', 'No records were returned for the current query.')}
-			</div>
-		);
-	}
-
 	return (
-		<div className="app-pane flex h-full min-h-0 flex-col overflow-hidden rounded-[1rem]">
-			<div ref={viewportRef} onScroll={() => syncScroll('viewport')} className="sql-result-grid-scroll min-h-0 flex-1 overflow-auto">
-				<table className="min-w-full border-collapse text-left text-sm">
-					<thead className="app-table-muted sticky top-0 z-[1] text-[color:var(--app-text)]">
-						<tr>
-							{columns.map((column) => (
-								<th key={column} className="whitespace-nowrap px-4 py-3 font-semibold">
-									{column}
-								</th>
-							))}
-						</tr>
-					</thead>
-					<tbody>
-						{filteredRows.map((row, rowIndex) => (
-							<tr key={`${rowIndex}-${JSON.stringify(row)}`} className="border-t border-[color:var(--app-card-border)] align-top">
-								{columns.map((column) => (
-									<td key={`${rowIndex}-${column}`} className="max-w-[320px] px-4 py-3 text-[color:var(--app-text)]">
-										<div className="break-words whitespace-pre-wrap">{formatCellValue(row[column])}</div>
-									</td>
-								))}
-							</tr>
-						))}
-					</tbody>
-				</table>
-			</div>
-			<div className="app-table-muted border-t border-[color:var(--app-card-border)] px-2 py-1">
-				<div ref={scrollbarRef} onScroll={() => syncScroll('bar')} className="sql-result-grid-scrollbar overflow-x-auto overflow-y-hidden">
-					<div style={{ width: `${scrollWidth}px`, height: '1px' }} />
-				</div>
-			</div>
-		</div>
+		<DynamicResultGrid
+			rows={rows}
+			search={search}
+			emptyMessage={t('sqlEditor.messages.noRowsForQuery', 'No records were returned for the current query.')}
+			maxColumns={60}
+			maxHeightClassName="h-full max-h-none"
+		/>
 	);
 }
 
@@ -193,10 +121,11 @@ function ToolbarIconButton({
 	);
 }
 
-export function SqlEditorPage() {
+export function SqlEditorPage({ variant = 'default' }: SqlEditorPageProps = {}) {
 	const { t } = useI18n();
 	const { session } = useAuth();
 	const access = useFeatureAccess('editorSql');
+	const isAgileVariant = variant === 'agile';
 	const defaultTabTitle = t('sqlEditor.defaultTab', 'Consulta principal');
 	const initialTabRef = useRef<WorkspaceTab | null>(null);
 	if (!initialTabRef.current) {
@@ -210,6 +139,8 @@ export function SqlEditorPage() {
 	const [workspaceHydrated, setWorkspaceHydrated] = useState(false);
 	const [hydratedWorkspaceKey, setHydratedWorkspaceKey] = useState('');
 	const [toast, setToast] = useState<{ message: string; tone: ToastTone } | null>(null);
+	const [agileEmpresasError, setAgileEmpresasError] = useState('');
+	const [agileEmpresa, setAgileEmpresa] = useState<AgileSqlEditorEmpresaOption | null>(null);
 	const [savedQueriesOpen, setSavedQueriesOpen] = useState(false);
 	const [saveModalOpen, setSaveModalOpen] = useState(false);
 	const [fullscreenOpen, setFullscreenOpen] = useState(false);
@@ -224,8 +155,9 @@ export function SqlEditorPage() {
 		const tenantId = session?.currentTenant.id;
 		if (!userId || !tenantId) return '';
 
-		return getSqlEditorWorkspaceStorageKey(userId, tenantId);
-	}, [session?.currentTenant.id, session?.user.id]);
+		const baseKey = getSqlEditorWorkspaceStorageKey(userId, tenantId);
+		return isAgileVariant ? `${baseKey}:agile` : baseKey;
+	}, [isAgileVariant, session?.currentTenant.id, session?.user.id]);
 
 	const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0];
 	const activeRows = activeTab?.result?.rows ?? EMPTY_ROWS;
@@ -245,6 +177,26 @@ export function SqlEditorPage() {
 	useEffect(() => {
 		if (savedQueriesOpen) void loadSavedQueries();
 	}, [loadSavedQueries, savedQueriesOpen]);
+
+	useEffect(() => {
+		if (!isAgileVariant) return;
+
+		let active = true;
+		setAgileEmpresasError('');
+		void agileSqlEditorClient.listEmpresas('', 1, 1)
+			.then((rows) => {
+				if (!active) return;
+				setAgileEmpresa((current) => current || rows[0] || null);
+			})
+			.catch((error) => {
+				if (!active) return;
+				setAgileEmpresasError(error instanceof Error ? error.message : t('agileSqlEditor.feedback.loadCompaniesError', 'Não foi possível carregar as empresas.'));
+			})
+
+		return () => {
+			active = false;
+		};
+	}, [isAgileVariant, t]);
 
 	useEffect(() => {
 		setWorkspaceHydrated(false);
@@ -322,6 +274,10 @@ export function SqlEditorPage() {
 
 	async function runQuery(targetTab = activeTab) {
 		if (!targetTab) return;
+		if (isAgileVariant && !agileEmpresa?.id) {
+			setToast({ message: t('agileSqlEditor.feedback.companyRequired', 'Selecione uma empresa antes de executar.'), tone: 'error' });
+			return;
+		}
 		if (!targetTab.sql.trim()) {
 			setToast({ message: t('sqlEditor.messages.sqlRequired', 'Informe a consulta SQL antes de executar.'), tone: 'error' });
 			return;
@@ -329,6 +285,7 @@ export function SqlEditorPage() {
 		setTabs((current) => current.map((tab) => (tab.id === targetTab.id ? { ...tab, isExecuting: true } : tab)));
 		try {
 			const result = await sqlEditorClient.execute({
+				idEmpresa: isAgileVariant ? agileEmpresa?.id : undefined,
 				fonteDados: targetTab.fonteDados,
 				sql: targetTab.sql,
 				page: targetTab.result?.pagination.page || 1,
@@ -343,9 +300,13 @@ export function SqlEditorPage() {
 
 	async function changePage(nextPage: number) {
 		if (!activeTab || !activePagination) return;
+		if (isAgileVariant && !agileEmpresa?.id) {
+			setToast({ message: t('agileSqlEditor.feedback.companyRequired', 'Selecione uma empresa antes de executar.'), tone: 'error' });
+			return;
+		}
 		try {
 			patchActiveTab({ isExecuting: true });
-			const result = await sqlEditorClient.execute({ fonteDados: activeTab.fonteDados, sql: activeTab.sql, page: nextPage, perPage: activePagination.perPage });
+			const result = await sqlEditorClient.execute({ idEmpresa: isAgileVariant ? agileEmpresa?.id : undefined, fonteDados: activeTab.fonteDados, sql: activeTab.sql, page: nextPage, perPage: activePagination.perPage });
 			patchActiveTab({ result, isExecuting: false });
 		} catch (error) {
 			patchActiveTab({ isExecuting: false });
@@ -652,6 +613,16 @@ export function SqlEditorPage() {
 				:global(.sql-result-grid-scrollbar) {
 					scrollbar-color: #c8cdd6 #ece7dc;
 				}
+
+				:global(.sql-editor-company-lookup button) {
+					min-height: 48px;
+					border-radius: 999px;
+					padding-left: 2.35rem;
+					padding-top: 0.62rem;
+					padding-bottom: 0.62rem;
+					font-size: 0.875rem;
+					font-weight: 600;
+				}
 			`}</style>
 			<PageHeader
 				title={t('sqlEditor.title', 'Editor SQL')}
@@ -663,6 +634,18 @@ export function SqlEditorPage() {
 				actions={
 					activeTab ? (
 						<div className="flex flex-wrap items-center gap-2">
+							{isAgileVariant ? (
+								<div className="sql-editor-company-lookup relative w-[min(300px,34vw)] min-w-[220px] max-w-[300px]">
+									<Warehouse className="pointer-events-none absolute left-3.5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-[color:var(--app-muted)]" />
+									<LookupSelect
+										label={t('agileSqlEditor.fields.company', 'Empresa')}
+										value={agileEmpresa}
+										onChange={setAgileEmpresa}
+										loadOptions={(query, page, perPage) => agileSqlEditorClient.listEmpresas(query, page, perPage)}
+										pageSize={15}
+									/>
+								</div>
+							) : null}
 							<div className="app-control inline-flex items-center gap-2 rounded-full px-3 py-2">
 								<Database className="h-4 w-4 text-[color:var(--app-muted)]" />
 								<select
@@ -678,12 +661,16 @@ export function SqlEditorPage() {
 									))}
 								</select>
 							</div>
-							<ToolbarIconButton label={t('sqlEditor.actions.openQuery', 'Carregar consulta')} onClick={() => setSavedQueriesOpen(true)}>
-								<FolderOpen className="h-4 w-4" />
-							</ToolbarIconButton>
-							<ToolbarIconButton label={t('sqlEditor.actions.saveQuery', 'Salvar consulta')} onClick={openSaveModal}>
-								<Save className="h-4 w-4" />
-							</ToolbarIconButton>
+							{!isAgileVariant ? (
+								<>
+									<ToolbarIconButton label={t('sqlEditor.actions.openQuery', 'Carregar consulta')} onClick={() => setSavedQueriesOpen(true)}>
+										<FolderOpen className="h-4 w-4" />
+									</ToolbarIconButton>
+									<ToolbarIconButton label={t('sqlEditor.actions.saveQuery', 'Salvar consulta')} onClick={openSaveModal}>
+										<Save className="h-4 w-4" />
+									</ToolbarIconButton>
+								</>
+							) : null}
 							<ToolbarIconButton
 								label={t('sqlEditor.actions.copySql', 'Copiar SQL')}
 								onClick={() =>
@@ -708,6 +695,10 @@ export function SqlEditorPage() {
 					) : null
 				}
 			/>
+
+			{isAgileVariant && agileEmpresasError ? (
+				<PageToast tone="error" message={agileEmpresasError} onClose={() => setAgileEmpresasError('')} />
+			) : null}
 
 			{activeTab ? (
 				<SectionCard className="overflow-hidden px-0 py-0">

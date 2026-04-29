@@ -3,6 +3,7 @@
 import { EditableSecretInput } from '@/src/components/form-page/editable-secret-input';
 import { FieldUpdateMeta, formatFieldUpdateMeta } from '@/src/components/form-page/field-update-meta';
 import { FormField } from '@/src/components/ui/form-field';
+import { InlineDataTable, type InlineDataTableColumn } from '@/src/components/ui/inline-data-table';
 import { inputClasses } from '@/src/components/ui/input-styles';
 import { SectionCard } from '@/src/components/ui/section-card';
 import type { IntegracaoAtendimentoBranchRow, IntegracaoAtendimentoRecord, IntegracaoAtendimentoValues } from '@/src/features/atendimento/services/integracao-atendimento-mappers';
@@ -39,60 +40,76 @@ export function IntegracaoAtendimentoWhatsappTab({
 	onUpdateBranch,
 	onSetTokenEditable,
 }: Props) {
+	const branchColumns: Array<InlineDataTableColumn<IntegracaoAtendimentoBranchRow>> = [
+		{
+			id: 'branch',
+			header: t('integrationsAttendance.fields.branch', 'Filial'),
+			cell: (branch) => (
+				<span className="text-sm font-semibold text-slate-800">
+					{branch.nome} - {branch.id}
+				</span>
+			),
+			cellClassName: 'min-w-[220px]',
+		},
+		{
+			id: 'number',
+			header: t('integrationsAttendance.fields.whatsappNumber', 'Número'),
+			cell: (branch, index) => (
+				<input
+					type="text"
+					value={branch.whatsappNumero}
+					onChange={(event) => onUpdateBranch(index, { whatsappNumero: phoneMask(event.target.value, event.target.value.replace(/\D/g, '').length > 10) })}
+					className={inputClasses()}
+					placeholder="(99) 99999-9999"
+					disabled={saving || !canSave}
+				/>
+			),
+			cellClassName: 'min-w-[240px]',
+		},
+		{
+			id: 'numberId',
+			header: t('integrationsAttendance.fields.whatsappNumberId', 'ID Número'),
+			cell: (branch, index) => (
+				<input
+					type="text"
+					value={branch.whatsappIdNumero}
+					onChange={(event) => onUpdateBranch(index, { whatsappIdNumero: event.target.value })}
+					className={inputClasses()}
+					disabled={saving || !canSave}
+				/>
+			),
+			cellClassName: 'min-w-[220px]',
+		},
+		{
+			id: 'lastUpdate',
+			header: t('integrationsAttendance.fields.lastUpdate', 'Última alteração'),
+			cell: (branch) => (
+				<span className="text-xs text-slate-500">
+					{formatFieldUpdateMeta({
+						metadata: branch.whatsappNumeroMeta,
+						t,
+						locale,
+						labelKey: 'integrationsAttendance.fields.lastUpdateValue',
+						fallback: 'Última alteração: {{date}} por {{user}}',
+					}) ?? '-'}
+				</span>
+			),
+			cellClassName: 'min-w-[220px]',
+		},
+	];
+
 	return (
 		<SectionCard
 			title={t('integrationsAttendance.sections.whatsapp.title', 'WhatsApp')}
 			description={t('integrationsAttendance.sections.whatsapp.description', 'Configure números por filial e o gateway usado para mensagens transacionais.')}
 		>
-			<div className="app-table-shell overflow-x-auto rounded-[1.2rem]">
-				<table className="min-w-180 w-full border-collapse">
-					<thead>
-						<tr className="app-table-muted text-left text-xs uppercase tracking-[0.08em] text-slate-500">
-							<th className="px-4 py-3">{t('integrationsAttendance.fields.branch', 'Filial')}</th>
-							<th className="px-4 py-3">{t('integrationsAttendance.fields.whatsappNumber', 'Número')}</th>
-							<th className="px-4 py-3">{t('integrationsAttendance.fields.whatsappNumberId', 'ID Número')}</th>
-							<th className="px-4 py-3">{t('integrationsAttendance.fields.lastUpdate', 'Última alteração')}</th>
-						</tr>
-					</thead>
-					<tbody>
-						{branches.map((branch, index) => (
-							<tr key={branch.id || `branch-${index}`} className="app-table-row-hover border-t border-line align-top">
-								<td className="px-4 py-3 text-sm font-semibold text-slate-800">
-									{branch.nome} - {branch.id}
-								</td>
-								<td className="px-4 py-3">
-									<input
-										type="text"
-										value={branch.whatsappNumero}
-										onChange={(event) => onUpdateBranch(index, { whatsappNumero: phoneMask(event.target.value, event.target.value.replace(/\D/g, '').length > 10) })}
-										className={inputClasses()}
-										placeholder="(99) 99999-9999"
-										disabled={saving || !canSave}
-									/>
-								</td>
-								<td className="px-4 py-3">
-									<input
-										type="text"
-										value={branch.whatsappIdNumero}
-										onChange={(event) => onUpdateBranch(index, { whatsappIdNumero: event.target.value })}
-										className={inputClasses()}
-										disabled={saving || !canSave}
-									/>
-								</td>
-								<td className="px-4 py-3 text-xs text-slate-500">
-									{formatFieldUpdateMeta({
-										metadata: branch.whatsappNumeroMeta,
-										t,
-										locale,
-										labelKey: 'integrationsAttendance.fields.lastUpdateValue',
-										fallback: 'Última alteração: {{date}} por {{user}}',
-									}) ?? '-'}
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			</div>
+			<InlineDataTable
+				rows={branches}
+				getRowId={(branch, index) => branch.id || `branch-${index}`}
+				columns={branchColumns}
+				emptyMessage={t('common.noResults', 'Nenhuma filial cadastrada.')}
+				minWidthClassName="min-w-[900px]"
+			/>
 
 			<p className="mt-3 text-xs leading-5 text-slate-500">
 				{t(

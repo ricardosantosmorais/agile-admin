@@ -2,6 +2,8 @@
 
 import { History, Loader2 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { AppDataTable } from '@/src/components/data-table/app-data-table'
+import type { AppDataTableColumn } from '@/src/components/data-table/types'
 import { AsyncState } from '@/src/components/ui/async-state'
 import { OverlayModal } from '@/src/components/ui/overlay-modal'
 import { ResizableHorizontalPanels } from '@/src/components/ui/resizable-horizontal-panels'
@@ -161,6 +163,31 @@ export function EmailTemplateEditorTab({
   const templateId = String(form.id || '').trim()
   const isPhpModel = model === 'php'
   const variablePaths = useMemo(() => collectVariablePaths(payload), [payload])
+  const historyColumns = useMemo<AppDataTableColumn<HistoryRow>[]>(() => [
+    {
+      id: 'id',
+      label: 'ID',
+      cell: (row) => (
+        <span className="app-control-muted inline-flex rounded-full px-2.5 py-1 text-xs font-semibold text-[color:var(--app-muted)]">
+          #{row.id}
+        </span>
+      ),
+      thClassName: 'w-[120px]',
+    },
+    {
+      id: 'usuario',
+      label: t('maintenance.emailTemplates.editor.historyUser', 'User'),
+      cell: (row) => row.usuario?.nome || '-',
+      tdClassName: 'text-[color:var(--app-text)]',
+    },
+    {
+      id: 'data',
+      label: t('maintenance.emailTemplates.editor.historyDate', 'Date'),
+      cell: (row) => row.data ? formatDateTime(row.data) : '-',
+      thClassName: 'w-[220px]',
+      tdClassName: 'text-[color:var(--app-text)]',
+    },
+  ], [t])
 
   useEffect(() => {
     if (form.modelo == null || String(form.modelo).trim() === '') {
@@ -411,50 +438,32 @@ export function EmailTemplateEditorTab({
                 </StatusBadge>
               </div>
             </div>
-            <div className="max-h-[65vh] overflow-auto">
-              <table className="min-w-full border-collapse text-left text-sm">
-                <thead className="sticky top-0 z-[1] bg-[color:var(--app-control-muted-bg)] text-[color:var(--app-text)]">
-                  <tr>
-                    <th className="px-4 py-3 text-[13px] font-semibold">ID</th>
-                    <th className="px-4 py-3 text-[13px] font-semibold">{t('maintenance.emailTemplates.editor.historyUser', 'User')}</th>
-                    <th className="px-4 py-3 text-[13px] font-semibold">{t('maintenance.emailTemplates.editor.historyDate', 'Date')}</th>
-                    <th className="px-4 py-3 text-right text-[13px] font-semibold">{t('common.actions', 'Actions')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historyRows.length ? historyRows.map((row) => (
-                    <tr key={row.id} className="border-t border-[color:var(--app-card-border)] align-top">
-                      <td className="px-4 py-3 text-[color:var(--app-text)]">
-                        <span className="app-control-muted inline-flex rounded-full px-2.5 py-1 text-xs font-semibold text-[color:var(--app-muted)]">
-                          #{row.id}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-[color:var(--app-text)]">{row.usuario?.nome || '-'}</td>
-                      <td className="px-4 py-3 text-[color:var(--app-text)]">{row.data ? formatDateTime(row.data) : '-'}</td>
-                      <td className="px-4 py-3 text-right">
-                        <button
-                          type="button"
-                          className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-xs font-semibold transition"
-                          onClick={() => {
-                            const nextHtml = String(row.html || '')
-                            patch('modelo', inferTemplateModel(nextHtml))
-                            patch('html', nextHtml)
-                            setHistoryOpen(false)
-                          }}
-                        >
-                          {t('maintenance.emailTemplates.editor.loadVersion', 'Load version')}
-                        </button>
-                      </td>
-                    </tr>
-                  )) : (
-                    <tr>
-                      <td colSpan={4} className="px-4 py-10 text-center text-sm text-[color:var(--app-muted)]">
-                        {t('maintenance.emailTemplates.editor.emptyHistory', 'No history available for this template.')}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="p-4">
+              <AppDataTable
+                rows={historyRows}
+                getRowId={(row) => row.id}
+                columns={historyColumns}
+                emptyMessage={t('maintenance.emailTemplates.editor.emptyHistory', 'No history available for this template.')}
+                mobileCard={{
+                  title: (row) => `#${row.id}`,
+                  subtitle: (row) => row.usuario?.nome || '-',
+                  meta: (row) => row.data ? formatDateTime(row.data) : '-',
+                }}
+                actionsLabel={t('common.actions', 'Actions')}
+                rowActions={(row) => [
+                  {
+                    id: 'load-version',
+                    label: t('maintenance.emailTemplates.editor.loadVersion', 'Load version'),
+                    icon: History,
+                    onClick: () => {
+                      const nextHtml = String(row.html || '')
+                      patch('modelo', inferTemplateModel(nextHtml))
+                      patch('html', nextHtml)
+                      setHistoryOpen(false)
+                    },
+                  },
+                ]}
+              />
             </div>
           </SectionCard>
         </AsyncState>

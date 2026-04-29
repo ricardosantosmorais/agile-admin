@@ -60,6 +60,13 @@ type AppDataTableProps<TItem, TColumn extends string = string, TFilters = never>
   pageSize?: AppDataTablePageSize
 }
 
+const ACTIONS_COLUMN_STICKY_CLASS = 'sticky right-0 z-20 bg-[color:var(--app-panel-solid)] shadow-[-14px_0_22px_rgba(15,23,42,0.06)]'
+const DEFAULT_ACTIONS_COLUMN_SIZE_CLASS = 'w-[132px] min-w-[132px] whitespace-nowrap'
+const DEFAULT_ACTIONS_COLUMN_PIXEL_WIDTH = 132
+const ACTION_BUTTON_PIXEL_WIDTH = 36
+const ACTION_BUTTON_GAP_PIXEL_WIDTH = 8
+const ACTIONS_COLUMN_PADDING_PIXEL_WIDTH = 32
+
 function getVisibilityClasses(visibility: AppDataTableBreakpoint | undefined) {
   switch (visibility) {
     case 'lg':
@@ -109,8 +116,9 @@ function DataTableActions<TItem>({
             ) : (
               <button
                 type="button"
+                disabled={action.disabled}
                 onClick={() => action.onClick?.(item)}
-                className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${actionButtonClasses(action.tone)}`}
+                className={`inline-flex h-9 w-9 items-center justify-center rounded-full disabled:cursor-not-allowed disabled:opacity-60 ${actionButtonClasses(action.tone)}`}
               >
                 <Icon className="h-4 w-4" />
               </button>
@@ -122,6 +130,28 @@ function DataTableActions<TItem>({
   )
 }
 
+function getActionsColumnPixelWidth<TItem>(
+  rows: TItem[],
+  rowActions: ((item: TItem) => AppDataTableRowAction<TItem>[]) | undefined,
+) {
+  if (!rowActions || !rows.length) {
+    return DEFAULT_ACTIONS_COLUMN_PIXEL_WIDTH
+  }
+
+  const maxVisibleActions = rows.reduce((max, item) => {
+    const visibleActions = rowActions(item).filter((action) => action.visible !== false).length
+    return Math.max(max, visibleActions)
+  }, 0)
+
+  if (!maxVisibleActions) {
+    return DEFAULT_ACTIONS_COLUMN_PIXEL_WIDTH
+  }
+
+  const buttonsWidth = maxVisibleActions * ACTION_BUTTON_PIXEL_WIDTH
+  const gapsWidth = Math.max(0, maxVisibleActions - 1) * ACTION_BUTTON_GAP_PIXEL_WIDTH
+  return Math.max(DEFAULT_ACTIONS_COLUMN_PIXEL_WIDTH, buttonsWidth + gapsWidth + ACTIONS_COLUMN_PADDING_PIXEL_WIDTH)
+}
+
 export function AppDataTable<TItem, TColumn extends string = string, TFilters = never>({
   rows,
   getRowId,
@@ -131,7 +161,7 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
   sort,
   rowActions,
   actionsLabel,
-  actionsColumnClassName = 'w-[88px] whitespace-nowrap',
+  actionsColumnClassName = DEFAULT_ACTIONS_COLUMN_SIZE_CLASS,
   expandedRowIds = [],
   onToggleExpandedRow,
   renderExpandedRow,
@@ -147,6 +177,12 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
 }: AppDataTableProps<TItem, TColumn, TFilters>) {
   const { t } = useI18n()
   const resolvedActionsLabel = actionsLabel ?? t('common.actions', 'Actions')
+  const resolvedActionsColumnClassName = `${actionsColumnClassName} ${ACTIONS_COLUMN_STICKY_CLASS}`
+  const actionsColumnPixelWidth = getActionsColumnPixelWidth(rows, rowActions)
+  const actionsColumnStyle = rowActions
+    ? { width: actionsColumnPixelWidth, minWidth: actionsColumnPixelWidth, maxWidth: actionsColumnPixelWidth }
+    : undefined
+  const dataColumnStyle = { minWidth: 0 }
   const selectableRows = selectable && isRowSelectable
     ? rows.filter((item) => isRowSelectable(item))
     : rows
@@ -226,7 +262,11 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                   const visibilityClasses = getVisibilityClasses(column.visibility)
 
                   return (
-                  <th key={column.id} className={`overflow-hidden whitespace-nowrap border-b border-line/50 px-3 py-3 ${visibilityClasses.th} ${column.thClassName ?? ''}`.trim()}>
+                  <th
+                    key={column.id}
+                    className={`overflow-hidden whitespace-normal break-words border-b border-line/50 px-3 py-3 ${visibilityClasses.th} ${column.thClassName ?? ''}`.trim()}
+                    style={dataColumnStyle}
+                  >
                       {column.header ?? (column.sortKey && sort && column.label ? (
                         <SortableHeader
                           label={column.label}
@@ -242,7 +282,10 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                   )
                 })}
                 {rowActions ? (
-                  <th className={`overflow-hidden whitespace-nowrap border-b border-line/50 px-3 py-3 text-center ${actionsColumnClassName}`.trim()}>
+                  <th
+                    className={`overflow-hidden whitespace-nowrap border-b border-line/50 px-3 py-3 text-center ${resolvedActionsColumnClassName}`.trim()}
+                    style={actionsColumnStyle}
+                  >
                     {resolvedActionsLabel}
                   </th>
                 ) : null}
@@ -286,15 +329,22 @@ export function AppDataTable<TItem, TColumn extends string = string, TFilters = 
                           const visibilityClasses = getVisibilityClasses(column.visibility)
 
                           return (
-                            <td key={`${rowId}-${column.id}`} className={`overflow-hidden border-b border-line/40 px-3 py-4 align-middle ${visibilityClasses.td} ${column.tdClassName ?? ''}`.trim()}>
-                              <div className="min-w-0 overflow-hidden">
+                            <td
+                              key={`${rowId}-${column.id}`}
+                              className={`overflow-hidden whitespace-normal break-words border-b border-line/40 px-3 py-4 align-middle ${visibilityClasses.td} ${column.tdClassName ?? ''}`.trim()}
+                              style={dataColumnStyle}
+                            >
+                              <div className="min-w-0 overflow-hidden whitespace-normal break-words">
                                 {column.cell(item)}
                               </div>
                             </td>
                           )
                         })}
                         {rowActions ? (
-                          <td className={`border-b border-line/40 px-3 py-4 text-center ${actionsColumnClassName}`.trim()}>
+                          <td
+                            className={`border-b border-line/40 px-3 py-4 text-center ${resolvedActionsColumnClassName}`.trim()}
+                            style={actionsColumnStyle}
+                          >
                             <DataTableActions item={item} actions={rowActions(item)} />
                           </td>
                         ) : null}

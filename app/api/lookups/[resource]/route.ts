@@ -18,6 +18,10 @@ const lookupConfig: Record<string, { path: string; labelKeys: string[]; searchFi
   templates: { path: 'templates', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   parametros_grupo: { path: 'parametros_grupo', labelKeys: ['nome'], searchField: 'nome::like', order: 'ordem,nome' },
   querys: { path: 'querys', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
+  scripts: { path: 'scripts', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
+  gateways: { path: 'gateways', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
+  gateways_endpoints: { path: 'gateways_endpoints', labelKeys: ['endpoint', 'nome'], searchField: 'endpoint::like', order: 'endpoint' },
+  acoes: { path: 'acoes', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   grupos_filiais: { path: 'grupos_filiais', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   vendedores: { path: 'vendedores', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   supervisores: { path: 'supervisores', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
@@ -42,6 +46,9 @@ const lookupConfig: Record<string, { path: string; labelKeys: string[]; searchFi
   formas_pagamento: { path: 'formas_pagamento', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   condicoes_pagamento: { path: 'condicoes_pagamento', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
   formas_entrega: { path: 'formas_entrega', labelKeys: ['nome'], searchField: 'formas_entrega.nome::like', order: 'formas_entrega.nome' },
+  fases: { path: 'implantacao/fases', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
+  categorias_tarefas: { path: 'implantacao/categorias_tarefas', labelKeys: ['nome'], searchField: 'nome::like', order: 'nome' },
+  agilesync_empresas: { path: 'agilesync_empresas', labelKeys: ['nome', 'nome_fantasia'], searchField: 'nome::like', order: 'nome' },
 }
 
 export async function GET(
@@ -87,7 +94,37 @@ export async function GET(
     return NextResponse.json(filtered)
   }
 
-  if (resource === 'erps' || resource === 'templates' || resource === 'parametros_grupo' || resource === 'querys') {
+  if (resource === 'agilesync_empresas') {
+    const result = await externalAdminApiFetch('painelb2b', 'agilesync_empresas', {
+      method: 'GET',
+      query: {
+        page: '1',
+        perpage: id ? '5000' : perPage,
+      },
+    })
+
+    if (!result.ok) {
+      return NextResponse.json({ message: 'Nao foi possivel carregar as empresas.' }, { status: result.status || 400 })
+    }
+
+    const payloadRecord = typeof result.payload === 'object' && result.payload !== null ? result.payload as { data?: unknown } : {}
+    const rows = Array.isArray(payloadRecord.data) ? payloadRecord.data : []
+    const options = rows.map((row) => {
+      const record = typeof row === 'object' && row !== null ? row as Record<string, unknown> : {}
+      const value = String(record.codigo ?? record.id ?? '').trim()
+      const label = String(record.nome ?? record.nome_fantasia ?? record.razao_social ?? value).trim()
+      return { value, label }
+    }).filter((option) => option.value)
+    const filtered = id
+      ? options.filter((option) => option.value === id)
+      : q
+        ? options.filter((option) => option.label.toLowerCase().includes(q.toLowerCase()) || option.value.toLowerCase().includes(q.toLowerCase()))
+        : options
+
+    return NextResponse.json(filtered)
+  }
+
+  if (resource === 'erps' || resource === 'templates' || resource === 'parametros_grupo' || resource === 'querys' || resource === 'scripts' || resource === 'gateways' || resource === 'gateways_endpoints' || resource === 'acoes') {
     const result = await agileV2Fetch(config.path, {
       method: 'GET',
       query: {

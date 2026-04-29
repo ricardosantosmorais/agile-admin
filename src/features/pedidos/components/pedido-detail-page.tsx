@@ -20,7 +20,9 @@ import {
   UserRound,
 } from 'lucide-react'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { AppDataTable } from '@/src/components/data-table/app-data-table'
 import { DataTableSectionAction } from '@/src/components/data-table/data-table-toolbar'
+import { InlineDataTable, type InlineDataTableColumn } from '@/src/components/ui/inline-data-table'
 import { AsyncState } from '@/src/components/ui/async-state'
 import { OverlayModal } from '@/src/components/ui/overlay-modal'
 import { PageHeader } from '@/src/components/ui/page-header'
@@ -328,6 +330,82 @@ export function PedidoDetailPage() {
     }
   }
 
+  const valueRows = [
+    { id: 'products', label: t('orders.fields.productsValue', 'Produtos'), requested: formatCurrencyValue(detail?.valor_produtos), served: formatCurrencyValue(detail?.valor_produtos_atendido_ajustado) },
+    { id: 'autoCoupon', label: t('orders.fields.automaticCoupon', 'Cupom desconto automático'), requested: `- ${formatCurrencyValue(detail?.valor_cupom_automatico)}`, served: `- ${formatCurrencyValue(detail?.valor_cupom_automatico)}` },
+    {
+      id: 'coupon',
+      label: `${t('orders.fields.discountCoupon', 'Cupom desconto')}${detail?.cupom_desconto && toRecord(detail.cupom_desconto)?.codigo ? ` (${String(toRecord(detail.cupom_desconto)?.codigo)})` : ''}`,
+      requested: `- ${formatCurrencyValue(detail?.valor_cupom_desconto)}`,
+      served: `- ${formatCurrencyValue(detail?.valor_cupom_desconto)}`,
+    },
+    { id: 'weight', label: t('orders.fields.variableWeight', 'Peso variável'), requested: `+ ${formatCurrencyValue(detail?.valor_variacao)}`, served: `+ ${formatCurrencyValue(detail?.valor_variacao)}` },
+    { id: 'freight', label: t('orders.fields.freight', 'Frete'), requested: `+ ${formatCurrencyValue(detail?.valor_frete)}`, served: `+ ${formatCurrencyValue(detail?.valor_frete)}` },
+    { id: 'total', label: t('orders.fields.total', 'Total'), requested: formatCurrencyValue(detail?.valor_total), served: formatCurrencyValue(detail?.valor_total_atendido_ajustado), total: true },
+  ]
+
+  const valueColumns: InlineDataTableColumn<(typeof valueRows)[number]>[] = [
+    { id: 'label', header: '', cell: (row) => row.label, cellClassName: 'font-semibold text-slate-700' },
+    { id: 'requested', header: t('orders.fields.requested', 'Solicitado'), cell: (row) => row.requested, headerClassName: 'text-right', cellClassName: 'text-right' },
+    { id: 'served', header: t('orders.fields.servedValue', 'Atendido'), cell: (row) => row.served, headerClassName: 'text-right', cellClassName: 'text-right' },
+  ]
+
+  const productRows = [...produtos, { __total: true, id: `${detail?.id || 'pedido'}-produtos-total` }] as RecordLike[]
+  const productColumns: InlineDataTableColumn<RecordLike>[] = [
+    {
+      id: 'thumb',
+      header: '',
+      cell: (item) => item.__total ? null : <ProductThumb product={toRecord(item.produto)} assetsBucketUrl={currentTenant.assetsBucketUrl} />,
+      cellClassName: 'w-[86px]',
+    },
+    { id: 'id', header: t('orders.fields.productId', 'ID'), cell: (item) => item.__total ? null : toStringValue(toRecord(item.produto)?.id), headerClassName: 'text-center', cellClassName: 'text-center' },
+    { id: 'codigo', header: t('orders.fields.productCode', 'Código'), cell: (item) => item.__total ? null : toStringValue(toRecord(item.produto)?.codigo), headerClassName: 'text-center', cellClassName: 'text-center' },
+    {
+      id: 'produto',
+      header: t('orders.fields.product', 'Produto'),
+      cell: (item) => {
+        if (item.__total) return <span className="font-semibold text-slate-900">{t('orders.fields.total', 'Total')}</span>
+        const produto = toRecord(item.produto)
+        const embalagem = toRecord(item.embalagem)
+        const quantidadeEmbalagem = toNumber(embalagem?.quantidade) || 1
+        const quantidadeSolicitada = toNumber(item.quantidade) / quantidadeEmbalagem
+        const quantidadeAtendida = toNumber(item.quantidade_atendida) / quantidadeEmbalagem
+        const hasTotalCut = detail?.status !== 'cancelado' && quantidadeAtendida < quantidadeSolicitada && quantidadeAtendida <= 0
+        const hasPartialCut = detail?.status !== 'cancelado' && quantidadeAtendida < quantidadeSolicitada && quantidadeAtendida > 0
+        return (
+          <div className="space-y-1">
+            <p className="font-semibold text-slate-900">{toStringValue(produto?.nome)}</p>
+            <p className="text-xs text-slate-500">{embalagem ? `${t('orders.fields.packaging', 'Embalagem')}: ${toStringValue(embalagem.nome)}` : t('orders.fields.packagingMissing', 'Embalagem não encontrada')}</p>
+            {item.mensagem_erp ? <p className="text-xs text-slate-500">{t('orders.fields.erpMessage', 'Mensagem ERP')}: {String(item.mensagem_erp)}</p> : null}
+            {item.id_cupom_automatico ? <p className="text-xs text-slate-500">{t('orders.fields.automaticCouponApplied', 'Cupom automático aplicado')}</p> : null}
+            {item.id_cupom_desconto ? <p className="text-xs text-slate-500">{t('orders.fields.discountCouponApplied', 'Cupom desconto aplicado')}</p> : null}
+            {item.prazo_adicional ? <p className="text-xs font-semibold text-slate-600">{t('orders.fields.additionalLeadTime', 'Prazo de entrega adicional de {{count}} dia(s)', { count: String(item.prazo_adicional) })}</p> : null}
+            {hasTotalCut ? <StatusBadge tone="danger">{t('orders.fields.totalCut', 'Produto com corte total')}</StatusBadge> : null}
+            {hasPartialCut ? <StatusBadge tone="warning">{t('orders.fields.partialCut', 'Produto com corte parcial')}</StatusBadge> : null}
+          </div>
+        )
+      },
+      cellClassName: 'min-w-[260px]',
+    },
+    { id: 'tabela', header: t('orders.fields.priceTable', 'Tabela'), cell: (item) => item.__total ? null : toStringValue(item.id_tabela_preco), headerClassName: 'text-center', cellClassName: 'text-center' },
+    {
+      id: 'qtdSolicitada',
+      header: t('orders.fields.quantityRequested', 'Qtd. solicitada'),
+      cell: (item) => item.__total ? produtoQuantidadeSolicitada : toNumber(item.quantidade) / (toNumber(toRecord(item.embalagem)?.quantidade) || 1),
+      headerClassName: 'text-right',
+      cellClassName: 'text-right font-semibold',
+    },
+    {
+      id: 'qtdAtendida',
+      header: t('orders.fields.quantityServed', 'Qtd. atendida'),
+      cell: (item) => item.__total ? produtoQuantidadeAtendida : toNumber(item.quantidade_atendida) / (toNumber(toRecord(item.embalagem)?.quantidade) || 1),
+      headerClassName: 'text-right',
+      cellClassName: 'text-right font-semibold',
+    },
+    { id: 'unit', header: t('orders.fields.unitValue', 'Valor unit.'), cell: (item) => item.__total ? null : formatCurrency(toNumber(item.valor_embalagem)), headerClassName: 'text-right', cellClassName: 'text-right' },
+    { id: 'subtotal', header: t('orders.fields.subtotal', 'Subtotal'), cell: (item) => item.__total ? formatCurrencyValue(detail?.valor_produtos_atendido_ajustado) : formatCurrency(toNumber(item.valor_total_atendido)), headerClassName: 'text-right', cellClassName: 'text-right font-semibold' },
+  ]
+
   return (
     <div className="space-y-5">
       <PageHeader
@@ -460,25 +538,13 @@ export function PedidoDetailPage() {
                 title={t('orders.sections.values', 'Valores')}
                 description={t('orders.sectionDescriptions.values', 'Comparativo entre o valor solicitado no checkout e o valor efetivamente atendido.')}
               >
-                <div className="overflow-x-auto">
-                  <table className="app-divider-soft min-w-full border-t text-sm">
-                    <thead>
-                      <tr className="app-divider-soft border-b text-left text-slate-500">
-                        <th className="py-3 pr-4" />
-                        <th className="py-3 pr-4 text-right">{t('orders.fields.requested', 'Solicitado')}</th>
-                        <th className="py-3 text-right">{t('orders.fields.servedValue', 'Atendido')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="app-divider-soft border-b last:border-b-0"><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.productsValue', 'Produtos')}</td><td className="py-3 pr-4 text-right">{formatCurrencyValue(detail.valor_produtos)}</td><td className="py-3 text-right">{formatCurrencyValue(detail.valor_produtos_atendido_ajustado)}</td></tr>
-                      <tr className="app-divider-soft border-b last:border-b-0"><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.automaticCoupon', 'Cupom desconto automático')}</td><td className="py-3 pr-4 text-right">- {formatCurrencyValue(detail.valor_cupom_automatico)}</td><td className="py-3 text-right">- {formatCurrencyValue(detail.valor_cupom_automatico)}</td></tr>
-                      <tr className="app-divider-soft border-b last:border-b-0"><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.discountCoupon', 'Cupom desconto')}{detail.cupom_desconto && toRecord(detail.cupom_desconto)?.codigo ? ` (${String(toRecord(detail.cupom_desconto)?.codigo)})` : ''}</td><td className="py-3 pr-4 text-right">- {formatCurrencyValue(detail.valor_cupom_desconto)}</td><td className="py-3 text-right">- {formatCurrencyValue(detail.valor_cupom_desconto)}</td></tr>
-                      <tr className="app-divider-soft border-b last:border-b-0"><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.variableWeight', 'Peso variável')}</td><td className="py-3 pr-4 text-right">+ {formatCurrencyValue(detail.valor_variacao)}</td><td className="py-3 text-right">+ {formatCurrencyValue(detail.valor_variacao)}</td></tr>
-                      <tr className="app-divider-soft border-b last:border-b-0"><td className="py-3 pr-4 font-semibold text-slate-700">{t('orders.fields.freight', 'Frete')}</td><td className="py-3 pr-4 text-right">+ {formatCurrencyValue(detail.valor_frete)}</td><td className="py-3 text-right">+ {formatCurrencyValue(detail.valor_frete)}</td></tr>
-                      <tr className="app-divider-soft border-b-0"><td className="py-3 pr-4 font-semibold text-slate-900">{t('orders.fields.total', 'Total')}</td><td className="py-3 pr-4 text-right font-semibold text-slate-900">{formatCurrencyValue(detail.valor_total)}</td><td className="py-3 text-right font-semibold text-slate-900">{formatCurrencyValue(detail.valor_total_atendido_ajustado)}</td></tr>
-                    </tbody>
-                  </table>
-                </div>
+                <InlineDataTable
+                  rows={valueRows}
+                  getRowId={(row) => row.id}
+                  columns={valueColumns}
+                  emptyMessage={t('orders.emptyValues', 'Nenhum valor dispon\u00edvel.')}
+                  rowClassName={(row) => row.total ? 'font-semibold text-slate-900' : ''}
+                />
               </DetailSectionCard>
             </div>
             ) : null}
@@ -640,65 +706,14 @@ export function PedidoDetailPage() {
               title={t('orders.sections.products', 'Produtos')}
               description={t('orders.sectionDescriptions.products', 'Itens do pedido com embalagem, corte, cupons, tabela e valores atendidos.')}
             >
-              <div className="overflow-x-auto">
-                <table className="app-divider-soft min-w-full border-t text-sm">
-                  <thead>
-                    <tr className="app-divider-soft border-b text-left text-slate-500">
-                      <th className="py-3 pr-4" />
-                      <th className="py-3 pr-4 text-center">{t('orders.fields.productId', 'ID')}</th>
-                      <th className="py-3 pr-4 text-center">{t('orders.fields.productCode', 'Código')}</th>
-                      <th className="py-3 pr-4">{t('orders.fields.product', 'Produto')}</th>
-                      <th className="py-3 pr-4 text-center">{t('orders.fields.priceTable', 'Tabela')}</th>
-                      <th className="py-3 pr-4 text-right">{t('orders.fields.quantityRequested', 'Qtd. solicitada')}</th>
-                      <th className="py-3 pr-4 text-right">{t('orders.fields.quantityServed', 'Qtd. atendida')}</th>
-                      <th className="py-3 pr-4 text-right">{t('orders.fields.unitValue', 'Valor unit.')}</th>
-                      <th className="py-3 text-right">{t('orders.fields.subtotal', 'Subtotal')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {produtos.map((item, index) => {
-                      const produto = toRecord(item.produto)
-                      const embalagem = toRecord(item.embalagem)
-                      const quantidadeEmbalagem = toNumber(embalagem?.quantidade) || 1
-                      const quantidadeSolicitada = toNumber(item.quantidade) / quantidadeEmbalagem
-                      const quantidadeAtendida = toNumber(item.quantidade_atendida) / quantidadeEmbalagem
-                      const hasTotalCut = detail.status !== 'cancelado' && quantidadeAtendida < quantidadeSolicitada && quantidadeAtendida <= 0
-                      const hasPartialCut = detail.status !== 'cancelado' && quantidadeAtendida < quantidadeSolicitada && quantidadeAtendida > 0
-                      return (
-                        <tr key={`${detail.id}-produto-${index}`} className="app-divider-soft border-b last:border-b-0">
-                          <td className="py-3 pr-4 align-middle"><ProductThumb product={produto} assetsBucketUrl={currentTenant.assetsBucketUrl} /></td>
-                          <td className="py-3 pr-4 text-center align-middle">{toStringValue(produto?.id)}</td>
-                          <td className="py-3 pr-4 text-center align-middle">{toStringValue(produto?.codigo)}</td>
-                          <td className="py-3 pr-4 align-middle">
-                            <div className="space-y-1">
-                              <p className="font-semibold text-slate-900">{toStringValue(produto?.nome)}</p>
-                              <p className="text-xs text-slate-500">{embalagem ? `${t('orders.fields.packaging', 'Embalagem')}: ${toStringValue(embalagem.nome)}` : t('orders.fields.packagingMissing', 'Embalagem não encontrada')}</p>
-                              {item.mensagem_erp ? <p className="text-xs text-slate-500">{t('orders.fields.erpMessage', 'Mensagem ERP')}: {String(item.mensagem_erp)}</p> : null}
-                              {item.id_cupom_automatico ? <p className="text-xs text-slate-500">{t('orders.fields.automaticCouponApplied', 'Cupom automático aplicado')}</p> : null}
-                              {item.id_cupom_desconto ? <p className="text-xs text-slate-500">{t('orders.fields.discountCouponApplied', 'Cupom desconto aplicado')}</p> : null}
-                              {item.prazo_adicional ? <p className="text-xs font-semibold text-slate-600">{t('orders.fields.additionalLeadTime', 'Prazo de entrega adicional de {{count}} dia(s)', { count: String(item.prazo_adicional) })}</p> : null}
-                              {hasTotalCut ? <StatusBadge tone="danger">{t('orders.fields.totalCut', 'Produto com corte total')}</StatusBadge> : null}
-                              {hasPartialCut ? <StatusBadge tone="warning">{t('orders.fields.partialCut', 'Produto com corte parcial')}</StatusBadge> : null}
-                            </div>
-                          </td>
-                          <td className="py-3 pr-4 text-center align-middle">{toStringValue(item.id_tabela_preco)}</td>
-                          <td className="py-3 pr-4 text-right align-middle">{quantidadeSolicitada}</td>
-                          <td className="py-3 pr-4 text-right align-middle">{quantidadeAtendida}</td>
-                          <td className="py-3 pr-4 text-right align-middle">{formatCurrency(toNumber(item.valor_embalagem))}</td>
-                          <td className="py-3 text-right align-middle">{formatCurrency(toNumber(item.valor_total_atendido))}</td>
-                        </tr>
-                      )
-                    })}
-                    <tr className="font-semibold text-slate-900">
-                      <td colSpan={5} className="py-3 pr-4" />
-                      <td className="py-3 pr-4 text-right">{produtoQuantidadeSolicitada}</td>
-                      <td className="py-3 pr-4 text-right">{produtoQuantidadeAtendida}</td>
-                      <td className="py-3 pr-4" />
-                      <td className="py-3 text-right">{formatCurrencyValue(detail.valor_produtos_atendido_ajustado)}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <InlineDataTable
+                rows={productRows}
+                getRowId={(item, index) => String(item.id || item.id_produto || index)}
+                columns={productColumns}
+                emptyMessage={t('orders.emptyProducts', 'Nenhum produto dispon\u00edvel.')}
+                minWidthClassName="min-w-[1180px]"
+                rowClassName={(item) => item.__total ? 'font-semibold text-slate-900' : ''}
+              />
             </DetailSectionCard>
             ) : null}
 
@@ -769,35 +784,35 @@ export function PedidoDetailPage() {
                 title={t('orders.sections.logs', 'Logs')}
                 description={t('orders.sectionDescriptions.logs', 'Histórico técnico e operacional com acesso rápido aos payloads registrados.')}
               >
-                <div className="overflow-x-auto">
-                  <table className="app-divider-soft min-w-full border-t text-sm">
-                    <thead>
-                      <tr className="app-divider-soft border-b text-left text-slate-500">
-                        <th className="py-3 pr-4">{t('common.code', 'Código')}</th>
-                        <th className="py-3 pr-4">{t('orders.fields.logType', 'Tipo')}</th>
-                        <th className="py-3 pr-4">{t('orders.fields.date', 'Data')}</th>
-                        <th className="py-3 pr-4">{t('orders.fields.description', 'Descrição')}</th>
-                        <th className="py-3 text-right">{t('common.actions', 'Ações')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {logs.length ? logs.map((log, index) => {
-                        const jsonContent = typeof log.json === 'string' ? log.json : log.json && typeof log.json === 'object' ? JSON.stringify(log.json, null, 2) : ''
-                        return (
-                          <tr key={`${detail.id}-log-${index}`} className="app-divider-soft border-b last:border-b-0">
-                            <td className="py-3 pr-4 align-top">{toStringValue(log.codigo)}</td>
-                            <td className="py-3 pr-4 align-top">{humanizeEnum(log.tipo)}</td>
-                            <td className="py-3 pr-4 align-top">{log.data ? formatDateTime(String(log.data)) : '-'}</td>
-                            <td className="py-3 pr-4 align-top">{toStringValue(log.descricao)}</td>
-                            <td className="py-3 text-right align-top">
-                              {jsonContent ? <button type="button" onClick={() => setJsonModal({ title: t('orders.fields.logJson', 'JSON do log de pedido'), content: jsonContent })} className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-slate-700"><Eye className="h-4 w-4" />{t('orders.actions.viewJson', 'Ver JSON')}</button> : null}
-                            </td>
-                          </tr>
-                        )
-                      }) : <tr><td className="py-4 text-sm text-slate-500" colSpan={5}>{t('orders.emptyLogs', 'Nenhum log disponível.')}</td></tr>}
-                    </tbody>
-                  </table>
-                </div>
+                <AppDataTable
+                  rows={logs}
+                  getRowId={(log) => String(log.id || log.codigo || logs.indexOf(log))}
+                  columns={[
+                    { id: 'codigo', label: t('common.code', 'C\u00f3digo'), cell: (log) => toStringValue(log.codigo) },
+                    { id: 'tipo', label: t('orders.fields.logType', 'Tipo'), cell: (log) => humanizeEnum(log.tipo) },
+                    { id: 'data', label: t('orders.fields.date', 'Data'), cell: (log) => log.data ? formatDateTime(String(log.data)) : '-' },
+                    { id: 'descricao', label: t('orders.fields.description', 'Descri\u00e7\u00e3o'), cell: (log) => toStringValue(log.descricao) },
+                  ]}
+                  emptyMessage={t('orders.emptyLogs', 'Nenhum log dispon\u00edvel.')}
+                  actionsLabel={t('common.actions', 'A\u00e7\u00f5es')}
+                  rowActions={(log) => {
+                    const jsonContent = typeof log.json === 'string' ? log.json : log.json && typeof log.json === 'object' ? JSON.stringify(log.json, null, 2) : ''
+                    return [
+                      {
+                        id: 'json',
+                        label: t('orders.actions.viewJson', 'Ver JSON'),
+                        icon: Eye,
+                        visible: Boolean(jsonContent),
+                        onClick: () => setJsonModal({ title: t('orders.fields.logJson', 'JSON do log de pedido'), content: jsonContent }),
+                      },
+                    ]
+                  }}
+                  mobileCard={{
+                    title: (log) => humanizeEnum(log.tipo),
+                    subtitle: (log) => toStringValue(log.descricao),
+                    meta: (log) => log.data ? formatDateTime(String(log.data)) : '-',
+                  }}
+                />
               </DetailSectionCard>
             </div>
             ) : null}

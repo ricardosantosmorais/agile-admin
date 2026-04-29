@@ -206,10 +206,33 @@ export function CrudFormSections({ config, form, isEditing, readOnly, patch, opt
 												return null;
 											})()}
 											onChange={(nextValue) => {
+												const stateKey = field.lookupStateKey ?? `${field.key}_lookup`;
+												const mapped = field.mapLookupSelection?.({
+													option: nextValue,
+													form,
+													isEditing: editingState,
+												});
+												if (mapped) {
+													patch(field.key, mapped.value);
+													patch(stateKey, mapped.lookup !== undefined ? mapped.lookup : nextValue ? { id: nextValue.id, label: nextValue.label } : null);
+													return;
+												}
+
 												patch(field.key, nextValue?.id ?? '');
-												patch(field.lookupStateKey ?? `${field.key}_lookup`, nextValue ? { id: nextValue.id, label: nextValue.label } : null);
+												patch(stateKey, nextValue ? { id: nextValue.id, label: nextValue.label } : null);
 											}}
 											loadOptions={async (query, page, perPage) => {
+												if (field.lookupLoadOptions) {
+													return field.lookupLoadOptions({
+														query,
+														page,
+														perPage,
+														form,
+														isEditing: editingState,
+														t,
+													});
+												}
+
 												if (field.optionsResource) {
 													const remoteOptions = await loadCrudLookupOptions(field.optionsResource, query, page, perPage);
 													return remoteOptions.map((option) => ({

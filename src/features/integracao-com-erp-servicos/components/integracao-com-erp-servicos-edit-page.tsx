@@ -7,6 +7,7 @@ import { DataTableFiltersCard } from '@/src/components/data-table/data-table-fil
 import { DataTableFilterToggleAction, DataTablePageActions } from '@/src/components/data-table/data-table-toolbar';
 import type { AppDataTableColumn } from '@/src/components/data-table/types';
 import { AsyncState } from '@/src/components/ui/async-state';
+import { DynamicResultGrid } from '@/src/components/ui/dynamic-result-grid';
 import { OverlayModal } from '@/src/components/ui/overlay-modal';
 import { SectionCard } from '@/src/components/ui/section-card';
 import { StatusBadge } from '@/src/components/ui/status-badge';
@@ -151,36 +152,6 @@ function ExecutionMetricsCell({ row }: { row: IntegracaoComErpServicoExecutionRe
 					<div className="text-(--app-text) mt-1 text-sm font-semibold">{metric.value}</div>
 				</div>
 			))}
-		</div>
-	);
-}
-
-function QueryResultGrid({ result }: { result: SqlEditorExecuteResponse }) {
-	const columns = Array.from(new Set(result.rows.flatMap((row) => Object.keys(row))));
-	return (
-		<div className="overflow-auto rounded-2xl border border-line/40">
-			<table className="min-w-full divide-y divide-line/40 text-sm">
-				<thead className="app-table-muted text-left text-xs font-semibold uppercase tracking-[0.14em] text-(--app-muted)">
-					<tr>
-						{columns.map((column) => (
-							<th key={column} className="px-4 py-3">
-								{column}
-							</th>
-						))}
-					</tr>
-				</thead>
-				<tbody className="divide-y divide-line/30">
-					{result.rows.map((row, rowIndex) => (
-						<tr key={`${rowIndex}-${JSON.stringify(row)}`}>
-							{columns.map((column) => (
-								<td key={`${rowIndex}-${column}`} className="px-4 py-3 align-top text-(--app-text)">
-									<div className="max-w-90 wrap-break-word whitespace-pre-wrap">{String(row[column] ?? '-')}</div>
-								</td>
-							))}
-						</tr>
-					))}
-				</tbody>
-			</table>
 		</div>
 	);
 }
@@ -1020,9 +991,12 @@ export function IntegracaoComErpServicosEditPage({ serviceId }: Props) {
 								queryResultMode === 'json' ? (
 									<pre className="app-control-muted h-[min(70vh,640px)] overflow-auto rounded-2xl p-4 text-sm">{JSON.stringify(queryResult.raw, null, 2)}</pre>
 								) : (
-									<div className="h-[min(70vh,640px)]">
-										<QueryResultGrid result={queryResult} />
-									</div>
+									<DynamicResultGrid
+										rows={queryResult.rows}
+										emptyMessage={t('maintenance.erpIntegration.servicesEdit.query.resultEmpty', 'Nenhum registro retornado pela query.')}
+										maxColumns={60}
+										maxHeightClassName="h-[min(70vh,640px)]"
+									/>
 								)
 							) : null}
 						</div>

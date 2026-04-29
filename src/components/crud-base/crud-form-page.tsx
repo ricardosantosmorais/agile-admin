@@ -23,9 +23,12 @@ function buildInitialRecord(config: CrudModuleConfig) {
     for (const field of section.fields) {
       if (field.defaultValue !== undefined) {
         record[field.key] = field.defaultValue
-        continue
+      } else {
+        record[field.key] = field.type === 'toggle' ? field.key === 'ativo' : ''
       }
-      record[field.key] = field.type === 'toggle' ? field.key === 'ativo' : ''
+      if (field.type === 'lookup' && field.lookupDefaultOption !== undefined) {
+        record[field.lookupStateKey ?? `${field.key}_lookup`] = field.lookupDefaultOption
+      }
     }
   }
   return record
@@ -212,14 +215,14 @@ export function CrudFormPage({ config, client, id }: { config: CrudModuleConfig;
         actions={
           <div className="flex flex-wrap gap-2">
             {!readOnly && !isFooterVisible ? (
-              <button type="submit" form={formId} disabled={isSaving} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60">
+              <button type="submit" form={formId} disabled={isSaving} className="app-button-primary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-60">
                 <Save className="h-4 w-4" />
                 {isSaving ? t('common.loading', 'Loading...') : t('common.save', 'Save')}
               </button>
             ) : null}
             {config.renderHeaderActions?.({ id: resolvedId, isEditing, readOnly })}
             {!isFooterVisible ? (
-              <Link href={config.routeBase} className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold text-slate-700"><ArrowLeft className="h-4 w-4" />{t('common.back', 'Back')}</Link>
+              <Link href={config.routeBase} className="app-button-secondary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"><ArrowLeft className="h-4 w-4" />{t('common.back', 'Back')}</Link>
             ) : null}
           </div>
         }
@@ -230,8 +233,8 @@ export function CrudFormPage({ config, client, id }: { config: CrudModuleConfig;
           <PageToast message={feedback || null} onClose={() => setFeedback('')} />
           <CrudFormSections config={config} form={form} isEditing={isEditing} readOnly={readOnly} patch={patch} optionsMap={optionsMap} />
           <div ref={footerRef} className="flex flex-wrap justify-center gap-2.5 pt-1">
-            {!readOnly ? <button type="submit" disabled={isSaving} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4.5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"><Save className="h-4 w-4" />{isSaving ? t('common.loading', 'Loading...') : t('common.save', 'Save')}</button> : null}
-            <Link href={config.routeBase} className="inline-flex items-center rounded-full border border-line bg-white px-4.5 py-2.5 text-sm font-semibold text-slate-700">{t('common.cancel', 'Cancel')}</Link>
+            {!readOnly ? <button type="submit" disabled={isSaving} className="app-button-primary inline-flex items-center gap-2 rounded-full px-4.5 py-2.5 text-sm font-semibold disabled:opacity-60"><Save className="h-4 w-4" />{isSaving ? t('common.loading', 'Loading...') : t('common.save', 'Save')}</button> : null}
+            <Link href={config.routeBase} className="app-button-secondary inline-flex items-center rounded-full px-4.5 py-2.5 text-sm font-semibold">{t('common.cancel', 'Cancel')}</Link>
           </div>
         </form>
       </AsyncState>

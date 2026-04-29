@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Save } from 'lucide-react'
+import { IdCard, Mail, Save, ShieldCheck, UserRound } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { AsyncState } from '@/src/components/ui/async-state'
 import { FormRow } from '@/src/components/ui/form-row'
@@ -22,6 +22,7 @@ import { useRouteParams } from '@/src/next/route-context'
 
 type EntityPasswordRecord = {
   id: string
+  nome?: string
   perfil: string
   email: string
   senha: string
@@ -30,10 +31,10 @@ type EntityPasswordRecord = {
 
 type EntityPasswordPageProps = {
   featureKey: FeatureKey
-  i18nPrefix: 'administradores' | 'usuarios'
-  sectionRouteKey: 'routes.administration' | 'routes.people'
-  modulePath: '/administradores' | '/usuarios'
-  moduleRouteKey: 'administradores.title' | 'usuarios.title'
+  i18nPrefix: string
+  sectionRouteKey: string
+  modulePath: string
+  moduleRouteKey: string
   formId: string
   createEmpty: () => EntityPasswordRecord
   loadById: (id: string) => Promise<EntityPasswordRecord | null>
@@ -153,17 +154,42 @@ export function EntityPasswordPage({
         <form id={formId} onSubmit={handleSubmit} className="space-y-5">
           <PageToast message={feedback} onClose={() => setFeedback(null)} />
 
-          <SectionCard title={t(`${i18nPrefix}.password.title`)}>
+          <SectionCard>
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex min-w-0 items-start gap-4">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[1.1rem] bg-[color:var(--app-primary-soft)] text-[color:var(--app-primary)] shadow-[0_12px_26px_rgba(15,23,42,0.08)]">
+                  <UserRound className="h-6 w-6" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--app-muted)]">{t(`${i18nPrefix}.password.title`)}</p>
+                  <h1 className="mt-1 break-words text-2xl font-black tracking-tight text-[color:var(--app-text)]">{form.nome || form.email || `ID #${form.id}`}</h1>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-[color:var(--app-muted)]">
+                    {form.perfil ? (
+                      <span className="app-badge app-badge-neutral inline-flex items-center gap-1 rounded-full px-3 py-1">
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                        {form.perfil}
+                      </span>
+                    ) : null}
+                    {form.email ? (
+                      <span className="app-badge app-badge-neutral inline-flex items-center gap-1 rounded-full px-3 py-1">
+                        <Mail className="h-3.5 w-3.5" />
+                        {form.email}
+                      </span>
+                    ) : null}
+                    {form.id ? (
+                      <span className="app-badge app-badge-neutral inline-flex items-center gap-1 rounded-full px-3 py-1">
+                        <IdCard className="h-3.5 w-3.5" />
+                        ID #{form.id}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </SectionCard>
+
+          <SectionCard title={t(`${i18nPrefix}.password.formTitle`, t(`${i18nPrefix}.password.title`))}>
             <div className="space-y-6">
-              <FormRow label="ID">
-                <input className={`${inputClasses()} border-0 bg-transparent`} value={form.id} readOnly />
-              </FormRow>
-              <FormRow label={t(`${i18nPrefix}.columns.profile`)}>
-                <input className={`${inputClasses()} border-0 bg-transparent`} value={form.perfil} readOnly />
-              </FormRow>
-              <FormRow label={t(`${i18nPrefix}.columns.email`)}>
-                <input className={`${inputClasses()} border-0 bg-transparent`} value={form.email} readOnly />
-              </FormRow>
               <FormRow label={t(`${i18nPrefix}.form.newPassword`)}>
                 <input className={inputClasses()} type="password" value={form.senha} onChange={(event) => patch('senha', event.target.value)} />
               </FormRow>

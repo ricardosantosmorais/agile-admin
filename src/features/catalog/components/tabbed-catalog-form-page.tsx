@@ -31,7 +31,7 @@ type CatalogTab = {
     optionsMap: Record<string, CrudOption[]>
     readOnly: boolean
     refreshRecord: () => Promise<void>
-    onFeedback: (message: string | null) => void
+    onFeedback: (message: string | null, tone?: 'success' | 'error') => void
     patch: (key: string, value: unknown) => void
   }) => ReactNode
   render?: (context: {
@@ -42,7 +42,7 @@ type CatalogTab = {
     optionsMap: Record<string, CrudOption[]>
     readOnly: boolean
     refreshRecord: () => Promise<void>
-    onFeedback: (message: string | null) => void
+    onFeedback: (message: string | null, tone?: 'success' | 'error') => void
     patch: (key: string, value: unknown) => void
   }) => ReactNode
   hidden?: (context: { isEditing: boolean; form: CrudRecord }) => boolean
@@ -52,7 +52,14 @@ function buildInitialRecord(config: CrudModuleConfig) {
   const record: CrudRecord = { ativo: true }
   for (const section of config.sections) {
     for (const field of section.fields) {
-      record[field.key] = field.type === 'toggle' ? field.key === 'ativo' : ''
+      if (field.defaultValue !== undefined) {
+        record[field.key] = field.defaultValue
+      } else {
+        record[field.key] = field.type === 'toggle' ? field.key === 'ativo' : ''
+      }
+      if (field.type === 'lookup' && field.lookupDefaultOption !== undefined) {
+        record[field.lookupStateKey ?? `${field.key}_lookup`] = field.lookupDefaultOption
+      }
     }
   }
   return record
@@ -122,12 +129,18 @@ export function TabbedCatalogFormPage({
   const [isLoading, setIsLoading] = useState(isEditing)
   const [error, setError] = useState<Error | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [feedbackTone, setFeedbackTone] = useState<'success' | 'error'>('success')
   const [isSaving, setIsSaving] = useState(false)
   const [optionsMap, setOptionsMap] = useState<Record<string, CrudOption[]>>({})
   const { state: form, setState: setForm, patch } = useFormState<CrudRecord>(buildInitialRecord(config))
   const { footerRef, isFooterVisible } = useFooterActionsVisibility<HTMLDivElement>()
   const formId = `${config.key}-form`
   const loadErrorMessageRef = useRef('Could not load the record.')
+
+  function showFeedback(message: string | null, tone: 'success' | 'error' = 'success') {
+    setFeedback(message)
+    setFeedbackTone(tone)
+  }
 
   useEffect(() => {
     loadErrorMessageRef.current = t('simpleCrud.loadError', 'Could not load the record.')
@@ -215,7 +228,7 @@ export function TabbedCatalogFormPage({
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setFeedback(null)
+    showFeedback(null)
 
     for (const section of config.sections) {
       for (const field of section.fields) {
@@ -226,15 +239,20 @@ export function TabbedCatalogFormPage({
         const disabled = typeof field.disabled === 'function'
           ? field.disabled({ form, isEditing })
           : Boolean(field.disabled)
-        const value = form[field.key]
-        if (!disabled && field.required && (value === '' || value === null || value === undefined)) {
-          setFeedback(t('simpleCrud.requiredField', '{{field}} is required.', { field: t(field.labelKey, field.label) }))
-          return
-        }
-        if (field.type === 'email' && value && typeof value === 'string' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          setFeedback(t('common.validEmail', 'Enter a valid e-mail.'))
-          return
-        }
+      const value = form[field.key]
+      if (!disabled && field.required && (value === '' || value === null || value === undefined)) {
+          showFeedback(t('simpleCrud.requiredField', '{{field}} is required.', { field: t(field.labelKey, field.label) }), 'error')
+        return
+      }
+      if (field.type === 'email' && value && typeof value === 'string' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          showFeedback(t('common.validEmail', 'Enter a valid e-mail.'), 'error')
+        return
+      }
+      const customValidationMessage = field.validate?.({ value, form, isEditing })
+      if (!disabled && customValidationMessage) {
+        showFeedback(t(customValidationMessage, customValidationMessage), 'error')
+        return
+      }
       }
     }
 
@@ -242,7 +260,22 @@ export function TabbedCatalogFormPage({
     try {
       const payload = config.beforeSave ? config.beforeSave(form) : form
       const result = await client.save(payload)
-      const savedId = Array.isArray(result) && result[0] && typeof result[0].id === 'string' ? result[0].id : null
+      const savedId = Array.isArray(result) && result[0]
+        ? String(result[0].id ?? '')
+        : result && typeof result === 'object' && 'id' in result
+          ? String((result as { id?: unknown }).id ?? '')
+          : ''
+
+      if (config.stayOnSave) {
+        showFeedback(t('simpleCrud.saved', 'Record saved successfully.'), 'success')
+        if (!isEditing && savedId) {
+          router.replace(`${config.routeBase}/${savedId}/editar`)
+          return
+        }
+        await refreshRecord()
+        return
+      }
+
       const redirectPath = config.getSaveRedirectPath?.({
         id,
         isEditing,
@@ -267,7 +300,7 @@ export function TabbedCatalogFormPage({
 
       router.push(config.routeBase)
     } catch (saveError) {
-      setFeedback(saveError instanceof Error ? saveError.message : t('simpleCrud.saveError', 'Could not save the record.'))
+      showFeedback(saveError instanceof Error ? saveError.message : t('simpleCrud.saveError', 'Could not save the record.'), 'error')
     } finally {
       setIsSaving(false)
     }
@@ -309,12 +342,13 @@ export function TabbedCatalogFormPage({
         actions={
           <div className="flex flex-wrap gap-2">
             {!readOnly && !isFooterVisible ? (
-              <button type="submit" form={formId} disabled={isSaving} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60">
+              <button type="submit" form={formId} disabled={isSaving} className="app-button-primary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-60">
                 <Save className="h-4 w-4" />
                 {isSaving ? t('common.loading', 'Loading...') : t('common.save', 'Save')}
               </button>
             ) : null}
-            <Link href={config.routeBase} className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold text-slate-700">
+            {config.renderHeaderActions?.({ id, isEditing, readOnly })}
+            <Link href={config.routeBase} className="app-button-secondary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold">
               <ArrowLeft className="h-4 w-4" />
               {t('common.back', 'Back')}
             </Link>
@@ -323,7 +357,7 @@ export function TabbedCatalogFormPage({
       />
 
       <AsyncState isLoading={isLoading} error={error?.message}>
-        <PageToast message={feedback} onClose={() => setFeedback(null)} />
+        <PageToast message={feedback} tone={feedbackTone} onClose={() => setFeedback(null)} />
 
         <form id={formId} className="space-y-5" onSubmit={(event) => void handleSubmit(event)}>
           {visibleTabs.length > 1 ? (
@@ -342,7 +376,7 @@ export function TabbedCatalogFormPage({
                   optionsMap,
                   readOnly,
                   refreshRecord,
-                  onFeedback: setFeedback,
+                  onFeedback: showFeedback,
                   patch,
                 }) : null}
               </div>
@@ -369,18 +403,18 @@ export function TabbedCatalogFormPage({
             optionsMap,
             readOnly,
             refreshRecord,
-            onFeedback: setFeedback,
+            onFeedback: showFeedback,
             patch,
           }) : null}
 
           <div ref={footerRef} className="flex flex-wrap justify-center gap-2.5 pt-1">
             {!readOnly ? (
-              <button type="submit" disabled={isSaving} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4.5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">
+              <button type="submit" disabled={isSaving} className="app-button-primary inline-flex items-center gap-2 rounded-full px-4.5 py-2.5 text-sm font-semibold disabled:opacity-60">
                 <Save className="h-4 w-4" />
                 {isSaving ? t('common.loading', 'Loading...') : t('common.save', 'Save')}
               </button>
             ) : null}
-            <Link href={config.routeBase} className="inline-flex items-center rounded-full border border-line bg-white px-4.5 py-2.5 text-sm font-semibold text-slate-700">
+            <Link href={config.routeBase} className="app-button-secondary inline-flex items-center rounded-full px-4.5 py-2.5 text-sm font-semibold">
               {t('common.cancel', 'Cancel')}
             </Link>
           </div>

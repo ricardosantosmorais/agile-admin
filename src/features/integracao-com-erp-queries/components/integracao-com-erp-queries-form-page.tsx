@@ -8,6 +8,7 @@ import type { AppDataTableColumn } from '@/src/components/data-table/types'
 import { resolveCrudLookupOption } from '@/src/components/crud-base/crud-client'
 import type { CrudRecord } from '@/src/components/crud-base/types'
 import { AsyncState } from '@/src/components/ui/async-state'
+import { DynamicResultGrid } from '@/src/components/ui/dynamic-result-grid'
 import { FormRow } from '@/src/components/ui/form-row'
 import { LookupSelect, type LookupOption } from '@/src/components/ui/lookup-select'
 import { OverlayModal } from '@/src/components/ui/overlay-modal'
@@ -67,34 +68,6 @@ function buildForm(record: CrudRecord): QueryFormState {
 		query: asString(normalized.query),
 		hash: asString(normalized.hash),
 	}
-}
-
-function QueryResultGrid({ result }: { result: SqlEditorExecuteResponse }) {
-	const columns = Array.from(new Set(result.rows.flatMap((row) => Object.keys(row))))
-	return (
-		<div className="h-full max-h-[min(70vh,640px)] overflow-auto rounded-2xl border border-line/40">
-			<table className="min-w-max divide-y divide-line/40 text-sm">
-				<thead className="app-table-muted text-left text-xs font-semibold uppercase tracking-[0.14em] text-(--app-muted)">
-					<tr>
-						{columns.map((column) => (
-							<th key={column} className="sticky top-0 z-10 bg-[color:var(--app-panel-solid)] px-4 py-3 whitespace-nowrap">{column}</th>
-						))}
-					</tr>
-				</thead>
-				<tbody className="divide-y divide-line/30">
-					{result.rows.map((row, rowIndex) => (
-						<tr key={`${rowIndex}-${JSON.stringify(row)}`}>
-							{columns.map((column) => (
-								<td key={`${rowIndex}-${column}`} className="px-4 py-3 align-top text-(--app-text)">
-									<div className="max-w-72 whitespace-pre-wrap break-words">{String(row[column] ?? '-')}</div>
-								</td>
-							))}
-						</tr>
-					))}
-				</tbody>
-			</table>
-		</div>
-	)
 }
 
 function SupportPanel({ title, items, sql }: { title: string; items: QuerySupportItem[]; sql: string }) {
@@ -535,7 +508,14 @@ export function IntegracaoComErpQueriesFormPage({ id }: Props) {
 					{queryResult ? (
 						queryResultMode === 'json'
 							? <pre className="app-control-muted h-[min(70vh,640px)] overflow-auto rounded-2xl p-4 text-sm">{JSON.stringify(queryResult.raw, null, 2)}</pre>
-							: <div className="h-[min(70vh,640px)] min-w-0 overflow-hidden"><QueryResultGrid result={queryResult} /></div>
+							: (
+								<DynamicResultGrid
+									rows={queryResult.rows}
+									emptyMessage="Nenhum registro retornado pela query."
+									maxColumns={60}
+									maxHeightClassName="h-[min(70vh,640px)]"
+								/>
+							)
 					) : null}
 				</div>
 			</OverlayModal>

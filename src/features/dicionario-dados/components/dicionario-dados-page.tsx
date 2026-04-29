@@ -1,7 +1,9 @@
 'use client';
 
-import { Download, FileText, Loader2, Search, Table2 } from 'lucide-react';
+import { Ban, Download, FileText, Loader2, Search, Table2, XCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { AppDataTable } from '@/src/components/data-table/app-data-table';
+import type { AppDataTableColumn } from '@/src/components/data-table/types';
 import { AsyncState } from '@/src/components/ui/async-state';
 import { OverlayModal } from '@/src/components/ui/overlay-modal';
 import { PageHeader } from '@/src/components/ui/page-header';
@@ -287,6 +289,61 @@ export function DicionarioDadosPage() {
 		}
 	}
 
+	const componentColumns = useMemo<AppDataTableColumn<DicionarioTabelaDetalhe['componentes'][number]>[]>(() => [
+		{
+			id: 'id',
+			label: t('dataDictionary.columns.id', 'ID'),
+			cell: (component) => component.id,
+			thClassName: 'w-[96px]',
+			tdClassName: 'font-semibold text-slate-700',
+		},
+		{
+			id: 'nome',
+			label: t('dataDictionary.columns.name', 'Nome'),
+			cell: (component) => component.nome,
+			tdClassName: 'font-semibold text-slate-900',
+		},
+		{
+			id: 'arquivo',
+			label: t('dataDictionary.columns.file', 'Arquivo'),
+			cell: (component) => component.arquivo || '-',
+		},
+		{
+			id: 'ativo',
+			label: t('dataDictionary.columns.active', 'Ativo'),
+			cell: (component) => (
+				<StatusBadge tone={component.ativo ? 'success' : 'neutral'}>
+					{component.ativo ? t('common.yes', 'Sim') : t('common.no', 'Não')}
+				</StatusBadge>
+			),
+			thClassName: 'w-[120px]',
+		},
+	], [t]);
+
+	const fieldColumns = useMemo<AppDataTableColumn<DicionarioComponenteCampo>[]>(() => [
+		{
+			id: 'campo',
+			label: t('dataDictionary.columns.field', 'Campo'),
+			cell: (field) => field.nome,
+			tdClassName: 'font-semibold text-slate-900',
+		},
+		{
+			id: 'posicao',
+			label: t('dataDictionary.columns.position', 'Posição'),
+			cell: (field) => field.posicao,
+			thClassName: 'w-[120px]',
+			tdClassName: 'font-semibold text-slate-700',
+		},
+		{
+			id: 'status',
+			label: t('dataDictionary.columns.status', 'Status'),
+			cell: (field) => (
+				<StatusBadge tone={getStatusBadgeTone(field.status)}>{getStatusLabel(field.status, t)}</StatusBadge>
+			),
+			thClassName: 'w-[180px]',
+		},
+	], [t]);
+
 	if (!access.canOpen) {
 		return <AccessDeniedState title={t('dataDictionary.title', 'Dicionário de dados')} />;
 	}
@@ -397,39 +454,31 @@ export function DicionarioDadosPage() {
 
 								{activeTab === 'componentes' ? (
 									<div className="space-y-4">
-										<div className="overflow-x-auto rounded-[1rem] border border-[#ece3d6] bg-white">
-											<table className="min-w-full text-left text-sm">
-												<thead className="bg-[#f8f4ec] text-xs uppercase text-slate-600">
-													<tr>
-														<th className="px-3 py-2">{t('dataDictionary.columns.id', 'ID')}</th>
-														<th className="px-3 py-2">{t('dataDictionary.columns.name', 'Nome')}</th>
-														<th className="px-3 py-2">{t('dataDictionary.columns.file', 'Arquivo')}</th>
-														<th className="px-3 py-2">{t('dataDictionary.columns.active', 'Ativo')}</th>
-														<th className="px-3 py-2 text-right">{t('dataDictionary.columns.actions', 'Ações')}</th>
-													</tr>
-												</thead>
-												<tbody>
-													{tableDetailState.data.componentes.map((component) => (
-														<tr key={component.id} className="border-t border-[#efe8dc]">
-															<td className="px-3 py-2">{component.id}</td>
-															<td className="px-3 py-2 font-semibold">{component.nome}</td>
-															<td className="px-3 py-2">{component.arquivo}</td>
-															<td className="px-3 py-2">{component.ativo ? t('common.yes', 'Sim') : t('common.no', 'Não')}</td>
-															<td className="px-3 py-2 text-right">
-																<button
-																	type="button"
-																	onClick={() => void loadComponentFields(component.id)}
-																	className="inline-flex items-center gap-1 rounded-full bg-slate-950 px-3 py-1.5 text-xs font-semibold text-white"
-																>
-																	<Search className="h-3.5 w-3.5" />
-																	{t('dataDictionary.actions.details', 'Detalhes')}
-																</button>
-															</td>
-														</tr>
-													))}
-												</tbody>
-											</table>
-										</div>
+										<AppDataTable
+											rows={tableDetailState.data.componentes}
+											getRowId={(component) => component.id}
+											columns={componentColumns}
+											emptyMessage={t('dataDictionary.emptyComponents', 'Nenhum componente encontrado para esta tabela.')}
+											mobileCard={{
+												title: (component) => component.nome,
+												subtitle: (component) => component.arquivo || '-',
+												meta: (component) => `ID ${component.id}`,
+												badges: (component) => (
+													<StatusBadge tone={component.ativo ? 'success' : 'neutral'}>
+														{component.ativo ? t('common.yes', 'Sim') : t('common.no', 'Não')}
+													</StatusBadge>
+												),
+											}}
+											actionsLabel={t('dataDictionary.columns.actions', 'Ações')}
+											rowActions={(component) => [
+												{
+													id: 'details',
+													label: t('dataDictionary.actions.details', 'Detalhes'),
+													icon: Search,
+													onClick: () => void loadComponentFields(component.id),
+												},
+											]}
+										/>
 
 										{selectedComponentId ? (
 											<AsyncState isLoading={componentFieldsState.loading} error={componentFieldsState.error}>
@@ -438,67 +487,48 @@ export function DicionarioDadosPage() {
 														<h3 className="text-base font-semibold text-slate-900">
 															{t('dataDictionary.componentFieldsTitle', 'Campos do componente {{file}}', { file: componentFieldsState.data.componente.arquivo })}
 														</h3>
-														<div className="overflow-x-auto rounded-[1rem] border border-[#ece3d6] bg-white">
-															<table className="min-w-full text-left text-sm">
-																<thead className="bg-[#f8f4ec] text-xs uppercase text-slate-600">
-																	<tr>
-																		<th className="px-3 py-2">{t('dataDictionary.columns.field', 'Campo')}</th>
-																		<th className="px-3 py-2">{t('dataDictionary.columns.position', 'Posição')}</th>
-																		<th className="px-3 py-2">{t('dataDictionary.columns.status', 'Status')}</th>
-																		<th className="px-3 py-2 text-right">{t('dataDictionary.columns.actions', 'Ações')}</th>
-																	</tr>
-																</thead>
-																<tbody>
-																	{componentFieldsState.data.fields.map((field) => (
-																		<tr key={field.id} className="border-t border-[#efe8dc]">
-																			<td className="px-3 py-2">{field.nome}</td>
-																			<td className="px-3 py-2">{field.posicao}</td>
-																			<td className="px-3 py-2">
-																				<StatusBadge tone={getStatusBadgeTone(field.status)}>{getStatusLabel(field.status, t)}</StatusBadge>
-																			</td>
-																			<td className="px-3 py-2 text-right">
-																				<div className="inline-flex items-center gap-1">
-																					{field.status === 'ignorado' ? (
-																						<button
-																							type="button"
-																							onClick={() => void removeIgnoredField(field)}
-																							className="rounded-full border border-[#eadfce] px-2.5 py-1 text-xs font-semibold text-slate-600"
-																						>
-																							{t('dataDictionary.actions.removeStatus', 'Remover status')}
-																						</button>
-																					) : null}
-
-																					{field.status === 'nao_disponivel' ? (
-																						<button
-																							type="button"
-																							onClick={() => setIgnoreModalField(field)}
-																							className="rounded-full border border-[#eadfce] px-2.5 py-1 text-xs font-semibold text-slate-600"
-																						>
-																							{t('dataDictionary.actions.ignore', 'Ignorar')}
-																						</button>
-																					) : null}
-
-																					<button
-																						type="button"
-																						onClick={() => setFieldEditModal({ mode: 'descricao', field })}
-																						className="rounded-full border border-[#eadfce] px-2.5 py-1 text-xs font-semibold text-slate-600"
-																					>
-																						{t('dataDictionary.tabs.description', 'Descrição')}
-																					</button>
-																					<button
-																						type="button"
-																						onClick={() => setFieldEditModal({ mode: 'regra', field })}
-																						className="rounded-full border border-[#eadfce] px-2.5 py-1 text-xs font-semibold text-slate-600"
-																					>
-																						{t('dataDictionary.actions.rule', 'Regra')}
-																					</button>
-																				</div>
-																			</td>
-																		</tr>
-																	))}
-																</tbody>
-															</table>
-														</div>
+													<AppDataTable
+														rows={componentFieldsState.data.fields}
+														getRowId={(field) => field.id}
+														columns={fieldColumns}
+														emptyMessage={t('dataDictionary.emptyFields', 'Nenhum campo encontrado para este componente.')}
+														mobileCard={{
+															title: (field) => field.nome,
+															subtitle: (field) => t('dataDictionary.columns.position', 'Posição') + ': ' + field.posicao,
+															badges: (field) => (
+																<StatusBadge tone={getStatusBadgeTone(field.status)}>{getStatusLabel(field.status, t)}</StatusBadge>
+															),
+														}}
+														actionsLabel={t('dataDictionary.columns.actions', 'Ações')}
+														rowActions={(field) => [
+															{
+																id: 'remove-status',
+																label: t('dataDictionary.actions.removeStatus', 'Remover status'),
+																icon: XCircle,
+																visible: field.status === 'ignorado',
+																onClick: () => void removeIgnoredField(field),
+															},
+															{
+																id: 'ignore',
+																label: t('dataDictionary.actions.ignore', 'Ignorar'),
+																icon: Ban,
+																visible: field.status === 'nao_disponivel',
+																onClick: () => setIgnoreModalField(field),
+															},
+															{
+																id: 'description',
+																label: t('dataDictionary.tabs.description', 'Descrição'),
+																icon: FileText,
+																onClick: () => setFieldEditModal({ mode: 'descricao', field }),
+															},
+															{
+																id: 'rule',
+																label: t('dataDictionary.actions.rule', 'Regra'),
+																icon: FileText,
+																onClick: () => setFieldEditModal({ mode: 'regra', field }),
+															},
+														]}
+													/>
 													</div>
 												) : null}
 											</AsyncState>

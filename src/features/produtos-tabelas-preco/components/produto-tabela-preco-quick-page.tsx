@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { ArrowLeft, LoaderCircle, Save } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AsyncState } from '@/src/components/ui/async-state'
+import { InlineDataTable, type InlineDataTableColumn } from '@/src/components/ui/inline-data-table'
 import { InputWithAffix } from '@/src/components/ui/input-with-affix'
 import { LookupSelect } from '@/src/components/ui/lookup-select'
 import { PageHeader } from '@/src/components/ui/page-header'
@@ -19,6 +20,7 @@ const primaryButtonClasses = 'app-button-primary inline-flex items-center gap-2 
 const footerPrimaryButtonClasses = 'app-button-primary inline-flex items-center gap-2 rounded-full px-4.5 py-2.5 text-sm font-semibold disabled:opacity-60'
 const secondaryButtonClasses = 'app-button-secondary inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold'
 const footerSecondaryButtonClasses = 'app-button-secondary inline-flex items-center rounded-full px-4.5 py-2.5 text-sm font-semibold'
+const PRICE_KEYS = ['preco1', 'preco2', 'preco3', 'preco4', 'preco5', 'preco6', 'preco7'] as const
 
 export function ProdutoTabelaPrecoQuickPage({ id }: { id?: string }) {
   const { t } = useI18n()
@@ -106,9 +108,32 @@ export function ProdutoTabelaPrecoQuickPage({ id }: { id?: string }) {
     }
   }
 
-  function patchPrice(index: number, key: keyof ProdutoTabelaPrecoQuickItem, value: string) {
+  const patchPrice = useCallback((index: number, key: keyof ProdutoTabelaPrecoQuickItem, value: string) => {
     setItems((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, [key]: currencyMask(value) } : item))
-  }
+  }, [])
+
+  const priceColumns = useMemo<InlineDataTableColumn<ProdutoTabelaPrecoQuickItem>[]>(() => [
+    {
+      id: 'tabela',
+      header: t('priceStock.productPriceTables.fields.priceTable', 'Tabela de preço'),
+      cell: (item) => <span className="font-semibold text-[color:var(--app-text)]">{item.nome_tabela}</span>,
+      cellClassName: 'min-w-[220px]',
+    },
+    ...PRICE_KEYS.map((priceKey, priceIndex) => ({
+      id: priceKey,
+      header: `Pre\u00e7o ${priceIndex + 1}`,
+      cell: (item: ProdutoTabelaPrecoQuickItem, index: number) => (
+        <InputWithAffix
+          prefix="R$"
+          value={item[priceKey]}
+          disabled={Boolean(item.id_sync) || !(access.canCreate || access.canEdit)}
+          onChange={(event) => patchPrice(index, priceKey, event.target.value)}
+          placeholder="0,00"
+        />
+      ),
+      cellClassName: 'min-w-[140px]',
+    })),
+  ], [access.canCreate, access.canEdit, patchPrice, t])
 
   if (!access.canCreate && !access.canEdit && !access.canView) {
     return null
@@ -160,40 +185,14 @@ export function ProdutoTabelaPrecoQuickPage({ id }: { id?: string }) {
       <AsyncState isLoading={isLoading} error={error}>
         <SectionCard>
           {product?.id ? (
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-separate border-spacing-y-2">
-                <thead>
-                  <tr className="text-left text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--app-muted)]">
-                    <th className="px-3 py-2">{t('priceStock.productPriceTables.fields.priceTable', 'Tabela de preço')}</th>
-                    <th className="px-3 py-2">Preço 1</th>
-                    <th className="px-3 py-2">Preço 2</th>
-                    <th className="px-3 py-2">Preço 3</th>
-                    <th className="px-3 py-2">Preço 4</th>
-                    <th className="px-3 py-2">Preço 5</th>
-                    <th className="px-3 py-2">Preço 6</th>
-                    <th className="px-3 py-2">Preço 7</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((item, index) => (
-                    <tr key={item.id_tabela_preco} className="app-pane-muted rounded-[1rem] shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
-                      <td className="px-3 py-2 font-semibold text-[color:var(--app-text)]">{item.nome_tabela}</td>
-                      {(['preco1', 'preco2', 'preco3', 'preco4', 'preco5', 'preco6', 'preco7'] as const).map((priceKey) => (
-                        <td key={priceKey} className="min-w-[140px] px-3 py-2">
-                          <InputWithAffix
-                            prefix="R$"
-                            value={item[priceKey]}
-                            disabled={Boolean(item.id_sync) || !(access.canCreate || access.canEdit)}
-                            onChange={(event) => patchPrice(index, priceKey, event.target.value)}
-                            placeholder="0,00"
-                          />
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <InlineDataTable
+              rows={items}
+              getRowId={(item) => item.id_tabela_preco}
+              columns={priceColumns}
+              emptyMessage={t('priceStock.productPriceTables.emptyQuickPricing', 'Nenhuma tabela de pre\u00e7o encontrada para este produto.')}
+              minWidthClassName="min-w-[1280px]"
+              rowClassName="app-pane-muted shadow-[0_10px_30px_rgba(15,23,42,0.05)]"
+            />
           ) : (
             <div className="app-pane-muted rounded-[1.25rem] border-dashed px-6 py-10 text-center text-sm text-[color:var(--app-muted)]">
               {t('priceStock.productPriceTables.help.selectProduct', 'Selecione um produto para carregar a grade de precificação rápida.')}

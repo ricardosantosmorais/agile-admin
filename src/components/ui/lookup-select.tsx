@@ -281,7 +281,7 @@ export function LookupSelect<TOption extends LookupOption>({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={open ? listboxId : undefined}
-        className="app-control flex w-full items-center justify-between gap-3 rounded-[1rem] px-3.5 py-3 text-left text-sm shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+        className="app-control flex w-full items-center justify-between gap-3 rounded-[1rem] px-3.5 py-3 text-left text-[15px] shadow-none disabled:cursor-not-allowed disabled:opacity-60"
       >
         <span className="min-w-0 truncate">{value?.label || `${t('clientes.form.general.select', 'Select')} ${label.toLowerCase()}`}</span>
         <ChevronDown className={['h-4 w-4 shrink-0 text-[color:var(--app-muted)] transition', open ? 'rotate-180' : ''].join(' ')} />
@@ -307,7 +307,7 @@ export function LookupSelect<TOption extends LookupOption>({
                   aria-controls={listboxId}
                   aria-autocomplete="list"
                   aria-activedescendant={highlightedIndex >= 0 ? `${listboxId}-option-${highlightedIndex}` : undefined}
-                  className="w-full border-none bg-transparent text-sm text-[color:var(--app-text)] outline-none placeholder:text-[color:var(--app-muted)]"
+                  className="w-full border-none bg-transparent text-[15px] text-[color:var(--app-text)] outline-none placeholder:text-[color:var(--app-muted)]"
                   placeholder={t('common.searchFor', 'Search {{label}}', { label: label.toLowerCase() })}
                 />
               </div>
@@ -327,7 +327,7 @@ export function LookupSelect<TOption extends LookupOption>({
                     event.stopPropagation()
                     commitSelection(null)
                   }}
-                  className="flex w-full items-center gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm text-[color:var(--app-muted)] transition hover:bg-[color:var(--app-hover-surface)]"
+                  className="flex w-full items-center gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-[15px] text-[color:var(--app-muted)] transition hover:bg-[color:var(--app-hover-surface)]"
                 >
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-dashed border-[color:var(--app-control-border)] text-[10px]">
                     x
@@ -360,7 +360,7 @@ export function LookupSelect<TOption extends LookupOption>({
                           commitSelection(option)
                         }}
                         className={[
-                          'flex w-full items-start justify-between gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm transition hover:bg-[color:var(--app-hover-surface)]',
+                          'flex w-full items-start justify-between gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-[15px] transition hover:bg-[color:var(--app-hover-surface)]',
                           isHighlighted ? 'bg-[color:var(--app-hover-surface)]' : '',
                         ].join(' ')}
                       >
@@ -373,7 +373,7 @@ export function LookupSelect<TOption extends LookupOption>({
                     )
                   })
                 ) : (
-                  <div className="px-3 py-6 text-center text-sm text-[color:var(--app-muted)]">{t('common.noResults', 'No results found.')}</div>
+                  <div className="px-3 py-6 text-center text-[15px] text-[color:var(--app-muted)]">{t('common.noResults', 'No results found.')}</div>
                 )}
 
                 {isLoading && options.length ? (

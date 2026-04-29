@@ -8,6 +8,31 @@
  */
 
 export const dashboardTooltips = {
+	comercialRoot: {
+		regraOficial: {
+			titulo: 'Regra comercial oficial',
+			descricao: 'Os pedidos são considerados pela data do pedido e classificados pelo status atual.',
+			statusRealizados: ['faturado', 'entregue', 'em_separacao', 'em_transporte', 'recebido', 'coletado'],
+			observacao: 'Status fora da whitelist aparecem na distribuição geral por status, mas não entram nos KPIs de receita, pedidos, ticket, rankings, concentração ou empresas sem venda.',
+		},
+		receitaRealizada: {
+			titulo: 'Receita realizada',
+			descricao: 'Soma dos pedidos cuja data está no período selecionado e cujo status atual está na whitelist comercial.',
+		},
+		pedidosRealizados: {
+			titulo: 'Pedidos realizados',
+			descricao: 'Quantidade de pedidos cuja data está no período selecionado e cujo status atual está na whitelist comercial.',
+		},
+		pedidosPorStatusAtual: {
+			titulo: 'Pedidos por status atual',
+			descricao: 'Distribuição atual dos pedidos do período por status atual. Não representa sequência histórica nem mudança de status ao longo do tempo.',
+		},
+		percentualCancelado: {
+			titulo: 'Percentual cancelado',
+			formula: 'pedidos cancelados / (pedidos realizados + pedidos cancelados)',
+		},
+	},
+
 	// ============ RESUMO EXECUTIVO ============
 
 	resumo: {

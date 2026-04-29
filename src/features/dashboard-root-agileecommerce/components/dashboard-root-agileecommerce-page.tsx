@@ -3,6 +3,8 @@
 import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { RefreshCcw } from 'lucide-react';
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
+import { AppDataTable } from '@/src/components/data-table/app-data-table';
+import type { AppDataTableColumn } from '@/src/components/data-table/types';
 import { AsyncState } from '@/src/components/ui/async-state';
 import { DateRangeComparativePicker, type DateRangePreset, type DateRangeValue } from '@/src/components/ui/date-range-comparative-picker';
 import { PageHeader } from '@/src/components/ui/page-header';
@@ -482,30 +484,25 @@ function SimpleTable({
 		return <div className="text-sm text-slate-500">{t('dashboardRoot.empty', 'Sem dados para este período.')}</div>;
 	}
 
+	const tableColumns = columns.map((column) => ({
+		id: column.key,
+		label: column.label,
+		cell: (row: DashboardRootSimpleRow) => column.formatter ? column.formatter(row[column.key], row) : parseText(row[column.key]),
+		tdClassName: 'text-[color:var(--app-text)]',
+	})) satisfies AppDataTableColumn<DashboardRootSimpleRow>[];
+
 	return (
-		<div className={['app-table-shell overflow-auto rounded-2xl', maxHeightClass ?? ''].filter(Boolean).join(' ')}>
-			<table className="min-w-full text-left text-sm">
-				<thead className="app-table-muted sticky top-0 text-[color:var(--app-muted)]">
-					<tr>
-						{columns.map((column) => (
-							<th key={column.key} className="px-3 py-2.5 font-semibold">
-								{column.label}
-							</th>
-						))}
-					</tr>
-				</thead>
-				<tbody>
-					{rows.map((row, index) => (
-						<tr key={`${index}-${parseText(row.id, String(index))}`} className="border-t border-line/60 text-[color:var(--app-text)]">
-							{columns.map((column) => (
-								<td key={column.key} className="px-3 py-2.5 align-top">
-									{column.formatter ? column.formatter(row[column.key], row) : parseText(row[column.key])}
-								</td>
-							))}
-						</tr>
-					))}
-				</tbody>
-			</table>
+		<div className={maxHeightClass ?? ''}>
+			<AppDataTable
+				rows={rows}
+				getRowId={(row) => `${parseText(row.id, '')}-${rows.indexOf(row)}`}
+				columns={tableColumns}
+				emptyMessage={t('dashboardRoot.empty', 'Sem dados para este período.')}
+				mobileCard={{
+					title: (row) => tableColumns[0]?.cell(row) ?? '-',
+					subtitle: (row) => tableColumns[1]?.cell(row) ?? '',
+				}}
+			/>
 		</div>
 	);
 }
@@ -636,8 +633,8 @@ function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: Retur
 			type: 'currency' as const,
 			tone: 'emerald' as const,
 			showComparison: hasComparison,
-			description: t('dashboardRoot.rootV2.executive.revenueDescription', 'Soma dos pedidos realizados no intervalo selecionado.'),
-			tooltip: t('dashboardRoot.rootV2.executive.revenueTooltip', 'Considera apenas pedidos nos status faturado, entregue, em separação, em transporte, recebido e coletado.'),
+			description: t('dashboardRoot.rootV2.executive.revenueDescription', 'Soma dos pedidos cuja data do pedido está no período e cujo status atual está na whitelist comercial.'),
+			tooltip: t('dashboardRoot.rootV2.executive.revenueTooltip', 'Whitelist comercial: faturado, entregue, em separação, em transporte, recebido e coletado. Status fora dela não entram na receita realizada.'),
 		},
 		{
 			label: t('dashboardRoot.rootV2.cards.realizedOrders', 'Pedidos realizados'),
@@ -646,8 +643,8 @@ function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: Retur
 			type: 'number' as const,
 			tone: 'sky' as const,
 			showComparison: hasComparison,
-			description: t('dashboardRoot.rootV2.executive.ordersDescription', 'Quantidade de pedidos realizados no intervalo selecionado.'),
-			tooltip: t('dashboardRoot.rootV2.executive.ordersTooltip', 'Usa a mesma regra comercial do faturamento para manter consistência entre volume e receita.'),
+			description: t('dashboardRoot.rootV2.executive.ordersDescription', 'Quantidade de pedidos cuja data do pedido está no período e cujo status atual está na whitelist comercial.'),
+			tooltip: t('dashboardRoot.rootV2.executive.ordersTooltip', 'Usa exatamente a mesma regra da receita realizada para manter volume e receita consistentes.'),
 		},
 		{
 			label: t('dashboardRoot.cards.averageTicketConsolidated', 'Ticket médio consolidado'),
@@ -656,8 +653,8 @@ function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: Retur
 			type: 'currency' as const,
 			tone: 'amber' as const,
 			showComparison: hasComparison,
-			description: t('dashboardRoot.rootV2.executive.ticketDescription', 'Valor médio por pedido realizado na carteira consolidada.'),
-			tooltip: t('dashboardRoot.rootV2.executive.ticketTooltip', 'Calculado dividindo a receita realizada pelo total de pedidos realizados do período.'),
+			description: t('dashboardRoot.rootV2.executive.ticketDescription', 'Receita realizada dividida pelos pedidos realizados no período.'),
+			tooltip: t('dashboardRoot.rootV2.executive.ticketTooltip', 'Calculado apenas com pedidos pela data do pedido e status atual dentro da whitelist comercial.'),
 		},
 		{
 			label: t('dashboardRoot.cards.companiesWithSales', 'Empresas com venda no período'),
@@ -666,8 +663,8 @@ function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: Retur
 			type: 'number' as const,
 			tone: 'sky' as const,
 			showComparison: false,
-				description: t('dashboardRoot.executive.companiesWithSalesDescription', 'Empresas distintas com pelo menos um pedido comercial válido no intervalo selecionado.'),
-				tooltip: t('dashboardRoot.executive.companiesWithSalesTooltip', 'Conta apenas as empresas que realmente contribuíram para o resultado comercial exibido no dashboard.'),
+			description: t('dashboardRoot.rootV2.executive.companiesWithSalesDescription', 'Empresas com pelo menos um pedido cuja data está no período e cujo status atual está na whitelist comercial.'),
+			tooltip: t('dashboardRoot.rootV2.executive.companiesWithSalesTooltip', 'Conta apenas empresas que contribuíram para a receita ou pedidos realizados exibidos no dashboard.'),
 		},
 	];
 
@@ -681,8 +678,8 @@ function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: Retur
 				type: 'percent' as const,
 				tone: parseNumber(analytics.resumo?.percentual_cancelado) > 10 ? ('rose' as const) : ('amber' as const),
 				showComparison: false,
-				description: t('dashboardRoot.rootV2.executive.cancelledPercentageDescription', 'Pedidos cancelados em relação aos pedidos realizados mais cancelados no período.'),
-				tooltip: t('dashboardRoot.rootV2.executive.cancelledPercentageTooltip', 'Ajuda a acompanhar perda comercial sem misturar carrinho, rascunho e outros status não realizados.'),
+				description: t('dashboardRoot.rootV2.executive.cancelledPercentageDescription', 'Pedidos cancelados divididos por pedidos realizados mais pedidos cancelados no período.'),
+				tooltip: t('dashboardRoot.rootV2.executive.cancelledPercentageTooltip', 'Usa pedidos pela data do pedido. Cancelados entram neste indicador e na distribuição geral por status, mas não entram na receita realizada.'),
 			},
 		];
 	}
@@ -690,14 +687,14 @@ function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: Retur
 	return [
 		...primaryCards,
 		{
-			label: t('dashboardRoot.cards.salesGrowth', 'Crescimento de faturamento'),
+			label: t('dashboardRoot.rootV2.cards.revenueGrowth', 'Crescimento de receita realizada'),
 			value: comparativo.valor_total_vendas ?? 0,
 			variation: 0,
 			type: 'percent' as const,
 			tone: (comparativo.valor_total_vendas ?? 0) >= 0 ? ('emerald' as const) : ('rose' as const),
 			showComparison: false,
-			description: t('dashboardRoot.executive.salesGrowthDescription', 'Variação percentual do faturamento comercial válido contra o período anterior equivalente.'),
-			tooltip: t('dashboardRoot.executive.salesGrowthTooltip', 'Ajuda a identificar aceleração ou retração da carteira no comparativo.'),
+			description: t('dashboardRoot.rootV2.executive.salesGrowthDescription', 'Variação percentual da receita realizada contra o período anterior equivalente.'),
+			tooltip: t('dashboardRoot.rootV2.executive.salesGrowthTooltip', 'Compara apenas pedidos pela data do pedido e status atual dentro da whitelist comercial.'),
 		},
 		{
 			label: t('dashboardRoot.cards.ordersGrowth', 'Crescimento de pedidos'),
@@ -706,8 +703,8 @@ function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: Retur
 			type: 'percent' as const,
 			tone: (comparativo.total_pedidos ?? 0) >= 0 ? ('sky' as const) : ('rose' as const),
 			showComparison: false,
-			description: t('dashboardRoot.executive.ordersGrowthDescription', 'Variação percentual do volume de pedidos comerciais válidos contra o período anterior.'),
-			tooltip: t('dashboardRoot.executive.ordersGrowthTooltip', 'Separa efeito de demanda do comportamento do ticket médio.'),
+			description: t('dashboardRoot.rootV2.executive.ordersGrowthDescription', 'Variação percentual dos pedidos realizados contra o período anterior equivalente.'),
+			tooltip: t('dashboardRoot.rootV2.executive.ordersGrowthTooltip', 'Usa a mesma whitelist comercial da receita realizada para separar volume de pedidos e ticket médio.'),
 		},
 		{
 			label: t('dashboardRoot.cards.companiesInDecline', 'Empresas em queda'),
@@ -716,8 +713,8 @@ function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: Retur
 			type: 'number' as const,
 			tone: 'rose' as const,
 			showComparison: false,
-			description: t('dashboardRoot.executive.companiesInDeclineDescription', 'Empresas cujo faturamento comercial válido caiu em relação ao período anterior equivalente.'),
-			tooltip: t('dashboardRoot.executive.companiesInDeclineTooltip', 'Usado para priorizar triagem comercial e acompanhamento da carteira.'),
+			description: t('dashboardRoot.rootV2.executive.companiesInDeclineDescription', 'Empresas cuja receita realizada caiu em relação ao período anterior equivalente.'),
+			tooltip: t('dashboardRoot.rootV2.executive.companiesInDeclineTooltip', 'Compara somente receita realizada, usando data do pedido e status atual dentro da whitelist comercial.'),
 		},
 		{
 			label: t('dashboardRoot.rootV2.cards.cancelledPercentage', 'Percentual cancelado'),
@@ -726,8 +723,8 @@ function buildCommercialExecutiveCards(snapshot: DashboardRootSnapshot, t: Retur
 			type: 'percent' as const,
 			tone: parseNumber(analytics.resumo?.percentual_cancelado) > 10 ? ('rose' as const) : ('amber' as const),
 			showComparison: false,
-			description: t('dashboardRoot.rootV2.executive.cancelledPercentageDescription', 'Pedidos cancelados em relação aos pedidos realizados mais cancelados no período.'),
-			tooltip: t('dashboardRoot.rootV2.executive.cancelledPercentageTooltip', 'Ajuda a acompanhar perda comercial sem misturar carrinho, rascunho e outros status não realizados.'),
+			description: t('dashboardRoot.rootV2.executive.cancelledPercentageDescription', 'Pedidos cancelados divididos por pedidos realizados mais pedidos cancelados no período.'),
+			tooltip: t('dashboardRoot.rootV2.executive.cancelledPercentageTooltip', 'Usa pedidos pela data do pedido. Cancelados entram neste indicador e na distribuição geral por status, mas não entram na receita realizada.'),
 		},
 	];
 }
@@ -755,9 +752,9 @@ function buildAnalyticsTrustCardsV2(snapshot: DashboardRootSnapshot, t: ReturnTy
 		{
 			label: t('dashboardRoot.trust.ordersCoverage', 'Empresas com atualização recente de pedidos'),
 			value: `${formatNumber(parseNumber(confianca.empresas_com_pedidos_frescos))}/${formatNumber(parseNumber(confianca.empresas_total_root))}`,
-			tooltip: t('dashboardRoot.trust.ordersCoverageTooltip', 'Mostra quantas empresas têm atualização recente das etapas de pedidos usadas na leitura operacional.'),
+			tooltip: t('dashboardRoot.trust.ordersCoverageTooltip', 'Mostra quantas empresas têm atualização recente da leitura de status atual dos pedidos.'),
 			tone: 'sky' as const,
-			helper: `${formatNumber(parseNumber(confianca.cobertura_pedidos_frescos_percentual))}% ${t('dashboardRoot.trust.ordersCoverageHelper', 'da carteira com leitura recente das etapas de pedidos.')}`,
+			helper: `${formatNumber(parseNumber(confianca.cobertura_pedidos_frescos_percentual))}% ${t('dashboardRoot.trust.ordersCoverageHelper', 'da carteira com leitura recente de status atual dos pedidos.')}`,
 		},
 		{
 			label: t('dashboardRoot.trust.syncFailures', 'Falhas recentes de sincronização'),
@@ -929,7 +926,7 @@ export function DashboardRootAgileecommercePage() {
 							fallback={
 								<SectionCard
 									title={t('dashboardRoot.executiveStoryTitle', 'Pulso comercial da carteira')}
-									description={t('dashboardRoot.executiveStoryDescription', 'Uma leitura rápida do ritmo de faturamento e dos sinais que merecem atenção no período selecionado.')}
+									description={t('dashboardRoot.executiveStoryDescription', 'Uma leitura rápida da receita realizada e dos sinais que merecem atenção no período selecionado.')}
 								>
 									<SectionSkeleton lines={4} chart />
 								</SectionCard>
@@ -937,15 +934,15 @@ export function DashboardRootAgileecommercePage() {
 						>
 							<SectionCard
 								title={t('dashboardRoot.executiveStoryTitle', 'Pulso comercial da carteira')}
-								description={t('dashboardRoot.executiveStoryDescription', 'Uma leitura rápida do ritmo de faturamento e dos sinais que merecem atenção no período selecionado.')}
-								action={<InfoTooltipButton label={t('dashboardRoot.executiveStoryTooltip', 'O gráfico centraliza a leitura do período e os cards laterais destacam crescimento, risco e cobertura do dado.')} />}
+								description={t('dashboardRoot.executiveStoryDescription', 'Uma leitura rápida da receita realizada e dos sinais que merecem atenção no período selecionado.')}
+								action={<InfoTooltipButton label={t('dashboardRoot.executiveStoryTooltip', 'O gráfico usa pedidos pela data do pedido e status atual na whitelist comercial; os cards laterais destacam crescimento, risco e cobertura do dado.')} />}
 							>
 								<div className="space-y-4">
 									<div className="app-pane-muted rounded-[1.6rem] p-4">
 										<div className="mb-3 flex flex-wrap items-start justify-between gap-3">
 											<div>
-												<div className="text-sm font-semibold text-slate-800">{t('dashboardRoot.charts.transactedVolumeDaily', 'Volume transacionado por dia')}</div>
-												<div className="text-[11px] leading-5 text-slate-500">{t('dashboardRoot.executiveStoryChartLegendDaily', 'Evolução diária do faturamento comercial válido, com comparação contra o período anterior quando disponível.')}</div>
+												<div className="text-sm font-semibold text-slate-800">{t('dashboardRoot.rootV2.charts.realizedRevenueDaily', 'Receita realizada por dia')}</div>
+												<div className="text-[11px] leading-5 text-slate-500">{t('dashboardRoot.executiveStoryChartLegendDaily', 'Evolução diária da receita realizada, com comparação contra o período anterior quando disponível.')}</div>
 											</div>
 											<div className="app-button-secondary rounded-full px-3 py-1 text-[11px] font-semibold text-[color:var(--app-muted)]">{selectedRangeLabel}</div>
 										</div>
@@ -953,16 +950,16 @@ export function DashboardRootAgileecommercePage() {
 										data={hasComparison ? analyticsRevenueDailyComparisonSeries : analyticsRevenueDailySeries}
 										dataKey={hasComparison ? 'currentValue' : 'value'}
 										comparisonDataKey={hasComparison ? 'previousValue' : undefined}
-										titleKey="dashboardRoot.charts.transactedVolumeDaily"
+										titleKey="dashboardRoot.rootV2.charts.realizedRevenueDaily"
 										formatValue={formatCurrency}
 										labelFormatter={(label) => {
 											if (!hasComparison) {
-												return `${t('dashboardRoot.charts.transactedVolumeDaily', 'Volume transacionado por dia')}: ${label}`;
+												return `${t('dashboardRoot.rootV2.charts.realizedRevenueDaily', 'Receita realizada por dia')}: ${label}`;
 											}
 
 											const row = analyticsRevenueDailyComparisonSeries.find((item) => item.label === label);
 											if (!row) {
-												return `${t('dashboardRoot.charts.transactedVolumeDaily', 'Volume transacionado por dia')}: ${label}`;
+												return `${t('dashboardRoot.rootV2.charts.realizedRevenueDaily', 'Receita realizada por dia')}: ${label}`;
 											}
 
 											return `${t('dashboardRoot.chart.currentPeriod', 'Período atual')}: ${row.currentLabel} | ${t('dashboardRoot.chart.previousPeriod', 'Período anterior')}: ${row.previousLabel}`;
@@ -1002,12 +999,12 @@ export function DashboardRootAgileecommercePage() {
 								<div className="space-y-4">
 									<SectionCard
 										title={t('dashboardRoot.analyticsExecutiveTitle', 'Visão executiva comercial')}
-										description={t('dashboardRoot.analyticsExecutiveDescription', 'Consolidado de vendas, pedidos e confiabilidade do dado root.')}
+									description={t('dashboardRoot.rootV2.analyticsExecutiveDescription', 'Receita realizada, pedidos realizados e confiabilidade da leitura comercial root.')}
 									>
 										<SectionSkeleton lines={4} chart />
 									</SectionCard>
 									<div className="grid gap-4">
-										<SectionCard title={t('dashboardRoot.tables.revenueRanking', 'Ranking de faturamento')}>
+										<SectionCard title={t('dashboardRoot.rootV2.tables.revenueRanking', 'Ranking de receita realizada')}>
 											<SectionSkeleton lines={6} />
 										</SectionCard>
 									</div>
@@ -1022,25 +1019,25 @@ export function DashboardRootAgileecommercePage() {
 									<div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.95fr)]">
 										<div className="space-y-4">
 											<div className="app-pane-muted rounded-[1.4rem] p-4">
-												<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.transactedVolumeMonthly', 'Volume transacionado por mês')}</h3>
-												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.revenueSeries', 'Mostra a evolução da receita realizada, usando apenas os status comerciais definidos para o root.')}</p>
-												<LineChartCard data={analyticsRevenueSeries} dataKey="value" titleKey="dashboardRoot.charts.transactedVolumeMonthly" formatValue={formatCurrency} />
+												<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.rootV2.charts.realizedRevenueMonthly', 'Receita realizada por mês')}</h3>
+												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.revenueSeries', 'Evolução mensal da receita realizada, considerando pedidos pela data do pedido e status atual dentro da whitelist comercial.')}</p>
+												<LineChartCard data={analyticsRevenueSeries} dataKey="value" titleKey="dashboardRoot.rootV2.charts.realizedRevenueMonthly" formatValue={formatCurrency} />
 											</div>
 
 											<div className="app-pane-muted rounded-[1.4rem] p-4">
-												<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.ordersMonthly', 'Pedidos por mês')}</h3>
-												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.ordersSeries', 'Mostra a evolução dos pedidos realizados com a mesma regra usada na receita realizada.')}</p>
-												<LineChartCard data={analyticsOrdersSeries} dataKey="value" titleKey="dashboardRoot.charts.ordersMonthly" />
+												<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.rootV2.charts.realizedOrdersMonthly', 'Pedidos realizados por mês')}</h3>
+												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.ordersSeries', 'Evolução mensal dos pedidos realizados, usando a mesma regra da receita realizada.')}</p>
+												<LineChartCard data={analyticsOrdersSeries} dataKey="value" titleKey="dashboardRoot.rootV2.charts.realizedOrdersMonthly" />
 											</div>
 										</div>
 
 										<div className="app-pane rounded-[1.4rem] p-4">
-											<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.charts.ordersByStatus', 'Pedidos por status')}</h3>
-											<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.ordersStatus', 'Mostra todos os status do período para explicar o funil operacional, inclusive os que não entram na receita realizada.')}</p>
+											<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.rootV2.charts.ordersByCurrentStatus', 'Pedidos por status atual')}</h3>
+											<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.ordersStatus', 'Distribuição atual dos pedidos cuja data está no período selecionado, agrupados pelo status atual.')}</p>
 											<StatusDonutCard
 												data={analyticsOrderStatusPie}
-												totalLabel={t('dashboardRoot.cards.ordersTotal', 'Pedidos consolidados')}
-												tooltip={t('dashboardRoot.chartTooltip.ordersStatusLegend', 'Legenda com peso percentual de cada status dentro do total de pedidos do intervalo.')}
+												totalLabel={t('dashboardRoot.rootV2.cards.ordersInPeriod', 'Pedidos do período')}
+												tooltip={t('dashboardRoot.rootV2.chartTooltip.ordersStatusLegend', 'Mostra o peso percentual de cada status atual entre os pedidos com data no período. Não representa sequência histórica de status.')}
 											/>
 										</div>
 									</div>
@@ -1052,36 +1049,36 @@ export function DashboardRootAgileecommercePage() {
 											label={t('dashboardRoot.rootV2.cards.companiesWithoutSales', 'Empresas sem venda')}
 											value={formatNumber(parseNumber(snapshot.analytics?.resumo?.empresas_sem_venda))}
 											helper={t('dashboardRoot.rootV2.portfolio.companiesWithoutSalesHelper', 'Carteira sem pedido realizado no período selecionado.')}
-											tooltip={t('dashboardRoot.rootV2.portfolio.companiesWithoutSalesTooltip', 'Total de empresas root menos as empresas com pelo menos um pedido nos status realizados.')}
+											tooltip={t('dashboardRoot.rootV2.portfolio.companiesWithoutSalesTooltip', 'Total root menos empresas com pelo menos um pedido cuja data está no período e cujo status atual está na whitelist comercial.')}
 											tone="amber"
 										/>
 										<MetricTile
 											label={t('dashboardRoot.rootV2.cards.revenueConcentrationTop10', 'Concentração top 10')}
 											value={`${formatNumber(parseNumber(snapshot.analytics?.concentracao_faturamento?.top_10_percentual))}%`}
 											helper={t('dashboardRoot.rootV2.portfolio.revenueConcentrationTop10Helper', 'Participação das dez maiores empresas na receita realizada.')}
-											tooltip={t('dashboardRoot.rootV2.portfolio.revenueConcentrationTop10Tooltip', 'Calculado com a mesma whitelist de status da receita realizada, para medir dependência das maiores contas.')}
+											tooltip={t('dashboardRoot.rootV2.portfolio.revenueConcentrationTop10Tooltip', 'Participação das 10 maiores contas dentro da receita realizada, usando data do pedido e status atual na whitelist comercial.')}
 											tone="sky"
 										/>
 										<MetricTile
 											label={t('dashboardRoot.cards.companiesInDecline', 'Empresas em queda')}
 											value={formatNumber(parseNumber(snapshot.analytics?.resumo?.empresas_em_queda))}
-											helper={t('dashboardRoot.rootV2.portfolio.companiesInDeclineHelper', 'Empresas que encolheram contra o período anterior equivalente.')}
-											tooltip={t('dashboardRoot.rootV2.portfolio.companiesInDeclineTooltip', 'A queda compara apenas a receita realizada dos dois períodos, usando a whitelist de status comerciais.')}
+											helper={t('dashboardRoot.rootV2.portfolio.companiesInDeclineHelper', 'Empresas que encolheram em receita realizada contra o período anterior equivalente.')}
+											tooltip={t('dashboardRoot.rootV2.portfolio.companiesInDeclineTooltip', 'A queda compara apenas receita realizada dos dois períodos, usando data do pedido e status atual na whitelist comercial.')}
 											tone="rose"
 										/>
 									</div>
 
 									<SectionCard
-										title={t('dashboardRoot.tables.revenueRanking', 'Ranking de faturamento')}
+										title={t('dashboardRoot.rootV2.tables.revenueRanking', 'Ranking de receita realizada')}
 										description={t('dashboardRoot.rootV2.tables.revenueRankingDescription', 'Mostra as empresas que mais contribuem para a receita realizada no período escolhido.')}
-										action={<InfoTooltipButton label={t('dashboardRoot.tables.revenueRankingTooltip', 'Ajuda a identificar concentração de receita e dependência das principais contas da carteira.')} />}
+										action={<InfoTooltipButton label={t('dashboardRoot.rootV2.tables.revenueRankingTooltip', 'Ranking calculado apenas com pedidos cuja data está no período e cujo status atual está na whitelist comercial.')} />}
 									>
 										<SimpleTable
 											rows={snapshot.analytics?.ranking_faturamento ?? []}
 											maxHeightClass="max-h-[320px]"
 											columns={[
 												{ key: 'empresa_nome', label: t('dashboardRoot.table.company', 'Empresa') },
-												{ key: 'valor_total_vendas', label: t('dashboardRoot.table.revenue', 'Faturamento'), formatter: (value) => formatCurrency(parseNumber(value)) },
+												{ key: 'valor_total_vendas', label: t('dashboardRoot.rootV2.table.realizedRevenue', 'Receita realizada'), formatter: (value) => formatCurrency(parseNumber(value)) },
 												{ key: 'total_pedidos', label: t('dashboardRoot.table.orderCount', 'Pedidos'), formatter: (value) => formatNumber(parseNumber(value)) },
 											]}
 										/>
@@ -1091,17 +1088,17 @@ export function DashboardRootAgileecommercePage() {
 								{hasComparison ? (
 									<div className="grid gap-4">
 										<SectionCard
-											title={t('dashboardRoot.tables.declineSignals', 'Sinais de queda de faturamento')}
-											description={t('dashboardRoot.tables.declineSignalsDescription', 'Empresas que perderam faturamento comercial válido no comparativo com o período anterior equivalente.')}
-											action={<InfoTooltipButton label={t('dashboardRoot.tables.declineSignalsTooltip', 'Use esta leitura para priorizar análise comercial nas contas que encolheram em relação ao período anterior.')} />}
+											title={t('dashboardRoot.rootV2.tables.declineSignals', 'Sinais de queda de receita realizada')}
+											description={t('dashboardRoot.rootV2.tables.declineSignalsDescription', 'Empresas cuja receita realizada caiu no comparativo com o período anterior equivalente.')}
+											action={<InfoTooltipButton label={t('dashboardRoot.rootV2.tables.declineSignalsTooltip', 'Compara somente receita realizada, usando data do pedido e status atual dentro da whitelist comercial.')} />}
 										>
 											<SimpleTable
 												rows={snapshot.analytics?.empresas_sinais_queda ?? []}
 												maxHeightClass="max-h-[320px]"
 												columns={[
 													{ key: 'empresa_nome', label: t('dashboardRoot.table.company', 'Empresa') },
-													{ key: 'valor_anterior', label: t('dashboardRoot.table.previousRevenue', 'Faturamento anterior'), formatter: (value) => formatCurrency(parseNumber(value)) },
-													{ key: 'valor_atual', label: t('dashboardRoot.table.currentRevenue', 'Faturamento atual'), formatter: (value) => formatCurrency(parseNumber(value)) },
+													{ key: 'valor_anterior', label: t('dashboardRoot.rootV2.table.previousRealizedRevenue', 'Receita anterior'), formatter: (value) => formatCurrency(parseNumber(value)) },
+													{ key: 'valor_atual', label: t('dashboardRoot.rootV2.table.currentRealizedRevenue', 'Receita atual'), formatter: (value) => formatCurrency(parseNumber(value)) },
 													{ key: 'variacao_percentual', label: t('dashboardRoot.table.variation', 'Variação'), formatter: (value) => `${formatNumber(parseNumber(value))}%` },
 												]}
 											/>

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { readSessionState, writeSessionState } from '@/src/components/data-table/table-persistence'
 import { useDataTableState } from '@/src/components/data-table/use-data-table-state'
-import type { CrudDataClient, CrudListFilters, CrudListResponse, CrudModuleConfig } from '@/src/components/crud-base/types'
+import type { CrudDataClient, CrudListFilters, CrudListRecord, CrudListResponse, CrudModuleConfig } from '@/src/components/crud-base/types'
 
 export function useCrudListController(
   config: CrudModuleConfig,
@@ -59,7 +59,12 @@ export function useCrudListController(
       try {
         const nextResponse = await client.list(filters, config.listEmbed)
         if (!alive) return
-        setResponse(nextResponse)
+        setResponse(config.normalizeRecord
+          ? {
+              ...nextResponse,
+              data: nextResponse.data.map((record) => (config.normalizeRecord?.(record) ?? record) as CrudListRecord),
+            }
+          : nextResponse)
         clearSelection()
       } catch (loadError) {
         if (!alive) return

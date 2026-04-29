@@ -1,3 +1,4 @@
+import { createElement, forwardRef, type ComponentProps } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
 	BadgePercent,
@@ -62,7 +63,10 @@ import {
 	Palette,
 	Ban,
 	Waypoints,
+	MessageCircle,
 } from 'lucide-react';
+import { DynamicIcon } from 'lucide-react/dynamic.mjs';
+import { isIconPickerIconValue, normalizeIconPickerValue } from '@/src/components/ui/icon-picker-catalog';
 import type { AuthPermission, AuthSession, AuthTenant } from '@/src/features/auth/types/auth';
 import { translateMenuFromCandidates, translateMenuLabel } from '@/src/i18n/menu';
 import type { Locale } from '@/src/i18n/types';
@@ -93,6 +97,14 @@ type LegacyRootDefinition = {
 };
 
 const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
+	'funcionalidades-list': '/cadastros/funcionalidades',
+	'funcionalidades-form': '/cadastros/funcionalidades/novo',
+	'componentes-list': '/componentes',
+	'componentes-form': '/componentes/novo',
+	'agile-editor-sql-form': '/agile/ferramentas/editor-sql',
+	'agile-http-client-form': '/agile/ferramentas/http-client',
+	'agile-dicionario-modulos-list': '/agile/ferramentas/dicionario-de-dados',
+	'agile-sync-modules': '/agile/ferramentas/sincronizar-modulos',
 	'editor-sql-form': '/ferramentas/editor-sql',
 	'editor-sql-tabed-form': '/ferramentas/editor-sql',
 	'http-client-form': '/ferramentas/http-client',
@@ -114,7 +126,7 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 	'produtos-tabelas-preco-list': '/produtos-x-tabelas-de-preco',
 	dashboard: '/dashboard',
 	'administradores-list': '/administradores',
-	'administradores-master-list': '/administradores',
+	'administradores-master-list': '/agile/administradores',
 	'perfis-list': '/perfis',
 	'linhas-list': '/linhas',
 	'cores-list': '/cores',
@@ -152,6 +164,12 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 	'processos-imagens-list': '/processamento-de-imagens',
 	'processos-arquivos-list': '/importar-planilha',
 	'fases-list': '/fases',
+	'categorias-tarefas-list': '/cadastros/categorias-tarefas',
+	'categorias-tarefas-form': '/cadastros/categorias-tarefas/novo',
+	'tarefas-list': '/cadastros/tarefas',
+	'tarefas-form': '/cadastros/tarefas/novo',
+	'relatorios-grupos-list': '/cadastros/relatorios-grupos',
+	'relatorios-grupos-form': '/cadastros/relatorios-grupos/novo',
 	'sequenciais-list': '/sequenciais',
 	'limites-credito-list': '/limites-de-credito',
 	'formas-pagamento-list': '/formas-de-pagamento',
@@ -171,7 +189,12 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 	'segmentos-list': '/segmentos-clientes',
 	'regras-cadastro-list': '/regras-de-cadastro',
 	'clientes-list': '/clientes',
-	'relatorios-master-list': '/relatorios',
+	'relatorios-master-list': '/cadastros/relatorios-v2',
+	'relatorios-master-form': '/cadastros/relatorios-v2/novo',
+	'emails-payloads-list': '/cadastros/emails-payloads',
+	'emails-payloads-form': '/cadastros/emails-payloads/novo',
+	'apps-list': '/cadastros/apps',
+	'apps-form': '/cadastros/apps/novo',
 	'relatorios-list': '/relatorios',
 	'relatorios-v2-list': '/relatorios',
 	'configuracoes-clientes-form': '/configuracoes/clientes',
@@ -188,6 +211,7 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 	'integracao-usuarios-list': '/api-de-integracao/aplicativos',
 	'integracao-usuarios-form': '/api-de-integracao/aplicativos',
 	'integracao-atendimento-form': '/integracoes/atendimento',
+	'atendimentos-whatsapp-config': '/integracao-com-ferramentas/whatsapp',
 	'integracao-cliente-form': '/integracoes/clientes',
 	'integracao-apps-form': '/integracoes/aplicativos',
 	'integracao-notificacoes-form': '/integracoes/notificacoes',
@@ -217,7 +241,8 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 	'parametros-empresa-list': '/configuracoes/parametros',
 	'chatbot-empresas-list': '/configuracoes/assistente-vendas-ia',
 	'changelog-list': '/changelog',
-	'notificacoes-painel-list': '/legacy/notificacoes-painel-list',
+	'notificacoes-painel-list': '/notificacoes-painel',
+	'notificacoes-painel-form': '/notificacoes-painel/novo',
 };
 
 const IMPLEMENTED_CLICK_ROUTES: Record<string, string> = {
@@ -247,6 +272,14 @@ const ROOT_MENU: LegacyRootDefinition[] = [
 		],
 	},
 	{
+		key: 'integracao-ferramentas',
+		label: 'Integracao com Ferramentas',
+		icon: Plug,
+		children: [
+			{ key: 'atendimentos-whatsapp-config', label: 'Whatsapp', icon: MessageCircle, component: 'atendimentos-whatsapp-config' },
+		],
+	},
+	{
 		key: 'cadastros-root',
 		label: 'Cadastros',
 		icon: PanelsTopLeft,
@@ -254,6 +287,9 @@ const ROOT_MENU: LegacyRootDefinition[] = [
 			{ key: 'funcionalidades-list', label: 'Funcionalidades', icon: PanelsTopLeft, component: 'funcionalidades-list' },
 			{ key: 'componentes-list', label: 'Componentes', icon: AppWindow, component: 'componentes-list' },
 			{ key: 'fases-list', label: 'Fases', icon: ClipboardCheck, component: 'fases-list' },
+			{ key: 'categorias-tarefas-list', label: 'Categorias de Tarefas', icon: List, component: 'categorias-tarefas-list' },
+			{ key: 'tarefas-list', label: 'Tarefas', icon: ClipboardList, component: 'tarefas-list' },
+			{ key: 'relatorios-grupos-list', label: 'Grupos de Relatorios', icon: Network, component: 'relatorios-grupos-list' },
 			{ key: 'relatorios-master-list', label: 'Relatorios', icon: FileBarChart2, component: 'relatorios-master-list' },
 			{ key: 'emails-payloads-list', label: 'E-mails Payloads', icon: FileInput, component: 'emails-payloads-list' },
 			{ key: 'apps-list', label: 'Apps', icon: AppWindow, component: 'apps-list' },
@@ -265,9 +301,10 @@ const ROOT_MENU: LegacyRootDefinition[] = [
 		label: 'Ferramentas',
 		icon: Wrench,
 		children: [
-			{ key: 'editor-sql-form', label: 'Editor SQL', icon: FileCode2, component: 'editor-sql-form' },
-			{ key: 'http-client-form', label: 'HTTP Client', icon: Globe, component: 'http-client-form' },
-			{ key: 'dicionario-modulos-list', label: 'Dicionario de Dados', icon: Database, component: 'dicionario-modulos-list' },
+			{ key: 'agile-editor-sql-form', label: 'Editor SQL', icon: FileCode2, component: 'agile-editor-sql-form' },
+			{ key: 'agile-http-client-form', label: 'HTTP Client', icon: Globe, component: 'agile-http-client-form' },
+			{ key: 'agile-sync-modules', label: 'Sincronizar Módulos', icon: RefreshCcw, component: 'agile-sync-modules' },
+			{ key: 'agile-dicionario-modulos-list', label: 'Dicionário de Dados', icon: Database, component: 'agile-dicionario-modulos-list' },
 		],
 	},
 	{ key: 'administradores-master-list', label: 'Administradores', icon: ShieldCheck, component: 'administradores-master-list' },
@@ -341,6 +378,64 @@ const FA_ICON_MAP: Array<{ matcher: RegExp; icon: LucideIcon }> = [
 	{ matcher: /fa-briefcase/, icon: BriefcaseBusiness },
 	{ matcher: /fa-sync|fa-redo|fa-refresh/, icon: RefreshCcw },
 ];
+
+const SYSTEM_ICON_KEY_MAP: Record<string, LucideIcon> = {
+	'layout-grid': PanelsTopLeft,
+	'grid-2x2': PanelsTopLeft,
+	list: List,
+	boxes: Package,
+	package: Package,
+	'layers-3': PanelsTopLeft,
+	tag: Tags,
+	bookmark: BookOpen,
+	palette: Palette,
+	image: Image,
+	'shopping-cart': ShoppingCart,
+	users: Users,
+	user: Users2,
+	crown: ShieldCheck,
+	'building-2': Building2,
+	store: Warehouse,
+	truck: Truck,
+	'credit-card': HandCoins,
+	megaphone: Sparkles,
+	bell: Bell,
+	mail: Mail,
+	'file-text': FileCode2,
+	folder: FolderTree,
+	globe: Globe,
+	settings: Settings,
+	wrench: Wrench,
+	database: Database,
+	chart: ChartColumnBig,
+	shield: ShieldCheck,
+	percent: BadgePercent,
+	ticket: TicketPercent,
+	search: Search,
+	'map-pin': Map,
+	star: Sparkles,
+	sparkles: Sparkles,
+	heart: Gift,
+	'book-open': BookOpen,
+};
+
+const dynamicMenuIconCache = new globalThis.Map<string, LucideIcon>();
+
+function getDynamicMenuIcon(name: string): LucideIcon {
+	const cached = dynamicMenuIconCache.get(name);
+	if (cached) {
+		return cached;
+	}
+
+	const DynamicMenuIcon = forwardRef<SVGSVGElement, Omit<ComponentProps<LucideIcon>, 'ref'>>((props, ref) => createElement(DynamicIcon, {
+		...props,
+		ref,
+		name: name as never,
+	})) as unknown as LucideIcon;
+	DynamicMenuIcon.displayName = `DynamicMenuIcon(${name})`;
+	dynamicMenuIconCache.set(name, DynamicMenuIcon);
+	return DynamicMenuIcon;
+}
 
 const ICON_MAP: Array<{ matcher: RegExp; icon: LucideIcon }> = [
 	{ matcher: /(cores|color)/i, icon: Palette },
@@ -465,6 +560,16 @@ function mapLegacyRootDefinition(item: LegacyRootDefinition, locale: Locale): Me
 
 function resolveIcon(permission: AuthPermission): LucideIcon {
 	const normalizedIcon = normalizeSearchValue(permission.icone ?? '');
+	const normalizedIconKey = normalizeIconPickerValue(permission.icone ?? '');
+	if (isIconPickerIconValue(normalizedIconKey)) {
+		return getDynamicMenuIcon(normalizedIconKey);
+	}
+
+	const systemIcon = SYSTEM_ICON_KEY_MAP[normalizedIcon];
+	if (systemIcon) {
+		return systemIcon;
+	}
+
 	const faMatched = FA_ICON_MAP.find((item) => item.matcher.test(normalizedIcon));
 	if (faMatched) {
 		return faMatched.icon;

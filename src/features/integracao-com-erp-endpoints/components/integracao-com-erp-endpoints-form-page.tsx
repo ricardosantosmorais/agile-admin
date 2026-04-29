@@ -3,6 +3,8 @@
 import { Database, IdCard, Loader2, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { AppDataTable } from '@/src/components/data-table/app-data-table'
+import type { AppDataTableColumn } from '@/src/components/data-table/types'
 import type { CrudRecord } from '@/src/components/crud-base/types'
 import { AsyncState } from '@/src/components/ui/async-state'
 import { FormRow } from '@/src/components/ui/form-row'
@@ -194,6 +196,18 @@ export function IntegracaoComErpEndpointsFormPage({ id }: Props) {
 	}, [activeTab, id])
 
 	const hasChanges = JSON.stringify(form) !== JSON.stringify(initialFormRef.current)
+	const profileColumns = useMemo<AppDataTableColumn<EndpointProfileRecord>[]>(() => [
+		{
+			id: 'idPerfil',
+			label: 'Id Perfil',
+			cell: (profile) => profile.idPerfil || '-',
+		},
+		{
+			id: 'nomePerfil',
+			label: 'Nome Perfil',
+			cell: (profile) => profile.nomePerfil || '-',
+		},
+	], [])
 
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault()
@@ -335,42 +349,31 @@ export function IntegracaoComErpEndpointsFormPage({ id }: Props) {
 							</div>
 						</FormRow>
 						<AsyncState isLoading={profilesLoading}>
-							<div className="overflow-hidden rounded-2xl border border-line/40">
-								<table className="w-full table-fixed divide-y divide-line/40 text-sm">
-									<thead className="app-table-muted text-left text-xs font-semibold uppercase tracking-[0.14em] text-(--app-muted)">
-										<tr>
-											<th className="px-4 py-3">Id Perfil</th>
-											<th className="px-4 py-3">Nome Perfil</th>
-											<th className="w-28 px-4 py-3 text-center">Ações</th>
-										</tr>
-									</thead>
-									<tbody className="divide-y divide-line/30">
-										{profiles.length ? profiles.map((profile) => (
-											<tr key={`${profile.id}-${profile.idPerfil}`}>
-												<td className="px-4 py-3 align-middle text-(--app-text)">{profile.idPerfil}</td>
-												<td className="px-4 py-3 align-middle text-(--app-text)">{profile.nomePerfil || '-'}</td>
-												<td className="px-4 py-3 align-middle">
-													<div className="flex justify-center">
-														<button type="button" onClick={() => void handleDeleteProfile(profile.idPerfil)} disabled={readOnly || profileSaving} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-rose-200 bg-rose-50 text-rose-600 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-rose-400/30 dark:bg-rose-400/10 dark:text-rose-200" title="Excluir">
-															<Trash2 className="h-4 w-4" />
-														</button>
-													</div>
-												</td>
-											</tr>
-										)) : (
-											<tr>
-												<td colSpan={3} className="px-4 py-8 text-center text-sm text-(--app-muted)">Não existem perfis associados ao endpoint.</td>
-											</tr>
-										)}
-									</tbody>
-								</table>
-							</div>
+							<AppDataTable<EndpointProfileRecord>
+								rows={profiles}
+								getRowId={(profile) => `${profile.id}-${profile.idPerfil}`}
+								columns={profileColumns}
+								emptyMessage="Não existem perfis associados ao endpoint."
+								mobileCard={{
+									title: (profile) => profile.nomePerfil || '-',
+									subtitle: (profile) => `ID #${profile.idPerfil || '-'}`,
+								}}
+								actionsLabel="Ações"
+								rowActions={(profile) => [{
+									id: 'delete',
+									label: 'Excluir',
+									icon: Trash2,
+									tone: 'danger',
+									disabled: readOnly || profileSaving,
+									onClick: () => void handleDeleteProfile(profile.idPerfil),
+								}]}
+							/>
 						</AsyncState>
 					</div>
 				</SectionCard>
 			),
 		},
-	], [form, isEditing, profileSaving, profiles, profilesLoading, readOnly, selectedProfile])
+	], [form, isEditing, profileColumns, profileSaving, profiles, profilesLoading, readOnly, selectedProfile])
 
 	if (!isRootAgileecommerceAdmin(session)) {
 		return <AccessDeniedState title={t('maintenance.erpIntegration.catalogs.items.endpoints.formTitle', 'Endpoint')} backHref="/dashboard" />

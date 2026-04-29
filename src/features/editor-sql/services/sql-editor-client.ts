@@ -3,6 +3,7 @@ import type { SavedSqlQuery, SqlDataSource, SqlEditorExecuteResponse } from '@/s
 
 export const sqlEditorClient = {
   async execute(input: {
+    idEmpresa?: string
     fonteDados: SqlDataSource
     sql: string
     page: number

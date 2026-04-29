@@ -11,6 +11,23 @@ O **Dashboard Root Agile E-commerce** é um painel executivo que centraliza mét
 5. **Operação** - Processos internos e alertas
 6. **IA e Governança** - Agente e auditoria MCP
 
+### Regra comercial oficial do root
+
+A leitura comercial do dashboard root usa `analitico_pedidos_status_diario`.
+
+Os pedidos são considerados pela **data do pedido** e classificados pelo **status atual** do pedido. Os KPIs comerciais de receita, pedidos, ticket médio, rankings, concentração, empresas em queda e empresas sem venda usam somente a whitelist:
+
+- `faturado`
+- `entregue`
+- `em_separacao`
+- `em_transporte`
+- `recebido`
+- `coletado`
+
+Status fora da whitelist continuam aparecendo em **Pedidos por status atual**, mas não entram nos KPIs de receita realizada nem nas leituras derivadas de venda realizada.
+
+O bloco **Pedidos por status atual** mostra a distribuição atual dos pedidos cuja data está no período selecionado, agrupados pelo status atual. Ele não deve ser descrito como sequência histórica ou mudança de status ao longo do tempo.
+
 ## 2. Arquitetura de Dados
 
 ### Flow Geral

@@ -6,6 +6,18 @@ import type { LookupOption } from '@/src/components/ui/lookup-select';
 import type { TranslationParams } from '@/src/i18n/types';
 
 export type CrudResource =
+	| 'funcionalidades'
+	| 'componentes'
+	| 'componentes_campos'
+	| 'relatorios'
+	| 'relatorios/grupos'
+	| 'implantacao/categorias_tarefas'
+	| 'implantacao/tarefas'
+	| 'fases'
+	| 'categorias_tarefas'
+	| 'agilesync_empresas'
+	| 'emails_payloads'
+	| 'apps'
 	| 'formularios'
 	| 'formularios_campos'
 	| 'produtos_precificadores'
@@ -32,6 +44,7 @@ export type CrudResource =
 	| 'campanhas'
 	| 'cupons_desconto'
 	| 'notificacoes'
+	| 'notificacoes_painel'
 	| 'linhas'
 	| 'cores'
 	| 'areas_banner'
@@ -65,6 +78,11 @@ export type CrudResource =
 	| 'querys'
 	| 'scripts'
 	| 'endpoints'
+	| 'gateways'
+	| 'gateways_endpoints'
+	| 'interfaces_consulta'
+	| 'acoes'
+	| 'servicos_cadastros'
 	| 'canais_distribuicao'
 	| 'perfis_administradores'
 	| 'changelog'
@@ -168,6 +186,20 @@ export type CrudFieldConfig = {
 	options?: CrudFieldOption[];
 	optionsResource?: CrudResource;
 	lookupStateKey?: string;
+	lookupDefaultOption?: LookupOption | null;
+	lookupLoadOptions?: (context: {
+		query: string;
+		page: number;
+		perPage: number;
+		form: CrudRecord;
+		isEditing: boolean;
+		t: (key: string, fallback: string, params?: Record<string, string | number>) => string;
+	}) => Promise<LookupOption[]>;
+	mapLookupSelection?: (context: {
+		option: LookupOption | null;
+		form: CrudRecord;
+		isEditing: boolean;
+	}) => { value: unknown; lookup?: LookupOption | null };
 	helperTextKey?: string;
 	helperText?: string;
 	accept?: Record<string, string[]>;
@@ -284,6 +316,7 @@ export type CrudModuleConfig = {
 	normalizeRecord?: (record: CrudRecord) => CrudRecord;
 	beforeSave?: (record: CrudRecord) => CrudRecord;
 	getSaveRedirectPath?: (context: { id?: string; isEditing: boolean; saved: CrudRecord[]; form: CrudRecord }) => string;
+	stayOnSave?: boolean;
 	renderHeaderActions?: (context: { id?: string; isEditing: boolean; readOnly: boolean }) => React.ReactNode;
 	buildListRowActions?: (context: {
 		record: CrudListRecord;

@@ -26,11 +26,11 @@ const ERP_CATALOGS: ErpCatalogCard[] = [
 	{ key: 'queries', icon: FileCode2, href: '/integracao-com-erp/cadastros/queries', migrated: true },
 	{ key: 'scripts', icon: FileJson2, href: '/integracao-com-erp/cadastros/scripts', migrated: true },
 	{ key: 'endpoints', icon: Cable, href: '/integracao-com-erp/cadastros/endpoints', migrated: true },
-	{ key: 'gateways', icon: Network, legacyComponent: 'cadastro-gateways-list' },
-	{ key: 'gatewayEndpoints', icon: Puzzle, legacyComponent: 'cadastro-gateway-endpoints-list' },
-	{ key: 'interfacesConsulta', icon: Waypoints, legacyComponent: 'cadastro-interfaces-consulta-list' },
-	{ key: 'acoes', icon: Bolt, legacyComponent: 'cadastro-acoes-list' },
-	{ key: 'servicos', icon: Database, legacyComponent: 'cadastro-servicos-list' },
+	{ key: 'gateways', icon: Network, href: '/integracao-com-erp/cadastros/gateways', migrated: true },
+	{ key: 'gatewayEndpoints', icon: Puzzle, href: '/integracao-com-erp/cadastros/gateway-endpoints', migrated: true },
+	{ key: 'interfacesConsulta', icon: Waypoints, href: '/integracao-com-erp/cadastros/interfaces-consulta', migrated: true },
+	{ key: 'acoes', icon: Bolt, href: '/integracao-com-erp/cadastros/acoes', migrated: true },
+	{ key: 'servicos', icon: Database, href: '/integracao-com-erp/cadastros/servicos', migrated: true },
 ] as const
 
 export function IntegracaoComErpCadastrosPage() {

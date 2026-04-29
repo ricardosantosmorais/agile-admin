@@ -176,6 +176,31 @@ export function EnviosFormulariosPage() {
 		[contextState.data?.data.formularios, t],
 	)
 
+	const detailColumns = useMemo<AppDataTableColumn<EnvioFormularioDetail['campos'][number]>[]>(
+		() => [
+			{
+				id: 'campo',
+				label: t('consultasPages.formSubmissions.field', 'Campo'),
+				cell: (campo) => campo.titulo,
+				tdClassName: 'font-medium text-(--app-text)',
+			},
+			{
+				id: 'valor',
+				label: t('consultasPages.formSubmissions.value', 'Valor'),
+				cell: (campo) =>
+					campo.arquivoUrl ? (
+						<a href={campo.arquivoUrl} target="_blank" rel="noreferrer" className="app-button-secondary inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold">
+							{t('consultasPages.formSubmissions.viewFile', 'Visualizar arquivo')}
+						</a>
+					) : (
+						campo.valor || '-'
+					),
+				tdClassName: 'text-(--app-muted)',
+			},
+		],
+		[t],
+	)
+
 	if (!access.canOpen) {
 		return <AccessDeniedState title={t('consultasPages.formSubmissions.title', 'Envios de Formulários')} />
 	}
@@ -306,26 +331,16 @@ export function EnviosFormulariosPage() {
 								</div>
 							</div>
 
-							<div className="app-table-shell overflow-hidden rounded-[1.1rem]">
-								<table className="w-full table-auto border-separate border-spacing-0">
-									<tbody>
-										{detailState.data.data.campos.map((campo) => (
-											<tr key={campo.id}>
-												<td className="border-b border-line/40 px-4 py-3 align-top text-sm font-medium text-(--app-text)">{campo.titulo}</td>
-												<td className="border-b border-line/40 px-4 py-3 text-sm text-(--app-muted)">
-													{campo.arquivoUrl ? (
-														<a href={campo.arquivoUrl} target="_blank" rel="noreferrer" className="app-button-secondary inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold">
-															{t('consultasPages.formSubmissions.viewFile', 'Visualizar arquivo')}
-														</a>
-													) : (
-														campo.valor || '-'
-													)}
-												</td>
-											</tr>
-										))}
-									</tbody>
-								</table>
-							</div>
+							<AppDataTable
+								rows={detailState.data.data.campos}
+								getRowId={(campo) => campo.id}
+								columns={detailColumns}
+								emptyMessage={t('consultasPages.formSubmissions.emptyFields', 'Nenhum campo encontrado para este envio.')}
+								mobileCard={{
+									title: (campo) => campo.titulo,
+									subtitle: (campo) => campo.arquivoUrl ? t('consultasPages.formSubmissions.fileField', 'Arquivo') : campo.valor || '-',
+								}}
+							/>
 						</div>
 					) : null}
 				</AsyncState>

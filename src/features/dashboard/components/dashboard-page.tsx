@@ -5,6 +5,8 @@ import jsPDF from 'jspdf';
 import { Download, RefreshCw } from 'lucide-react';
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { AppDataTable } from '@/src/components/data-table/app-data-table';
+import type { AppDataTableColumn } from '@/src/components/data-table/types';
 import { AsyncState } from '@/src/components/ui/async-state';
 import { DateRangeComparativePicker } from '@/src/components/ui/date-range-comparative-picker';
 import { PageHeader } from '@/src/components/ui/page-header';
@@ -166,35 +168,29 @@ function LightTable({
 	rows: Array<Record<string, string>>;
 	disableScroll?: boolean;
 }) {
+	const tableColumns = columns.map((column, index) => ({
+		id: column.key,
+		label: column.label,
+		cell: (row: Record<string, string>) => row[column.key],
+		thClassName: column.align === 'right' ? 'text-right' : 'text-left',
+		tdClassName: [
+			column.align === 'right' ? 'text-right' : 'text-left',
+			index === 0 ? 'font-semibold text-slate-950' : 'text-slate-700',
+		].join(' '),
+	})) satisfies AppDataTableColumn<Record<string, string>>[];
+
 	return (
-		<div className={['app-table-shell rounded-[1rem]', disableScroll ? 'overflow-visible' : 'overflow-x-auto'].join(' ')}>
-			<table className="min-w-full text-left text-[12px]">
-				<thead className="app-table-muted border-b border-line/70 text-slate-500">
-					<tr>
-						{columns.map((column) => (
-							<th key={column.key} className={['px-3.5 py-2.5 font-semibold uppercase tracking-[0.18em]', column.align === 'right' ? 'text-right' : 'text-left'].join(' ')}>
-								{column.label}
-							</th>
-						))}
-					</tr>
-				</thead>
-				<tbody>
-					{rows.map((row, index) => (
-						<tr key={index} className="border-t border-line/60 text-slate-700">
-							{columns.map((column) => (
-								<td
-									key={column.key}
-									className={['px-3.5 py-2.5', column.align === 'right' ? 'text-right' : 'text-left', column.key === columns[0]?.key ? 'font-semibold text-slate-950' : ''].join(
-										' ',
-									)}
-								>
-									{row[column.key]}
-								</td>
-							))}
-						</tr>
-					))}
-				</tbody>
-			</table>
+		<div className={disableScroll ? 'overflow-visible' : ''}>
+			<AppDataTable
+				rows={rows}
+				getRowId={(row) => `${row[columns[0]?.key ?? ''] || ''}-${row[columns[1]?.key ?? ''] || ''}-${rows.indexOf(row)}`}
+				columns={tableColumns}
+				emptyMessage="Sem dados para este período."
+				mobileCard={{
+					title: (row) => row[columns[0]?.key ?? ''] || '-',
+					subtitle: (row) => row[columns[1]?.key ?? ''] || '',
+				}}
+			/>
 		</div>
 	);
 }

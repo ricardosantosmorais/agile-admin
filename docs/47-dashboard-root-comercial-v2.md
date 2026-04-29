@@ -22,7 +22,9 @@ O desenho atual do root passa a separar o dashboard em quatro leituras principai
 
 Clientes e produtos deixam de fazer parte do dashboard root neste momento. As cargas dessas dimensoes podem continuar existindo no worker ate a remocao upstream, mas a API e a tela root nao devem depender de `analitico_clientes_diario` nem de `analitico_produtos_diario`.
 
-A fonte comercial final do root passa a ser `analitico_pedidos_status_diario`, com whitelist inicial de venda realizada:
+A fonte comercial final do root passa a ser `analitico_pedidos_status_diario`. A regra oficial é: os pedidos são considerados pela **data do pedido** e classificados pelo **status atual** do pedido.
+
+Os KPIs de venda realizada usam a whitelist:
 
 - `faturado`
 - `entregue`
@@ -31,17 +33,16 @@ A fonte comercial final do root passa a ser `analitico_pedidos_status_diario`, c
 - `recebido`
 - `coletado`
 
-Status fora dessa whitelist continuam aparecendo na distribuicao operacional de pedidos por status, mas nao entram em receita realizada, pedidos realizados, ticket medio, ranking de faturamento ou sinais de queda.
+Status fora dessa whitelist continuam aparecendo em **Pedidos por status atual**, como distribuição atual dos pedidos do período por status atual. Eles não entram em receita realizada, pedidos realizados, ticket médio, ranking de faturamento, ranking de pedidos, concentração, empresas em queda ou empresas sem venda.
+
+O bloco de status não representa sequência histórica nem mudança de status ao longo do tempo.
 
 ## Motivacao
 
 O dashboard atual entrega volume relevante de informacao, mas ainda concentra muito destaque em operacao interna da plataforma, apps, push, agente e auditoria.
 
-Com a entrada das tabelas:
+Com a entrada e estabilização das tabelas analíticas operacionais:
 
-- `analitico_vendas_diario`
-- `analitico_clientes_diario`
-- `analitico_produtos_diario`
 - `analitico_pedidos_status_diario`
 - `analitico_sincronizacao_checkpoint`
 - `analitico_sincronizacao_execucao`
@@ -72,15 +73,15 @@ o root ja passa a ter base suficiente para uma leitura mais proxima dos dashboar
 
 Leitura validada em `api-v3` e nas tabelas reais do banco root:
 
-- `analitico_clientes_diario` e `analitico_produtos_diario` estao atualizadas ate `2026-04-22`;
-- `analitico_vendas_diario` e `analitico_pedidos_status_diario` nao estao igualmente frescas para toda a base;
+- clientes e produtos ficam fora da narrativa root atual ate revisao do pipeline upstream;
+- `analitico_pedidos_status_diario` sustenta a leitura comercial por data do pedido e status atual;
 - o campo `ultima_data_referencia` em `analitico_sincronizacao_checkpoint` hoje nao e suficiente como fonte unica de frescor;
 - o dashboard deve medir confiabilidade diretamente nas tabelas analiticas reais via `MAX(data_referencia)`.
 
 Implicacoes de produto:
 
 - nao usar linguagem que faca parecer que toda a carteira esta com dado comercial atualizado se isso nao for verdade;
-- nao expor metricas como "clientes ativos" sem deixar claro se e snapshot, media diaria ou soma no periodo;
+- manter clientes e produtos fora deste dashboard root ate que a regra upstream seja revisada;
 - destacar cobertura e defasagem junto do consolidado comercial.
 
 ## Nova arquitetura de leitura da tela
@@ -109,13 +110,13 @@ Esses blocos continuam uteis, mas deixam de ser a narrativa principal da abertur
 
 ### Linha 1 - KPIs executivos
 
-- `Faturamento consolidado`: valor total vendido pela carteira no periodo selecionado.
-- `Pedidos consolidados`: quantidade total de pedidos registrados no periodo.
-- `Ticket medio consolidado`: faturamento consolidado dividido por pedidos.
-- `Crescimento de faturamento`: variacao percentual contra o periodo anterior equivalente.
-- `Crescimento de pedidos`: variacao percentual de volume contra o periodo anterior.
-- `Empresas com venda no periodo`: empresas distintas presentes em `analitico_vendas_diario`.
-- `Empresas em queda`: empresas com variacao negativa de faturamento vs periodo anterior.
+- `Receita realizada`: soma dos pedidos cuja data do pedido esta no periodo selecionado e cujo status atual esta na whitelist comercial.
+- `Pedidos realizados`: quantidade de pedidos pela mesma regra da receita realizada.
+- `Ticket medio consolidado`: receita realizada dividida por pedidos realizados.
+- `Crescimento de receita`: variacao percentual da receita realizada contra o periodo anterior equivalente.
+- `Crescimento de pedidos`: variacao percentual dos pedidos realizados contra o periodo anterior.
+- `Empresas com venda no periodo`: empresas com pelo menos um pedido cuja data esta no periodo e cujo status atual esta na whitelist comercial.
+- `Empresas em queda`: empresas com queda de receita realizada vs periodo anterior.
 - `Cobertura comercial atual`: percentual da carteira com dado comercial fresco.
 
 ### Linha 2 - Faixa de confianca
@@ -132,7 +133,7 @@ Cards sugeridos:
 
 - `Ultima atualizacao real de vendas`
 - `Cobertura de vendas frescas`
-- `Cobertura de pedidos por status`
+- `Empresas com status de pedidos recente`
 - `Falhas recentes de sincronizacao`
 
 ## Secoes detalhadas propostas
@@ -144,9 +145,9 @@ mostrar a historia principal do negocio.
 
 Componentes:
 
-- serie de faturamento por periodo;
+- serie de receita realizada por periodo;
 - serie de pedidos por periodo;
-- distribuicao de pedidos por status;
+- distribuicao atual dos pedidos do periodo por status atual;
 - comparativo atual x anterior;
 - seletor de periodo com comparativo automatico.
 
@@ -181,8 +182,8 @@ o bloco `analytics_summary` continua existindo por retrocompatibilidade, mas a t
 
 Os blocos `analytics_commercial` e `analytics_operations` devem conter apenas o que esta efetivamente visivel na experiencia principal:
 
-- serie mensal de vendas;
-- ranking de faturamento;
+- serie mensal de receita realizada;
+- ranking de receita realizada;
 - sinais de queda;
 - resumo de sincronizacao.
 
@@ -204,16 +205,18 @@ Quando esses dados forem necessarios, devem ser buscados por `analytics_diagnost
 
 ## Regra de verdade para KPI comercial
 
-No curto prazo, o dashboard root deve usar uma estrategia hibrida:
+O dashboard root deve usar uma regra comercial unica:
 
-- `analitico_pedidos_status_diario` como fonte de verdade para KPI comercial valido;
-- `analitico_vendas_diario` apenas como apoio transicional para campos legados que ainda nao foram reprojetados;
+- `analitico_pedidos_status_diario` como fonte de verdade para KPI comercial;
+- pedidos considerados pela data do pedido;
+- classificacao pelo status atual do pedido;
+- whitelist comercial aplicada em receita realizada, pedidos realizados, ticket medio, ranking, concentracao, empresas em queda e empresas sem venda;
 - `analitico_sincronizacao_checkpoint` e `analitico_sincronizacao_execucao` para frescor, cobertura e governanca operacional.
 
 Aplicacao pratica:
 
-- `Faturamento consolidado`, `Pedidos consolidados`, `Ticket medio`, series de vendas, ranking de faturamento e sinais de queda devem considerar apenas status comerciais validos;
-- a distribuicao por status continua mostrando o quadro completo da operacao;
+- `Receita realizada`, `Pedidos realizados`, `Ticket medio`, series, ranking de faturamento, ranking de pedidos, concentracao e sinais de queda devem considerar apenas a whitelist comercial;
+- a distribuicao por status mostra a distribuicao atual dos pedidos do periodo por status atual;
 - metricas derivadas de clientes e produtos permanecem em observacao ate a correcao do pipeline analitico de origem.
 - os cards de sincronizacao devem refletir uma janela tecnica recente, independente do periodo comercial filtrado.
 
@@ -221,7 +224,7 @@ Enquanto o pipeline upstream de clientes e produtos nao for corrigido, a tela v2
 
 - remover da narrativa principal cards e rankings de clientes e produtos;
 - evitar score comercial que dependa dessas dimensoes;
-- explicar no proprio card ou secao que os indicadores comerciais sao computados apenas com pedidos em status comerciais validos.
+- explicar no proprio card ou secao que os indicadores comerciais usam pedidos pela data do pedido e status atual dentro da whitelist comercial.
 
 Objetivo:
 
@@ -236,11 +239,11 @@ mostrar quem puxa o resultado.
 
 Blocos:
 
-- ranking de empresas por faturamento;
+- ranking de empresas por receita realizada;
 - ranking de empresas por volume de pedidos;
-- ranking de empresas por base ativa;
-- ranking de empresas por produtos ativos;
-- top empresas por engajamento de compradores sobre base ativa.
+- empresas com venda no periodo;
+- empresas sem venda no periodo;
+- concentracao top 10 dentro da receita realizada.
 
 ### 3. Saude comercial da base
 
@@ -251,7 +254,6 @@ Blocos:
 
 - empresas com maior crescimento;
 - empresas com sinais de queda;
-- empresas com base saudavel;
 - empresas sem movimento recente;
 - empresas com dado desatualizado.
 
@@ -288,42 +290,14 @@ Blocos mantidos abaixo:
 
 Usar soma no periodo:
 
-- faturamento;
-- pedidos;
-- novos clientes;
-- produtos vendidos;
+- receita realizada;
+- pedidos realizados;
 - itens vendidos;
 - registros lidos e gravados.
 
-### KPI de estoque
+### Dimensoes fora do root atual
 
-Nao usar soma no periodo sem aviso.
-
-Preferir:
-
-- ultimo snapshot disponivel no intervalo; ou
-- media diaria explicitamente rotulada.
-
-Aplicar especialmente em:
-
-- clientes ativos;
-- clientes compradores;
-- produtos ativos;
-- empresas com base ativa.
-
-### Nomenclatura obrigatoria
-
-Evitar:
-
-- `Clientes ativos`
-- `Produtos ativos`
-
-Preferir:
-
-- `Media diaria de clientes ativos`
-- `Ultimo snapshot de produtos ativos`
-
-ou outra variacao equivalente que deixe a leitura correta.
+Clientes e produtos nao devem aparecer no dashboard root neste momento. Se voltarem no futuro, precisam de nomenclatura explicita sobre snapshot, media diaria ou periodo, para evitar leitura acumulada incorreta.
 
 ## Queries que ja existem e devem ser promovidas
 
@@ -333,8 +307,6 @@ Bloco `analytics` atual em `DashboardAgileecommerceController` ja entrega:
 - comparativo;
 - `ranking_faturamento`;
 - `ranking_pedidos`;
-- `engajamento_empresas`;
-- `empresas_mais_produtos`;
 - `pedidos_status`;
 - `empresas_sinais_queda`;
 - `sincronizacao_resumo`;
@@ -356,39 +328,25 @@ Saida sugerida:
 - `id_empresa`
 - `empresa_nome`
 - `max_vendas_data`
-- `max_clientes_data`
-- `max_produtos_data`
 - `max_pedidos_status_data`
 - `dias_defasagem_vendas`
 - `dias_defasagem_pedidos`
 - `situacao_frescor`
 
-### 2. `ranking_usuarios_ativos`
+### 2. Clientes e produtos
 
-Objetivo:
-mostrar empresas com maior base ativa sem ambiguidade.
+Status:
+fora do dashboard root atual.
 
-Regra sugerida:
-usar ultimo snapshot disponivel por empresa dentro do periodo ou media diaria, deixando isso explicito no contrato.
-
-### 3. `empresas_base_saudavel`
-
-Objetivo:
-listar empresas com melhor equilibrio entre uso, vendas e frescor.
-
-Score inicial sugerido:
-
-- crescimento de faturamento;
-- taxa compradores/ativos;
-- produtos com venda;
-- presenca de dado fresco.
+Motivo:
+essas dimensoes ainda dependem do pipeline analitico upstream e nao devem compor a narrativa executiva/comercial deste painel ate nova decisao.
 
 ### 4. `empresas_sem_movimento_recente`
 
 Objetivo:
 detectar empresas com base implantada, mas sem movimentacao recente.
 
-### 5. `serie_volume_transacionado`
+### 5. `serie_receita_realizada`
 
 Objetivo:
 dar granularidade adaptativa ao grafico principal.
@@ -401,13 +359,13 @@ Regra sugerida:
 
 ## Textos de legenda recomendados
 
-### Faturamento consolidado
+### Receita realizada
 
 Legenda:
-Soma de vendas registradas nas empresas com dados comerciais no periodo.
+Soma dos pedidos cuja data do pedido esta no periodo selecionado e cujo status atual esta na whitelist comercial.
 
 Tooltip:
-Considera os registros de `analitico_vendas_diario` dentro do intervalo selecionado. Se parte da carteira estiver defasada, a cobertura aparece na faixa de confianca logo abaixo.
+Considera apenas `faturado`, `entregue`, `em_separacao`, `em_transporte`, `recebido` e `coletado`. Outros status continuam visiveis na distribuicao por status atual, mas nao entram na receita realizada.
 
 ### Cobertura comercial atual
 
@@ -420,18 +378,11 @@ Calculado a partir da data maxima real de vendas e pedidos por empresa. Nao usa 
 ### Empresas em queda
 
 Legenda:
-Empresas cujo faturamento caiu em relacao ao periodo anterior equivalente.
+Empresas cuja receita realizada caiu em relacao ao periodo anterior equivalente.
 
 Tooltip:
-Mostra risco de retracao na carteira. Serve para priorizar triagem comercial e acompanhamento.
+Compara somente receita realizada entre os dois periodos, usando data do pedido e status atual dentro da whitelist comercial.
 
-### Media diaria de clientes ativos
-
-Legenda:
-Media diaria da base com atividade analitica no periodo.
-
-Tooltip:
-Nao representa um estoque unico consolidado. E uma media calculada sobre os snapshots diarios disponiveis.
 
 ## Direcao de UX
 
@@ -474,8 +425,8 @@ Campos minimos por tooltip:
 ### Etapa 2
 
 - criar queries de frescor e cobertura real;
-- ajustar metricas ambiguas de clientes e produtos;
-- incluir rankings adicionais.
+- manter clientes e produtos fora da narrativa root ate nova decisao;
+- incluir rankings adicionais somente se usarem a regra oficial de receita realizada.
 
 ### Etapa 3
 

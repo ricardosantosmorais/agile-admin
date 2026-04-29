@@ -314,28 +314,37 @@ export function ExcecoesProdutosListPage() {
                   <div className="mb-3 text-sm font-semibold text-[color:var(--app-text)]">
                     {t('maintenance.productExceptions.sections.rules', 'Regras')} ({rules.length})
                   </div>
-                  <div className="overflow-x-auto rounded-[0.9rem] border border-[color:var(--app-card-border)]">
-                    <table className="min-w-full divide-y divide-[color:var(--app-card-border)] text-sm">
-                      <thead className="bg-[color:var(--app-control-muted-bg)] text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--app-muted)]">
-                        <tr>
-                          <th className="px-4 py-3">{t('maintenance.productExceptions.sections.target', 'Alvo')}</th>
-                          <th className="px-4 py-3">{t('maintenance.productExceptions.sections.products', 'Produtos')}</th>
-                          <th className="px-4 py-3">{t('maintenance.productExceptions.sections.period', 'Período')}</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[color:var(--app-card-border)] bg-[color:var(--app-panel-solid)]">
-                        {rules.map((rule, index) => (
-                          <tr key={`${String(rule.id || row.id)}-${index}`}>
-                            <td className="px-4 py-3">{describeSide(rule, TARGET_FIELDS)}</td>
-                            <td className="px-4 py-3">{describeSide(rule, PRODUCT_FIELDS)}</td>
-                            <td className="px-4 py-3 text-[color:var(--app-muted)]">
-                              {rule.data_inicio ? formatDateTime(String(rule.data_inicio)) : '—'} {'->'} {rule.data_fim ? formatDateTime(String(rule.data_fim)) : '—'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  <AppDataTable
+                    rows={rules}
+                    getRowId={(rule) => `${String(rule.id || row.id)}-${rules.indexOf(rule)}`}
+                    columns={[
+                      {
+                        id: 'target',
+                        label: t('maintenance.productExceptions.sections.target', 'Alvo'),
+                        cell: (rule) => describeSide(rule, TARGET_FIELDS),
+                      },
+                      {
+                        id: 'products',
+                        label: t('maintenance.productExceptions.sections.products', 'Produtos'),
+                        cell: (rule) => describeSide(rule, PRODUCT_FIELDS),
+                      },
+                      {
+                        id: 'period',
+                        label: t('maintenance.productExceptions.sections.period', 'Per\u00edodo'),
+                        cell: (rule) => (
+                          <span className="text-[color:var(--app-muted)]">
+                            {rule.data_inicio ? formatDateTime(String(rule.data_inicio)) : '-'} {'->'} {rule.data_fim ? formatDateTime(String(rule.data_fim)) : '-'}
+                          </span>
+                        ),
+                      },
+                    ]}
+                    emptyMessage={t('maintenance.productExceptions.emptyRules', 'Nenhuma regra encontrada.')}
+                    mobileCard={{
+                      title: (rule) => describeSide(rule, TARGET_FIELDS),
+                      subtitle: (rule) => describeSide(rule, PRODUCT_FIELDS),
+                      meta: (rule) => `${rule.data_inicio ? formatDateTime(String(rule.data_inicio)) : '-'} -> ${rule.data_fim ? formatDateTime(String(rule.data_fim)) : '-'}`,
+                    }}
+                  />
                 </div>
               )
             }}

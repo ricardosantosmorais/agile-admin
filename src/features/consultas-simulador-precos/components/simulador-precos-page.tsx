@@ -1,8 +1,9 @@
 'use client'
 
 import { Play, RefreshCcw } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { CurrencyInput } from '@/src/components/ui/currency-input'
+import { DynamicResultGrid } from '@/src/components/ui/dynamic-result-grid'
 import { FormField } from '@/src/components/ui/form-field'
 import { inputClasses } from '@/src/components/ui/input-styles'
 import { LookupSelect, type LookupOption } from '@/src/components/ui/lookup-select'
@@ -15,7 +16,6 @@ import { simuladorPrecosClient } from '@/src/features/consultas-simulador-precos
 import type {
 	SimuladorPrecosDraft,
 	SimuladorPrecosResult,
-	SimuladorPrecosTableRow,
 } from '@/src/features/consultas-simulador-precos/services/simulador-precos-types'
 import { useI18n } from '@/src/i18n/use-i18n'
 
@@ -29,41 +29,6 @@ const DEFAULT_DRAFT: SimuladorPrecosDraft = {
 	id_condicao_pagamento: '',
 	id_cliente: '',
 	id_vendedor: '',
-}
-
-function ResultTable({ rows, emptyMessage }: { rows: SimuladorPrecosTableRow[]; emptyMessage: string }) {
-	const columns = useMemo(() => Array.from(new Set(rows.flatMap((row) => Object.keys(row)))), [rows])
-
-	if (!rows.length) {
-		return <p className="text-sm text-slate-500">{emptyMessage}</p>
-	}
-
-	return (
-		<div className="app-table-shell overflow-x-auto rounded-[1.2rem]">
-			<table className="min-w-full text-sm">
-				<thead className="app-table-muted text-left text-slate-500">
-					<tr>
-						{columns.map((column) => (
-							<th key={column} className="border-b border-line/50 px-3 py-3 whitespace-nowrap">
-								{column}
-							</th>
-						))}
-					</tr>
-				</thead>
-				<tbody>
-					{rows.map((row, index) => (
-						<tr key={index}>
-							{columns.map((column) => (
-								<td key={column} className="border-b border-line/40 px-3 py-3 align-top text-(--app-text)">
-									{row[column] || '-'}
-								</td>
-							))}
-						</tr>
-					))}
-				</tbody>
-			</table>
-		</div>
-	)
 }
 
 export function SimuladorPrecosPage() {
@@ -343,15 +308,15 @@ export function SimuladorPrecosPage() {
 					</div>
 
 					<SectionCard title={t('consultasPages.priceSimulator.sections.pricers', 'Precificadores Aplicados')}>
-						<ResultTable rows={result.precificadores} emptyMessage={emptyMessage} />
+						<DynamicResultGrid rows={result.precificadores} emptyMessage={emptyMessage} />
 					</SectionCard>
 
 					<SectionCard title={t('consultasPages.priceSimulator.sections.taxes', 'Tributos Aplicados')}>
-						<ResultTable rows={result.tributos} emptyMessage={emptyMessage} />
+						<DynamicResultGrid rows={result.tributos} emptyMessage={emptyMessage} />
 					</SectionCard>
 
 					<SectionCard title={t('consultasPages.priceSimulator.sections.quantityPromotions', 'Promoções por Quantidade')}>
-						<ResultTable rows={result.promocoesQuantidade} emptyMessage={emptyMessage} />
+						<DynamicResultGrid rows={result.promocoesQuantidade} emptyMessage={emptyMessage} />
 					</SectionCard>
 
 					{result.debug ? (

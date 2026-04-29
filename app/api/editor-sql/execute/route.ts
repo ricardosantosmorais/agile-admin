@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json().catch(() => null) as {
+    idEmpresa?: string
     fonteDados?: string
     sql?: string
     page?: number
@@ -42,6 +43,7 @@ export async function POST(request: NextRequest) {
   }
 
   const executed = await executeSqlAgainstExternalApi(resolved.context, {
+    idEmpresa: String(body?.idEmpresa || '').trim() || undefined,
     fonteDados,
     sql,
     page,
