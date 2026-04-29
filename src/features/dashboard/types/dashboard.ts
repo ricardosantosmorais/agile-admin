@@ -11,6 +11,8 @@ export type DashboardSnapshot = {
     tone?: 'emerald' | 'sky' | 'amber' | 'rose'
     description?: string
     descriptionKey?: string
+    tooltip?: string
+    tooltipKey?: string
   }>
   customerMetrics: Array<{
     label: string
@@ -47,6 +49,8 @@ export type DashboardSnapshot = {
     tone?: 'emerald' | 'sky' | 'amber' | 'rose'
     description?: string
     descriptionKey?: string
+    tooltip?: string
+    tooltipKey?: string
   }>
   marketingMixExclusive: Array<Record<string, unknown>>
   marketingMixInclusive: Array<Record<string, unknown>>

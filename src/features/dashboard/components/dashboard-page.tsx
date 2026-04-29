@@ -13,6 +13,7 @@ import { PageHeader } from '@/src/components/ui/page-header';
 import { SectionCard } from '@/src/components/ui/section-card';
 import { StatCard } from '@/src/components/ui/stat-card';
 import { StatusBadge } from '@/src/components/ui/status-badge';
+import { TooltipIconButton } from '@/src/components/ui/tooltip-icon-button';
 import { useTenant } from '@/src/contexts/tenant-context';
 import { useDashboardSequencedSnapshot, type DashboardPhaseId } from '@/src/features/dashboard/hooks/use-dashboard-sequenced-snapshot';
 import { useIntersectionOnce } from '@/src/hooks/use-intersection-once';
@@ -193,6 +194,30 @@ function LightTable({
 			/>
 		</div>
 	);
+}
+
+function InfoTooltipButton({ label }: { label: string }) {
+	return (
+		<TooltipIconButton label={label}>
+			<button
+				type="button"
+				className="app-button-secondary inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold text-[color:var(--app-muted)] shadow-sm"
+				aria-label={label}
+			>
+				i
+			</button>
+		</TooltipIconButton>
+	);
+}
+
+function getCustomerMetricTooltipKey(label: string) {
+	const normalizedLabel = label.toLowerCase();
+
+	if (normalizedLabel.includes('novos')) return 'dashboard.help.metrics.novosClientes';
+	if (normalizedLabel.includes('ativos')) return 'dashboard.help.metrics.clientesAtivos';
+	if (normalizedLabel.includes('recompra')) return 'dashboard.help.metrics.taxaRecompra';
+	if (normalizedLabel.includes('ltv')) return 'dashboard.help.metrics.ltvMedio';
+	return 'dashboard.help.sections.customers';
 }
 
 function LazyDashboardSection({
@@ -387,11 +412,15 @@ export function DashboardPage() {
 							<SectionCard
 								title={t('dashboard.customersIndicatorsTitle', 'Indicadores de clientes')}
 								description={t('dashboard.customersIndicatorsDescription', 'Indicadores complementares do tenant no periodo selecionado.')}
+								action={<InfoTooltipButton label={t('dashboard.help.sections.customers', 'Indicadores calculados a partir dos clientes que tiveram relacionamento comercial no período, usando a mesma regra de pedidos válidos do dashboard.')} />}
 							>
 								<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4">
 									{snapshot.customerMetrics.map((metric) => (
 										<div key={metric.label} className="app-pane-muted rounded-[1rem] px-3.5 py-3">
-											<p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">{translateDashboardMetricLabel(metric.label, t)}</p>
+											<div className="flex items-start justify-between gap-2">
+												<p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">{translateDashboardMetricLabel(metric.label, t)}</p>
+												<InfoTooltipButton label={t(getCustomerMetricTooltipKey(metric.label), 'Explica como este indicador de clientes é calculado para o período selecionado.')} />
+											</div>
 											<strong className="mt-2 block text-[1.55rem] font-black tracking-tight text-slate-950">
 												{metric.type === 'currency' ? formatCompactCurrency(metric.value) : metric.type === 'percent' ? formatPercent(metric.value) : formatNumber(metric.value)}
 											</strong>
@@ -423,6 +452,7 @@ export function DashboardPage() {
 							<div className="space-y-4 xl:space-y-5">
 								<SectionCard
 									title={t('dashboard.dailyRevenueTitle', 'Faturamento por dia')}
+									action={<InfoTooltipButton label={t('dashboard.help.sections.dailyRevenue', 'Mostra a receita válida por data do pedido. Quando houver comparação, a linha anterior usa o período anterior selecionado.')} />}
 									description={
 										hasPreviousComparison && selectedPreviousRange
 											? t('dashboard.dailyRevenueDescriptionWithRanges', 'Comparando o período selecionado ({{currentRange}}) com o período anterior ({{previousRange}}).', {
@@ -486,6 +516,7 @@ export function DashboardPage() {
 								<SectionCard
 									title={t('dashboard.monitoringTitle', 'Monitoramento do periodo')}
 									description={t('dashboard.monitoringDescription', 'Alertas operacionais e sinais de atencao do tenant ativo.')}
+									action={<InfoTooltipButton label={t('dashboard.help.sections.monitoring', 'Alertas derivados dos indicadores carregados para destacar quedas, riscos ou mudanças relevantes no período.')} />}
 								>
 									<div className="space-y-2">
 										{snapshot.monitoringAlerts.map((alert) => (
@@ -509,7 +540,11 @@ export function DashboardPage() {
 							}
 						>
 							<div className="grid gap-4 xl:grid-cols-2">
-								<SectionCard title={t('dashboard.funnelTitle', 'Funil de conversao')} description={t('dashboard.funnelDescription', 'Carrinho, pedidos validos e faturado.')}>
+								<SectionCard
+									title={t('dashboard.funnelTitle', 'Funil de conversao')}
+									description={t('dashboard.funnelDescription', 'Carrinho, pedidos validos e faturado.')}
+									action={<InfoTooltipButton label={t('dashboard.help.sections.funnel', 'Mostra a relação entre intenção de compra, pedidos válidos, faturamento e cancelamentos no período. Não é uma linha do tempo de mudança de status.')} />}
+								>
 									<ChartFrame>
 										{hasFunilData ? (
 											<ResponsiveChart>
@@ -525,7 +560,9 @@ export function DashboardPage() {
 																	`${t('dashboard.tooltip.quantity', 'Quantity')}: ${formatNumber(row.qtd ?? row.value ?? 0)}`,
 																	`${t('dashboard.tooltip.value', 'Value')}: ${formatCurrency(row.valor ?? 0)}`,
 																	row.name === 'Carrinho' ? '' : `${t('dashboard.tooltip.cartUsage', 'Usage over cart')}: ${formatPercent(row.pctCarrinho ?? 0)}`,
-																	row.name === 'Carrinho' || row.name === 'Aprovados' ? '' : `Aproveitamento sobre aprovados: ${formatPercent(row.pctAprovados ?? 0)}`,
+																	row.name === 'Carrinho' || row.name === 'Aprovados'
+																		? ''
+																		: `${t('dashboard.tooltip.approvedUsage', 'Usage over approved')}: ${formatPercent(row.pctAprovados ?? 0)}`,
 																]}
 															/>
 														}
@@ -545,6 +582,7 @@ export function DashboardPage() {
 								<SectionCard
 									title={t('dashboard.ticketPerDayTitle', 'Ticket medio por dia')}
 									description={t('dashboard.ticketPerDayDescription', 'Evolucao do valor medio por pedido ao longo do periodo.')}
+									action={<InfoTooltipButton label={t('dashboard.help.sections.ticketPerDay', 'Ticket médio diário calculado como receita válida do dia dividida pelos pedidos válidos do mesmo dia.')} />}
 								>
 									<ChartFrame>
 										{hasTicketData ? (
@@ -592,6 +630,7 @@ export function DashboardPage() {
 								<SectionCard
 									title={t('dashboard.deviceSalesTitle', 'Vendas por dispositivo')}
 									description={t('dashboard.deviceSalesDescription', 'Participacao das vendas por canal de origem.')}
+									action={<InfoTooltipButton label={t('dashboard.help.sections.deviceSales', 'Distribui pedidos válidos do período pelo canal de origem registrado no pedido.')} />}
 								>
 									<ChartFrame>
 										{hasChannelData ? (
@@ -626,6 +665,7 @@ export function DashboardPage() {
 								<SectionCard
 									title={t('dashboard.issuerSalesTitle', 'Vendas por emitente')}
 									description={t('dashboard.issuerSalesDescription', 'Compara pedidos feitos pelo cliente com pedidos feitos com apoio de vendedor.')}
+									action={<InfoTooltipButton label={t('dashboard.help.sections.issuerSales', 'Agrupa a receita válida entre pedidos feitos diretamente pelo cliente e pedidos emitidos com apoio comercial.')} />}
 								>
 									<ChartFrame>
 										{hasEmitenteData ? (
@@ -673,6 +713,7 @@ export function DashboardPage() {
 							<SectionCard
 								title={t('dashboard.topClientsTitle', 'Top clientes do periodo')}
 								description={t('dashboard.topClientsDescription', 'Clientes com maior valor vendido no periodo selecionado.')}
+								action={<InfoTooltipButton label={t('dashboard.help.sections.topClients', 'Ranking dos clientes com maior receita válida no período, considerando apenas pedidos válidos.')} />}
 							>
 								<LightTable
 									disableScroll={isExportingPdf}
@@ -707,6 +748,7 @@ export function DashboardPage() {
 								<SectionCard
 									title={t('dashboard.topProductsTitle', 'Top produtos do periodo')}
 									description={t('dashboard.topProductsDescription', 'Produtos com maior valor vendido no periodo selecionado.')}
+									action={<InfoTooltipButton label={t('dashboard.help.sections.topProducts', 'Produtos ordenados pela receita dos itens vinculados a pedidos válidos do período.')} />}
 								>
 									{hasTopProductsData ? (
 										<LightTable
@@ -730,6 +772,7 @@ export function DashboardPage() {
 								<SectionCard
 									title={t('dashboard.revenuePerHourTitle', 'Receita por hora')}
 									description={t('dashboard.revenuePerHourDescription', 'Horarios com maior volume de vendas, destacando o horario comercial.')}
+									action={<InfoTooltipButton label={t('dashboard.help.sections.revenuePerHour', 'Distribui a receita válida pela hora de criação do pedido para identificar picos de compra.')} />}
 								>
 									<div className="app-pane-muted mb-2.5 rounded-[0.95rem] px-3 py-2.5 text-[11px] text-slate-600">
 										{t('dashboard.revenuePerHourNote', 'Horario comercial (08h as 18h): acompanhamento da distribuicao de receita ao longo do dia.')}
@@ -783,6 +826,7 @@ export function DashboardPage() {
 								<SectionCard
 									title={t('dashboard.rebuyRateTitle', 'Taxa de recompra')}
 									description={t('dashboard.rebuyRateDescription', 'Clientes do periodo que voltaram a comprar em 30, 60 e 90 dias.')}
+									action={<InfoTooltipButton label={t('dashboard.help.sections.rebuyRate', 'Parte dos clientes com compra válida no período e verifica se eles voltaram a comprar nas janelas de 30, 60 e 90 dias.')} />}
 								>
 									<div className="app-pane-muted mb-2.5 flex items-center justify-between rounded-[0.95rem] px-3 py-2.5 text-[11px] text-slate-600">
 										<span>{t('dashboard.fixedBaseLabel', 'Base fixa: total de clientes que compraram no periodo')}</span>
@@ -816,6 +860,7 @@ export function DashboardPage() {
 								<SectionCard
 									title={t('dashboard.paymentMethodsTitle', 'Formas de pagamento')}
 									description={t('dashboard.paymentMethodsDescription', 'Distribuicao do valor vendido por tipo de pagamento.')}
+									action={<InfoTooltipButton label={t('dashboard.help.sections.paymentMethods', 'Distribui a receita válida por tipo de pagamento registrado nos pedidos do período.')} />}
 								>
 									<ChartFrame>
 										{hasPaymentData ? (
@@ -865,6 +910,7 @@ export function DashboardPage() {
 							<SectionCard
 								title={t('dashboard.marketingOverviewTitle', 'Visao de marketing')}
 								description={t('dashboard.marketingOverviewDescription', 'Indicadores de incentivo e impacto comercial do periodo.')}
+								action={<InfoTooltipButton label={t('dashboard.help.sections.marketingOverview', 'Resume quanto da receita válida teve algum incentivo comercial, como cupom, campanha, promoção ou brinde.')} />}
 							>
 								<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 									{snapshot.marketingMetrics.map((metric) => (
@@ -897,6 +943,7 @@ export function DashboardPage() {
 								<SectionCard
 									title={t('dashboard.incentivesMixTitle', 'Mix de incentivos')}
 									description={t('dashboard.incentivesMixDescription', 'Distribuicao exclusiva por tipo de incentivo.')}
+									action={<InfoTooltipButton label={t('dashboard.help.sections.incentivesMix', 'Classifica cada item vendido em um tipo principal de incentivo para evitar dupla contagem nesta visão.')} />}
 								>
 									<ChartFrame>
 										{hasMarketingExclusiveData ? (
@@ -932,6 +979,7 @@ export function DashboardPage() {
 									<SectionCard
 										title={t('dashboard.incentiveRevenueTitle', 'Receita por tipo de incentivo')}
 										description={t('dashboard.incentiveRevenueDescription', 'Receita dos itens com cada tipo de incentivo.')}
+										action={<InfoTooltipButton label={t('dashboard.help.sections.incentiveRevenue', 'Soma a receita dos itens vendidos por tipo de incentivo, podendo considerar sobreposição quando um item teve mais de um estímulo.')} />}
 									>
 										<ChartFrame>
 											{hasMarketingInclusiveData ? (
@@ -963,6 +1011,7 @@ export function DashboardPage() {
 									<SectionCard
 										title={t('dashboard.ticketComparisonTitle', 'Ticket medio')}
 										description={t('dashboard.ticketComparisonDescription', 'Comparativo entre pedidos com e sem incentivo.')}
+										action={<InfoTooltipButton label={t('dashboard.help.sections.ticketComparison', 'Compara o ticket médio de pedidos válidos com algum incentivo contra pedidos válidos sem incentivo.')} />}
 									>
 										<ChartFrame>
 											{hasMarketingTicketData ? (
@@ -1005,6 +1054,7 @@ export function DashboardPage() {
 								<SectionCard
 									title={t('dashboard.topCouponsTitle', 'Top cupons por receita')}
 									description={t('dashboard.topCouponsDescription', 'Cupons com maior receita no periodo.')}
+									action={<InfoTooltipButton label={t('dashboard.help.sections.topCoupons', 'Ranking dos cupons que mais contribuíram para a receita válida no período.')} />}
 								>
 									<ChartFrame>
 										{hasCouponData ? (
@@ -1041,6 +1091,7 @@ export function DashboardPage() {
 								<SectionCard
 									title={t('dashboard.topPromotionsTitle', 'Top promocoes por receita')}
 									description={t('dashboard.topPromotionsDescription', 'Promocoes com maior impacto em receita no periodo.')}
+									action={<InfoTooltipButton label={t('dashboard.help.sections.topPromotions', 'Ranking das promoções com maior receita vinculada a pedidos válidos do período.')} />}
 								>
 									<ChartFrame>
 										{hasPromotionData ? (

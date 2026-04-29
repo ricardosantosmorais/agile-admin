@@ -24,16 +24,51 @@ Clientes e produtos deixam de fazer parte do dashboard root neste momento. As ca
 
 A fonte comercial final do root passa a ser `analitico_pedidos_status_diario`. A regra oficial é: os pedidos são considerados pela **data do pedido** e classificados pelo **status atual** do pedido.
 
-Os KPIs de venda realizada usam a whitelist:
+Os KPIs de venda realizada usam a mesma regra comercial do dashboard tenant, para evitar divergência entre o que a empresa enxerga e o que o root consolida.
 
-- `faturado`
-- `entregue`
-- `em_separacao`
-- `em_transporte`
+Entram na leitura comercial realizada:
+
 - `recebido`
+- `em_analise`
+- `pagamento_em_analise`
+- `aguardando_pagamento`
+- `pagamento_aprovado`
+- `aprovado`
+- `aguardando_faturamento`
+- `faturado`
+- `faturado_parcial`
+- `em_conferencia`
+- `conferido`
+- `aguardando_separacao`
+- `em_separacao`
+- `separado`
 - `coletado`
+- `em_transporte`
+- `entregue`
+- `concluido`
+- `pendente`
+- `devolvido_parcial`
+- `reentrega`
+- `aguardando_recepcao`
+- `bloqueio_financeiro`
+- `bloqueio_comercial`
+- `bloqueio_sefaz`
+- `nota_denegada`
+- `pronto_retirada`
 
-Status fora dessa whitelist continuam aparecendo em **Pedidos por status atual**, como distribuição atual dos pedidos do período por status atual. Eles não entram em receita realizada, pedidos realizados, ticket médio, ranking de faturamento, ranking de pedidos, concentração, empresas em queda ou empresas sem venda.
+Ficam fora da leitura comercial realizada:
+
+- `carrinho`
+- `consulta`
+- `rejeitado`
+- `pagamento_reprovado`
+- `reprovado`
+- `cancelado`
+- `estornado`
+- `devolvido`
+- `rascunho`
+
+Status fora dessa regra continuam aparecendo em **Pedidos por status atual**, como distribuição atual dos pedidos do período por status atual. Eles não entram em receita realizada, pedidos realizados, ticket médio, ranking de faturamento, ranking de pedidos, concentração, empresas em queda ou empresas sem venda.
 
 O bloco de status não representa sequência histórica nem mudança de status ao longo do tempo.
 
@@ -110,12 +145,12 @@ Esses blocos continuam uteis, mas deixam de ser a narrativa principal da abertur
 
 ### Linha 1 - KPIs executivos
 
-- `Receita realizada`: soma dos pedidos cuja data do pedido esta no periodo selecionado e cujo status atual esta na whitelist comercial.
+- `Receita realizada`: soma dos pedidos cuja data do pedido esta no periodo selecionado e cujo status atual entra na mesma regra comercial do dashboard tenant.
 - `Pedidos realizados`: quantidade de pedidos pela mesma regra da receita realizada.
 - `Ticket medio consolidado`: receita realizada dividida por pedidos realizados.
 - `Crescimento de receita`: variacao percentual da receita realizada contra o periodo anterior equivalente.
 - `Crescimento de pedidos`: variacao percentual dos pedidos realizados contra o periodo anterior.
-- `Empresas com venda no periodo`: empresas com pelo menos um pedido cuja data esta no periodo e cujo status atual esta na whitelist comercial.
+- `Empresas com venda no periodo`: empresas com pelo menos um pedido cuja data esta no periodo e cujo status atual entra na mesma regra comercial do dashboard tenant.
 - `Empresas em queda`: empresas com queda de receita realizada vs periodo anterior.
 - `Cobertura comercial atual`: percentual da carteira com dado comercial fresco.
 
@@ -210,12 +245,12 @@ O dashboard root deve usar uma regra comercial unica:
 - `analitico_pedidos_status_diario` como fonte de verdade para KPI comercial;
 - pedidos considerados pela data do pedido;
 - classificacao pelo status atual do pedido;
-- whitelist comercial aplicada em receita realizada, pedidos realizados, ticket medio, ranking, concentracao, empresas em queda e empresas sem venda;
+- regra comercial do dashboard tenant aplicada em receita realizada, pedidos realizados, ticket medio, ranking, concentracao, empresas em queda e empresas sem venda;
 - `analitico_sincronizacao_checkpoint` e `analitico_sincronizacao_execucao` para frescor, cobertura e governanca operacional.
 
 Aplicacao pratica:
 
-- `Receita realizada`, `Pedidos realizados`, `Ticket medio`, series, ranking de faturamento, ranking de pedidos, concentracao e sinais de queda devem considerar apenas a whitelist comercial;
+- `Receita realizada`, `Pedidos realizados`, `Ticket medio`, series, ranking de faturamento, ranking de pedidos, concentracao e sinais de queda devem considerar apenas a regra comercial do dashboard tenant;
 - a distribuicao por status mostra a distribuicao atual dos pedidos do periodo por status atual;
 - metricas derivadas de clientes e produtos permanecem em observacao ate a correcao do pipeline analitico de origem.
 - os cards de sincronizacao devem refletir uma janela tecnica recente, independente do periodo comercial filtrado.
@@ -224,7 +259,7 @@ Enquanto o pipeline upstream de clientes e produtos nao for corrigido, a tela v2
 
 - remover da narrativa principal cards e rankings de clientes e produtos;
 - evitar score comercial que dependa dessas dimensoes;
-- explicar no proprio card ou secao que os indicadores comerciais usam pedidos pela data do pedido e status atual dentro da whitelist comercial.
+- explicar no proprio card ou secao que os indicadores comerciais usam pedidos pela data do pedido e status atual dentro da regra comercial do dashboard tenant.
 
 Objetivo:
 
@@ -362,10 +397,10 @@ Regra sugerida:
 ### Receita realizada
 
 Legenda:
-Soma dos pedidos cuja data do pedido esta no periodo selecionado e cujo status atual esta na whitelist comercial.
+Soma dos pedidos cuja data do pedido esta no periodo selecionado e cujo status atual entra na mesma regra comercial do dashboard tenant.
 
 Tooltip:
-Considera apenas `faturado`, `entregue`, `em_separacao`, `em_transporte`, `recebido` e `coletado`. Outros status continuam visiveis na distribuicao por status atual, mas nao entram na receita realizada.
+Usa a mesma regra comercial do dashboard da empresa. Outros status continuam visiveis na distribuicao por status atual, mas nao entram na receita realizada.
 
 ### Cobertura comercial atual
 
@@ -381,7 +416,7 @@ Legenda:
 Empresas cuja receita realizada caiu em relacao ao periodo anterior equivalente.
 
 Tooltip:
-Compara somente receita realizada entre os dois periodos, usando data do pedido e status atual dentro da whitelist comercial.
+Compara somente receita realizada entre os dois periodos, usando data do pedido e status atual dentro da regra comercial do dashboard tenant.
 
 
 ## Direcao de UX

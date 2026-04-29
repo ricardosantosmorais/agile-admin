@@ -15,16 +15,51 @@ O **Dashboard Root Agile E-commerce** é um painel executivo que centraliza mét
 
 A leitura comercial do dashboard root usa `analitico_pedidos_status_diario`.
 
-Os pedidos são considerados pela **data do pedido** e classificados pelo **status atual** do pedido. Os KPIs comerciais de receita, pedidos, ticket médio, rankings, concentração, empresas em queda e empresas sem venda usam somente a whitelist:
+Os pedidos são considerados pela **data do pedido** e classificados pelo **status atual** do pedido. Para evitar divergência entre o painel root e o painel da empresa, os KPIs comerciais do root usam a mesma regra de status do dashboard tenant.
 
-- `faturado`
-- `entregue`
-- `em_separacao`
-- `em_transporte`
+Entram em receita realizada, pedidos realizados, ticket médio, rankings, concentração, empresas em queda e empresas sem venda:
+
 - `recebido`
+- `em_analise`
+- `pagamento_em_analise`
+- `aguardando_pagamento`
+- `pagamento_aprovado`
+- `aprovado`
+- `aguardando_faturamento`
+- `faturado`
+- `faturado_parcial`
+- `em_conferencia`
+- `conferido`
+- `aguardando_separacao`
+- `em_separacao`
+- `separado`
 - `coletado`
+- `em_transporte`
+- `entregue`
+- `concluido`
+- `pendente`
+- `devolvido_parcial`
+- `reentrega`
+- `aguardando_recepcao`
+- `bloqueio_financeiro`
+- `bloqueio_comercial`
+- `bloqueio_sefaz`
+- `nota_denegada`
+- `pronto_retirada`
 
-Status fora da whitelist continuam aparecendo em **Pedidos por status atual**, mas não entram nos KPIs de receita realizada nem nas leituras derivadas de venda realizada.
+Ficam fora da leitura comercial realizada:
+
+- `carrinho`
+- `consulta`
+- `rejeitado`
+- `pagamento_reprovado`
+- `reprovado`
+- `cancelado`
+- `estornado`
+- `devolvido`
+- `rascunho`
+
+Status fora da regra comercial continuam aparecendo em **Pedidos por status atual**, mas não entram nos KPIs de receita realizada nem nas leituras derivadas de venda realizada.
 
 O bloco **Pedidos por status atual** mostra a distribuição atual dos pedidos cuja data está no período selecionado, agrupados pelo status atual. Ele não deve ser descrito como sequência histórica ou mudança de status ao longo do tempo.
 

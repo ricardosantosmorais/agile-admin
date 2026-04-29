@@ -15,6 +15,7 @@ type StatCardProps = {
 	descriptionKey?: string;
 	tone?: 'emerald' | 'sky' | 'amber' | 'rose';
 	tooltip?: string;
+	tooltipKey?: string;
 };
 
 const toneStyles = {
@@ -53,12 +54,13 @@ function renderMetricIcon(type: 'currency' | 'number' | 'percent', tone: 'emeral
 	return <ShoppingCart className="h-4 w-4" />;
 }
 
-export function StatCard({ label, labelKey, value, variation, showComparison = true, type = 'number', description, descriptionKey, tone = 'emerald', tooltip }: StatCardProps) {
+export function StatCard({ label, labelKey, value, variation, showComparison = true, type = 'number', description, descriptionKey, tone = 'emerald', tooltip, tooltipKey }: StatCardProps) {
 	const { t } = useI18n();
 	const variationPositive = variation > 0;
 	const VariationIcon = variationPositive ? ArrowUpRight : ArrowDownRight;
 	const translatedLabel = labelKey ? t(labelKey, label) : translateDashboardMetricLabel(label, t);
 	const translatedDescription = descriptionKey ? t(descriptionKey, description) : translateDashboardMetricDescription(description, t);
+	const translatedTooltip = tooltipKey ? t(tooltipKey, tooltip) : tooltip;
 
 	return (
 		<article className="app-stat-card relative overflow-hidden rounded-[1.3rem] px-3.5 py-3.5">
@@ -68,8 +70,8 @@ export function StatCard({ label, labelKey, value, variation, showComparison = t
 				<div>
 					<div className="flex items-center gap-1.5">
 						<p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">{translatedLabel}</p>
-						{tooltip ? (
-							<TooltipIconButton label={tooltip}>
+						{translatedTooltip ? (
+							<TooltipIconButton label={translatedTooltip}>
 								<button
 									type="button"
 									className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-line/80 text-[10px] font-bold text-slate-500"

@@ -102,6 +102,7 @@ export function mapDashboardPayloadToSnapshot(payload: unknown, rangeLabel: stri
         tone: 'emerald',
         description: 'Receita total dos pedidos validos no periodo selecionado.',
         descriptionKey: 'dashboard.metricDescriptions.totalVendas',
+        tooltipKey: 'dashboard.help.metrics.totalVendas',
       },
       {
         label: 'Numero de pedidos',
@@ -112,6 +113,7 @@ export function mapDashboardPayloadToSnapshot(payload: unknown, rangeLabel: stri
         tone: 'sky',
         description: 'Quantidade de pedidos validos no periodo selecionado.',
         descriptionKey: 'dashboard.metricDescriptions.numeroPedidos',
+        tooltipKey: 'dashboard.help.metrics.numeroPedidos',
       },
       {
         label: 'Ticket medio',
@@ -122,6 +124,7 @@ export function mapDashboardPayloadToSnapshot(payload: unknown, rangeLabel: stri
         tone: 'amber',
         description: 'Valor medio por pedido valido no periodo selecionado.',
         descriptionKey: 'dashboard.metricDescriptions.ticketMedio',
+        tooltipKey: 'dashboard.help.metrics.ticketMedio',
       },
       {
         label: 'Taxa de conversao',
@@ -132,6 +135,7 @@ export function mapDashboardPayloadToSnapshot(payload: unknown, rangeLabel: stri
         tone: 'rose',
         description: 'Percentual de aproveitamento do funil no periodo selecionado.',
         descriptionKey: 'dashboard.metricDescriptions.taxaConversao',
+        tooltipKey: 'dashboard.help.metrics.taxaConversao',
       },
     ],
     customerMetrics: [
@@ -206,10 +210,10 @@ export function mapDashboardPayloadToSnapshot(payload: unknown, rangeLabel: stri
       valor: asNumber(item.valor_total),
     })),
     marketingMetrics: [
-      { label: 'Pedidos incentivados', labelKey: 'dashboard.metricLabels.pedidosIncentivados', value: asNumber(marketingResumo.valor_pedidos_com_incentivo), variation: asNumber(marketingComparativo.valor_pedidos_com_incentivo), type: 'currency', tone: 'emerald', descriptionKey: 'dashboard.metricDescriptions.previousPeriod' },
-      { label: 'Itens incentivados', labelKey: 'dashboard.metricLabels.itensIncentivados', value: asNumber(marketingResumo.valor_itens_incentivados), variation: asNumber(marketingComparativo.valor_itens_incentivados), type: 'currency', tone: 'sky', descriptionKey: 'dashboard.metricDescriptions.previousPeriod' },
-      { label: 'Qtd. pedidos com incentivo', labelKey: 'dashboard.metricLabels.qtdPedidosComIncentivo', value: asNumber(marketingResumo.pedidos_com_incentivo), variation: asNumber(marketingComparativo.pedidos_com_incentivo), type: 'number', tone: 'amber', descriptionKey: 'dashboard.metricDescriptions.previousPeriod' },
-      { label: '% da receita com incentivo', labelKey: 'dashboard.metricLabels.receitaComIncentivo', value: asNumber(marketingResumo.receita_com_incentivo_percentual), variation: asNumber(marketingComparativo.receita_com_incentivo_percentual), type: 'percent', tone: 'rose', descriptionKey: 'dashboard.metricDescriptions.previousPeriod' },
+      { label: 'Pedidos incentivados', labelKey: 'dashboard.metricLabels.pedidosIncentivados', value: asNumber(marketingResumo.valor_pedidos_com_incentivo), variation: asNumber(marketingComparativo.valor_pedidos_com_incentivo), type: 'currency', tone: 'emerald', descriptionKey: 'dashboard.metricDescriptions.previousPeriod', tooltipKey: 'dashboard.help.metrics.pedidosIncentivados' },
+      { label: 'Itens incentivados', labelKey: 'dashboard.metricLabels.itensIncentivados', value: asNumber(marketingResumo.valor_itens_incentivados), variation: asNumber(marketingComparativo.valor_itens_incentivados), type: 'currency', tone: 'sky', descriptionKey: 'dashboard.metricDescriptions.previousPeriod', tooltipKey: 'dashboard.help.metrics.itensIncentivados' },
+      { label: 'Qtd. pedidos com incentivo', labelKey: 'dashboard.metricLabels.qtdPedidosComIncentivo', value: asNumber(marketingResumo.pedidos_com_incentivo), variation: asNumber(marketingComparativo.pedidos_com_incentivo), type: 'number', tone: 'amber', descriptionKey: 'dashboard.metricDescriptions.previousPeriod', tooltipKey: 'dashboard.help.metrics.qtdPedidosComIncentivo' },
+      { label: '% da receita com incentivo', labelKey: 'dashboard.metricLabels.receitaComIncentivo', value: asNumber(marketingResumo.receita_com_incentivo_percentual), variation: asNumber(marketingComparativo.receita_com_incentivo_percentual), type: 'percent', tone: 'rose', descriptionKey: 'dashboard.metricDescriptions.previousPeriod', tooltipKey: 'dashboard.help.metrics.receitaComIncentivo' },
     ],
     marketingMixExclusive: marketingExclusiveRows.map((item) => ({
       name: mapMarketingLabel(asString(item.classificacao)),
