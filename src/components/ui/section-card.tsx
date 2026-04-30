@@ -19,7 +19,7 @@ export function SectionCard({ title, description, action, children, className = 
           <div className="mb-5 flex flex-col gap-1.5 md:flex-row md:items-start md:justify-between">
             <div>
               {title ? <h2 className="text-base font-bold tracking-tight text-slate-950">{title}</h2> : null}
-              {description ? <p className="mt-0.5 text-[11px] leading-5 text-slate-500">{description}</p> : null}
+              {description ? <p className="mt-0.5 line-clamp-2 text-[11px] leading-5 text-slate-500">{description}</p> : null}
             </div>
             {action ? <div className="flex flex-wrap gap-2">{action}</div> : null}
           </div>

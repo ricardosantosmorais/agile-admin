@@ -945,7 +945,7 @@ export function DashboardRootAgileecommercePage() {
 										<div className="mb-3 flex flex-wrap items-start justify-between gap-3">
 											<div>
 												<div className="text-sm font-semibold text-slate-800">{t('dashboardRoot.rootV2.charts.realizedRevenueDaily', 'Receita realizada por dia')}</div>
-												<div className="text-[11px] leading-5 text-slate-500">{t('dashboardRoot.executiveStoryChartLegendDaily', 'Evolução diária da receita realizada, com comparação contra o período anterior quando disponível.')}</div>
+												<div className="line-clamp-2 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.executiveStoryChartLegendDaily', 'Evolução diária da receita realizada, com comparação contra o período anterior quando disponível.')}</div>
 											</div>
 											<div className="app-button-secondary rounded-full px-3 py-1 text-[11px] font-semibold text-[color:var(--app-muted)]">{selectedRangeLabel}</div>
 										</div>
@@ -1023,20 +1023,20 @@ export function DashboardRootAgileecommercePage() {
 										<div className="space-y-4">
 											<div className="app-pane-muted rounded-[1.4rem] p-4">
 												<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.rootV2.charts.realizedRevenueMonthly', 'Receita realizada por mês')}</h3>
-												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.revenueSeries', 'Evolução mensal da receita realizada, considerando pedidos pela data do pedido e status atual dentro da regra comercial usada também no dashboard da empresa.')}</p>
+												<p className="mb-3 line-clamp-2 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.revenueSeries', 'Evolução mensal da receita realizada, considerando pedidos pela data do pedido e status atual dentro da regra comercial usada também no dashboard da empresa.')}</p>
 												<LineChartCard data={analyticsRevenueSeries} dataKey="value" titleKey="dashboardRoot.rootV2.charts.realizedRevenueMonthly" formatValue={formatCurrency} />
 											</div>
 
 											<div className="app-pane-muted rounded-[1.4rem] p-4">
 												<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.rootV2.charts.realizedOrdersMonthly', 'Pedidos realizados por mês')}</h3>
-												<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.ordersSeries', 'Evolução mensal dos pedidos realizados, usando a mesma regra da receita realizada.')}</p>
+												<p className="mb-3 line-clamp-2 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.ordersSeries', 'Evolução mensal dos pedidos realizados, usando a mesma regra da receita realizada.')}</p>
 												<LineChartCard data={analyticsOrdersSeries} dataKey="value" titleKey="dashboardRoot.rootV2.charts.realizedOrdersMonthly" />
 											</div>
 										</div>
 
 										<div className="app-pane rounded-[1.4rem] p-4">
 											<h3 className="mb-2 text-sm font-semibold text-slate-700">{t('dashboardRoot.rootV2.charts.ordersByCurrentStatus', 'Pedidos por status atual')}</h3>
-											<p className="mb-3 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.ordersStatus', 'Distribuição atual dos pedidos cuja data está no período selecionado, agrupados pelo status atual.')}</p>
+											<p className="mb-3 line-clamp-2 text-[11px] leading-5 text-slate-500">{t('dashboardRoot.rootV2.chartLegend.ordersStatus', 'Distribuição atual dos pedidos cuja data está no período selecionado, agrupados pelo status atual.')}</p>
 											<StatusDonutCard
 												data={analyticsOrderStatusPie}
 												totalLabel={t('dashboardRoot.rootV2.cards.ordersInPeriod', 'Pedidos do período')}

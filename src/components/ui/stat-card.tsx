@@ -90,7 +90,7 @@ export function StatCard({ label, labelKey, value, variation, showComparison = t
 
 			{showComparison || translatedDescription ? (
 				<div className="mt-3 flex items-center justify-between gap-2.5 border-t border-line/70 pt-2.5">
-					<span className="text-[11px] leading-4 text-slate-500">
+					<span className="line-clamp-2 text-[11px] leading-4 text-slate-500">
 						{showComparison ? (translatedDescription ?? t('dashboard.metricDescriptions.previousPeriod', 'Comparativo com o periodo anterior.')) : translatedDescription}
 					</span>
 					{showComparison ? (
