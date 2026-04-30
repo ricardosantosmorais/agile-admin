@@ -1,6 +1,7 @@
 import { createHmac } from 'node:crypto'
 import type { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
+import { ACTIVE_TENANT_REQUEST_HEADER } from '@/src/features/auth/services/request-tenant'
 type StoredAuthSession = {
   token: string
   currentTenantId: string
@@ -56,7 +57,27 @@ function decodeSession(value: string): StoredAuthSession | null {
 export async function readAuthSession() {
   const cookieStore = await cookies()
   const raw = cookieStore.get(AUTH_COOKIE_NAME)?.value
-  return raw ? decodeSession(raw) : null
+  const session = raw ? decodeSession(raw) : null
+
+  if (!session) {
+    return null
+  }
+
+  try {
+    const requestHeaders = await headers()
+    const activeTabTenantId = requestHeaders.get(ACTIVE_TENANT_REQUEST_HEADER)?.trim()
+
+    if (activeTabTenantId) {
+      return {
+        ...session,
+        currentTenantId: activeTabTenantId,
+      }
+    }
+  } catch {
+    // Fora de um contexto de request, o cookie continua sendo a fonte disponível.
+  }
+
+  return session
 }
 
 export function writeAuthSession(response: NextResponse, session: StoredAuthSession) {

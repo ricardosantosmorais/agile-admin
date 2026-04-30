@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mapDashboardPayloadToSnapshot } from '@/src/features/dashboard/services/dashboard-mappers';
 import { readAuthSession } from '@/src/features/auth/services/auth-session';
+import { resolveRequestTenantId } from '@/src/features/auth/services/request-tenant';
 import { serverApiFetch } from '@/src/services/http/server-api';
 
 function extractMessage(payload: unknown) {
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
 		previousEnd?: string | null;
 	};
 
-	const tenantId = body.tenantId || session.currentTenantId;
+	const tenantId = resolveRequestTenantId(request, session, body.tenantId);
 	const forceRefresh = body.forceRefresh === true;
 	const result = await serverApiFetch('relatorios/dashboard-v2-comparativo', {
 		method: 'POST',

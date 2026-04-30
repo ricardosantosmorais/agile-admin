@@ -13,6 +13,7 @@ import { ProdutoImagePreview } from '@/src/features/produtos/components/produto-
 import { buildProdutoImageUrl } from '@/src/features/produtos/services/produto-image-url'
 import { useI18n } from '@/src/i18n/use-i18n'
 import { httpClient } from '@/src/services/http/http-client'
+import { fetchWithTenantContext } from '@/src/services/http/tenant-context'
 
 type ProdutoImagemRecord = {
   id: string
@@ -76,7 +77,7 @@ export function ProdutoImagensTab({
     formData.append('tenantBucketUrl', session?.currentTenant.assetsBucketUrl || '')
     formData.append('fixedFileName', `${productId}_${orderedItems.length + 1}.${extension}`)
 
-    const response = await fetch('/api/uploads', {
+    const response = await fetchWithTenantContext('/api/uploads', {
       method: 'POST',
       body: formData,
       credentials: 'include',

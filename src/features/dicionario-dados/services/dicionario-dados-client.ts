@@ -1,4 +1,5 @@
 import { httpClient } from '@/src/services/http/http-client'
+import { fetchWithTenantContext } from '@/src/services/http/tenant-context'
 import type {
   DicionarioComponenteCamposResponse,
   DicionarioTabelaDetalhe,
@@ -113,7 +114,7 @@ export const dicionarioDadosClient = {
   },
 
   async exportHtml() {
-    const response = await fetch('/api/dicionario-dados/export', { method: 'GET', cache: 'no-store' })
+    const response = await fetchWithTenantContext('/api/dicionario-dados/export', { method: 'GET', cache: 'no-store' })
     if (!response.ok) {
       throw new Error('Nao foi possivel exportar o dicionario.')
     }

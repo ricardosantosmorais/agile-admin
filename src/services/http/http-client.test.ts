@@ -64,4 +64,20 @@ describe('http-client session loss notifications', () => {
     await expect(httpClient('/api/auth/session', { method: 'GET' })).resolves.toEqual({ ok: true })
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
+
+  it('sends the active tab tenant on protected app api requests', async () => {
+    window.sessionStorage.setItem('admin-v2-web:tenant', 'agileecommerce')
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }))
+
+    await expect(httpClient('/api/dashboard-agileecommerce', { method: 'POST' })).resolves.toEqual({ ok: true })
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/dashboard-agileecommerce', expect.objectContaining({
+      headers: expect.objectContaining({
+        'X-Admin-V2-Tenant-Id': 'agileecommerce',
+      }),
+    }))
+  })
 })

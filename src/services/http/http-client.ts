@@ -2,6 +2,7 @@ import { isAuthenticatedSessionRecentlyEstablished } from '@/src/features/auth/s
 import { getSessionClientPhase } from '@/src/features/auth/services/session-client-gate';
 import { translateCurrentLocale } from '@/src/i18n/utils';
 import { captureOperationalClientError } from '@/src/lib/sentry';
+import { buildTenantContextHeaders } from '@/src/services/http/tenant-context';
 
 export class HttpError extends Error {
 	status: number;
@@ -131,10 +132,7 @@ export async function httpClient<T>(input: RequestInfo | URL, init?: RequestInit
 
 	const response = await fetch(input, {
 		...init,
-		headers: {
-			'Content-Type': 'application/json',
-			...(init?.headers ?? {}),
-		},
+		headers: buildTenantContextHeaders(path, init?.headers, { defaultContentType: 'application/json' }),
 	});
 	const payload = await parseResponse(response);
 

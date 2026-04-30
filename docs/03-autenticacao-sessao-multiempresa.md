@@ -82,6 +82,9 @@ Pontos principais:
 - existe um `tab id` próprio por aba;
 - atividade global e encerramento de sessão são propagados por `localStorage`;
 - perda de sessão em uma aba pode refletir nas demais.
+- o tenant ativo da aba é mantido em `sessionStorage` e enviado nas bridges por `X-Admin-V2-Tenant-Id`;
+- bridges que recebem tenant explícito no payload devem priorizar `payload > header da aba > cookie`, evitando que o cookie compartilhado entre abas sobrescreva o contexto visual da aba.
+- chamadas client-side para `app/api/*` devem passar por `httpClient` ou `fetchWithTenantContext`, inclusive uploads e downloads que usam `FormData` ou `blob`.
 
 Chaves relevantes:
 - `admin-v2-web:session-activity-global`

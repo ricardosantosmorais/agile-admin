@@ -1,5 +1,6 @@
 ﻿import { httpClient } from '@/src/services/http/http-client'
 import { normalizeImportarPlanilhaResponse, normalizeProcessoArquivoDetail } from '@/src/features/importar-planilha/services/importar-planilha-mappers'
+import { fetchWithTenantContext } from '@/src/services/http/tenant-context'
 import type {
   ImportarPlanilhaFilters,
   ImportarPlanilhaResponse,
@@ -105,7 +106,7 @@ export const importarPlanilhaClient = {
       formData.append('dztotalchunkcount', String(totalChunks))
       formData.append('dztotalfilesize', String(file.size))
 
-      const response = await fetch('/api/processos-arquivos', {
+      const response = await fetchWithTenantContext('/api/processos-arquivos', {
         method: 'POST',
         body: formData,
         credentials: 'include',

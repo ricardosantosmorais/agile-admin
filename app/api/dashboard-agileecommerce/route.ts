@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readAuthSession } from '@/src/features/auth/services/auth-session';
+import { resolveRequestTenantId } from '@/src/features/auth/services/request-tenant';
 import { mapDashboardRootAgileecommercePayload } from '@/src/features/dashboard-root-agileecommerce/services/dashboard-root-agileecommerce-mapper';
+import { isRootAgileecommerceTenant } from '@/src/lib/root-tenant';
 import { serverApiFetch } from '@/src/services/http/server-api';
 
 function extractMessage(payload: unknown) {
@@ -28,7 +30,9 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json({ message: 'Sessão não encontrada.' }, { status: 401 });
 	}
 
-	if (session.currentTenantId !== 'agileecommerce') {
+	const tenantId = resolveRequestTenantId(request, session);
+
+	if (!isRootAgileecommerceTenant(tenantId)) {
 		return NextResponse.json({ message: 'Acesso permitido apenas no tenant root.' }, { status: 403 });
 	}
 
@@ -44,7 +48,7 @@ export async function POST(request: NextRequest) {
 	const result = await serverApiFetch('relatorios/dashboard-agileecommerce', {
 		method: 'POST',
 		token: session.token,
-		tenantId: session.currentTenantId,
+		tenantId,
 		body: {
 			data_inicio: body.startDate ?? '',
 			data_fim: body.endDate ?? '',

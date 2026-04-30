@@ -1,5 +1,6 @@
 ﻿import { httpClient } from '@/src/services/http/http-client'
 import { normalizeProcessoImagemDetail, normalizeProcessamentoImagensResponse } from '@/src/features/processamento-imagens/services/processamento-imagens-mappers'
+import { fetchWithTenantContext } from '@/src/services/http/tenant-context'
 import type {
   ProcessoImagemDetail,
   ProcessamentoImagensFilters,
@@ -98,7 +99,7 @@ export const processamentoImagensClient = {
       formData.append('dztotalchunkcount', String(totalChunks))
       formData.append('dztotalfilesize', String(file.size))
 
-      const response = await fetch('/api/processos-imagens', {
+      const response = await fetchWithTenantContext('/api/processos-imagens', {
         method: 'POST',
         body: formData,
         credentials: 'include',

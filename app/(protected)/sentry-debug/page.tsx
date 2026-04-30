@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/nextjs';
 import { useState } from 'react';
 import { useAuth } from '@/src/contexts/auth-context';
 import { applySentrySessionContext } from '@/src/lib/sentry';
+import { fetchWithTenantContext } from '@/src/services/http/tenant-context';
 
 type TriggerState = {
 	kind: 'idle' | 'success' | 'error';
@@ -54,7 +55,7 @@ export default function SentryDebugPage() {
 
 	async function triggerServerError() {
 		try {
-			const response = await fetch('/api/dev/sentry-test', {
+			const response = await fetchWithTenantContext('/api/dev/sentry-test', {
 				method: 'GET',
 				cache: 'no-store',
 			});

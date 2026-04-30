@@ -30,6 +30,7 @@ import type {
 import { useAsyncData } from '@/src/hooks/use-async-data'
 import { useI18n } from '@/src/i18n/use-i18n'
 import { useRouteParams } from '@/src/next/route-context'
+import { fetchWithTenantContext } from '@/src/services/http/tenant-context'
 
 type ToastState = {
   tone: 'success' | 'error'
@@ -493,7 +494,7 @@ export function RelatorioPreviewPage() {
   async function openDownload(item: RelatorioProcessoRecord) {
     try {
       setDownloadTargetId(item.id)
-      const response = await fetch(
+      const response = await fetchWithTenantContext(
         `/api/processos-relatorios/${encodeURIComponent(item.id)}/download`,
         {
           method: 'GET',
