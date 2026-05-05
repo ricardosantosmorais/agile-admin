@@ -167,6 +167,8 @@ ObservaÃ§Ã£o:
 - `Notificacoes` do painel possui rota v2 em `/notificacoes-painel`, com listagem server-side, filtros do legado, formulario em abas, vinculo por empresa, pre-visualizacao, duplicacao, publicacao e modal de usuarios visualizadores.
 - `Cadastros > Categorias de Tarefas`, `Tarefas` e `Grupos de Relatorios` possuem CRUDs v2 com bridges dedicadas, formularios em linhas e lookups lazy para fases, categorias e empresas quando aplicavel.
 - `Cadastros > Relatorios v2` possui rota de cadastro separada da execucao operacional, com dados gerais, editor SQL executavel e mapeamento de campos da query.
+- `Filiais` cobre os complementos do legado para filial selecionavel, tabela de preco, variacao, distancia maxima e UFs de excecao/restricao, com normalizacao antes de salvar.
+- `Grupos de filiais` cobre os lookups complementares de filial NF e tabela de preco, alem da filial padrao.
 - `ConfiguraÃ§Ãµes > Clientes` lÃª e grava parÃ¢metros do tenant direto em `empresas/parametros`, seguindo o contrato do legado.
 - `ConfiguraÃ§Ãµes > Entregas` usa o mesmo contrato de parÃ¢metros e complementa o carregamento com `formas_entrega` para o campo padrÃ£o.
 - `ConfiguraÃ§Ãµes > Geral` combina `empresas/parametros`, `configuracoes_empresa` e atualizaÃ§Ã£o parcial de `empresas` para os campos estruturais do tenant.

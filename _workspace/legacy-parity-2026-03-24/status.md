@@ -24,7 +24,9 @@ Base date: 2026-03-24
 - Orders needed parity for delivery statuses, payment-interest configuration, master-only technical logs, and master product technical artifacts in the order detail.
 - Eighth batch checked: `condicoes-pagamento`.
 - Payment terms needed parity for `Restrições` and `Exceções`, including occurrence scopes, active/date fields, dedicated bridges, and synchronized-record protection through `id_sync`.
-- Next step: continue with the next inventory batch after `condicoes-pagamento`; likely candidates are `filiais`, `formularios`, `integracao-erp/servicos`, or the larger `configuracoes` triage group.
+- Ninth batch checked: `filiais`.
+- Branches needed parity for `seleciona_filial` profile options, complementary branch fields, branch-group invoice branch and price table lookups, and lookup label restoration through form embeds. `exibe_precos_filial` had already been migrated to `Configuracoes > Produtos`.
+- Next step: continue with the next inventory batch after `filiais`; likely candidates are `formularios`, `integracao-erp/servicos`, or the larger `configuracoes` triage group.
 
 ## Completed batches
 
@@ -36,6 +38,7 @@ Base date: 2026-03-24
 - `simulador-precos`: migrated freight normalization in the API v2 bridge and added regression coverage for freight and packaging query format.
 - `pedidos`: migrated delivery statuses `devolvido`/`solicitado`, `exibe_juros_parcelas`, master-only filtering for technical logs, and master product actions for price memory/origin trace payloads.
 - `condicoes-pagamento`: migrated restriction/exception tabs, occurrence mappers, bridges, i18n/docs/E2E coverage, and `id_sync` edit/delete protection.
+- `filiais`: migrated `seleciona_filial` profile options, complementary branch fields, UF/list normalization, table-price lookup, branch-group invoice branch/table-price lookups, i18n/docs, and regression coverage.
 
 ## Known local noise excluded
 

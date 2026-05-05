@@ -24,6 +24,13 @@ const yesNoOptions = [
   { value: '0', labelKey: 'common.no', fallbackLabel: 'Não' },
 ] as const
 
+const profileVisibilityOptions = [
+  { value: 'cliente', labelKey: 'configuracoes.customers.options.audience.customer', fallbackLabel: 'Cliente' },
+  { value: 'vendedor', labelKey: 'configuracoes.customers.options.audience.seller', fallbackLabel: 'Vendedor' },
+  { value: 'todos', labelKey: 'configuracoes.customers.options.audience.all', fallbackLabel: 'Todos' },
+  { value: 'nao', labelKey: 'common.no', fallbackLabel: 'Não' },
+] as const
+
 const customerTypeOptions = [
   { value: 'PF', labelKey: 'configuracoes.customers.options.pf', fallbackLabel: 'Apenas pessoa física' },
   { value: 'PJ', labelKey: 'configuracoes.customers.options.pj', fallbackLabel: 'Apenas pessoa jurídica' },
@@ -69,7 +76,7 @@ export const configuracoesClientesFieldDefinitions: ConfiguracoesClientesFieldDe
   { key: 'informa_idade', section: 'experience', type: 'boolean', options: [...yesNoOptions] },
   { key: 'qualquer_filial', section: 'experience', type: 'boolean', options: [...yesNoOptions] },
   { key: 'seleciona_entrega', section: 'experience', type: 'boolean', options: [...yesNoOptions] },
-  { key: 'seleciona_filial', section: 'experience', type: 'boolean', options: [...yesNoOptions] },
+  { key: 'seleciona_filial', section: 'experience', type: 'enum', options: [...profileVisibilityOptions] },
   { key: 'seleciona_pagamento', section: 'experience', type: 'boolean', options: [...yesNoOptions] },
   { key: 'seleciona_preferencias', section: 'experience', type: 'boolean', options: [...yesNoOptions] },
   { key: 'seleciona_regiao', section: 'experience', type: 'boolean', options: [...yesNoOptions] },
@@ -91,6 +98,19 @@ export function createEmptyConfiguracoesClientesForm(): ConfiguracoesClientesFor
   }, {} as ConfiguracoesClientesFormValues)
 }
 
+function normalizeProfileVisibilityValue(value: string) {
+  const normalized = value.toLowerCase()
+  if (['1', 'true', 'sim', 'yes', 'on'].includes(normalized)) {
+    return 'todos'
+  }
+
+  if (['0', 'false', 'nao', 'não', 'off'].includes(normalized)) {
+    return 'nao'
+  }
+
+  return value
+}
+
 export function normalizeConfiguracoesClientesRecord(payload: unknown): ConfiguracoesClientesRecord {
   const record = asRecord(payload)
   const rows = asArray(record.data)
@@ -104,7 +124,12 @@ export function normalizeConfiguracoesClientesRecord(payload: unknown): Configur
       continue
     }
 
-    values[key] = toStringValue(parameter.parametros)
+    let currentValue = toStringValue(parameter.parametros)
+    if (key === 'seleciona_filial') {
+      currentValue = normalizeProfileVisibilityValue(currentValue)
+    }
+
+    values[key] = currentValue
 
     const updatedAt = toStringValue(parameter.created_at)
     const updatedBy = toStringValue(asRecord(parameter.usuario).nome)
@@ -154,5 +179,4 @@ export function buildDirtyConfiguracoesClientesPayload(
     })),
   ]
 }
-
 

@@ -2,6 +2,7 @@
 import {
   buildDirtyConfiguracoesClientesPayload,
   buildConfiguracoesClientesPayload,
+  configuracoesClientesFieldDefinitions,
   createEmptyConfiguracoesClientesForm,
   normalizeConfiguracoesClientesRecord,
 } from '@/src/features/configuracoes-clientes/services/configuracoes-clientes-mappers'
@@ -83,6 +84,32 @@ describe('configuracoes-clientes-mappers', () => {
       { id_filial: null, chave: 'versao', parametros: '2026-04-02 09:10:11' },
       { id_filial: null, chave: 'forma_ativacao_cliente', parametros: 'email' },
       { id_filial: null, chave: 'senha_forte', parametros: '1' },
+    ])
+  })
+
+  it('trata seleciona_filial como perfil de visibilidade mantendo compatibilidade com valores booleanos legados', () => {
+    const field = configuracoesClientesFieldDefinitions.find((definition) => definition.key === 'seleciona_filial')
+
+    expect(field?.type).toBe('enum')
+    expect(field?.options?.map((option) => option.value)).toEqual(['cliente', 'vendedor', 'todos', 'nao'])
+
+    const normalized = normalizeConfiguracoesClientesRecord({
+      data: [
+        { chave: 'seleciona_filial', parametros: '1' },
+        { chave: 'qualquer_filial', parametros: '0' },
+      ],
+    })
+
+    expect(normalized.values.seleciona_filial).toBe('todos')
+    expect(normalized.values.qualquer_filial).toBe('0')
+
+    const initialValues = createEmptyConfiguracoesClientesForm()
+    const currentValues = createEmptyConfiguracoesClientesForm()
+    currentValues.seleciona_filial = 'vendedor'
+
+    expect(buildDirtyConfiguracoesClientesPayload(initialValues, currentValues, '2026-04-23 10:00:00')).toEqual([
+      { id_filial: null, chave: 'versao', parametros: '2026-04-23 10:00:00' },
+      { id_filial: null, chave: 'seleciona_filial', parametros: 'vendedor' },
     ])
   })
 })

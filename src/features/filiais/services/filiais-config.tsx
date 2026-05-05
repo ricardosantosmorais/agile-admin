@@ -1,8 +1,23 @@
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 import { BRAZILIAN_STATES } from '@/src/lib/brazil'
 import { cepMask, cnpjMask, currencyMask, parseCurrencyInput, phoneMask } from '@/src/lib/input-masks'
+import { nullableLookupId, toLookupOption } from '@/src/lib/lookup-options'
 import { validateCepLength } from '@/src/lib/validators'
 import { formatLocalizedDecimal, parseInteger, parseLocalizedNumber, splitPhone } from '@/src/lib/value-parsers'
+
+function normalizeBoolean(value: unknown) {
+  return value === true || value === 1 || value === '1'
+}
+
+function normalizeUfList(value: unknown) {
+  const normalized = String(value ?? '')
+    .split(',')
+    .map((item) => item.trim().toUpperCase())
+    .filter((item, index, items) => /^[A-Z]{2}$/.test(item) && items.indexOf(item) === index)
+    .join(',')
+
+  return normalized
+}
 
 export const FILIAIS_CONFIG: CrudModuleConfig = {
   key: 'filiais',
@@ -37,11 +52,13 @@ export const FILIAIS_CONFIG: CrudModuleConfig = {
     layout: 'rows',
     fields: [
       { key: 'ativo', labelKey: 'simpleCrud.fields.active', label: 'Ativo', type: 'toggle' },
+      { key: 'selecionavel', labelKey: 'basicRegistrations.branches.fields.selectable', label: 'Selecionável', type: 'toggle' },
       { key: 'calcula_ipi', labelKey: 'basicRegistrations.branches.fields.calculateIpi', label: 'Calcula IPI', type: 'toggle' },
       { key: 'padrao', labelKey: 'basicRegistrations.branches.fields.default', label: 'Padrão', type: 'toggle' },
       { key: 'feed', labelKey: 'basicRegistrations.branches.fields.feed', label: 'Feed', type: 'toggle' },
       { key: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Código', type: 'text' },
       { key: 'id_grupo', labelKey: 'basicRegistrations.branches.fields.group', label: 'Grupo', type: 'lookup', optionsResource: 'grupos_filiais', lookupStateKey: 'id_grupo_lookup' },
+      { key: 'id_tabela_preco', labelKey: 'basicRegistrations.branches.fields.priceTable', label: 'Tabela de preço', type: 'lookup', optionsResource: 'tabelas_preco', lookupStateKey: 'id_tabela_preco_lookup' },
       { key: 'nome_fantasia', labelKey: 'basicRegistrations.branches.fields.tradeName', label: 'Nome fantasia', type: 'text', required: true },
       { key: 'razao_social', labelKey: 'basicRegistrations.branches.fields.companyName', label: 'Razão social', type: 'text' },
       { key: 'cnpj', labelKey: 'basicRegistrations.branches.fields.document', label: 'CNPJ', type: 'text', mask: 'cnpj', required: true },
@@ -58,14 +75,19 @@ export const FILIAIS_CONFIG: CrudModuleConfig = {
       { key: 'uf', labelKey: 'basicRegistrations.branches.fields.state', label: 'UF', type: 'select', options: BRAZILIAN_STATES.map((state) => ({ value: state, label: state })) },
       { key: 'latitude', labelKey: 'basicRegistrations.branches.fields.latitude', label: 'Latitude', type: 'text', helperTextKey: 'basicRegistrations.branches.fields.latitudeHint', helperText: 'Use ponto para decimais.' },
       { key: 'longitude', labelKey: 'basicRegistrations.branches.fields.longitude', label: 'Longitude', type: 'text', helperTextKey: 'basicRegistrations.branches.fields.longitudeHint', helperText: 'Use ponto para decimais.' },
+      { key: 'distancia_maxima', labelKey: 'basicRegistrations.branches.fields.maxDistance', label: 'Distância máxima', type: 'number', suffixText: 'km' },
+      { key: 'ufs_excecao', labelKey: 'basicRegistrations.branches.fields.exceptionStates', label: 'UFs de exceção', type: 'text', helperTextKey: 'basicRegistrations.branches.fields.statesHint', helperText: 'Informe as UFs separadas por vírgula.' },
+      { key: 'ufs_restricao', labelKey: 'basicRegistrations.branches.fields.restrictedStates', label: 'UFs de restrição', type: 'text', helperTextKey: 'basicRegistrations.branches.fields.statesHint', helperText: 'Informe as UFs separadas por vírgula.' },
       { key: 'pedido_minimo', labelKey: 'basicRegistrations.branches.fields.minimumOrder', label: 'Pedido mínimo', type: 'text', mask: 'currency', prefixText: 'R$' },
       { key: 'peso_minimo', labelKey: 'basicRegistrations.branches.fields.minimumWeight', label: 'Peso mínimo', type: 'text', mask: 'decimal', suffixText: 'kg' },
+      { key: 'variacao', labelKey: 'basicRegistrations.branches.fields.variation', label: 'Variação', type: 'text', mask: 'decimal', suffixText: '%' },
       { key: 'posicao', labelKey: 'simpleCrud.fields.position', label: 'Posição', type: 'number' },
       { key: 'desconto_retira', labelKey: 'basicRegistrations.branches.fields.pickupDiscount', label: 'Desconto retira', type: 'text', suffixText: '%' },
       { key: 'acrescimo_retira', labelKey: 'basicRegistrations.branches.fields.pickupAdditional', label: 'Acréscimo retira', type: 'text', suffixText: '%' },
       { key: 'limite_itens_pedido', labelKey: 'basicRegistrations.branches.fields.orderItemsLimit', label: 'Limite de itens por pedido', type: 'number' },
     ],
   }],
+  formEmbed: 'grupo,tabela_preco',
   normalizeRecord: (record) => {
     const phone = splitPhone(`${String(record.ddd || '')}${String(record.telefone || '')}`)
     const mobile = splitPhone(`${String(record.ddd_celular || '')}${String(record.celular || '')}`)
@@ -82,7 +104,12 @@ export const FILIAIS_CONFIG: CrudModuleConfig = {
       peso_minimo: formatLocalizedDecimal(record.peso_minimo, 3),
       desconto_retira: record.desconto_retira === null || record.desconto_retira === undefined ? '' : formatLocalizedDecimal(record.desconto_retira, 2),
       acrescimo_retira: record.acrescimo_retira === null || record.acrescimo_retira === undefined ? '' : formatLocalizedDecimal(record.acrescimo_retira, 2),
-      id_grupo_lookup: record.id_grupo ? { id: String(record.id_grupo), label: String(record.id_grupo) } : null,
+      variacao: formatLocalizedDecimal(record.variacao, 2),
+      distancia_maxima: parseInteger(record.distancia_maxima)?.toString() ?? '',
+      ufs_excecao: normalizeUfList(record.ufs_excecao),
+      ufs_restricao: normalizeUfList(record.ufs_restricao),
+      id_grupo_lookup: toLookupOption(record.grupo, ['nome', 'label'], record.id_grupo),
+      id_tabela_preco_lookup: toLookupOption(record.tabela_preco, ['nome', 'label'], record.id_tabela_preco),
     }
   },
   beforeSave: (record: CrudRecord) => {
@@ -93,7 +120,10 @@ export const FILIAIS_CONFIG: CrudModuleConfig = {
 
     return {
       ...rest,
-      id_grupo: String(record.id_grupo || '').trim() || null,
+      codigo: String(record.codigo || '').trim() || null,
+      selecionavel: normalizeBoolean(record.selecionavel),
+      id_grupo: nullableLookupId(record.id_grupo_lookup ?? record.id_grupo),
+      id_tabela_preco: nullableLookupId(record.id_tabela_preco_lookup ?? record.id_tabela_preco),
       cnpj: String(record.cnpj || '').replace(/\D/g, '') || null,
       ddd: phone.ddd || null,
       telefone: phone.number || null,
@@ -104,10 +134,15 @@ export const FILIAIS_CONFIG: CrudModuleConfig = {
       peso_minimo: parseCurrencyInput(String(record.peso_minimo || '')),
       desconto_retira: parseLocalizedNumber(record.desconto_retira),
       acrescimo_retira: parseLocalizedNumber(record.acrescimo_retira),
+      variacao: parseLocalizedNumber(record.variacao),
+      distancia_maxima: parseInteger(record.distancia_maxima),
+      ufs_excecao: normalizeUfList(record.ufs_excecao) || null,
+      ufs_restricao: normalizeUfList(record.ufs_restricao) || null,
       limite_itens_pedido: parseInteger(record.limite_itens_pedido),
       posicao: parseInteger(record.posicao),
       contato: String(record.contato || record.pessoa_contato || '').trim() || null,
       id_grupo_lookup: undefined,
+      id_tabela_preco_lookup: undefined,
     }
   },
 }
