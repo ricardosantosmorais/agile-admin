@@ -18,7 +18,9 @@ Base date: 2026-03-24
 - Gateway endpoints needed OAuth2Cookie parity, fixed `@oauth2.cookie` discovery, automatic cookie exclusion from test variables, and masked read-only company-context variables in endpoint testing.
 - Fifth batch checked: `integracao-erp/interfaces-consulta`.
 - Interfaces consulta already had most of the legacy module surface in v2; the remaining migration was bridge normalization for consultation map fields introduced by the legacy commits.
-- Next step: open the next inventory batch after ERP interfaces, choosing the smallest cohesive module group with actionable v2 impact.
+- Sixth batch checked: `simulador-precos`.
+- Price simulator already had the new freight field and API v2 route; the remaining migration was freight normalization in the bridge so masked Brazilian values and already-normalized decimal values are both forwarded correctly.
+- Next step: open `pedidos`, the next larger batch with likely user-facing order/detail impact.
 
 ## Completed batches
 
@@ -27,6 +29,7 @@ Base date: 2026-03-24
 - `notificacoes-painel`: migrated channel options, selected-company link behavior, channel-aware publishing, and audience channel display.
 - `integracao-erp/gateway-endpoints`: migrated OAuth2Cookie/cookie-token parity and masked read-only context variables for endpoint testing.
 - `integracao-erp/interfaces-consulta`: migrated consultation-map normalization for filter/order application mode and value-resolution config in template and override saves.
+- `simulador-precos`: migrated freight normalization in the API v2 bridge and added regression coverage for freight and packaging query format.
 
 ## Known local noise excluded
 

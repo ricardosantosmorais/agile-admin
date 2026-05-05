@@ -17,6 +17,17 @@ function toNumberString(value: unknown) {
   return String(value ?? '').replace(/\D/g, '')
 }
 
+function normalizeFreightValue(value: unknown) {
+  const text = toStringValue(value).replace(/\s/g, '')
+  if (!text) return ''
+
+  if (text.includes(',')) {
+    return text.replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '')
+  }
+
+  return text.replace(/[^\d.-]/g, '')
+}
+
 function formatBooleanLabel(value: unknown) {
   return value === true || value === 1 || value === '1' ? 'Sim' : 'Não'
 }
@@ -360,8 +371,9 @@ export async function POST(request: Request) {
   calculoQuery.set(`quantidades[${idProduto}]`, quantidade)
   calculoQuery.set('cache', '0')
 
-  if (valorFreteItem) {
-    calculoQuery.set('valor_frete_item', valorFreteItem.replace(/\./g, '').replace(',', '.'))
+  const normalizedFreightValue = normalizeFreightValue(valorFreteItem)
+  if (normalizedFreightValue) {
+    calculoQuery.set('valor_frete_item', normalizedFreightValue)
   }
 
   const calculoResult = await agileV2Fetch('produtos', {
