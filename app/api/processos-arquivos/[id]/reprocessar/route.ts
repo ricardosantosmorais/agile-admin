@@ -1,26 +1,7 @@
-﻿import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+import { ensureProcessHasMappings, getProcessoArquivoErrorMessage } from '@/app/api/processos-arquivos/_execution-guard'
 import { readAuthSession } from '@/src/features/auth/services/auth-session'
 import { serverApiFetch } from '@/src/services/http/server-api'
-
-function getErrorMessage(payload: unknown, fallback: string) {
-  if (typeof payload === 'object' && payload !== null && 'message' in payload && typeof payload.message === 'string') {
-    return payload.message
-  }
-
-  if (
-    typeof payload === 'object'
-    && payload !== null
-    && 'error' in payload
-    && typeof payload.error === 'object'
-    && payload.error !== null
-    && 'message' in payload.error
-    && typeof payload.error.message === 'string'
-  ) {
-    return payload.error.message
-  }
-
-  return fallback
-}
 
 export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await readAuthSession()
@@ -29,6 +10,16 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   }
 
   const { id } = await params
+  const mappingError = await ensureProcessHasMappings({
+    id,
+    token: session.token,
+    tenantId: session.currentTenantId,
+  })
+
+  if (mappingError) {
+    return mappingError
+  }
+
   const result = await serverApiFetch('processos', {
     method: 'POST',
     token: session.token,
@@ -38,7 +29,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
 
   if (!result.ok) {
     return NextResponse.json(
-      { message: getErrorMessage(result.payload, 'Não foi possível reprocessar o processo.') },
+      { message: getProcessoArquivoErrorMessage(result.payload, 'Não foi possível reprocessar o processo.') },
       { status: result.status || 400 },
     )
   }

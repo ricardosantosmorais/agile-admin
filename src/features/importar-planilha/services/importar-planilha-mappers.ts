@@ -1,9 +1,15 @@
 ﻿import { formatDateTime } from '@/src/lib/date-time'
 import type {
+  ProcessoArquivoDictionaryField,
+  ProcessoArquivoDictionaryTable,
   ImportarPlanilhaResponse,
+  ProcessoArquivoMappingDetail,
+  ProcessoArquivoMappingRecord,
   ProcessoArquivoDetail,
   ProcessoArquivoLogRecord,
   ProcessoArquivoRecord,
+  ProcessoArquivoSpreadsheetColumn,
+  ProcessoArquivoSpreadsheetPreview,
 } from '@/src/features/importar-planilha/services/importar-planilha-types'
 
 type ApiRecord = Record<string, unknown>
@@ -64,6 +70,7 @@ export function normalizeProcessoArquivoRecord(value: unknown): ProcessoArquivoR
     canStart: status === 'rascunho',
     canCancel: status === 'criado' || status === 'rascunho',
     canReprocess: status === 'erro',
+    canReplaceFile: status === 'criado' || status === 'rascunho' || status === 'erro',
   }
 }
 
@@ -123,5 +130,78 @@ export function normalizeImportarPlanilhaResponse(payload: unknown, fallback: { 
       pages,
       perPage,
     },
+  }
+}
+
+function normalizeSpreadsheetColumn(value: unknown, index: number): ProcessoArquivoSpreadsheetColumn {
+  const record = asRecord(value)
+  const letter = asString(record.letter) || String.fromCharCode(65 + index)
+  return {
+    letter,
+    name: asString(record.name) || `Coluna ${letter}`,
+  }
+}
+
+function normalizeSpreadsheetPreview(value: unknown): ProcessoArquivoSpreadsheetPreview {
+  const record = asRecord(value)
+  const columns = asArray(record.columns).map(normalizeSpreadsheetColumn)
+
+  return {
+    sheetName: asString(record.sheetName),
+    columns,
+    rows: asArray(record.rows).map((row) => asArray(row).map(asString)),
+    previewRows: asNumber(record.previewRows, 0),
+    warning: asString(record.warning),
+  }
+}
+
+function normalizeDictionaryField(value: unknown): ProcessoArquivoDictionaryField {
+  const record = asRecord(value)
+  const nullableRaw = asString(record.nulo).toUpperCase()
+  const nullable = nullableRaw !== 'NO'
+
+  return {
+    id: asString(record.id),
+    name: asString(record.nome) || '-',
+    type: asString(record.tipo) || '-',
+    nullable,
+    required: !nullable,
+    position: asNumber(record.posicao, 0),
+  }
+}
+
+function normalizeDictionaryTable(value: unknown): ProcessoArquivoDictionaryTable {
+  const record = asRecord(value)
+  const fields = asArray(record.campos)
+    .map(normalizeDictionaryField)
+    .filter((field) => field.id)
+    .sort((left, right) => left.position - right.position)
+
+  return {
+    id: asString(record.id),
+    name: asString(record.nome) || '-',
+    fields,
+  }
+}
+
+function normalizeMapping(value: unknown): ProcessoArquivoMappingRecord {
+  const record = asRecord(value)
+
+  return {
+    id: asString(record.id),
+    tableId: asString(record.id_tabela ?? record.tabela),
+    sourceColumn: asString(record.coluna_origem),
+    targetFieldId: asString(record.id_campo ?? record.coluna_destino),
+  }
+}
+
+export function normalizeProcessoArquivoMappingDetail(payload: unknown): ProcessoArquivoMappingDetail {
+  const record = asRecord(payload)
+
+  return {
+    processo: normalizeProcessoArquivoDetail(record.processo),
+    tables: asArray(record.dicionarios).map(normalizeDictionaryTable).filter((table) => table.id),
+    mappings: asArray(record.mapeamentos).map(normalizeMapping).filter((mapping) => mapping.sourceColumn && mapping.targetFieldId),
+    preview: normalizeSpreadsheetPreview(record.preview),
   }
 }

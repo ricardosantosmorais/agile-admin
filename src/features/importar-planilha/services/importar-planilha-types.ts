@@ -21,6 +21,7 @@ export type ProcessoArquivoRecord = {
   canStart: boolean
   canCancel: boolean
   canReprocess: boolean
+  canReplaceFile: boolean
 }
 
 export type ProcessoArquivoLogRecord = {
@@ -45,6 +46,48 @@ export type ProcessoArquivoDetail = {
   logs: ProcessoArquivoLogRecord[]
 }
 
+export type ProcessoArquivoSpreadsheetColumn = {
+  letter: string
+  name: string
+}
+
+export type ProcessoArquivoSpreadsheetPreview = {
+  sheetName: string
+  columns: ProcessoArquivoSpreadsheetColumn[]
+  rows: string[][]
+  previewRows: number
+  warning: string
+}
+
+export type ProcessoArquivoDictionaryField = {
+  id: string
+  name: string
+  type: string
+  nullable: boolean
+  required: boolean
+  position: number
+}
+
+export type ProcessoArquivoDictionaryTable = {
+  id: string
+  name: string
+  fields: ProcessoArquivoDictionaryField[]
+}
+
+export type ProcessoArquivoMappingRecord = {
+  id: string
+  tableId: string
+  sourceColumn: string
+  targetFieldId: string
+}
+
+export type ProcessoArquivoMappingDetail = {
+  processo: ProcessoArquivoDetail
+  tables: ProcessoArquivoDictionaryTable[]
+  mappings: ProcessoArquivoMappingRecord[]
+  preview: ProcessoArquivoSpreadsheetPreview
+}
+
 export type ImportarPlanilhaResponse = {
   data: ProcessoArquivoRecord[]
   meta: {
@@ -55,4 +98,12 @@ export type ImportarPlanilhaResponse = {
     pages: number
     perPage: number
   }
+}
+
+export type ImportarPlanilhaSummary = {
+  total: number
+  draft: number
+  running: number
+  success: number
+  error: number
 }

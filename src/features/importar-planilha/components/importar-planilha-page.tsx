@@ -1,7 +1,8 @@
 'use client'
 
-import { Eye, FileSpreadsheet, Loader2, Play, RefreshCcw, RotateCw, Upload, XCircle } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { Eye, FileSpreadsheet, GitBranch, Loader2, Play, RefreshCcw, RotateCw, Upload, XCircle } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useCallback, useMemo, useState } from 'react'
 import { AppDataTable } from '@/src/components/data-table/app-data-table'
 import { DataTableFiltersCard } from '@/src/components/data-table/data-table-filters'
 import { DataTableFilterToggleAction, DataTablePageActions, DataTableSectionAction } from '@/src/components/data-table/data-table-toolbar'
@@ -53,6 +54,7 @@ const valueClasses = 'mt-2 text-sm font-semibold text-[color:var(--app-text)]'
 
 export function ImportarPlanilhaPage() {
   const { t } = useI18n()
+  const router = useRouter()
   const access = useFeatureAccess('importarPlanilha')
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [filters, setFilters] = useState<ImportarPlanilhaFilters>(DEFAULT_FILTERS)
@@ -60,25 +62,27 @@ export function ImportarPlanilhaPage() {
   const [detailTarget, setDetailTarget] = useState<ProcessoArquivoRecord | null>(null)
   const [uploadOpen, setUploadOpen] = useState(false)
   const [uploadFile, setUploadFile] = useState<File | null>(null)
+  const [uploadProcessTarget, setUploadProcessTarget] = useState<ProcessoArquivoRecord | null>(null)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [toast, setToast] = useState<ToastState | null>(null)
   const [cancelTarget, setCancelTarget] = useState<ProcessoArquivoRecord | null>(null)
 
   const listState = useAsyncData(() => importarPlanilhaClient.list(filters), [filters])
+  const summaryState = useAsyncData(
+    () => importarPlanilhaClient.summary(filters),
+    [filters.id, filters.usuario, filters.data_inicio, filters.data_fim],
+  )
   const detailState = useAsyncData<ProcessoArquivoDetail | null>(
     () => (detailTarget ? importarPlanilhaClient.getById(detailTarget.id) : Promise.resolve(null)),
     [detailTarget?.id],
   )
 
   const rows = listState.data?.data ?? EMPTY_ROWS
-  const statusSummary = useMemo(() => ({
-    total: rows.length,
-    draft: rows.filter((row) => row.status === 'rascunho').length,
-    running: rows.filter((row) => row.status === 'criado' || row.status === 'iniciado').length,
-    success: rows.filter((row) => row.status === 'sucesso').length,
-    error: rows.filter((row) => row.status === 'erro').length,
-  }), [rows])
+  const statusSummary = summaryState.data ?? { total: 0, draft: 0, running: 0, success: 0, error: 0 }
+  const reloadListAndSummary = useCallback(async () => {
+    await Promise.all([listState.reload(), summaryState.reload()])
+  }, [listState, summaryState])
 
   const tableState = useDataTableState<ProcessoArquivoRecord, ImportarPlanilhaFilters, ImportarPlanilhaFilters['orderBy']>({
     rows,
@@ -196,7 +200,7 @@ export function ImportarPlanilhaPage() {
     try {
       await importarPlanilhaClient.cancelar(id)
       setToast({ tone: 'success', message: t('maintenance.spreadsheetImport.feedback.cancelSuccess', 'Processo cancelado com sucesso.') })
-      await listState.reload()
+      await reloadListAndSummary()
       tableState.clearSelection()
     } catch (error) {
       setToast({
@@ -224,7 +228,7 @@ export function ImportarPlanilhaPage() {
     try {
       await importarPlanilhaClient.iniciar(id)
       setToast({ tone: 'success', message: t('maintenance.spreadsheetImport.feedback.startSuccess', 'Processo iniciado com sucesso.') })
-      await listState.reload()
+      await reloadListAndSummary()
     } catch (error) {
       setToast({
         tone: 'error',
@@ -239,7 +243,7 @@ export function ImportarPlanilhaPage() {
     try {
       await importarPlanilhaClient.reprocessar(id)
       setToast({ tone: 'success', message: t('maintenance.spreadsheetImport.feedback.reprocessSuccess', 'Processo enviado para reprocessamento.') })
-      await listState.reload()
+      await reloadListAndSummary()
     } catch (error) {
       setToast({
         tone: 'error',
@@ -259,12 +263,16 @@ export function ImportarPlanilhaPage() {
     setUploading(true)
     setUploadProgress(0)
     try {
-      const response = await importarPlanilhaClient.uploadSpreadsheet(uploadFile, (progress) => setUploadProgress(progress))
+      const response = await importarPlanilhaClient.uploadSpreadsheet(uploadFile, (progress) => setUploadProgress(progress), uploadProcessTarget?.id)
       setToast({ tone: 'success', message: response.message || t('maintenance.spreadsheetImport.feedback.uploadSuccess', 'Arquivo enviado com sucesso.') })
       setUploadOpen(false)
       setUploadFile(null)
+      setUploadProcessTarget(null)
       setUploadProgress(0)
-      await listState.reload()
+      await reloadListAndSummary()
+      if (!uploadProcessTarget && response.id) {
+        router.push(`/importar-planilha/${encodeURIComponent(response.id)}/editar`)
+      }
     } catch (error) {
       setToast({
         tone: 'error',
@@ -289,7 +297,7 @@ export function ImportarPlanilhaPage() {
           { label: t('routes.manutencao', 'Manutenção'), href: '/sequenciais' },
           { label: t('routes.importarPlanilha', 'Importar Planilha'), href: '/importar-planilha' },
         ]}
-        actions={<DataTableSectionAction label={t('common.refresh', 'Atualizar')} icon={RefreshCcw} onClick={listState.reload} />}
+        actions={<DataTableSectionAction label={t('common.refresh', 'Atualizar')} icon={RefreshCcw} onClick={() => void reloadListAndSummary()} />}
       />
 
       <AsyncState isLoading={listState.isLoading} error={listState.error}>
@@ -337,7 +345,10 @@ export function ImportarPlanilhaPage() {
                   {
                     label: t('maintenance.spreadsheetImport.actions.newSpreadsheet', 'Novo (XLS ou XLSX)'),
                     icon: Upload,
-                    onClick: () => setUploadOpen(true),
+                    onClick: () => {
+                      setUploadProcessTarget(null)
+                      setUploadOpen(true)
+                    },
                     tone: 'primary',
                   },
                 ]}
@@ -391,11 +402,28 @@ export function ImportarPlanilhaPage() {
                 onClick: () => setDetailTarget(row),
               },
               {
+                id: 'mapear',
+                label: t('maintenance.spreadsheetImport.actions.mapping', 'Mapeamentos'),
+                icon: GitBranch,
+                href: `/importar-planilha/${encodeURIComponent(row.id)}/editar`,
+                visible: access.canEdit,
+              },
+              {
                 id: 'iniciar',
                 label: t('maintenance.spreadsheetImport.actions.start', 'Iniciar processo'),
                 icon: Play,
                 visible: row.canStart,
                 onClick: () => void handleStart(row.id),
+              },
+              {
+                id: 'alterar-arquivo',
+                label: t('maintenance.spreadsheetImport.actions.replaceFile', 'Alterar arquivo'),
+                icon: Upload,
+                visible: row.canReplaceFile,
+                onClick: () => {
+                  setUploadProcessTarget(row)
+                  setUploadOpen(true)
+                },
               },
               {
                 id: 'cancelar',
@@ -431,12 +459,15 @@ export function ImportarPlanilhaPage() {
 
       <OverlayModal
         open={uploadOpen}
-        title={t('maintenance.spreadsheetImport.modalUploadTitle', 'Enviar novo arquivo')}
+        title={uploadProcessTarget
+          ? t('maintenance.spreadsheetImport.modalReplaceTitle', 'Alterar arquivo do processo')
+          : t('maintenance.spreadsheetImport.modalUploadTitle', 'Enviar novo arquivo')}
         maxWidthClassName="max-w-2xl"
         onClose={() => {
           if (!uploading) {
             setUploadOpen(false)
             setUploadFile(null)
+            setUploadProcessTarget(null)
             setUploadProgress(0)
           }
         }}
@@ -467,6 +498,12 @@ export function ImportarPlanilhaPage() {
               <p className="text-sm text-[color:var(--app-muted)]">{t('common.selectFile', 'Selecionar arquivo')}</p>
             </div>
           </label>
+
+          {uploadProcessTarget ? (
+            <div className="app-control-muted rounded-[1rem] px-4 py-3 text-sm text-[color:var(--app-muted)]">
+              {t('maintenance.spreadsheetImport.replaceHint', 'O novo arquivo substituirá a referência do processo ID #{{id}}.', { id: uploadProcessTarget.id })}
+            </div>
+          ) : null}
 
           {uploading ? (
             <div className="app-control-muted space-y-2 rounded-[1rem] px-4 py-3">

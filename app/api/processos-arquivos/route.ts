@@ -121,12 +121,14 @@ async function createProcessRecord(input: {
   tenantId: string
   userId: string
   arquivo: string
+  id?: string
 }) {
   return serverApiFetch('processos', {
     method: 'POST',
     token: input.token,
     tenantId: input.tenantId,
     body: {
+      ...(input.id ? { id: input.id } : {}),
       id_empresa: input.tenantId,
       id_usuario: input.userId,
       tipo: 'importacao_planilha',
@@ -134,6 +136,32 @@ async function createProcessRecord(input: {
       status: 'rascunho',
     },
   })
+}
+
+async function createFileChangeLog(input: {
+  token: string
+  tenantId: string
+  processId: string
+  fileName: string
+}) {
+  await serverApiFetch('processos/logs', {
+    method: 'POST',
+    token: input.token,
+    tenantId: input.tenantId,
+    body: {
+      id_processo: input.processId,
+      tipo: 'informacao',
+      mensagem: `Arquivo alterado para ${input.fileName}.`,
+    },
+  })
+}
+
+function getCreatedProcess(payload: unknown) {
+  if (Array.isArray(payload)) {
+    return typeof payload[0] === 'object' && payload[0] !== null ? payload[0] as Record<string, unknown> : {}
+  }
+
+  return typeof payload === 'object' && payload !== null ? payload as Record<string, unknown> : {}
 }
 
 export const runtime = 'nodejs'
@@ -211,6 +239,7 @@ export async function POST(request: NextRequest) {
   const totalChunks = Number(formData.get('dztotalchunkcount') ?? 1)
   const totalFileSize = Number(formData.get('dztotalfilesize') ?? file.size)
   const originalFileName = String(formData.get('dzfilename') || file.name || 'arquivo.xlsx').trim() || 'arquivo.xlsx'
+  const processId = String(formData.get('id_processo') || '').trim()
 
   if (totalFileSize > MAX_SPREADSHEET_SIZE_BYTES) {
     return NextResponse.json({ message: 'O arquivo da planilha deve ter no máximo 500 MB.' }, { status: 400 })
@@ -238,6 +267,7 @@ export async function POST(request: NextRequest) {
       tenantId: session.currentTenantId,
       userId: session.currentUserId,
       arquivo: key,
+      id: processId,
     })
 
     if (!createProcess.ok) {
@@ -247,10 +277,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const processo = getCreatedProcess(createProcess.payload)
+    const resolvedProcessId = String(processo.id || processId || '').trim()
+    if (processId && resolvedProcessId) {
+      await createFileChangeLog({
+        token: session.token,
+        tenantId: session.currentTenantId,
+        processId: resolvedProcessId,
+        fileName: originalFileName,
+      })
+    }
+
     return NextResponse.json({
       success: true,
       status: 'completed',
       uploadId,
+      id: resolvedProcessId,
+      processo,
       message: 'Upload concluído com sucesso. O processo foi criado para execução.',
       progress: 100,
     })
@@ -360,6 +403,7 @@ export async function POST(request: NextRequest) {
     tenantId: session.currentTenantId,
     userId: session.currentUserId,
     arquivo: state.key,
+    id: processId,
   })
 
   if (!createProcess.ok) {
@@ -369,10 +413,23 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  const processo = getCreatedProcess(createProcess.payload)
+  const resolvedProcessId = String(processo.id || processId || '').trim()
+  if (processId && resolvedProcessId) {
+    await createFileChangeLog({
+      token: session.token,
+      tenantId: session.currentTenantId,
+      processId: resolvedProcessId,
+      fileName: state.fileName,
+    })
+  }
+
   return NextResponse.json({
     success: true,
     status: 'completed',
     uploadId,
+    id: resolvedProcessId,
+    processo,
     progress: 100,
     message: 'Upload concluído com sucesso. O processo foi criado para execução.',
   })

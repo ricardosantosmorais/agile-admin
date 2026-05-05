@@ -1,5 +1,5 @@
 ﻿import { describe, expect, it } from 'vitest'
-import { normalizeImportarPlanilhaResponse, normalizeProcessoArquivoDetail } from '@/src/features/importar-planilha/services/importar-planilha-mappers'
+import { normalizeImportarPlanilhaResponse, normalizeProcessoArquivoDetail, normalizeProcessoArquivoMappingDetail } from '@/src/features/importar-planilha/services/importar-planilha-mappers'
 
 describe('importar-planilha-mappers', () => {
   it('normalizes list response with status and pagination', () => {
@@ -46,5 +46,41 @@ describe('importar-planilha-mappers', () => {
     expect(result.statusLabel).toBe('Erro')
     expect(result.logs).toHaveLength(1)
     expect(result.logs[0].tipoLabel).toBe('Erro')
+  })
+
+  it('normalizes mapping detail with dictionary fields and preview', () => {
+    const result = normalizeProcessoArquivoMappingDetail({
+      processo: {
+        id: '186',
+        status: 'rascunho',
+        usuario: { nome: 'Maria' },
+        mapeamentos: [],
+      },
+      dicionarios: [
+        {
+          id: 'TAB1',
+          nome: 'Clientes',
+          campos: [
+            { id: 'CAM2', nome: 'Nome', tipo: 'varchar', nulo: 'YES', posicao: 2 },
+            { id: 'CAM1', nome: 'Código', tipo: 'number', nulo: 'NO', posicao: 1 },
+          ],
+        },
+      ],
+      mapeamentos: [
+        { id: 'MAP1', id_tabela: 'TAB1', coluna_origem: 'A', id_campo: 'CAM1' },
+      ],
+      preview: {
+        sheetName: 'Planilha1',
+        columns: [{ letter: 'A', name: 'Código' }],
+        rows: [[123]],
+        previewRows: 1,
+      },
+    })
+
+    expect(result.processo.id).toBe('186')
+    expect(result.tables[0].fields[0].id).toBe('CAM1')
+    expect(result.tables[0].fields[0].required).toBe(true)
+    expect(result.mappings[0].targetFieldId).toBe('CAM1')
+    expect(result.preview.rows[0][0]).toBe('123')
   })
 })
