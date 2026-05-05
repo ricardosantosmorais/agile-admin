@@ -42,18 +42,18 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     usuario: 'usuario:nome',
     empresa: 'empresa:nome_fantasia',
     data: 'data',
+    canais: 'canais',
   }
 
   const params = new URLSearchParams({
     page: searchParams.get('page') || '1',
     perpage: searchParams.get('perPage') || '15',
-    embed: 'usuario,empresa',
     id_notificacao: id,
     order: orderMap[orderBy] ?? orderBy,
     sort: searchParams.get('sort') || 'desc',
   })
 
-  const result = await serverApiFetch(`notificacoes_painel/usuarios?${params.toString()}`, {
+  const result = await serverApiFetch(`notificacoes_painel/audiencia?${params.toString()}`, {
     method: 'GET',
     token: session.token,
     tenantId: session.currentTenantId,

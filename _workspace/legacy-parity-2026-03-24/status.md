@@ -12,12 +12,15 @@ Base date: 2026-03-24
 - Second batch checked: `importar-planilha/processos-arquivos`.
 - Gateways 3DS behavior was already present in v2; missing bridge coverage was added.
 - Spreadsheet import mapping needed the legacy field-level `integra_planilha` filter; v2 now filters dictionary fields in the mapper with regression coverage.
-- Next step: open `notificacoes-painel` and compare channel/audience/status changes with the v2 flow.
+- Third batch checked: `notificacoes-painel`.
+- Panel notifications needed channel parity: remove `novidades`, validate `admin/email/todos`, publish push/e-mail by channel, link selected companies without unwanted push for e-mail-only notifications, and load audience from the channel-aware endpoint.
+- Next step: open `integracao-erp/interfaces-consulta` and `integracao-erp/gateway-endpoints`, prioritizing the two gateway-endpoints commits because the current batch also touched ERP lint cleanup.
 
 ## Completed batches
 
 - `gateways-pagamento`: no functional migration needed; added Cielo 3DS bridge tests.
 - `importar-planilha/processos-arquivos`: migrated `integra_planilha` field filtering in spreadsheet mapping and added mapper test coverage.
+- `notificacoes-painel`: migrated channel options, selected-company link behavior, channel-aware publishing, and audience channel display.
 
 ## Known local noise excluded
 

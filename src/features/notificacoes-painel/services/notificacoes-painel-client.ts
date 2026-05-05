@@ -7,6 +7,7 @@ export type NotificacaoPainelUsuarioRecord = CrudListRecord & {
   usuario?: { nome?: string | null } | null
   empresa?: { nome_fantasia?: string | null; nome?: string | null } | null
   data?: string | null
+  canais?: string[] | string | null
 }
 
 export type NotificacaoPainelUsuariosResponse = CrudListResponse & {

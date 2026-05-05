@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { handleCrudCollectionDelete, handleCrudCollectionPost } from '@/src/services/http/crud-route'
+import { handleCrudCollectionDelete } from '@/src/services/http/crud-route'
 import { readAuthSession } from '@/src/features/auth/services/auth-session'
 import { serverApiFetch } from '@/src/services/http/server-api'
 import { getErrorMessage } from '@/app/api/notificacoes-painel/_shared'
@@ -8,6 +8,14 @@ const config = { resource: 'notificacoes_painel' as const }
 
 function withDayTime(value: string, endOfDay = false) {
   return /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value} ${endOfDay ? '23:59:59' : '00:00:00'}` : value
+}
+
+function isValidPainelChannel(canal: unknown) {
+  return ['admin', 'email', 'todos'].includes(String(canal ?? '').toLowerCase())
+}
+
+function readRowsForValidation(body: unknown) {
+  return Array.isArray(body) ? body : [body]
 }
 
 function mapListPayload(payload: unknown) {
@@ -80,8 +88,39 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(mapListPayload(result.payload))
 }
 
-export function POST(request: NextRequest) {
-  return handleCrudCollectionPost(request, config)
+export async function POST(request: NextRequest) {
+  const session = await readAuthSession()
+  if (!session) {
+    return NextResponse.json({ message: 'Sessão expirada.' }, { status: 401 })
+  }
+
+  const body = await request.json()
+  const hasInvalidChannel = readRowsForValidation(body).some((row) => {
+    if (typeof row !== 'object' || row === null || !('canal' in row)) return false
+    return !isValidPainelChannel((row as { canal?: unknown }).canal)
+  })
+
+  if (hasInvalidChannel) {
+    return NextResponse.json({ message: 'Canal inválido. Selecione Admin, E-mail ou Todos.' }, { status: 400 })
+  }
+
+  const result = await serverApiFetch(config.resource, {
+    method: 'POST',
+    token: session.token,
+    tenantId: session.currentTenantId,
+    body: typeof body === 'object' && body !== null && !Array.isArray(body)
+      ? {
+          ...body,
+          id_empresa: session.currentTenantId,
+        }
+      : body,
+  })
+
+  if (!result.ok) {
+    return NextResponse.json({ message: getErrorMessage(result.payload, 'Não foi possível salvar a notificação.') }, { status: result.status || 400 })
+  }
+
+  return NextResponse.json(result.payload)
 }
 
 export function DELETE(request: NextRequest) {

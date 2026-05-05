@@ -1,5 +1,6 @@
 'use client'
 
+import { Bell, Mail } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { AppDataTable } from '@/src/components/data-table/app-data-table'
 import type { AppDataTableColumn } from '@/src/components/data-table/types'
@@ -15,6 +16,11 @@ const INITIAL_FILTERS: CrudListFilters = {
   perPage: 15,
   orderBy: 'data',
   sort: 'desc',
+}
+
+function normalizeChannels(value: unknown) {
+  if (Array.isArray(value)) return value.map((item) => String(item).trim().toLowerCase()).filter(Boolean)
+  return String(value ?? '').split(',').map((item) => item.trim().toLowerCase()).filter(Boolean)
 }
 
 export function NotificacaoPainelUsuariosModal({
@@ -78,6 +84,23 @@ export function NotificacaoPainelUsuariosModal({
       label: t('panelNotifications.users.viewedAt', 'Data'),
       sortKey: 'data',
       cell: (record) => record.data ? formatDateTime(String(record.data)) : '-',
+    },
+    {
+      id: 'canais',
+      label: t('panelNotifications.users.viewedChannels', 'Visualizado'),
+      sortKey: 'canais',
+      thClassName: 'w-[120px] text-center',
+      tdClassName: 'text-center',
+      cell: (record) => {
+        const channels = normalizeChannels(record.canais)
+        return (
+          <span className="inline-flex min-w-12 items-center justify-center gap-2 text-[color:var(--app-muted)]">
+            {channels.includes('admin') ? <Bell className="h-4 w-4 text-emerald-600" aria-label={t('panelNotifications.users.adminChannel', 'Visualizado pelo admin')} /> : null}
+            {channels.includes('email') ? <Mail className="h-4 w-4 text-sky-600" aria-label={t('panelNotifications.users.emailChannel', 'Visualizado pelo e-mail')} /> : null}
+            {!channels.length ? '-' : null}
+          </span>
+        )
+      },
     },
   ], [t])
 
