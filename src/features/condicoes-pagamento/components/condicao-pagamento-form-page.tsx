@@ -1,8 +1,9 @@
 'use client'
 
-import { Building2, FileText } from 'lucide-react'
+import { Building2, FileText, LockKeyhole, ShieldBan } from 'lucide-react'
 import { TabbedCatalogFormPage } from '@/src/features/catalog/components/tabbed-catalog-form-page'
 import { CondicoesPagamentoFiliaisTab } from '@/src/features/condicoes-pagamento/components/condicoes-pagamento-filiais-tab'
+import { CondicoesPagamentoOcorrenciasTab } from '@/src/features/condicoes-pagamento/components/condicoes-pagamento-ocorrencias-tab'
 import { condicoesPagamentoClient } from '@/src/features/condicoes-pagamento/services/condicoes-pagamento-client'
 import { CONDICOES_PAGAMENTO_CONFIG } from '@/src/features/condicoes-pagamento/services/condicoes-pagamento-config'
 import { useI18n } from '@/src/i18n/use-i18n'
@@ -35,6 +36,24 @@ export function CondicaoPagamentoFormPage({ id }: { id?: string }) {
               onRefresh={refreshRecord}
               onError={onFeedback}
             />
+          ) : null,
+        },
+        {
+          key: 'restrictions',
+          label: t('financial.paymentTerms.tabs.restrictions', 'Restrições'),
+          icon: <ShieldBan className="h-4 w-4" />,
+          hidden: ({ isEditing }) => !isEditing,
+          render: ({ id: condicaoPagamentoId, readOnly, onFeedback }) => condicaoPagamentoId ? (
+            <CondicoesPagamentoOcorrenciasTab mode="restricoes" condicaoPagamentoId={condicaoPagamentoId} readOnly={readOnly} onError={onFeedback} />
+          ) : null,
+        },
+        {
+          key: 'exceptions',
+          label: t('financial.paymentTerms.tabs.exceptions', 'Exceções'),
+          icon: <LockKeyhole className="h-4 w-4" />,
+          hidden: ({ isEditing }) => !isEditing,
+          render: ({ id: condicaoPagamentoId, readOnly, onFeedback }) => condicaoPagamentoId ? (
+            <CondicoesPagamentoOcorrenciasTab mode="excecoes" condicaoPagamentoId={condicaoPagamentoId} readOnly={readOnly} onError={onFeedback} />
           ) : null,
         },
       ]}

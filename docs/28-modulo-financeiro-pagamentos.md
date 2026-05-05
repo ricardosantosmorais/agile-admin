@@ -37,7 +37,11 @@
 - formulário por abas:
   - `Dados gerais`
   - `Filiais`
+  - `Restrições`
+  - `Exceções`
 - `Filiais` funciona por vínculo relacional com lookup de filial e exclusão em lote
+- `Restrições` e `Exceções` seguem o contrato legado de ocorrências por cliente, filial, grupo, praça, rede, segmento, supervisor, tabela de preço, UF, vendedor e demais escopos aplicáveis
+- registros sincronizados por `id_sync` ficam protegidos contra edição e exclusão, como no controller legado
 
 ### Tabelas de preço
 - listagem server-side com:
@@ -69,9 +73,12 @@
 
 ## Contrato
 - `Condições de pagamento`
-  - leitura com `embed=filiais.filial`
+  - leitura com `embed=filiais.filial,restricoes,excecoes`
   - escrita em `/condicoes_pagamento`
   - vínculo em `/condicoes_pagamento/filiais`
+  - ocorrências em:
+    - `/condicoes_pagamento/restricoes`
+    - `/condicoes_pagamento/excecoes`
 - `Tabelas de preço`
   - leitura com `embed=filiais.filial`
   - escrita em `/tabelas_preco`
@@ -103,6 +110,6 @@
   - serialização e normalização dos configs
   - labels e regra de `internaliza_auto` em `Formas de pagamento`
 - E2E:
-  - `Condições de pagamento`: criar, filtrar, editar, abrir aba `Filiais`, excluir
+  - `Condições de pagamento`: criar, filtrar, editar, abrir abas `Filiais`, `Restrições`, `Exceções`, excluir
   - `Tabelas de preço`: criar, filtrar, editar, abrir aba `Filiais`, excluir
   - `Formas de pagamento`: criar, filtrar, editar, abrir abas `Condições`, `Restrições`, `Exceções`, excluir

@@ -22,7 +22,9 @@ Base date: 2026-03-24
 - Price simulator already had the new freight field and API v2 route; the remaining migration was freight normalization in the bridge so masked Brazilian values and already-normalized decimal values are both forwarded correctly.
 - Seventh batch checked: `pedidos`.
 - Orders needed parity for delivery statuses, payment-interest configuration, master-only technical logs, and master product technical artifacts in the order detail.
-- Next step: continue with the next inventory batch after `pedidos`, unless we choose to refine the order price-memory modal from JSON view to a richer table view.
+- Eighth batch checked: `condicoes-pagamento`.
+- Payment terms needed parity for `Restrições` and `Exceções`, including occurrence scopes, active/date fields, dedicated bridges, and synchronized-record protection through `id_sync`.
+- Next step: continue with the next inventory batch after `condicoes-pagamento`; likely candidates are `filiais`, `formularios`, `integracao-erp/servicos`, or the larger `configuracoes` triage group.
 
 ## Completed batches
 
@@ -33,6 +35,7 @@ Base date: 2026-03-24
 - `integracao-erp/interfaces-consulta`: migrated consultation-map normalization for filter/order application mode and value-resolution config in template and override saves.
 - `simulador-precos`: migrated freight normalization in the API v2 bridge and added regression coverage for freight and packaging query format.
 - `pedidos`: migrated delivery statuses `devolvido`/`solicitado`, `exibe_juros_parcelas`, master-only filtering for technical logs, and master product actions for price memory/origin trace payloads.
+- `condicoes-pagamento`: migrated restriction/exception tabs, occurrence mappers, bridges, i18n/docs/E2E coverage, and `id_sync` edit/delete protection.
 
 ## Known local noise excluded
 
