@@ -48,3 +48,13 @@ export const PEDIDO_STATUS_OPTIONS = Object.entries(PEDIDO_STATUS_META).map(([va
   value,
   label: meta.label,
 }))
+
+export const PEDIDO_DELIVERY_STATUS_OPTIONS = [
+  { value: 'aguardando', labelKey: 'orders.deliveryStatusOptions.waiting', fallback: 'Aguardando' },
+  { value: 'pronto_retirada', labelKey: 'orders.deliveryStatusOptions.readyForPickup', fallback: 'Pronto para retirada' },
+  { value: 'coletado', labelKey: 'orders.deliveryStatusOptions.collected', fallback: 'Coletado' },
+  { value: 'devolvido', labelKey: 'orders.deliveryStatusOptions.returned', fallback: 'Devolvido' },
+  { value: 'em_transporte', labelKey: 'orders.deliveryStatusOptions.inTransit', fallback: 'Em transporte' },
+  { value: 'entregue', labelKey: 'orders.deliveryStatusOptions.delivered', fallback: 'Entregue' },
+  { value: 'solicitado', labelKey: 'orders.deliveryStatusOptions.requested', fallback: 'Solicitado' },
+] as const

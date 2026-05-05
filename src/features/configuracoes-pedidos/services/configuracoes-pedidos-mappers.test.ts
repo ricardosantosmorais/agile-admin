@@ -1,6 +1,7 @@
 ﻿import { describe, expect, it } from 'vitest'
 import {
   buildDirtyConfiguracoesPedidosPayload,
+  getConfiguracoesPedidosFieldDefinitions,
   normalizeConfiguracoesPedidosRecord,
 } from '@/src/features/configuracoes-pedidos/services/configuracoes-pedidos-mappers'
 
@@ -37,6 +38,7 @@ describe('configuracoes-pedidos-mappers', () => {
       atualizar_carrinho: '',
       bloqueia_pedidos: '',
       exibe_impostos: '',
+      exibe_juros_parcelas: '',
       exige_pagamento_total: '',
       filial_cliente: '',
       forca_tabela_preco: '',
@@ -69,14 +71,32 @@ describe('configuracoes-pedidos-mappers', () => {
     const currentValues = {
       ...initialValues,
       codigo_vendedor: 'C',
+      exibe_juros_parcelas: '1',
       tentativas_pagamento: '3',
     }
 
     expect(buildDirtyConfiguracoesPedidosPayload(initialValues, currentValues, '2026-04-02 10:10:00')).toEqual([
       { id_filial: null, chave: 'versao', parametros: '2026-04-02 10:10:00' },
       { id_filial: null, chave: 'codigo_vendedor', parametros: 'C' },
+      { id_filial: null, chave: 'exibe_juros_parcelas', parametros: '1' },
       { id_filial: null, chave: 'tentativas_pagamento', parametros: '3' },
     ])
+  })
+
+  it('mantem a configuracao legada para exibir juros das condicoes nas parcelas', () => {
+    const field = getConfiguracoesPedidosFieldDefinitions((_, fallback) => fallback)
+      .find((definition) => definition.key === 'exibe_juros_parcelas')
+
+    expect(field).toEqual(expect.objectContaining({
+      key: 'exibe_juros_parcelas',
+      section: 'payment',
+      label: 'Exibe juros das condições',
+      helper: 'Indica se a plataforma exibe a informação de juros das condições de pagamento nas parcelas do cartão no checkout.',
+      options: [
+        { value: '1', label: 'Sim' },
+        { value: '0', label: 'Não' },
+      ],
+    }))
   })
 })
 

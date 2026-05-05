@@ -20,7 +20,9 @@ Base date: 2026-03-24
 - Interfaces consulta already had most of the legacy module surface in v2; the remaining migration was bridge normalization for consultation map fields introduced by the legacy commits.
 - Sixth batch checked: `simulador-precos`.
 - Price simulator already had the new freight field and API v2 route; the remaining migration was freight normalization in the bridge so masked Brazilian values and already-normalized decimal values are both forwarded correctly.
-- Next step: open `pedidos`, the next larger batch with likely user-facing order/detail impact.
+- Seventh batch checked: `pedidos`.
+- Orders needed parity for delivery statuses, payment-interest configuration, master-only technical logs, and master product technical artifacts in the order detail.
+- Next step: continue with the next inventory batch after `pedidos`, unless we choose to refine the order price-memory modal from JSON view to a richer table view.
 
 ## Completed batches
 
@@ -30,6 +32,7 @@ Base date: 2026-03-24
 - `integracao-erp/gateway-endpoints`: migrated OAuth2Cookie/cookie-token parity and masked read-only context variables for endpoint testing.
 - `integracao-erp/interfaces-consulta`: migrated consultation-map normalization for filter/order application mode and value-resolution config in template and override saves.
 - `simulador-precos`: migrated freight normalization in the API v2 bridge and added regression coverage for freight and packaging query format.
+- `pedidos`: migrated delivery statuses `devolvido`/`solicitado`, `exibe_juros_parcelas`, master-only filtering for technical logs, and master product actions for price memory/origin trace payloads.
 
 ## Known local noise excluded
 

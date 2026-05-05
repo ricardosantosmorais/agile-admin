@@ -10,6 +10,8 @@ import {
   History,
   Loader2,
   MapPin,
+  FileCode2,
+  BadgeDollarSign,
   Package2,
   ReceiptText,
   RefreshCcw,
@@ -31,9 +33,12 @@ import { SectionCard } from '@/src/components/ui/section-card'
 import { StatusBadge } from '@/src/components/ui/status-badge'
 import { TabButton } from '@/src/components/ui/tab-button'
 import { useTenant } from '@/src/contexts/tenant-context'
+import { useAuth } from '@/src/features/auth/hooks/use-auth'
 import { useFeatureAccess } from '@/src/features/auth/hooks/use-feature-access'
 import { usePedidoActions } from '@/src/features/pedidos/components/use-pedido-actions'
 import { pedidosClient } from '@/src/features/pedidos/services/pedidos-client'
+import { filterPedidoLogsByAccess, getPedidoProductTechnicalArtifacts } from '@/src/features/pedidos/services/pedidos-mappers'
+import { PEDIDO_DELIVERY_STATUS_OPTIONS } from '@/src/features/pedidos/services/pedidos-meta'
 import type { PedidoDetail } from '@/src/features/pedidos/services/pedidos-types'
 import { buildProdutoImageCandidates } from '@/src/features/produtos/services/produto-image-url'
 import { useAsyncData } from '@/src/hooks/use-async-data'
@@ -54,14 +59,6 @@ type MetricCardProps = {
   helper?: ReactNode
   tone?: 'slate' | 'emerald' | 'sky' | 'amber'
 }
-
-const DELIVERY_STATUS_OPTIONS = [
-  { value: 'aguardando', labelKey: 'orders.deliveryStatusOptions.waiting', fallback: 'Aguardando' },
-  { value: 'pronto_retirada', labelKey: 'orders.deliveryStatusOptions.readyForPickup', fallback: 'Pronto para retirada' },
-  { value: 'coletado', labelKey: 'orders.deliveryStatusOptions.collected', fallback: 'Coletado' },
-  { value: 'em_transporte', labelKey: 'orders.deliveryStatusOptions.inTransit', fallback: 'Em transporte' },
-  { value: 'entregue', labelKey: 'orders.deliveryStatusOptions.delivered', fallback: 'Entregue' },
-] as const
 
 function InfoRow({ label, value }: { label: string; value: ReactNode }) {
   return (
@@ -236,6 +233,7 @@ function ProductThumb({ product, assetsBucketUrl }: { product: RecordLike | null
 
 export function PedidoDetailPage() {
   const { t } = useI18n()
+  const { session } = useAuth()
   const access = useFeatureAccess('pedidos')
   const { currentTenant } = useTenant()
   const { id } = useRouteParams<{ id?: string }>()
@@ -273,7 +271,8 @@ export function PedidoDetailPage() {
   const usuario = toRecord(detail?.usuario)
   const produtos = toArray(detail?.produtos)
   const eventos = toArray(detail?.eventos)
-  const logs = toArray(detail?.logs)
+  const isMasterUser = Boolean(session?.user.master)
+  const logs = filterPedidoLogsByAccess(detail?.logs, isMasterUser)
   const customerName = toStringValue(cliente?.nome_fantasia || cliente?.nome)
   const deliveryStatusLabel = humanizeEnum(entrega?.status)
   const produtoQuantidadeSolicitada = produtos.reduce((sum, item) => sum + (toNumber(item.quantidade) / (toNumber(toRecord(item.embalagem)?.quantidade) || 1)), 0)
@@ -372,6 +371,7 @@ export function PedidoDetailPage() {
         const quantidadeAtendida = toNumber(item.quantidade_atendida) / quantidadeEmbalagem
         const hasTotalCut = detail?.status !== 'cancelado' && quantidadeAtendida < quantidadeSolicitada && quantidadeAtendida <= 0
         const hasPartialCut = detail?.status !== 'cancelado' && quantidadeAtendida < quantidadeSolicitada && quantidadeAtendida > 0
+        const technicalArtifacts = getPedidoProductTechnicalArtifacts(item)
         return (
           <div className="space-y-1">
             <p className="font-semibold text-slate-900">{toStringValue(produto?.nome)}</p>
@@ -382,6 +382,22 @@ export function PedidoDetailPage() {
             {item.prazo_adicional ? <p className="text-xs font-semibold text-slate-600">{t('orders.fields.additionalLeadTime', 'Prazo de entrega adicional de {{count}} dia(s)', { count: String(item.prazo_adicional) })}</p> : null}
             {hasTotalCut ? <StatusBadge tone="danger">{t('orders.fields.totalCut', 'Produto com corte total')}</StatusBadge> : null}
             {hasPartialCut ? <StatusBadge tone="warning">{t('orders.fields.partialCut', 'Produto com corte parcial')}</StatusBadge> : null}
+            {isMasterUser && (technicalArtifacts.priceMemory || technicalArtifacts.originTrace) ? (
+              <div className="flex flex-wrap gap-2 pt-2">
+                {technicalArtifacts.priceMemory ? (
+                  <button type="button" className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold" onClick={() => setJsonModal({ title: t('orders.fields.priceMemory', 'Formação de preço do produto'), content: technicalArtifacts.priceMemory })}>
+                    <BadgeDollarSign className="h-3.5 w-3.5" />
+                    {t('orders.actions.viewPriceMemory', 'Formação de preço')}
+                  </button>
+                ) : null}
+                {technicalArtifacts.originTrace ? (
+                  <button type="button" className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold" onClick={() => setJsonModal({ title: t('orders.fields.productTechnicalLog', 'Log técnico do produto'), content: technicalArtifacts.originTrace })}>
+                    <FileCode2 className="h-3.5 w-3.5" />
+                    {t('orders.actions.viewProductTechnicalLog', 'Log técnico')}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         )
       },
@@ -651,7 +667,7 @@ export function PedidoDetailPage() {
                       <div className="space-y-2">
                         <label htmlFor="pedido-entrega-status" className="text-sm font-semibold text-slate-700">{t('orders.fields.deliveryStatus', 'Status da entrega')}</label>
                         <select id="pedido-entrega-status" value={deliveryForm.status} onChange={(event) => setDeliveryForm((current) => ({ ...current, status: event.target.value }))} className="app-control w-full rounded-[1.1rem] px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400">
-                          {DELIVERY_STATUS_OPTIONS.map((option) => <option key={option.value} value={option.value}>{t(option.labelKey, option.fallback)}</option>)}
+                          {PEDIDO_DELIVERY_STATUS_OPTIONS.map((option) => <option key={option.value} value={option.value}>{t(option.labelKey, option.fallback)}</option>)}
                         </select>
                       </div>
                       <div className="space-y-2">

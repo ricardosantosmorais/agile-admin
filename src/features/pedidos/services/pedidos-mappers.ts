@@ -40,6 +40,49 @@ function resolveCanCancel(record: Record<string, unknown>) {
   return !['carrinho', 'rascunho', 'cancelado'].includes(status) && record.brinde !== true
 }
 
+export function isTechnicalPedidoLog(log: unknown) {
+  const record = log && typeof log === 'object' ? log as Record<string, unknown> : {}
+  const codigo = String(record.codigo || '').trim()
+  return codigo.startsWith('processing_') || codigo === 'origin_trace_snapshot'
+}
+
+export function filterPedidoLogsByAccess(logs: unknown, isMasterUser: boolean) {
+  const rows = Array.isArray(logs) ? logs as Array<Record<string, unknown>> : []
+  return isMasterUser ? rows : rows.filter((log) => !isTechnicalPedidoLog(log))
+}
+
+function normalizeJsonArtifact(value: unknown) {
+  if (!value) return ''
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if (!trimmed) return ''
+
+    try {
+      return JSON.stringify(JSON.parse(trimmed), null, 2)
+    } catch {
+      return trimmed
+    }
+  }
+
+  if (typeof value === 'object') {
+    return JSON.stringify(value, null, 2)
+  }
+
+  return ''
+}
+
+export function getPedidoProductTechnicalArtifacts(product: unknown) {
+  const record = product && typeof product === 'object' ? product as Record<string, unknown> : {}
+  const metadata = record.metadata && typeof record.metadata === 'object'
+    ? record.metadata as Record<string, unknown>
+    : {}
+
+  return {
+    priceMemory: normalizeJsonArtifact(record.memoria_preco),
+    originTrace: normalizeJsonArtifact(metadata.origin_trace),
+  }
+}
+
 export function normalizePedidoListRecord(item: unknown): PedidoListRecord {
   const record = typeof item === 'object' && item !== null ? item as Record<string, unknown> : {}
   const statusMeta = getPedidoStatusMeta(record.status)

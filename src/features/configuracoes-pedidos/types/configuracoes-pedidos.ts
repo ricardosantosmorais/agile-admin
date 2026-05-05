@@ -4,6 +4,7 @@ export type ConfiguracoesPedidosFieldKey =
   | 'checkout_unificado'
   | 'codigo_vendedor'
   | 'exibe_impostos'
+  | 'exibe_juros_parcelas'
   | 'exige_pagamento_total'
   | 'exige_vendedor'
   | 'filial_cliente'
