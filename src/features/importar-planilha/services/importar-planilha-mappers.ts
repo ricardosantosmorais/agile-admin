@@ -170,9 +170,16 @@ function normalizeDictionaryField(value: unknown): ProcessoArquivoDictionaryFiel
   }
 }
 
+function shouldIncludeDictionaryField(value: unknown) {
+  const record = asRecord(value)
+  if (!Object.prototype.hasOwnProperty.call(record, 'integra_planilha')) return true
+  return asBoolean(record.integra_planilha)
+}
+
 function normalizeDictionaryTable(value: unknown): ProcessoArquivoDictionaryTable {
   const record = asRecord(value)
   const fields = asArray(record.campos)
+    .filter(shouldIncludeDictionaryField)
     .map(normalizeDictionaryField)
     .filter((field) => field.id)
     .sort((left, right) => left.position - right.position)

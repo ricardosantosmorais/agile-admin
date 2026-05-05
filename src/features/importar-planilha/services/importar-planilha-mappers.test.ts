@@ -63,6 +63,7 @@ describe('importar-planilha-mappers', () => {
           campos: [
             { id: 'CAM2', nome: 'Nome', tipo: 'varchar', nulo: 'YES', posicao: 2 },
             { id: 'CAM1', nome: 'Código', tipo: 'number', nulo: 'NO', posicao: 1 },
+            { id: 'CAM3', nome: 'Interno', tipo: 'number', nulo: 'YES', posicao: 3, integra_planilha: 0 },
           ],
         },
       ],
@@ -78,6 +79,7 @@ describe('importar-planilha-mappers', () => {
     })
 
     expect(result.processo.id).toBe('186')
+    expect(result.tables[0].fields.map((field) => field.id)).toEqual(['CAM1', 'CAM2'])
     expect(result.tables[0].fields[0].id).toBe('CAM1')
     expect(result.tables[0].fields[0].required).toBe(true)
     expect(result.mappings[0].targetFieldId).toBe('CAM1')

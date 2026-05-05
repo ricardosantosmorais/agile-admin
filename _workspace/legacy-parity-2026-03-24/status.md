@@ -9,12 +9,15 @@ Base date: 2026-03-24
 
 - Inventory generated from legacy git history.
 - First batch checked: `gateways-pagamento`.
+- Second batch checked: `importar-planilha/processos-arquivos`.
 - Gateways 3DS behavior was already present in v2; missing bridge coverage was added.
-- Next step: open `importar-planilha/processos-arquivos` and compare the legacy `integra_planilha` filter with the v2 mapping flow.
+- Spreadsheet import mapping needed the legacy field-level `integra_planilha` filter; v2 now filters dictionary fields in the mapper with regression coverage.
+- Next step: open `notificacoes-painel` and compare channel/audience/status changes with the v2 flow.
 
 ## Completed batches
 
 - `gateways-pagamento`: no functional migration needed; added Cielo 3DS bridge tests.
+- `importar-planilha/processos-arquivos`: migrated `integra_planilha` field filtering in spreadsheet mapping and added mapper test coverage.
 
 ## Known local noise excluded
 

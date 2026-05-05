@@ -1,6 +1,6 @@
 import { StatusBadge } from '@/src/components/ui/status-badge'
 import { JsonCodeEditor } from '@/src/components/ui/json-code-editor'
-import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
+import type { CrudModuleConfig } from '@/src/components/crud-base/types'
 import { buildGatewayEndpointPayload, GATEWAY_ENDPOINT_PAGINATION_OPTIONS, GATEWAY_ENDPOINT_TYPE_OPTIONS, GATEWAY_ENDPOINT_VERB_OPTIONS, normalizeGatewayEndpointRecord } from '@/src/features/integracao-com-erp-gateway-endpoints/services/integracao-com-erp-gateway-endpoints'
 
 function wrap(value: unknown) {

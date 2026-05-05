@@ -36,8 +36,11 @@ export function NotificacaoPainelUsuariosModal({
   useEffect(() => {
     if (!open || !id) return
     let alive = true
-    setIsLoading(true)
-    setError(null)
+    queueMicrotask(() => {
+      if (!alive) return
+      setIsLoading(true)
+      setError(null)
+    })
     notificacoesPainelClient.usuarios(id, filters)
       .then((response) => {
         if (!alive) return

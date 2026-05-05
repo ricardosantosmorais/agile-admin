@@ -1,7 +1,7 @@
 'use client'
 
 import { Database, IdCard, Loader2, Trash2 } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AppDataTable } from '@/src/components/data-table/app-data-table'
 import type { AppDataTableColumn } from '@/src/components/data-table/types'
@@ -230,7 +230,7 @@ export function IntegracaoComErpEndpointsFormPage({ id }: Props) {
 		}
 	}
 
-	async function handleAddProfile() {
+	const handleAddProfile = useCallback(async () => {
 		if (!id || !selectedProfile) {
 			setFeedback({ tone: 'error', message: 'Selecione o perfil antes de incluir.' })
 			return
@@ -245,9 +245,9 @@ export function IntegracaoComErpEndpointsFormPage({ id }: Props) {
 		} finally {
 			setProfileSaving(false)
 		}
-	}
+	}, [id, selectedProfile])
 
-	async function handleDeleteProfile(profileId: string) {
+	const handleDeleteProfile = useCallback(async (profileId: string) => {
 		if (!id || !profileId) return
 		setProfileSaving(true)
 		try {
@@ -258,7 +258,7 @@ export function IntegracaoComErpEndpointsFormPage({ id }: Props) {
 		} finally {
 			setProfileSaving(false)
 		}
-	}
+	}, [id])
 
 	const tabs = useMemo<IntegrationFormTab[]>(() => [
 		{
@@ -373,7 +373,7 @@ export function IntegracaoComErpEndpointsFormPage({ id }: Props) {
 				</SectionCard>
 			),
 		},
-	], [form, isEditing, profileColumns, profileSaving, profiles, profilesLoading, readOnly, selectedProfile])
+	], [form, handleAddProfile, handleDeleteProfile, isEditing, profileColumns, profileSaving, profiles, profilesLoading, readOnly, selectedProfile])
 
 	if (!isRootAgileecommerceAdmin(session)) {
 		return <AccessDeniedState title={t('maintenance.erpIntegration.catalogs.items.endpoints.formTitle', 'Endpoint')} backHref="/dashboard" />

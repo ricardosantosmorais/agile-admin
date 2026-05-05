@@ -7,7 +7,6 @@ import {
 	jsonError,
 	loadCampos,
 	loadConsultaMaps,
-	loadEndpoint,
 	loadEndpointsLookup,
 	loadGatewaysLookup,
 	loadQueriesLookup,

@@ -2,7 +2,7 @@
 
 import { CheckCircle2, Code2, Copy, Database, FlaskConical, Loader2, Play, RefreshCcw, RotateCcw, Search, ShieldCheck, Sparkles, Variable } from 'lucide-react'
 import type { DragEvent, FormEvent } from 'react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { CrudRecord } from '@/src/components/crud-base/types'
 import { AsyncState } from '@/src/components/ui/async-state'
@@ -490,7 +490,7 @@ export function IntegracaoComErpGatewayEndpointsFormPage({ id }: { id?: string }
 		</SectionCard>
 	)
 
-	const tabs = useMemo<IntegrationFormTab[]>(() => [
+	const tabs: IntegrationFormTab[] = [
 		{
 			key: 'dados',
 			label: 'Dados gerais',
@@ -531,7 +531,7 @@ export function IntegracaoComErpGatewayEndpointsFormPage({ id }: { id?: string }
 			icon: <FlaskConical className="h-4 w-4" />,
 			content: testEndpointTab,
 		},
-	], [dynamicVariablesPanel, form, readOnly, testEndpointTab])
+	]
 
 	if (!isRootAgileecommerceAdmin(session)) return <AccessDeniedState title="Gateway Endpoint" backHref="/dashboard" />
 	if (!canAccess) return <AccessDeniedState title="Gateway Endpoint" backHref="/integracao-com-erp/cadastros/gateway-endpoints" />

@@ -1,7 +1,7 @@
 'use client'
 
 import { Building2, Loader2, Plus, RefreshCcw, Save, Settings, ToggleLeft, ToggleRight, Unlink } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { TabbedCatalogFormPage } from '@/src/features/catalog/components/tabbed-catalog-form-page'
 import { AppDataTable } from '@/src/components/data-table/app-data-table'
 import type { AppDataTableColumn } from '@/src/components/data-table/types'
@@ -79,7 +79,7 @@ function ServicoEmpresasPanel({ id, refreshSignal, createSignal }: ServicoEmpres
 	const [saving, setSaving] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 
-	async function loadRows() {
+	const loadRows = useCallback(async () => {
 		setLoading(true)
 		setError(null)
 		try {
@@ -90,7 +90,7 @@ function ServicoEmpresasPanel({ id, refreshSignal, createSignal }: ServicoEmpres
 		} finally {
 			setLoading(false)
 		}
-	}
+	}, [id])
 
 	async function saveLink() {
 		if (!empresa) return
@@ -150,11 +150,11 @@ function ServicoEmpresasPanel({ id, refreshSignal, createSignal }: ServicoEmpres
 
 	useEffect(() => {
 		void loadRows()
-	}, [id])
+	}, [loadRows])
 
 	useEffect(() => {
 		if (refreshSignal > 0) void loadRows()
-	}, [refreshSignal])
+	}, [loadRows, refreshSignal])
 
 	useEffect(() => {
 		if (createSignal > 0) {
@@ -230,4 +230,3 @@ function ServicoEmpresasPanel({ id, refreshSignal, createSignal }: ServicoEmpres
 		</>
 	)
 }
-
