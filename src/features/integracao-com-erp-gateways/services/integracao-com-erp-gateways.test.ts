@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CrudRecord } from '@/src/components/crud-base/types'
-import { buildGatewayCollectionParams, buildGatewayPayload, normalizeGatewayRecord } from './integracao-com-erp-gateways'
+import { buildGatewayCollectionParams, buildGatewayPayload, GATEWAY_AUTH_OPTIONS, normalizeGatewayRecord } from './integracao-com-erp-gateways'
 
 describe('integracao-com-erp-gateways', () => {
 	it('normaliza labels do template e valores de verbo/acesso', () => {
@@ -32,5 +32,9 @@ describe('integracao-com-erp-gateways', () => {
 		expect(params.get('sort')).toBe('desc')
 		expect(params.get('nome:lk')).toBe('api')
 		expect(params.get('join')).toBe('templates:nome,id')
+	})
+
+	it('expoe OAuth2Cookie como tipo de autenticacao legado', () => {
+		expect(GATEWAY_AUTH_OPTIONS).toContain('OAuth2Cookie')
 	})
 })

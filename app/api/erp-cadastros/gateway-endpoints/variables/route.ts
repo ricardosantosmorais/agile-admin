@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
 		['@empresa.id', 'Identificador da empresa no contexto da execução.'],
 		['@empresa.codigo', 'Código da empresa no contexto da execução.'],
 		['@oauth2.token', 'Token OAuth2 obtido na autenticação do gateway.'],
+		['@oauth2.cookie', 'Cookie capturado na autenticação OAuth2Cookie do gateway.'],
 	]) {
 		addToken(tokens, item[0], item[1], 'fixa')
 	}

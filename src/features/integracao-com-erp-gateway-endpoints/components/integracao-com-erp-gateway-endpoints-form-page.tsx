@@ -22,7 +22,15 @@ import { httpClient } from '@/src/services/http/http-client'
 import { useI18n } from '@/src/i18n/use-i18n'
 import { isRootAgileecommerceAdmin } from '@/src/lib/root-tenant'
 
-type DynamicVariable = { token: string; description: string; origin?: string; default_value?: string }
+type DynamicVariable = {
+	token: string
+	description: string
+	origin?: string
+	default_value?: string
+	display_value?: string
+	resolved_by_context?: boolean
+	editable?: boolean
+}
 type TokenDropElement = HTMLInputElement | HTMLTextAreaElement
 
 const FIELD_LABELS: Record<string, string> = {
@@ -221,7 +229,7 @@ export function IntegracaoComErpGatewayEndpointsFormPage({ id }: { id?: string }
 			setTestValues((current) => {
 				const next: Record<string, string> = {}
 				for (const item of nextVariables) {
-					next[item.token] = current[item.token] ?? String(item.default_value || '')
+					next[item.token] = current[item.token] ?? String(item.display_value || item.default_value || '')
 				}
 				return next
 			})
@@ -237,9 +245,15 @@ export function IntegracaoComErpGatewayEndpointsFormPage({ id }: { id?: string }
 		setTestLoading(true)
 		setFeedback(null)
 		try {
+			const contextTokens = new Set(
+				testVariables
+					.filter((item) => item.resolved_by_context || item.editable === false)
+					.map((item) => item.token),
+			)
+			const variaveis = Object.fromEntries(Object.entries(testValues).filter(([token]) => !contextTokens.has(token)))
 			const result = await httpClient<unknown>('/api/erp-cadastros/gateway-endpoints/test', {
 				method: 'POST',
-				body: JSON.stringify({ ...form, variaveis: testValues, pagina: 1 }),
+				body: JSON.stringify({ ...form, variaveis, pagina: 1 }),
 			})
 			setTestResult(result)
 		} catch (runError) {
@@ -445,16 +459,22 @@ export function IntegracaoComErpGatewayEndpointsFormPage({ id }: { id?: string }
 									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 									Carregando variáveis...
 								</div>
-							) : testVariables.length ? testVariables.map((item) => (
-								<label key={`${item.token}-test`} className="block rounded-2xl border border-line/50 bg-[color:var(--app-panel-solid)]/70 p-3 transition hover:border-emerald-500/40">
-									<span className="mb-2 flex items-center justify-between gap-2">
-										<span className="min-w-0 text-sm font-black text-[color:var(--app-text)] [overflow-wrap:anywhere]">{item.token}</span>
-										{String(testValues[item.token] || '').trim() ? <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" /> : null}
-									</span>
-									<input className="app-input w-full rounded-xl border border-line/60 bg-transparent px-3 py-2 text-sm" value={testValues[item.token] || ''} onChange={(event) => setTestValues((current) => ({ ...current, [item.token]: event.target.value }))} placeholder="Informe o valor para o teste" />
-									<span className="mt-2 block text-xs leading-relaxed text-[color:var(--app-muted)]">{item.description || 'Valor necessário para executar o endpoint.'}</span>
-								</label>
-							)) : (
+							) : testVariables.length ? testVariables.map((item) => {
+								const isContextResolved = Boolean(item.resolved_by_context || item.editable === false)
+								return (
+									<label key={`${item.token}-test`} className="block rounded-2xl border border-line/50 bg-[color:var(--app-panel-solid)]/70 p-3 transition hover:border-emerald-500/40">
+										<span className="mb-2 flex items-center justify-between gap-2">
+											<span className="min-w-0 text-sm font-black text-[color:var(--app-text)] [overflow-wrap:anywhere]">{item.token}</span>
+											<span className="flex shrink-0 items-center gap-2">
+												{isContextResolved ? <span className="rounded-full border border-emerald-500/30 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.12em] text-emerald-600 dark:text-emerald-300">Contexto</span> : null}
+												{String(testValues[item.token] || '').trim() ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : null}
+											</span>
+										</span>
+										<input className="app-input w-full rounded-xl border border-line/60 bg-transparent px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-70" value={testValues[item.token] || ''} onChange={(event) => setTestValues((current) => ({ ...current, [item.token]: event.target.value }))} placeholder="Informe o valor para o teste" disabled={isContextResolved} readOnly={isContextResolved} />
+										<span className="mt-2 block text-xs leading-relaxed text-[color:var(--app-muted)]">{item.description || 'Valor necessário para executar o endpoint.'}</span>
+									</label>
+								)
+							}) : (
 								<div className="rounded-2xl border border-dashed border-line/60 px-4 py-8 text-center">
 									<CheckCircle2 className="mx-auto h-8 w-8 text-emerald-500" />
 									<div className="mt-3 text-sm font-black text-[color:var(--app-text)]">Nenhuma variável obrigatória</div>
