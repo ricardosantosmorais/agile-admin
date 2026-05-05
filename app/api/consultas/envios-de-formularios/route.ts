@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { asArray, asRecord, extractApiErrorMessage, resolveConsultasContext, serverTenantFetch, toStringValue } from '@/app/api/consultas/_shared'
+import { getSubmissionPersonDisplayDocument, getSubmissionPersonName } from '@/app/api/consultas/envios-de-formularios/_person'
 
 function normalizeBooleanLabel(value: unknown) {
 	return value === true || value === 1 || value === '1' ? 'Sim' : 'Não'
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
 		perpage: searchParams.get('perPage') || '15',
 		order: searchParams.get('orderBy') || 'data',
 		sort: searchParams.get('sort') || 'desc',
-		embed: 'cliente,formulario',
+		embed: 'cliente,contato,formulario',
 	})
 
 	const idFormulario = toStringValue(searchParams.get('id_formulario'))
@@ -66,7 +67,11 @@ export async function GET(request: NextRequest) {
 
 	const cliente = toStringValue(searchParams.get('cliente'))
 	if (cliente) {
-		params.set('cliente:nome_fantasia::like', cliente)
+		const escaped = cliente.replace(/'/g, "''")
+		params.set(
+			'q',
+			`(clientes.nome_fantasia like '%${escaped}%' or clientes.razao_social like '%${escaped}%' or contatos.nome_fantasia like '%${escaped}%' or contatos.razao_social like '%${escaped}%')`,
+		)
 	}
 
 	const internalizado = toStringValue(searchParams.get('internalizado'))
@@ -97,14 +102,13 @@ export async function GET(request: NextRequest) {
 		data: asArray(payload.data).map((entry) => {
 			const row = asRecord(entry)
 			const formulario = asRecord(row.formulario)
-			const clienteRow = asRecord(row.cliente)
 
 			return {
 				id: toStringValue(row.id),
 				formularioTitulo: toStringValue(formulario.titulo),
 				formularioId: toStringValue(formulario.id),
-				clienteNome: toStringValue(clienteRow.nome_fantasia || clienteRow.razao_social),
-				clienteDocumento: toStringValue(clienteRow.cnpj_cpf),
+				clienteNome: getSubmissionPersonName(row),
+				clienteDocumento: getSubmissionPersonDisplayDocument(row),
 				data: toStringValue(row.data),
 				dataLabel: formatDateTime(row.data),
 				internalizado: row.internalizado === true || row.internalizado === 1 || row.internalizado === '1',

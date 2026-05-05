@@ -247,7 +247,12 @@ ObservaÃ§Ã£o:
 - `ManutenÃ§Ã£o > Campos de formulÃ¡rios` jÃ¡ possui:
   - listagem server-side com filtros por `id`, `id_formulario`, `codigo`, `titulo`, `tipo`, `protegido` e `ativo`;
   - criaÃ§Ã£o e ediÃ§Ã£o com reaproveitamento da base CRUD, incluindo serializaÃ§Ã£o para campos opcionais e dependentes do tipo do campo;
-  - bridges dedicadas via `app/api/formularios-campos` e `app/api/formularios`, sem fallback para `/legacy/...`.
+  - bridges dedicadas via `app/api/formularios-campos` e `app/api/formularios`, sem fallback para `/legacy/...`;
+  - invalidação segmentada de cache após gravação, exclusão e reordenação bem-sucedidas, alinhada aos serviços `Formulario` e `FormularioCampo` do legado.
+- `Consultas > Envios de Formulários` já possui:
+  - listagem e detalhe com resolução de pessoa por `cliente` ou `contato`, seguindo a prioridade de nome e documento do legado;
+  - filtro de cliente expandido para pesquisar também contatos;
+  - exportação com `data_envio`, `cnpj_cpf`, `nome_fantasia` e valores enviados por campo.
 - `ManutenÃ§Ã£o > Logs` jÃ¡ possui:
   - listagem server-side com filtros por `id_registro`, `mÃ³dulo`, `usuÃ¡rio`, perÃ­odo e `aÃ§Ã£o`;
   - modal de detalhe por registro com dados do evento e snapshots JSON anterior/novo;

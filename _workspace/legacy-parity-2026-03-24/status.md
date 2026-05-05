@@ -26,7 +26,9 @@ Base date: 2026-03-24
 - Payment terms needed parity for `Restrições` and `Exceções`, including occurrence scopes, active/date fields, dedicated bridges, and synchronized-record protection through `id_sync`.
 - Ninth batch checked: `filiais`.
 - Branches needed parity for `seleciona_filial` profile options, complementary branch fields, branch-group invoice branch and price table lookups, and lookup label restoration through form embeds. `exibe_precos_filial` had already been migrated to `Configuracoes > Produtos`.
-- Next step: continue with the next inventory batch after `filiais`; likely candidates are `formularios`, `integracao-erp/servicos`, or the larger `configuracoes` triage group.
+- Tenth batch checked: `formularios`.
+- Forms needed parity for segmented cache invalidation after successful `formularios` and `formularios_campos` mutations. Form submissions needed contact fallback in list/detail/export, customer/contact search parity, and legacy export metadata.
+- Next step: continue with the next inventory batch after `formularios`; likely candidates are `integracao-erp/servicos` or the larger `configuracoes` triage group.
 
 ## Completed batches
 
@@ -39,6 +41,7 @@ Base date: 2026-03-24
 - `pedidos`: migrated delivery statuses `devolvido`/`solicitado`, `exibe_juros_parcelas`, master-only filtering for technical logs, and master product actions for price memory/origin trace payloads.
 - `condicoes-pagamento`: migrated restriction/exception tabs, occurrence mappers, bridges, i18n/docs/E2E coverage, and `id_sync` edit/delete protection.
 - `filiais`: migrated `seleciona_filial` profile options, complementary branch fields, UF/list normalization, table-price lookup, branch-group invoice branch/table-price lookups, i18n/docs, and regression coverage.
+- `formularios`: migrated segmented cache invalidation for forms/form fields, contact fallback in form submissions, customer/contact search parity, export metadata, and bridge regression coverage.
 
 ## Known local noise excluded
 

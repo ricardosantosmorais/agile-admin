@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { asArray, asRecord, extractApiErrorMessage, resolveConsultasContext, serverTenantFetch, toStringValue } from '@/app/api/consultas/_shared'
+import { getSubmissionPersonDisplayDocument, getSubmissionPersonName } from '@/app/api/consultas/envios-de-formularios/_person'
 import { buildEnvioArquivoUrl } from '@/src/features/consultas-envios-formularios/services/envios-formularios-files'
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -10,7 +11,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
 	const { context } = contextResult
 	const { id } = await params
-	const result = await serverTenantFetch(context, `formularios_envios?id=${encodeURIComponent(id)}&embed=dados,formulario,cliente`)
+	const result = await serverTenantFetch(context, `formularios_envios?id=${encodeURIComponent(id)}&embed=dados,formulario,cliente,contato`)
 
 	if (!result.ok) {
 		return NextResponse.json(
@@ -30,8 +31,8 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 			id: toStringValue(envio.id),
 			formularioTitulo: toStringValue(asRecord(envio.formulario).titulo),
 			data: toStringValue(envio.data),
-			clienteNome: toStringValue(asRecord(envio.cliente).nome_fantasia || asRecord(envio.cliente).razao_social),
-			clienteDocumento: toStringValue(asRecord(envio.cliente).cnpj_cpf),
+			clienteNome: getSubmissionPersonName(envio),
+			clienteDocumento: getSubmissionPersonDisplayDocument(envio),
 			campos: asArray(envio.dados)
 				.map((entry) => {
 					const dado = asRecord(entry)
