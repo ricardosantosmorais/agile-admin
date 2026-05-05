@@ -392,6 +392,18 @@ export function endpointLabel(row: ApiRow) {
 	return id ? `#${id}${endpoint ? ` - ${endpoint}` : ''}` : endpoint || '-'
 }
 
+export function normalizeGatewayConsultaMap(map: ApiRow, endpointId: string) {
+	return {
+		...map,
+		id_gateway_endpoint: endpointId,
+		permite_filtro: toBool(map.permite_filtro),
+		modo_aplicacao_filtro: toStringValue(map.modo_aplicacao_filtro) || 'remoto',
+		permite_ordenacao: toBool(map.permite_ordenacao),
+		modo_aplicacao_ordenacao: toStringValue(map.modo_aplicacao_ordenacao) || 'remoto',
+		resolucao_valor_config: toStringValue(map.resolucao_valor_config),
+	}
+}
+
 export async function buildTemplateLinks(idTabela: string) {
 	const [templates, queryRows, endpointRows] = await Promise.all([
 		loadTemplatesLookup(),

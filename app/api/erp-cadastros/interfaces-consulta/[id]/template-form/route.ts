@@ -13,6 +13,7 @@ import {
 	loadRetornoMaps,
 	loadTabela,
 	loadTemplatesLookup,
+	normalizeGatewayConsultaMap,
 	postResource,
 	toBool,
 	toStringValue,
@@ -90,7 +91,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 			const endpointId = toStringValue(saved.id || endpoint.id)
 			for (const map of asArray<Record<string, unknown>>(body.consulta_maps)) {
 				if (!toStringValue(map.id_tabela_campo)) continue
-				await postResource('gateways_endpoints_campos_consulta', { ...map, id_gateway_endpoint: endpointId }, 'Falha ao salvar mapeamento de consulta.')
+				await postResource('gateways_endpoints_campos_consulta', normalizeGatewayConsultaMap(map, endpointId), 'Falha ao salvar mapeamento de consulta.')
 			}
 			for (const map of asArray<Record<string, unknown>>(body.retorno_maps)) {
 				if (!toStringValue(map.id_tabela_campo)) continue
