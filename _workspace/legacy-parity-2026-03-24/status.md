@@ -40,7 +40,9 @@ Base date: 2026-03-24
 - Dashboard did not need new visual or metric migration because v2 already loads sections by phase and viewport. The remaining parity was request-pressure hardening: dedupe identical in-flight snapshot calls, abort stale cycles through `AbortSignal`, and ignore obsolete responses.
 - Sixteenth batch checked: `docs`.
 - Docs had no functional v2 migration. The project-governance commit was legacy-only documentation, and the `ASSETS_VERSION` auto-refresh bug is already absent from the v2 architecture.
-- Next step: continue with the next inventory batch after `docs`.
+- Seventeenth batch checked: `.ebextensions`.
+- Elastic Beanstalk health-reporting configuration is legacy infrastructure only and was ignored by product decision because v2 has no `.ebextensions` deployment surface.
+- Next step: continue with the next uncompleted inventory batch after `.ebextensions`: `geral`.
 
 ## Completed batches
 
@@ -60,6 +62,7 @@ Base date: 2026-03-24
 - `controllers`: migrated Editor SQL execution to always use PainelB2BApi, full-cache invalidation after Componentes/Componentes Campos/Areas de Pagina mutations, and Sentry observability for remote-cache cluster failures.
 - `dashboard`: migrated request-pressure control with in-flight dedupe, stale-cycle aborts and `AbortSignal` propagation while preserving the existing v2 phase/viewport loading model.
 - `docs`: no functional migration needed; legacy project-documentation governance is repository-specific and the legacy `ASSETS_VERSION` auto-refresh bug surface is absent from v2.
+- `.ebextensions`: no migration needed; legacy Elastic Beanstalk 4xx health-reporting configuration is not applicable to v2 and was ignored by product decision.
 
 ## Known local noise excluded
 
