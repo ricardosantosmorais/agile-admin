@@ -42,7 +42,9 @@ Base date: 2026-03-24
 - Docs had no functional v2 migration. The project-governance commit was legacy-only documentation, and the `ASSETS_VERSION` auto-refresh bug is already absent from the v2 architecture.
 - Seventeenth batch checked: `.ebextensions`.
 - Elastic Beanstalk health-reporting configuration is legacy infrastructure only and was ignored by product decision because v2 has no `.ebextensions` deployment surface.
-- Next step: continue with the next uncompleted inventory batch after `.ebextensions`: `geral`.
+- Eighteenth batch checked: `geral`.
+- Local admin port `8080` support is already covered by the v2 architecture because bridge API URLs come from environment variables instead of `HTTP_HOST`/frontend port checks.
+- Next step: continue with the next uncompleted inventory batch after `geral`: `.gitignore`.
 
 ## Completed batches
 
@@ -63,6 +65,7 @@ Base date: 2026-03-24
 - `dashboard`: migrated request-pressure control with in-flight dedupe, stale-cycle aborts and `AbortSignal` propagation while preserving the existing v2 phase/viewport loading model.
 - `docs`: no functional migration needed; legacy project-documentation governance is repository-specific and the legacy `ASSETS_VERSION` auto-refresh bug surface is absent from v2.
 - `.ebextensions`: no migration needed; legacy Elastic Beanstalk 4xx health-reporting configuration is not applicable to v2 and was ignored by product decision.
+- `geral`: no migration needed; legacy local-port `8080` API routing is already covered in v2 by env-based API base URL resolution.
 
 ## Known local noise excluded
 
