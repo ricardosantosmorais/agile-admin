@@ -44,7 +44,9 @@ Base date: 2026-03-24
 - Elastic Beanstalk health-reporting configuration is legacy infrastructure only and was ignored by product decision because v2 has no `.ebextensions` deployment surface.
 - Eighteenth batch checked: `geral`.
 - Local admin port `8080` support is already covered by the v2 architecture because bridge API URLs come from environment variables instead of `HTTP_HOST`/frontend port checks.
-- Next step: continue with the next uncompleted inventory batch after `geral`: `.gitignore`.
+- Nineteenth batch checked: `.gitignore`.
+- The legacy local admin log ignore entry is already covered by the v2 `.gitignore` because `*.log` is ignored globally.
+- Next step: continue with the next uncompleted inventory batch after `.gitignore`: `includes`.
 
 ## Completed batches
 
@@ -66,6 +68,7 @@ Base date: 2026-03-24
 - `docs`: no functional migration needed; legacy project-documentation governance is repository-specific and the legacy `ASSETS_VERSION` auto-refresh bug surface is absent from v2.
 - `.ebextensions`: no migration needed; legacy Elastic Beanstalk 4xx health-reporting configuration is not applicable to v2 and was ignored by product decision.
 - `geral`: no migration needed; legacy local-port `8080` API routing is already covered in v2 by env-based API base URL resolution.
+- `.gitignore`: no migration needed; legacy `tmp/admin-local.log` ignore is already covered by the v2 `*.log` rule.
 
 ## Known local noise excluded
 
