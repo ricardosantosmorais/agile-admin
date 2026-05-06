@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = (await request.json()) as {
-    parameters?: Array<{ id_filial?: string | null; chave?: string; parametros?: string }>
+    parameters?: Array<{ id_filial?: string | null; chave?: string; parametros?: string | number | null }>
   }
 
   const parameters = Array.isArray(body.parameters)
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
         .map((parameter) => ({
           id_filial: parameter.id_filial ?? null,
           chave: String(parameter.chave).trim(),
-          parametros: String(parameter.parametros ?? '').trim(),
+          parametros: parameter.parametros === null ? null : typeof parameter.parametros === 'number' ? parameter.parametros : String(parameter.parametros ?? '').trim(),
         }))
     : []
 

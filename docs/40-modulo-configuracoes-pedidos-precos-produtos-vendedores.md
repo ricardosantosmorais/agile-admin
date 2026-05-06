@@ -36,6 +36,9 @@ Migrar os formulários diretos de parâmetros restantes do grupo `Configuraçõe
 ### Vendedores
 - adiciona uma seção específica de disponibilidade semanal;
 - usa janelas de meia em meia hora compatíveis com os parâmetros originais do legado.
+- preserva a Área Representante V2 do legado com `area_representante`, `preco_flexivel`, `acrescimo_maximo`, `desconto_maximo` e `quantidade_cotas_vendedor`;
+- mantém `quantidade_cotas_vendedor` editável apenas para usuário master;
+- o cadastro de vendedores envia `area_vendedor` e a bridge bloqueia nova ativação quando a Área V2 não está ativa ou quando não há licenças disponíveis.
 
 ## Testes
 - cobertura unitária mínima criada para os mapeadores dos quatro formulários;

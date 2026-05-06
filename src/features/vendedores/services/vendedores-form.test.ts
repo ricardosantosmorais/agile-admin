@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mapVendedorDetail, toVendedorPayload } from '@/src/features/vendedores/services/vendedores-form'
+import { createEmptyVendedorForm, mapVendedorDetail, toVendedorPayload } from '@/src/features/vendedores/services/vendedores-form'
 
 describe('vendedores-form', () => {
   it('maps seller details from the api to form state', () => {
@@ -7,6 +7,7 @@ describe('vendedores-form', () => {
       id: '12',
       ativo: 1,
       bloqueado: 0,
+      area_vendedor: 1,
       codigo: 'VND-12',
       codigo_ativacao: 'ACT-12',
       tipo: 'PJ',
@@ -28,6 +29,7 @@ describe('vendedores-form', () => {
       id: '12',
       ativo: true,
       bloqueado: false,
+      area_vendedor: true,
       tipo: 'PJ',
       tipo_vendedor: 'externo',
       cnpj: '12.345.678/0001-99',
@@ -47,6 +49,7 @@ describe('vendedores-form', () => {
       id: '12',
       ativo: true,
       bloqueado: false,
+      area_vendedor: true,
       codigo: 'VND-12',
       codigo_ativacao: 'ACT-12',
       tipo: 'PF',
@@ -68,6 +71,7 @@ describe('vendedores-form', () => {
       id: '12',
       ativo: true,
       bloqueado: false,
+      area_vendedor: true,
       codigo: 'VND-12',
       codigo_ativacao: 'ACT-12',
       tipo: 'PF',
@@ -82,6 +86,18 @@ describe('vendedores-form', () => {
       telefone: '33334444',
       ddd_celular: '85',
       celular: '999998888',
+    })
+  })
+
+  it('mapeia e serializa o uso da area vendedor v2 com os defaults do formulario', () => {
+    expect(toVendedorPayload({
+      ...createEmptyVendedorForm(),
+      area_vendedor: true,
+      cpf: '123.456.789-01',
+      nome: 'Ana Vendedora',
+    })).toMatchObject({
+      area_vendedor: true,
+      cnpj_cpf: '12345678901',
     })
   })
 })

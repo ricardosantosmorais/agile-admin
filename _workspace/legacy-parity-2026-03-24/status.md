@@ -30,7 +30,9 @@ Base date: 2026-03-24
 - Forms needed parity for segmented cache invalidation after successful `formularios` and `formularios_campos` mutations. Form submissions needed contact fallback in list/detail/export, customer/contact search parity, and legacy export metadata.
 - Eleventh batch checked: `integracao-erp/servicos`.
 - ERP services needed dataset-consolidado parity in service registration payload/field visibility and log-modal copy/download actions. Abort execution tenant context, execution-detail pagination reset and lazy operational loading were already covered in v2. Protheus header diagnostics were not applicable to this v2 screen.
-- Next step: continue with the next inventory batch after `integracao-erp/servicos`; likely candidate is the larger `configuracoes` triage group.
+- Twelfth batch checked: `configuracoes`.
+- Configurations needed Área Representante V2 parity in seller settings and seller registration quota enforcement. Product assistant stock and general fixed options were already covered in v2; legacy cache publication initialization was not directly applicable.
+- Next step: continue with the next inventory batch after `configuracoes`.
 
 ## Completed batches
 
@@ -45,6 +47,7 @@ Base date: 2026-03-24
 - `filiais`: migrated `seleciona_filial` profile options, complementary branch fields, UF/list normalization, table-price lookup, branch-group invoice branch/table-price lookups, i18n/docs, and regression coverage.
 - `formularios`: migrated segmented cache invalidation for forms/form fields, contact fallback in form submissions, customer/contact search parity, export metadata, and bridge regression coverage.
 - `integracao-erp/servicos`: migrated dataset-consolidado conditional fields/payload cleanup in `Cadastros ERP > Serviços`, added copy/download actions to the execution log modal, and recorded already-covered operational parity for abort, pagination reset and lazy loading.
+- `configuracoes`: migrated seller Área Representante V2 parameters, master-only seller quota setting, decimal/null payload normalization, `area_vendedor` in seller registration and bridge-side quota enforcement.
 
 ## Known local noise excluded
 

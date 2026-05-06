@@ -2513,6 +2513,7 @@ export const ptBR: TranslationDictionary = {
 			},
 			fields: {
 				blocked: 'Bloqueado',
+				areaVendedor: 'Utiliza Área V2',
 				activationCode: 'Código de ativação',
 				sellerType: 'Tipo de vendedor',
 				personType: 'Tipo',
@@ -2528,6 +2529,9 @@ export const ptBR: TranslationDictionary = {
 				phone: 'Telefone',
 				mobile: 'Celular',
 				creditLimit: 'Limite de crédito',
+			},
+			helpers: {
+				areaVendedor: 'A ativação depende da Área Representante V2 habilitada e de licenças disponíveis.',
 			},
 			validation: {
 				document: 'Informe CPF ou CNPJ.',
@@ -3815,12 +3819,17 @@ export const ptBR: TranslationDictionary = {
 					title: 'Tipos',
 					description: 'Regras por tipo de pessoa para vendedores e clientes.',
 				},
+				representativeArea: {
+					title: 'Área Representante V2',
+					description: 'Parâmetros comerciais e cotas de uso para a nova área do representante.',
+				},
 			},
 			feedback: {
 				loadError: 'Não foi possível carregar as configurações de vendedores.',
 				saveError: 'Não foi possível salvar as configurações de vendedores.',
 				saveSuccess: 'Configurações de vendedores salvas com sucesso.',
 			},
+			masterOnlyEdit: 'Somente usuário master pode alterar este valor.',
 			options: {
 				person: {
 					pfOnly: 'Apenas pessoa física',
@@ -3847,6 +3856,11 @@ export const ptBR: TranslationDictionary = {
 				tipo_vendedor: { label: 'Tipos aceitos para ativação e login', helper: 'Define quais tipos de vendedores podem ativar e acessar a área.' },
 				tipo_cliente: { label: 'Tipos aceitos para cadastro', helper: 'Define quais tipos de clientes podem ser cadastrados pelo vendedor.' },
 				tipo_vendedor_padrao: { label: 'Tipo padrão', helper: 'Tipo de vendedor definido como padrão.' },
+				area_representante: { label: 'Área Representante', helper: 'Indica qual versão da área do representante está ativa.' },
+				preco_flexivel: { label: 'Preço Flexível', helper: 'Indica se permite preço flexível na Área Representante V2.' },
+				acrescimo_maximo: { label: 'Acréscimo Máximo', helper: 'Percentual máximo de acréscimo permitido.' },
+				desconto_maximo: { label: 'Desconto Máximo', helper: 'Percentual máximo de desconto permitido.' },
+				quantidade_cotas_vendedor: { label: 'Quantidade de Licenças Vendedor', helper: 'Quantidade de licenças para vendedores na Área Representante V2.' },
 			},
 			schedule: {
 				monday: { label: 'Segunda-feira', helper: 'Permissão de acesso nas segundas-feiras.' },

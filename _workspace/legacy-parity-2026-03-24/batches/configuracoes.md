@@ -5,18 +5,18 @@ Date range: 2026-03-25..2026-04-29
 
 | Date | Commit | Type | Disposition | Subject | Files |
 |---|---|---|---|---|---:|
-| 2026-03-25 | 22638a2f5 | ui-flow-or-visual | triage-needed | Ajusta instrucao do modal de precos | 1 |
-| 2026-03-25 | e4a8c7358 | form-field-or-form-flow | triage-needed | Adiciona parametro de estoque no assistente | 1 |
-| 2026-03-25 | 652569364 | cache-or-assets | triage-needed | Ajusta renovacao de cache e label da URL API | 6 |
-| 2026-03-25 | fe2db7d06 | bugfix | triage-needed | Restaura opcoes fixas nas configuracoes gerais | 2 |
-| 2026-03-25 | 4da2066cc | behavior-change | triage-needed | Ajusta opcoes fixas da URL API | 2 |
-| 2026-03-25 | 4c30ba50c | form-field-or-form-flow | triage-needed | Corrige cache v2 e restaura formulario geral | 2 |
-| 2026-03-25 | 60ea3435f | bugfix | triage-needed | Corrige opcoes fixas das configuracoes gerais | 1 |
-| 2026-03-25 | c463a8957 | bugfix | triage-needed | Restaura opcoes fixas nas configuracoes gerais | 1 |
-| 2026-03-29 | e4356e219 | form-field-or-form-flow | triage-needed | Inicializa parametros ao publicar versao do cache | 1 |
-| 2026-04-10 | 4e70062f0 | cache-or-assets | triage-needed | Inclusão dos Parâmetros para Área do Vendedor V2 | 4 |
-| 2026-04-10 | 25d54d0b3 | behavior-change | triage-needed | Inclusão de lógica controller | 1 |
-| 2026-04-29 | e3007392e | cache-or-assets | triage-needed | Inclusão das cotas para vendedores da área V2 | 6 |
+| 2026-03-25 | 22638a2f5 | ui-flow-or-visual | already-covered | Ajusta instrucao do modal de precos | 1 |
+| 2026-03-25 | e4a8c7358 | form-field-or-form-flow | already-covered | Adiciona parametro de estoque no assistente | 1 |
+| 2026-03-25 | 652569364 | cache-or-assets | already-covered | Ajusta renovacao de cache e label da URL API | 6 |
+| 2026-03-25 | fe2db7d06 | bugfix | already-covered | Restaura opcoes fixas nas configuracoes gerais | 2 |
+| 2026-03-25 | 4da2066cc | behavior-change | already-covered | Ajusta opcoes fixas da URL API | 2 |
+| 2026-03-25 | 4c30ba50c | form-field-or-form-flow | already-covered | Corrige cache v2 e restaura formulario geral | 2 |
+| 2026-03-25 | 60ea3435f | bugfix | already-covered | Corrige opcoes fixas das configuracoes gerais | 1 |
+| 2026-03-25 | c463a8957 | bugfix | already-covered | Restaura opcoes fixas nas configuracoes gerais | 1 |
+| 2026-03-29 | e4356e219 | form-field-or-form-flow | not-applicable | Inicializa parametros ao publicar versao do cache | 1 |
+| 2026-04-10 | 4e70062f0 | cache-or-assets | migrated | Inclusão dos Parâmetros para Área do Vendedor V2 | 4 |
+| 2026-04-10 | 25d54d0b3 | behavior-change | migrated | Inclusão de lógica controller | 1 |
+| 2026-04-29 | e3007392e | cache-or-assets | migrated | Inclusão das cotas para vendedores da área V2 | 6 |
 
 ## Detailed commits
 
@@ -24,7 +24,7 @@ Date range: 2026-03-25..2026-04-29
 
 - Date: 2026-03-25
 - Type: ui-flow-or-visual
-- Disposition: triage-needed
+- Disposition: already-covered
 - Files:
   - M components/configuracoes-produtos-form.php
 
@@ -32,7 +32,7 @@ Date range: 2026-03-25..2026-04-29
 
 - Date: 2026-03-25
 - Type: form-field-or-form-flow
-- Disposition: triage-needed
+- Disposition: already-covered
 - Files:
   - M components/configuracoes-produtos-form.php
 
@@ -40,7 +40,7 @@ Date range: 2026-03-25..2026-04-29
 
 - Date: 2026-03-25
 - Type: cache-or-assets
-- Disposition: triage-needed
+- Disposition: already-covered
 - Files:
   - M boot.php
   - M components/configuracoes-geral-form.php
@@ -53,7 +53,7 @@ Date range: 2026-03-25..2026-04-29
 
 - Date: 2026-03-25
 - Type: bugfix
-- Disposition: triage-needed
+- Disposition: already-covered
 - Files:
   - M boot.php
   - M components/configuracoes-geral-form.php
@@ -62,7 +62,7 @@ Date range: 2026-03-25..2026-04-29
 
 - Date: 2026-03-25
 - Type: behavior-change
-- Disposition: triage-needed
+- Disposition: already-covered
 - Files:
   - M boot.php
   - M components/configuracoes-geral-form.php
@@ -71,7 +71,7 @@ Date range: 2026-03-25..2026-04-29
 
 - Date: 2026-03-25
 - Type: form-field-or-form-flow
-- Disposition: triage-needed
+- Disposition: already-covered
 - Files:
   - M components/configuracoes-geral-form.php
   - M includes/helpers.php
@@ -80,7 +80,7 @@ Date range: 2026-03-25..2026-04-29
 
 - Date: 2026-03-25
 - Type: bugfix
-- Disposition: triage-needed
+- Disposition: already-covered
 - Files:
   - M components/configuracoes-geral-form.php
 
@@ -88,7 +88,7 @@ Date range: 2026-03-25..2026-04-29
 
 - Date: 2026-03-25
 - Type: bugfix
-- Disposition: triage-needed
+- Disposition: already-covered
 - Files:
   - M components/configuracoes-geral-form.php
 
@@ -96,7 +96,7 @@ Date range: 2026-03-25..2026-04-29
 
 - Date: 2026-03-29
 - Type: form-field-or-form-flow
-- Disposition: triage-needed
+- Disposition: not-applicable
 - Files:
   - M controllers/api-controller.php
 
@@ -104,7 +104,7 @@ Date range: 2026-03-25..2026-04-29
 
 - Date: 2026-04-10
 - Type: cache-or-assets
-- Disposition: triage-needed
+- Disposition: migrated
 - Files:
   - M assets/js/components/configuracoes-vendedores-form.js
   - M boot.php
@@ -115,7 +115,7 @@ Date range: 2026-03-25..2026-04-29
 
 - Date: 2026-04-10
 - Type: behavior-change
-- Disposition: triage-needed
+- Disposition: migrated
 - Files:
   - M controllers/configuracoes-vendedores-controller.php
 
@@ -123,7 +123,7 @@ Date range: 2026-03-25..2026-04-29
 
 - Date: 2026-04-29
 - Type: cache-or-assets
-- Disposition: triage-needed
+- Disposition: migrated
 - Files:
   - M assets/js/components/configuracoes-vendedores-form.js
   - M boot.php

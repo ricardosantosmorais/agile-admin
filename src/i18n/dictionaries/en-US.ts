@@ -2514,6 +2514,7 @@ export const enUS: TranslationDictionary = {
 			},
 			fields: {
 				blocked: 'Blocked',
+				areaVendedor: 'Uses Area V2',
 				activationCode: 'Activation code',
 				sellerType: 'Seller type',
 				personType: 'Type',
@@ -2529,6 +2530,9 @@ export const enUS: TranslationDictionary = {
 				phone: 'Phone',
 				mobile: 'Mobile',
 				creditLimit: 'Credit limit',
+			},
+			helpers: {
+				areaVendedor: 'Activation depends on Representative Area V2 being enabled and available licenses.',
 			},
 			validation: {
 				document: 'Enter CPF or CNPJ.',
@@ -4061,12 +4065,17 @@ export const enUS: TranslationDictionary = {
 					title: 'Types',
 					description: 'Person-type rules for sellers and customers.',
 				},
+				representativeArea: {
+					title: 'Representative Area V2',
+					description: 'Commercial parameters and usage quotas for the new representative area.',
+				},
 			},
 			feedback: {
 				loadError: 'Could not load the seller settings.',
 				saveError: 'Could not save the seller settings.',
 				saveSuccess: 'Seller settings saved successfully.',
 			},
+			masterOnlyEdit: 'Only a master user can edit this value.',
 			options: {
 				person: {
 					pfOnly: 'Only individual',
@@ -4093,6 +4102,11 @@ export const enUS: TranslationDictionary = {
 				tipo_vendedor: { label: 'Accepted types for activation and login', helper: 'Defines which seller types can activate and access the area.' },
 				tipo_cliente: { label: 'Accepted types for registration', helper: 'Defines which customer types can be registered by the seller.' },
 				tipo_vendedor_padrao: { label: 'Default type', helper: 'Seller type defined as default.' },
+				area_representante: { label: 'Representative Area', helper: 'Indicates which version of the representative area is active.' },
+				preco_flexivel: { label: 'Flexible Price', helper: 'Indicates whether flexible pricing is allowed in Representative Area V2.' },
+				acrescimo_maximo: { label: 'Maximum Increase', helper: 'Maximum allowed increase percentage.' },
+				desconto_maximo: { label: 'Maximum Discount', helper: 'Maximum allowed discount percentage.' },
+				quantidade_cotas_vendedor: { label: 'Seller License Quantity', helper: 'Number of licenses for sellers in Representative Area V2.' },
 			},
 			schedule: {
 				monday: { label: 'Monday', helper: 'Access permission on Mondays.' },
