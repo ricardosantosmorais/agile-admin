@@ -38,7 +38,9 @@ Base date: 2026-03-24
 - Controllers needed Editor SQL execution parity through PainelB2BApi, full-cache invalidation after Componentes/Componentes Campos/Areas de Pagina mutations, and remote-cache failure observability. The billing-upgrade banner gate is not applicable because the v2 has no equivalent billing-upgrade surface.
 - Fifteenth batch checked: `dashboard`.
 - Dashboard did not need new visual or metric migration because v2 already loads sections by phase and viewport. The remaining parity was request-pressure hardening: dedupe identical in-flight snapshot calls, abort stale cycles through `AbortSignal`, and ignore obsolete responses.
-- Next step: continue with the next inventory batch after `dashboard`.
+- Sixteenth batch checked: `docs`.
+- Docs had no functional v2 migration. The project-governance commit was legacy-only documentation, and the `ASSETS_VERSION` auto-refresh bug is already absent from the v2 architecture.
+- Next step: continue with the next inventory batch after `docs`.
 
 ## Completed batches
 
@@ -57,6 +59,7 @@ Base date: 2026-03-24
 - `contatos`: migrated administrative contact editing for non-internalized contacts, payload normalization, bridge-side internalized-contact blocking, and `permite_cadastro_contato_duplicado` in `Configurações > Clientes`.
 - `controllers`: migrated Editor SQL execution to always use PainelB2BApi, full-cache invalidation after Componentes/Componentes Campos/Areas de Pagina mutations, and Sentry observability for remote-cache cluster failures.
 - `dashboard`: migrated request-pressure control with in-flight dedupe, stale-cycle aborts and `AbortSignal` propagation while preserving the existing v2 phase/viewport loading model.
+- `docs`: no functional migration needed; legacy project-documentation governance is repository-specific and the legacy `ASSETS_VERSION` auto-refresh bug surface is absent from v2.
 
 ## Known local noise excluded
 
