@@ -29,8 +29,9 @@ Este documento cobre os módulos do menu `Pessoas` que fecham a trilha operacion
 ### `Contatos`
 - permanece como tela operacional própria;
 - a listagem mantém filtros por documento, cliente, contato, e-mail, telefones, período e status;
-- o fluxo principal continua sendo consulta detalhada e mudança de status (`aprovar`/`reprovar`);
+- o fluxo principal continua sendo consulta detalhada, mudança de status (`aprovar`/`reprovar`) e edição administrativa de contatos ainda não internalizados;
 - o detalhe é carregado por modal, com bridge própria em `app/api/contatos/*`.
+- a edição administrativa normaliza campos mascarados, datas e booleanos antes de gravar na `api-v3`, e a bridge bloqueia alterações em contatos já internalizados.
 
 ## Contratos e legado
 - o legado foi comparado contra `controllers/contatos-controller.php`, `controllers/redes-controller.php`, `controllers/segmentos-controller.php` e `controllers/regras-cadastro-controller.php`;

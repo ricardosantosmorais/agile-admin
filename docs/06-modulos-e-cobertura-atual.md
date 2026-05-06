@@ -369,6 +369,7 @@ Continuam como pÃ¡ginas prÃ³prias, com mais regra de negÃ³cio:
 - `Pedidos` com teste unitÃ¡rio das aÃ§Ãµes operacionais e E2E cobrindo listagem, detalhe e abertura de todas as abas principais.
 - `ConfiguraÃ§Ãµes` com teste de integraÃ§Ã£o validando o estado disabled/enabled do botÃ£o `Salvar` conforme o dirty state.
 - `Configurações > Vendedores` com teste unitário para payload da Área Representante V2 e teste da bridge de `Vendedores` cobrindo bloqueio por cotas indisponíveis.
+- `Contatos` com testes de mapper e bridge cobrindo edição administrativa, normalização de payload e bloqueio de contatos internalizados.
 - `Templates de E-mails` com teste de componente cobrindo a aba `Editor`, o carregamento de variÃ¡veis e a abertura da prÃ©-visualizaÃ§Ã£o.
 - `Clientes` com testes do controller da listagem e do modal de usuÃ¡rios vinculados.
 - `Cadastros ERP > Gateways`, `Gateway Endpoints`, `Interfaces de Consulta`, `Acoes` e `Servicos` com testes unitarios de mapeadores, payloads e filtros usados pelas bridges v2.

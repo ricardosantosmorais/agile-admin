@@ -84,6 +84,7 @@ export const configuracoesClientesFieldDefinitions: ConfiguracoesClientesFieldDe
   { key: 'checa_limite_credito', section: 'rules', type: 'boolean', options: [...yesNoOptions] },
   { key: 'exibe_limite', section: 'rules', type: 'boolean', options: [...yesNoOptions] },
   { key: 'senha_forte', section: 'rules', type: 'boolean', options: [...yesNoOptions] },
+  { key: 'permite_cadastro_contato_duplicado', section: 'rules', type: 'boolean', options: [...yesNoOptions] },
   { key: 'valida_cnae', section: 'rules', type: 'boolean', options: [...yesNoOptions] },
   { key: 'valida_vendedor', section: 'rules', type: 'boolean', options: [...yesNoOptions] },
   { key: 'vincula_tabela_preco', section: 'rules', type: 'boolean', options: [...yesNoOptions] },
@@ -179,4 +180,3 @@ export function buildDirtyConfiguracoesClientesPayload(
     })),
   ]
 }
-

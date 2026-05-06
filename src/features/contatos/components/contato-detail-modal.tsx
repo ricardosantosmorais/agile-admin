@@ -1,5 +1,6 @@
 'use client'
 
+import { Pencil } from 'lucide-react'
 import { AsyncState } from '@/src/components/ui/async-state'
 import { OverlayModal } from '@/src/components/ui/overlay-modal'
 import { useI18n } from '@/src/i18n/use-i18n'
@@ -23,6 +24,14 @@ function statusTone(status?: string | null) {
   return 'warning'
 }
 
+function isInternalized(value: unknown) {
+  if (typeof value === 'string') {
+    return ['1', 'true', 'sim', 'yes', 'on'].includes(value.trim().toLowerCase())
+  }
+
+  return value === true || value === 1
+}
+
 type Props = {
   open: boolean
   detail: ContatoDetail | null
@@ -31,6 +40,7 @@ type Props = {
   onClose: () => void
   onApprove?: () => void
   onReject?: () => void
+  onEdit?: () => void
   canEdit: boolean
 }
 
@@ -42,9 +52,11 @@ export function ContatoDetailModal({
   onClose,
   onApprove,
   onReject,
+  onEdit,
   canEdit,
 }: Props) {
   const { t } = useI18n()
+  const canEditContact = canEdit && detail && !isInternalized(detail.internalizado)
 
   const generalRows = detail ? [
     ['people.contacts.fields.status', 'Status', detail.status || '-'],
@@ -139,16 +151,24 @@ export function ContatoDetailModal({
                 </div>
               ) : null}
 
-              {canEdit && detail.status === 'recebido' ? (
-                <div className="flex justify-end gap-2">
-                  <button type="button" onClick={onReject} className="inline-flex items-center rounded-full border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
-                    {t('people.contacts.actions.reject', 'Reprovar')}
+              <div className="flex flex-wrap justify-end gap-2">
+                {canEditContact ? (
+                  <button type="button" onClick={onEdit} className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold">
+                    <Pencil className="h-4 w-4" />
+                    {t('people.contacts.actions.edit', 'Editar')}
                   </button>
-                  <button type="button" onClick={onApprove} className="inline-flex items-center rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white">
-                    {t('people.contacts.actions.approve', 'Aprovar')}
-                  </button>
-                </div>
-              ) : null}
+                ) : null}
+                {canEdit && detail.status === 'recebido' ? (
+                  <>
+                    <button type="button" onClick={onReject} className="inline-flex items-center rounded-full border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
+                      {t('people.contacts.actions.reject', 'Reprovar')}
+                    </button>
+                    <button type="button" onClick={onApprove} className="inline-flex items-center rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white">
+                      {t('people.contacts.actions.approve', 'Aprovar')}
+                    </button>
+                  </>
+                ) : null}
+              </div>
             </>
           ) : null}
         </div>

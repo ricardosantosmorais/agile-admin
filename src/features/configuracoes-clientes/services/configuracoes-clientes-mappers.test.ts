@@ -112,6 +112,31 @@ describe('configuracoes-clientes-mappers', () => {
       { id_filial: null, chave: 'seleciona_filial', parametros: 'vendedor' },
     ])
   })
+
+  it('inclui o parametro de contato duplicado com opcoes sim e nao', () => {
+    const field = configuracoesClientesFieldDefinitions.find((definition) => definition.key === 'permite_cadastro_contato_duplicado')
+
+    expect(field).toMatchObject({
+      section: 'rules',
+      type: 'boolean',
+    })
+    expect(field?.options?.map((option) => option.value)).toEqual(['1', '0'])
+
+    const normalized = normalizeConfiguracoesClientesRecord({
+      data: [{ chave: 'permite_cadastro_contato_duplicado', parametros: '0' }],
+    })
+
+    expect(normalized.values.permite_cadastro_contato_duplicado).toBe('0')
+
+    const initialValues = createEmptyConfiguracoesClientesForm()
+    const currentValues = createEmptyConfiguracoesClientesForm()
+    currentValues.permite_cadastro_contato_duplicado = '1'
+
+    expect(buildDirtyConfiguracoesClientesPayload(initialValues, currentValues, '2026-04-28 08:30:00')).toEqual([
+      { id_filial: null, chave: 'versao', parametros: '2026-04-28 08:30:00' },
+      { id_filial: null, chave: 'permite_cadastro_contato_duplicado', parametros: '1' },
+    ])
+  })
 })
 
 

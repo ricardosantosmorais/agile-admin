@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, Eye, RefreshCcw, X } from 'lucide-react'
+import { Check, Eye, Pencil, RefreshCcw, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useCrudListController } from '@/src/components/crud-base/use-crud-list-controller'
 import { AppDataTable } from '@/src/components/data-table/app-data-table'
@@ -15,6 +15,7 @@ import { SectionCard } from '@/src/components/ui/section-card'
 import { StatusBadge } from '@/src/components/ui/status-badge'
 import { AccessDeniedState } from '@/src/features/auth/components/access-denied-state'
 import { useFeatureAccess } from '@/src/features/auth/hooks/use-feature-access'
+import { ContatoEditModal } from '@/src/features/contatos/components/contato-edit-modal'
 import { ContatoDetailModal } from '@/src/features/contatos/components/contato-detail-modal'
 import { contatosClient, DEFAULT_CONTATOS_FILTERS } from '@/src/features/contatos/services/contatos-client'
 import type { ContatoDetail, ContatoListFilters, ContatoListItem } from '@/src/features/contatos/types/contatos'
@@ -50,6 +51,14 @@ type PendingAction =
   | { type: 'reject'; item: ContatoListItem }
   | null
 
+function isInternalized(value: unknown) {
+  if (typeof value === 'string') {
+    return ['1', 'true', 'sim', 'yes', 'on'].includes(value.trim().toLowerCase())
+  }
+
+  return value === true || value === 1
+}
+
 export function ContatosListPage() {
   const { t } = useI18n()
   const access = useFeatureAccess('contatos')
@@ -58,6 +67,9 @@ export function ContatosListPage() {
   const [contactDetail, setContactDetail] = useState<ContatoDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
   const [detailError, setDetailError] = useState<string>()
+  const [editingContact, setEditingContact] = useState<ContatoDetail | null>(null)
+  const [editSaving, setEditSaving] = useState(false)
+  const [editError, setEditError] = useState<string>()
   const [pendingAction, setPendingAction] = useState<PendingAction>(null)
 
   const columns = useMemo(() => ([
@@ -156,6 +168,43 @@ export function ContatosListPage() {
     }
   }
 
+  async function openEdit(item: ContatoListItem) {
+    setEditError(undefined)
+    setDetailError(undefined)
+    setDetailLoading(true)
+    try {
+      const detail = await contatosClient.getById(item.id)
+      setContactDetail(detail)
+      setSelectedContact(item)
+      setEditingContact(detail)
+    } catch (error) {
+      setDetailError(error instanceof Error ? error.message : t('people.contacts.loadDetailError', 'Não foi possível carregar o contato.'))
+    } finally {
+      setDetailLoading(false)
+    }
+  }
+
+  async function handleSaveEdit(values: Parameters<typeof contatosClient.update>[1]) {
+    if (!editingContact) {
+      return
+    }
+
+    try {
+      setEditSaving(true)
+      setEditError(undefined)
+      await contatosClient.update(editingContact.id, values)
+      setEditingContact(null)
+      controller.refreshList()
+      if (selectedContact?.id === editingContact.id) {
+        await openDetail(selectedContact)
+      }
+    } catch (error) {
+      setEditError(error instanceof Error ? error.message : t('people.contacts.saveError', 'Não foi possível salvar o contato.'))
+    } finally {
+      setEditSaving(false)
+    }
+  }
+
   async function handleConfirmAction() {
     if (!pendingAction) {
       return
@@ -213,6 +262,7 @@ export function ContatosListPage() {
             sort={{ activeColumn: controller.filters.orderBy, direction: controller.filters.sort, onToggle: controller.tableState.toggleSort }}
             rowActions={(record) => [
               { id: 'details', label: t('people.contacts.actions.details', 'Informações'), icon: Eye, onClick: () => void openDetail(record), visible: access.canView || access.canEdit },
+              { id: 'edit', label: t('people.contacts.actions.edit', 'Editar'), icon: Pencil, onClick: () => void openEdit(record), visible: access.canEdit && !isInternalized(record.internalizado) },
               { id: 'approve', label: t('people.contacts.actions.approve', 'Aprovar'), icon: Check, onClick: () => setPendingAction({ type: 'approve', item: record }), visible: access.canEdit && (record.status === 'recebido' || record.status === 'reprovado') },
               { id: 'reject', label: t('people.contacts.actions.reject', 'Reprovar'), icon: X, onClick: () => setPendingAction({ type: 'reject', item: record }), visible: access.canEdit && record.status === 'recebido', tone: 'danger' as const },
             ]}
@@ -248,7 +298,17 @@ export function ContatosListPage() {
         onClose={() => setSelectedContact(null)}
         onApprove={selectedContact ? () => setPendingAction({ type: 'approve', item: selectedContact }) : undefined}
         onReject={selectedContact ? () => setPendingAction({ type: 'reject', item: selectedContact }) : undefined}
+        onEdit={selectedContact ? () => void openEdit(selectedContact) : undefined}
         canEdit={access.canEdit}
+      />
+
+      <ContatoEditModal
+        open={Boolean(editingContact)}
+        detail={editingContact}
+        isSaving={editSaving}
+        error={editError}
+        onClose={() => setEditingContact(null)}
+        onSubmit={handleSaveEdit}
       />
 
       <ConfirmDialog

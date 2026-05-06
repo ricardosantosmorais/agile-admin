@@ -1,5 +1,5 @@
 import { httpClient } from '@/src/services/http/http-client'
-import type { ContatoDetail, ContatoListFilters, ContatoListItem } from '@/src/features/contatos/types/contatos'
+import type { ContatoDetail, ContatoEditFormValues, ContatoListFilters, ContatoListItem } from '@/src/features/contatos/types/contatos'
 
 type ListResponse = {
   data: ContatoListItem[]
@@ -69,6 +69,13 @@ export const contatosClient = {
     return httpClient(`/api/contatos/${id}/status`, {
       method: 'POST',
       body: JSON.stringify({ status }),
+      cache: 'no-store',
+    })
+  },
+  update(id: string, values: ContatoEditFormValues) {
+    return httpClient(`/api/contatos/${id}`, {
+      method: 'POST',
+      body: JSON.stringify(values),
       cache: 'no-store',
     })
   },
