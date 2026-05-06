@@ -63,7 +63,9 @@ Base date: 2026-03-24
 - Autenticação/sessão precisou de paridade para limpeza de cache com token da sessão e para exibir o modal global de sessão encerrada em `403/TENANT_CONTEXT_INVALID`. A remoção do log de token Firebase do legado foi registrada como já ausente no v2, sem código equivalente a migrar.
 - Twenty-seventh batch checked: `components`.
 - Components precisou de paridade para decodificação de scripts legados, tipos/ordem de universos de banner e campos Frenet ocultos. Os placeholders de Apps já estavam presentes no v2 por `APP_DEFAULTS`.
-- Next step: continue with the next uncompleted inventory batch: `agente-ia`.
+- Twenty-eighth batch checked: `agente-ia`.
+- Agente IA não teve migração de produção nesta etapa: os commits do legado pertencem ao chat/sidebar nativo do Agente IA, com agendamentos, histórico e CSS dark mode. O v2 atual só possui o embed externo de `Assistente de vendas IA`, então os pontos foram registrados como deferred até existir uma superfície equivalente.
+- Next step: continue with the next uncompleted inventory batch: `assets`.
 
 ## Completed batches
 
@@ -94,6 +96,7 @@ Base date: 2026-03-24
 - `cache-assets`: no migration needed; legacy-only `ASSETS_VERSION` bumps in `boot.php` are not applicable to the Next.js asset pipeline.
 - `autenticacao-sessao`: migrated session-token preference in remote cache clear and `403/TENANT_CONTEXT_INVALID` session-loss modal handling; Firebase token console logging was already absent in v2.
 - `components`: migrated HTML entity decoding for ERP scripts, completed legacy banner universe type/order support, hid Frenet partner token/invoice-only fields, and recorded Apps placeholders as already present in v2.
+- `agente-ia`: no production migration; legacy native Agent IA chat/sidebar schedule UX, history timezone parsing and dark-mode CSS were registered as deferred because v2 currently embeds an external sales assistant instead of owning that chat surface.
 
 ## Known local noise excluded
 
