@@ -28,7 +28,9 @@ Base date: 2026-03-24
 - Branches needed parity for `seleciona_filial` profile options, complementary branch fields, branch-group invoice branch and price table lookups, and lookup label restoration through form embeds. `exibe_precos_filial` had already been migrated to `Configuracoes > Produtos`.
 - Tenth batch checked: `formularios`.
 - Forms needed parity for segmented cache invalidation after successful `formularios` and `formularios_campos` mutations. Form submissions needed contact fallback in list/detail/export, customer/contact search parity, and legacy export metadata.
-- Next step: continue with the next inventory batch after `formularios`; likely candidates are `integracao-erp/servicos` or the larger `configuracoes` triage group.
+- Eleventh batch checked: `integracao-erp/servicos`.
+- ERP services needed dataset-consolidado parity in service registration payload/field visibility and log-modal copy/download actions. Abort execution tenant context, execution-detail pagination reset and lazy operational loading were already covered in v2. Protheus header diagnostics were not applicable to this v2 screen.
+- Next step: continue with the next inventory batch after `integracao-erp/servicos`; likely candidate is the larger `configuracoes` triage group.
 
 ## Completed batches
 
@@ -42,6 +44,7 @@ Base date: 2026-03-24
 - `condicoes-pagamento`: migrated restriction/exception tabs, occurrence mappers, bridges, i18n/docs/E2E coverage, and `id_sync` edit/delete protection.
 - `filiais`: migrated `seleciona_filial` profile options, complementary branch fields, UF/list normalization, table-price lookup, branch-group invoice branch/table-price lookups, i18n/docs, and regression coverage.
 - `formularios`: migrated segmented cache invalidation for forms/form fields, contact fallback in form submissions, customer/contact search parity, export metadata, and bridge regression coverage.
+- `integracao-erp/servicos`: migrated dataset-consolidado conditional fields/payload cleanup in `Cadastros ERP > Serviços`, added copy/download actions to the execution log modal, and recorded already-covered operational parity for abort, pagination reset and lazy loading.
 
 ## Known local noise excluded
 

@@ -6088,14 +6088,19 @@ export const ptBR: TranslationDictionary = {
 						refreshList: 'Atualizar Lista',
 						detailsTitle: 'Detalhes do Serviço de Execução',
 						detailsEmpty: 'Nenhum detalhe operacional encontrado para esta execução.',
+						fileLabel: 'Arquivo',
 						actions: {
 							details: 'Detalhes da execução',
 							viewContent: 'Visualizar conteúdo',
 							viewScript: 'Visualizar script',
+							copyContent: 'Copiar conteúdo',
+							downloadContent: 'Baixar arquivo',
 						},
 					},
 					feedback: {
 						executionDetailLoadError: 'Não foi possível carregar o conteúdo do detalhe da execução.',
+						executionLogCopied: 'Conteúdo do log copiado para a área de transferência.',
+						executionLogCopyError: 'Não foi possível copiar o conteúdo do log.',
 					},
 				},
 				servicesWizard: {

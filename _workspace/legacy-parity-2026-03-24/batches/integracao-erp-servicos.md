@@ -5,13 +5,13 @@ Date range: 2026-03-24..2026-04-22
 
 | Date | Commit | Type | Disposition | Subject | Files |
 |---|---|---|---|---|---:|
-| 2026-03-24 | 9a13e0879 | new-feature-or-screen | triage-needed | feat: suportar dataset consolidado no mapeamento de servicos | 8 |
-| 2026-03-27 | 02c369878 | behavior-change | triage-needed | Correção do botão de abortar execução em serviços execuções | 2 |
-| 2026-03-30 | 6e9b5f7f3 | ui-flow-or-visual | triage-needed | Improve integration execution log modal | 3 |
-| 2026-04-13 | e6686a8f8 | new-feature-or-screen | triage-needed | feat: improve protheus auth diagnostics in admin | 5 |
-| 2026-04-13 | 5316cdd22 | cache-or-assets | triage-needed | Ajusta acentuacao das mensagens Protheus | 4 |
-| 2026-04-17 | 2883f5bf3 | bugfix | triage-needed | fix: resetar paginação dos detalhes de execução no admin | 1 |
-| 2026-04-22 | e334b4312 | cache-or-assets | triage-needed | Otimiza carregamento de servicos de integracao | 3 |
+| 2026-03-24 | 9a13e0879 | new-feature-or-screen | migrated | feat: suportar dataset consolidado no mapeamento de servicos | 8 |
+| 2026-03-27 | 02c369878 | behavior-change | already-covered | Correção do botão de abortar execução em serviços execuções | 2 |
+| 2026-03-30 | 6e9b5f7f3 | ui-flow-or-visual | migrated | Improve integration execution log modal | 3 |
+| 2026-04-13 | e6686a8f8 | new-feature-or-screen | not-applicable | feat: improve protheus auth diagnostics in admin | 5 |
+| 2026-04-13 | 5316cdd22 | cache-or-assets | not-applicable | Ajusta acentuacao das mensagens Protheus | 4 |
+| 2026-04-17 | 2883f5bf3 | bugfix | already-covered | fix: resetar paginação dos detalhes de execução no admin | 1 |
+| 2026-04-22 | e334b4312 | cache-or-assets | already-covered | Otimiza carregamento de servicos de integracao | 3 |
 
 ## Detailed commits
 
@@ -19,7 +19,7 @@ Date range: 2026-03-24..2026-04-22
 
 - Date: 2026-03-24
 - Type: new-feature-or-screen
-- Disposition: triage-needed
+- Disposition: migrated
 - Files:
   - M assets/js/components/cadastro-servicos-form.js
   - M assets/js/components/servicos-integracao-form.js
@@ -34,7 +34,7 @@ Date range: 2026-03-24..2026-04-22
 
 - Date: 2026-03-27
 - Type: behavior-change
-- Disposition: triage-needed
+- Disposition: already-covered
 - Files:
   - M components/configuracoes-produtos-form.php
   - M controllers/servicos-integracao-controller.php
@@ -43,7 +43,7 @@ Date range: 2026-03-24..2026-04-22
 
 - Date: 2026-03-30
 - Type: ui-flow-or-visual
-- Disposition: triage-needed
+- Disposition: migrated
 - Files:
   - M assets/js/components/servicos-integracao-form.js
   - M components/servicos-integracao-form.php
@@ -53,7 +53,7 @@ Date range: 2026-03-24..2026-04-22
 
 - Date: 2026-04-13
 - Type: new-feature-or-screen
-- Disposition: triage-needed
+- Disposition: not-applicable
 - Files:
   - M assets/js/components/editor-sql-tabed-form.js
   - M assets/js/scripts.js
@@ -65,7 +65,7 @@ Date range: 2026-03-24..2026-04-22
 
 - Date: 2026-04-13
 - Type: cache-or-assets
-- Disposition: triage-needed
+- Disposition: not-applicable
 - Files:
   - M assets/js/components/editor-sql-tabed-form.js
   - M assets/js/scripts.js
@@ -76,7 +76,7 @@ Date range: 2026-03-24..2026-04-22
 
 - Date: 2026-04-17
 - Type: bugfix
-- Disposition: triage-needed
+- Disposition: already-covered
 - Files:
   - M assets/js/components/servicos-integracao-form.js
 
@@ -84,7 +84,7 @@ Date range: 2026-03-24..2026-04-22
 
 - Date: 2026-04-22
 - Type: cache-or-assets
-- Disposition: triage-needed
+- Disposition: already-covered
 - Files:
   - M assets/js/components/servicos-integracao-form.js
   - M boot.php

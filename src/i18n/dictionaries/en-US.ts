@@ -6086,14 +6086,19 @@ export const enUS: TranslationDictionary = {
 						refreshList: 'Refresh List',
 						detailsTitle: 'Execution Service Details',
 						detailsEmpty: 'No operational detail was found for this execution.',
+						fileLabel: 'File',
 						actions: {
 							details: 'Execution details',
 							viewContent: 'View content',
 							viewScript: 'View script',
+							copyContent: 'Copy content',
+							downloadContent: 'Download file',
 						},
 					},
 					feedback: {
 						executionDetailLoadError: 'Could not load the execution detail content.',
+						executionLogCopied: 'Log content copied to the clipboard.',
+						executionLogCopyError: 'Could not copy the log content.',
 					},
 				},
 				servicesWizard: {

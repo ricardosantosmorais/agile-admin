@@ -230,6 +230,7 @@ ObservaÃ§Ã£o:
   - `Cadastros > Queries` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/queries`, com listagem server-side, formulário em abas, editor SQL Monaco, execução contra integradores ativos e aba de mapeamento em edição;
   - `Cadastros > Scripts` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/scripts`, com listagem server-side e formulário direto com editor Monaco cuja linguagem acompanha o select do legado;
   - `Cadastros > Endpoints` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/endpoints`, com listagem server-side, campos condicionais por `tipo_retorno` e aba de perfis em edição;
+  - `Cadastros > Serviços` mantém paridade do modo `dataset_consolidado` do legado, exibindo campos de mapeamento consolidado apenas para `endpoint_gateway`, limpando payload obsoleto fora desse modo e preservando o modal operacional de log com copiar conteúdo e download;
   - páginas diretas já disponíveis no v2 para `Parâmetros`, `Imagens`, `API`, `Banco de Dados`, `Instalação do Integrador`, `Dashboard ERP`, `Rotinas Integradas`, `Serviços` e `Serviços com Falha`;
   - bridges dedicadas em `app/api/integracoes/*` para todos os módulos do menu;
   - bridge dedicada em `app/api/integracao-com-erp/*` para configuração e leitura operacional do dashboard ERP;
