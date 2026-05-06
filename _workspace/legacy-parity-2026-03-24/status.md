@@ -36,7 +36,9 @@ Base date: 2026-03-24
 - Contacts needed administrative editing for non-internalized contacts, bridge-side protection against editing internalized contacts, and the duplicated-contact registration parameter in customer settings. The billing-upgrade contact separator change was not applicable to this v2 batch.
 - Fourteenth batch checked: `controllers`.
 - Controllers needed Editor SQL execution parity through PainelB2BApi, full-cache invalidation after Componentes/Componentes Campos/Areas de Pagina mutations, and remote-cache failure observability. The billing-upgrade banner gate is not applicable because the v2 has no equivalent billing-upgrade surface.
-- Next step: continue with the next inventory batch after `controllers`.
+- Fifteenth batch checked: `dashboard`.
+- Dashboard did not need new visual or metric migration because v2 already loads sections by phase and viewport. The remaining parity was request-pressure hardening: dedupe identical in-flight snapshot calls, abort stale cycles through `AbortSignal`, and ignore obsolete responses.
+- Next step: continue with the next inventory batch after `dashboard`.
 
 ## Completed batches
 
@@ -54,6 +56,7 @@ Base date: 2026-03-24
 - `configuracoes`: migrated seller Área Representante V2 parameters, master-only seller quota setting, decimal/null payload normalization, `area_vendedor` in seller registration and bridge-side quota enforcement.
 - `contatos`: migrated administrative contact editing for non-internalized contacts, payload normalization, bridge-side internalized-contact blocking, and `permite_cadastro_contato_duplicado` in `Configurações > Clientes`.
 - `controllers`: migrated Editor SQL execution to always use PainelB2BApi, full-cache invalidation after Componentes/Componentes Campos/Areas de Pagina mutations, and Sentry observability for remote-cache cluster failures.
+- `dashboard`: migrated request-pressure control with in-flight dedupe, stale-cycle aborts and `AbortSignal` propagation while preserving the existing v2 phase/viewport loading model.
 
 ## Known local noise excluded
 

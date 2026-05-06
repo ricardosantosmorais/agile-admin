@@ -160,7 +160,7 @@ ObservaÃ§Ã£o:
 
 ## ObservaÃ§Ãµes atuais de cobertura
 
-- `Dashboard` carrega fases e grÃ¡ficos sob demanda, mantendo a carga completa apenas na exportaÃ§Ã£o de PDF.
+- `Dashboard` carrega fases e gráficos sob demanda, controla requisições duplicadas/obsoletas por ciclo e mantém a carga completa apenas na exportação de PDF.
 - `Cadastros > Componentes` possui listagem, formulario em abas, upload para CDN publica de componentes, editor JSON e aba de campos com modal, opcoes personalizadas, exclusao e reordenacao.
 - `Cadastros > Componentes`, `Componentes Campos` e `Areas de Pagina` invalidam o cache completo da empresa ativa apos gravacao, exclusao e reordenacao bem-sucedidas, alinhando o efeito operacional do legado.
 - `Cadastros > E-mails Payloads` possui CRUD linear v2 com listagem, filtros, formulario em linhas e editor JSON para o payload.
@@ -373,6 +373,7 @@ Continuam como pÃ¡ginas prÃ³prias, com mais regra de negÃ³cio:
 - `Configurações > Vendedores` com teste unitário para payload da Área Representante V2 e teste da bridge de `Vendedores` cobrindo bloqueio por cotas indisponíveis.
 - `Contatos` com testes de mapper e bridge cobrindo edição administrativa, normalização de payload e bloqueio de contatos internalizados.
 - `Controllers` com testes de bridge cobrindo Editor SQL no `PainelB2BApi`, invalidacao de cache completo em Componentes/Areas de Pagina e observabilidade de falha na renovacao de cache remoto.
+- `Dashboard` com testes do coordenador de requisições e do hook sequenciado cobrindo deduplicação, abort de ciclos obsoletos e propagação de `AbortSignal`.
 - `Templates de E-mails` com teste de componente cobrindo a aba `Editor`, o carregamento de variÃ¡veis e a abertura da prÃ©-visualizaÃ§Ã£o.
 - `Clientes` com testes do controller da listagem e do modal de usuÃ¡rios vinculados.
 - `Cadastros ERP > Gateways`, `Gateway Endpoints`, `Interfaces de Consulta`, `Acoes` e `Servicos` com testes unitarios de mapeadores, payloads e filtros usados pelas bridges v2.

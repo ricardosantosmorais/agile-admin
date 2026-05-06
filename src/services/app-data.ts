@@ -16,6 +16,13 @@ import { HttpError, httpClient } from '@/src/services/http/http-client';
 const MOCK_LATENCY_MS = 120;
 const DASHBOARD_CACHE_TTL_MS = 5 * 60 * 1000;
 
+type DashboardSnapshotOptions = {
+	forceRefresh?: boolean;
+	previousStart?: string | null;
+	previousEnd?: string | null;
+	signal?: AbortSignal;
+};
+
 function withLatency<T>(value: T): Promise<T> {
 	return new Promise((resolve) => {
 		window.setTimeout(() => resolve(value), MOCK_LATENCY_MS);
@@ -259,7 +266,7 @@ export const appData = {
 		},
 	},
 	dashboard: {
-		async getSnapshot(tenantId: string, startDate: string, endDate: string, selectedRangeLabel: string, options?: { forceRefresh?: boolean }) {
+		async getSnapshot(tenantId: string, startDate: string, endDate: string, selectedRangeLabel: string, options?: DashboardSnapshotOptions) {
 			return this.getSnapshotByBlocks(tenantId, startDate, endDate, selectedRangeLabel, undefined, options);
 		},
 		async getSnapshotByBlocks(
@@ -268,7 +275,7 @@ export const appData = {
 			endDate: string,
 			selectedRangeLabel: string,
 			blocks?: string[],
-			options?: { forceRefresh?: boolean; previousStart?: string | null; previousEnd?: string | null },
+			options?: DashboardSnapshotOptions,
 		) {
 			const cacheKey = getDashboardCacheKey(tenantId, startDate, endDate, blocks, options?.previousStart ?? null, options?.previousEnd ?? null);
 			const forceRefresh = options?.forceRefresh === true;
@@ -289,6 +296,7 @@ export const appData = {
 					httpClient<DashboardSnapshot>('/api/dashboard', {
 						method: 'POST',
 						cache: forceRefresh ? 'no-store' : 'default',
+						signal: options?.signal,
 						body: JSON.stringify({
 							tenantId,
 							startDate,

@@ -48,16 +48,18 @@ describe('useDashboardSequencedSnapshot', () => {
 		expect(result.current.selectedPreviousRange).not.toBeNull();
 
 		expect(getSnapshotByBlocksMock).toHaveBeenCalledTimes(2);
-		expect(getSnapshotByBlocksMock).toHaveBeenNthCalledWith(1, 'tenant-1', expect.any(String), expect.any(String), expect.any(String), ['resumo'], {
+		expect(getSnapshotByBlocksMock).toHaveBeenNthCalledWith(1, 'tenant-1', expect.any(String), expect.any(String), expect.any(String), ['resumo'], expect.objectContaining({
 			forceRefresh: false,
 			previousStart: expect.any(String),
 			previousEnd: expect.any(String),
-		});
-		expect(getSnapshotByBlocksMock).toHaveBeenNthCalledWith(2, 'tenant-1', expect.any(String), expect.any(String), expect.any(String), ['funil'], {
+			signal: expect.any(AbortSignal),
+		}));
+		expect(getSnapshotByBlocksMock).toHaveBeenNthCalledWith(2, 'tenant-1', expect.any(String), expect.any(String), expect.any(String), ['funil'], expect.objectContaining({
 			forceRefresh: false,
 			previousStart: expect.any(String),
 			previousEnd: expect.any(String),
-		});
+			signal: expect.any(AbortSignal),
+		}));
 
 		result.current.requestPhases('series');
 
@@ -66,11 +68,12 @@ describe('useDashboardSequencedSnapshot', () => {
 		});
 
 		expect(getSnapshotByBlocksMock).toHaveBeenCalledTimes(3);
-		expect(getSnapshotByBlocksMock).toHaveBeenNthCalledWith(3, 'tenant-1', expect.any(String), expect.any(String), expect.any(String), ['serie', 'alertas', 'resumo', 'funil', 'operacao'], {
+		expect(getSnapshotByBlocksMock).toHaveBeenNthCalledWith(3, 'tenant-1', expect.any(String), expect.any(String), expect.any(String), ['serie', 'alertas', 'resumo', 'funil', 'operacao'], expect.objectContaining({
 			forceRefresh: false,
 			previousStart: expect.any(String),
 			previousEnd: expect.any(String),
-		});
+			signal: expect.any(AbortSignal),
+		}));
 	});
 
 	it('allows disabling the comparison period and reloads without previous dates', async () => {
@@ -94,15 +97,70 @@ describe('useDashboardSequencedSnapshot', () => {
 			expect(result.current.completedPhases).toContain('funnel');
 		});
 
-		expect(getSnapshotByBlocksMock).toHaveBeenNthCalledWith(1, 'tenant-1', expect.any(String), expect.any(String), expect.any(String), ['resumo'], {
+		expect(getSnapshotByBlocksMock).toHaveBeenNthCalledWith(1, 'tenant-1', expect.any(String), expect.any(String), expect.any(String), ['resumo'], expect.objectContaining({
 			forceRefresh: false,
 			previousStart: null,
 			previousEnd: null,
-		});
-		expect(getSnapshotByBlocksMock).toHaveBeenNthCalledWith(2, 'tenant-1', expect.any(String), expect.any(String), expect.any(String), ['funil'], {
+			signal: expect.any(AbortSignal),
+		}));
+		expect(getSnapshotByBlocksMock).toHaveBeenNthCalledWith(2, 'tenant-1', expect.any(String), expect.any(String), expect.any(String), ['funil'], expect.objectContaining({
 			forceRefresh: false,
 			previousStart: null,
 			previousEnd: null,
+			signal: expect.any(AbortSignal),
+		}));
+	});
+
+	it('aborts in-flight snapshot requests when the dashboard cycle changes', async () => {
+		let firstSignal: AbortSignal | null = null;
+
+		getSnapshotByBlocksMock.mockImplementationOnce(async (_tenantId, _startDate, _endDate, _rangeLabel, _blocks, options) => {
+			firstSignal = options?.signal ?? null;
+			return new Promise((resolve, reject) => {
+				firstSignal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+				window.setTimeout(() => resolve({
+					rangeLabel: 'stale',
+					primaryMetrics: [],
+					customerMetrics: [],
+					serie: [],
+					ticketByDay: [],
+					channel: [],
+					emitente: [],
+					funil: [],
+					monitoringAlerts: [],
+					coorte: [],
+					topClients: [],
+					topProducts: [],
+					payments: [],
+					hourlyRevenue: [],
+					marketingMetrics: [],
+					marketingMixExclusive: [],
+					marketingMixInclusive: [],
+					marketingTicketComparison: [],
+					topCoupons: [],
+					topPromotions: [],
+				}), 1000);
+			});
 		});
+
+		const { result } = renderHook(() => useDashboardSequencedSnapshot('tenant-1'));
+
+		await waitFor(() => {
+			expect(firstSignal).not.toBeNull();
+		});
+
+		act(() => {
+			result.current.setSelectedRange({ start: '2026-04-01', end: '2026-04-30' });
+		});
+
+		await waitFor(() => {
+			expect(firstSignal?.aborted).toBe(true);
+		});
+
+		await waitFor(() => {
+			expect(result.current.completedPhases).toContain('summary');
+		});
+
+		expect(result.current.error).toBe('');
 	});
 });
