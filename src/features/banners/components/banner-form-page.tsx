@@ -22,7 +22,7 @@ export function BannerFormPage({ id }: { id?: string }) {
       config={BANNERS_CONFIG}
       client={bannersClient}
       id={id}
-      formEmbed="area,universos.canal_distribuicao,universos.filial,universos.grupo,universos.rede,universos.segmento,universos.tabela_preco,urls"
+      formEmbed="area,universos.canal_distribuicao,universos.colecao,universos.departamento,universos.filial,universos.fornecedor,universos.grupo,universos.marca,universos.rede,universos.segmento,universos.tabela_preco,urls"
       tabs={[
         {
           key: 'general',

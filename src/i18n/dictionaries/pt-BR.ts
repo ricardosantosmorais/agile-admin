@@ -2435,8 +2435,12 @@ export const ptBR: TranslationDictionary = {
 			allow: 'Permitir',
 			types: {
 				canal_distribuicao: 'Canal de distribuição',
+				colecao: 'Coleção',
+				departamento: 'Departamento',
 				filial: 'Filial',
+				fornecedor: 'Fornecedor',
 				grupo: 'Grupo de clientes',
+				marca: 'Marca',
 				rede: 'Rede de clientes',
 				segmento: 'Segmento de clientes',
 				tabela_preco: 'Tabela de preço',

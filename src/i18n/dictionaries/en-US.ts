@@ -2436,8 +2436,12 @@ export const enUS: TranslationDictionary = {
 			allow: 'Allow',
 			types: {
 				canal_distribuicao: 'Distribution channel',
+				colecao: 'Collection',
+				departamento: 'Department',
 				filial: 'Branch',
+				fornecedor: 'Supplier',
 				grupo: 'Customer group',
+				marca: 'Brand',
 				rede: 'Customer network',
 				segmento: 'Customer segment',
 				tabela_preco: 'Price table',

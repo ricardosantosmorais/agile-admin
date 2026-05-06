@@ -164,7 +164,7 @@ ObservaÃ§Ã£o:
 - `Cadastros > Componentes` possui listagem, formulario em abas, upload para CDN publica de componentes, editor JSON e aba de campos com modal, opcoes personalizadas, exclusao e reordenacao.
 - `Cadastros > Componentes`, `Componentes Campos` e `Areas de Pagina` invalidam o cache completo da empresa ativa apos gravacao, exclusao e reordenacao bem-sucedidas, alinhando o efeito operacional do legado.
 - `Cadastros > E-mails Payloads` possui CRUD linear v2 com listagem, filtros, formulario em linhas e editor JSON para o payload.
-- `Cadastros > Apps` possui listagem v2 com acoes de compilacao, publicacao Android/iOS e logs; formulario em linhas com arquivos privados S3 por empresa; e bridges server-side para sincronizar `config/clients.json` e disparar GitHub Actions sem expor token no client.
+- `Cadastros > Apps` possui listagem v2 com acoes de compilacao, publicacao Android/iOS e logs; formulario em linhas com placeholders/defaults dos textos do app, arquivos privados S3 por empresa; e bridges server-side para sincronizar `config/clients.json` e disparar GitHub Actions sem expor token no client.
 - `Notificacoes` do painel possui rota v2 em `/notificacoes-painel`, com listagem server-side, filtros do legado, formulario em abas, vinculo por empresa, pre-visualizacao, duplicacao, publicacao e modal de usuarios visualizadores.
 - `Cadastros > Categorias de Tarefas`, `Tarefas` e `Grupos de Relatorios` possuem CRUDs v2 com bridges dedicadas, formularios em linhas e lookups lazy para fases, categorias e empresas quando aplicavel.
 - `Cadastros > Relatorios v2` possui rota de cadastro separada da execucao operacional, com dados gerais, editor SQL executavel e mapeamento de campos da query.
@@ -230,10 +230,11 @@ ObservaÃ§Ã£o:
   - `Cadastros > Parâmetros Grupo` agora já possui CRUD próprio no v2 em `/integracao-com-erp/cadastros/parametros-grupo`, com listagem server-side, formulário linear e bridge root-only fiel ao contrato do legado;
   - `Cadastros > Parâmetros Cadastro` agora já possui CRUD próprio no v2 em `/integracao-com-erp/cadastros/parametros-cadastro`, com lookups lazy para `Parâmetros Grupo` e `Templates`, regras condicionais por `tipo_entrada` e bridge root-only fiel ao contrato do legado;
   - `Cadastros > Queries` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/queries`, com listagem server-side, formulário em abas, editor SQL Monaco, execução contra integradores ativos e aba de mapeamento em edição;
-  - `Cadastros > Scripts` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/scripts`, com listagem server-side e formulário direto com editor Monaco cuja linguagem acompanha o select do legado;
+  - `Cadastros > Scripts` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/scripts`, com listagem server-side, formulário direto com editor Monaco cuja linguagem acompanha o select do legado e decodificação de entidades HTML ao carregar scripts legados;
   - `Cadastros > Endpoints` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/endpoints`, com listagem server-side, campos condicionais por `tipo_retorno` e aba de perfis em edição;
   - `Cadastros > Serviços` mantém paridade do modo `dataset_consolidado` do legado, exibindo campos de mapeamento consolidado apenas para `endpoint_gateway`, limpando payload obsoleto fora desse modo e preservando o modal operacional de log com copiar conteúdo e download;
   - páginas diretas já disponíveis no v2 para `Parâmetros`, `Imagens`, `API`, `Banco de Dados`, `Instalação do Integrador`, `Dashboard ERP`, `Rotinas Integradas`, `Serviços` e `Serviços com Falha`;
+  - `Integrações > Logística > Frenet` preserva somente os campos visíveis do legado atual, ocultando `Token Parceiro` e `Enviar apenas pedidos com nota fiscal` enquanto mantém o payload compatível;
   - bridges dedicadas em `app/api/integracoes/*` para todos os módulos do menu;
   - bridge dedicada em `app/api/integracao-com-erp/*` para configuração e leitura operacional do dashboard ERP;
   - `Gateways de Pagamento` com listagem, formulário novo, edição por id e regras condicionais do legado reaproveitadas no CRUD do v2;

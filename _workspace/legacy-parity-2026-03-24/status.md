@@ -61,7 +61,9 @@ Base date: 2026-03-24
 - Cache/assets não precisou de migração: todos os 26 commits alteravam apenas `boot.php` para bump/restauração de `ASSETS_VERSION`, um mecanismo de cache-busting exclusivo do legado PHP e já substituído pelo build do Next.js no v2.
 - Twenty-sixth batch checked: `autenticacao-sessao`.
 - Autenticação/sessão precisou de paridade para limpeza de cache com token da sessão e para exibir o modal global de sessão encerrada em `403/TENANT_CONTEXT_INVALID`. A remoção do log de token Firebase do legado foi registrada como já ausente no v2, sem código equivalente a migrar.
-- Next step: continue with the next uncompleted inventory batch: `components`.
+- Twenty-seventh batch checked: `components`.
+- Components precisou de paridade para decodificação de scripts legados, tipos/ordem de universos de banner e campos Frenet ocultos. Os placeholders de Apps já estavam presentes no v2 por `APP_DEFAULTS`.
+- Next step: continue with the next uncompleted inventory batch: `agente-ia`.
 
 ## Completed batches
 
@@ -91,6 +93,7 @@ Base date: 2026-03-24
 - `produtos-restricoes-excecoes`: migrated weekday time bridge normalization for product restrictions and exceptions, preserving the already-present v2 wizard UI/mappers and adding route coverage.
 - `cache-assets`: no migration needed; legacy-only `ASSETS_VERSION` bumps in `boot.php` are not applicable to the Next.js asset pipeline.
 - `autenticacao-sessao`: migrated session-token preference in remote cache clear and `403/TENANT_CONTEXT_INVALID` session-loss modal handling; Firebase token console logging was already absent in v2.
+- `components`: migrated HTML entity decoding for ERP scripts, completed legacy banner universe type/order support, hid Frenet partner token/invoice-only fields, and recorded Apps placeholders as already present in v2.
 
 ## Known local noise excluded
 

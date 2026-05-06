@@ -25,6 +25,18 @@ describe('integracao-com-erp-scripts', () => {
 		})
 	})
 
+	it('decodifica entidades HTML ao carregar linguagem e script', () => {
+		expect(
+			normalizeScriptRecord({
+				linguagem: ' C&#35; ',
+				script: 'if (valor &lt; 10 &amp;&amp; nome === &quot;A&quot;) return &#039;ok&#039;',
+			}),
+		).toMatchObject({
+			linguagem: 'c#',
+			script: 'if (valor < 10 && nome === "A") return \'ok\'',
+		})
+	})
+
 	it('mantém fallback de linguagem conhecido', () => {
 		expect(normalizeScriptLanguage('desconhecido')).toBe('javascript')
 		expect(normalizeScriptLanguage('c#')).toBe('c#')
