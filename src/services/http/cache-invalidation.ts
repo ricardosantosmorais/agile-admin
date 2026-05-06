@@ -4,9 +4,7 @@ import { serverApiFetch } from '@/src/services/http/server-api'
 
 export async function invalidateRemoteCacheService(apiService: string) {
   const service = apiService.trim()
-  if (!service) {
-    return
-  }
+  const path = service ? `cache/clear/${encodeURIComponent(service)}` : 'cache/clear'
 
   try {
     const session = await readAuthSession()
@@ -14,7 +12,7 @@ export async function invalidateRemoteCacheService(apiService: string) {
       return
     }
 
-    await serverApiFetch(`cache/clear/${encodeURIComponent(service)}`, {
+    await serverApiFetch(path, {
       method: 'GET',
       token: session.token,
       tenantId: session.currentTenantId,
@@ -23,7 +21,7 @@ export async function invalidateRemoteCacheService(apiService: string) {
     captureOperationalServerError({
       area: 'server-api',
       action: 'cache-invalidation',
-      path: `cache/clear/${service}`,
+      path,
       status: 0,
       payload: error instanceof Error ? { message: error.message } : { message: 'Falha inesperada ao invalidar cache.' },
     })

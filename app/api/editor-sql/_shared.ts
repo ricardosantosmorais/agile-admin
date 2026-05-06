@@ -13,10 +13,6 @@ type ResolvedSqlEditorContext = {
   useAgileSyncForErp: boolean
 }
 
-function asRecord(value: unknown) {
-  return typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
-}
-
 export async function resolveSqlEditorContext() {
   const storedSession = await readAuthSession()
 
@@ -54,31 +50,13 @@ export async function resolveSqlEditorContext() {
     }
   }
 
-  const integrationParam = await serverApiFetch(
-    `empresas/parametros?id_empresa=${encodeURIComponent(storedSession.currentTenantId)}&chave=protheus_tipo_integracao&order=chave,posicao&perpage=1`,
-    {
-      method: 'GET',
-      token: storedSession.token,
-      tenantId: storedSession.currentTenantId,
-    },
-  )
-
-  const responseData = asRecord(integrationParam.payload).data
-  const firstParam = Array.isArray(responseData)
-    ? responseData[0]
-    : undefined
-  const firstParamRecord = asRecord(firstParam)
-  const useAgileSyncForErp =
-    firstParamRecord.chave === 'protheus_tipo_integracao'
-    && firstParamRecord.parametros === 'api'
-
   return {
     context: {
       token: storedSession.token,
       tenantId: storedSession.currentTenantId,
       tenantCodigo,
       currentUserId: storedSession.currentUserId,
-      useAgileSyncForErp,
+      useAgileSyncForErp: false,
     } satisfies ResolvedSqlEditorContext,
   }
 }
@@ -93,13 +71,7 @@ export async function executeSqlAgainstExternalApi(
     perPage: number
   },
 ) {
-  const target = requestBody.idEmpresa
-    ? 'painelb2b'
-    : requestBody.fonteDados === 'erp' && context.useAgileSyncForErp
-    ? 'agilesync'
-    : 'painelb2b'
-
-  return externalAdminApiFetch(target, 'agilesync_editorsql', {
+  return externalAdminApiFetch('painelb2b', 'agilesync_editorsql', {
     method: 'POST',
     body: {
       id_empresa: requestBody.idEmpresa || context.tenantCodigo,

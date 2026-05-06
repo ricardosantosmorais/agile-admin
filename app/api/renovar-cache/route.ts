@@ -2,6 +2,7 @@
 import { enrichMasterPayload } from '@/src/features/auth/services/auth-server'
 import { extractApiErrorMessage, mapAuthSession } from '@/src/features/auth/services/auth-mappers'
 import { readAuthSession } from '@/src/features/auth/services/auth-session'
+import { captureOperationalServerError } from '@/src/lib/sentry'
 import { serverApiFetch } from '@/src/services/http/server-api'
 
 function getErrorMessage(payload: unknown, fallback: string) {
@@ -82,10 +83,12 @@ export async function POST() {
   }
 
   let result: Awaited<ReturnType<typeof clearByV3Fallback>>
+  let cacheTarget: 'api-v3' | 'cluster-api' = 'api-v3'
 
   if (!clusterApi) {
     result = await clearByV3Fallback()
   } else {
+    cacheTarget = 'cluster-api'
     const response = await fetch(`${clusterApi}/cache/clear`, {
       method: 'POST',
       headers: {
@@ -105,6 +108,7 @@ export async function POST() {
       : await response.text()
 
     if (response.status === 404) {
+      cacheTarget = 'api-v3'
       result = await clearByV3Fallback()
     } else {
       result = {
@@ -116,6 +120,21 @@ export async function POST() {
   }
 
   if (!result.ok) {
+    if (cacheTarget === 'cluster-api') {
+      captureOperationalServerError({
+        area: 'remote-cache',
+        action: 'renew-cache',
+        path: 'cache/clear',
+        status: result.status || 400,
+        tenantId: currentTenantId,
+        payload: result.payload,
+        requestMeta: {
+          target: cacheTarget,
+          clusterConfigured: Boolean(clusterApi),
+        },
+      })
+    }
+
     return NextResponse.json(
       { message: getErrorMessage(result.payload, 'Não foi possível renovar o cache.') },
       { status: result.status || 400 },

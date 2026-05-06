@@ -88,12 +88,10 @@ Observações:
 ### APIs externas usadas por Ferramentas > Editor SQL
 - `ADMIN_URL_API_PAINELB2B`
 - `ADMIN_API_PAINELB2B_TOKEN`
-- `ADMIN_URL_API_AGILESYNC`
-- `ADMIN_API_AGILESYNC_TOKEN`
 
 Uso:
 - o Editor SQL não usa a `api-v3`;
-- ele chama APIs externas legadas via bridge em `app/api/editor-sql/*`.
+- ele chama o `PainelB2BApi` via bridge em `app/api/editor-sql/*`, inclusive para consultas de fonte `ERP`.
 
 ### Amplify SSR
 - para deploy no AWS Amplify com SSR, as variáveis necessárias ao runtime server-side do Next precisam ser exportadas no build para `.env.production`;

@@ -162,6 +162,7 @@ ObservaÃ§Ã£o:
 
 - `Dashboard` carrega fases e grÃ¡ficos sob demanda, mantendo a carga completa apenas na exportaÃ§Ã£o de PDF.
 - `Cadastros > Componentes` possui listagem, formulario em abas, upload para CDN publica de componentes, editor JSON e aba de campos com modal, opcoes personalizadas, exclusao e reordenacao.
+- `Cadastros > Componentes`, `Componentes Campos` e `Areas de Pagina` invalidam o cache completo da empresa ativa apos gravacao, exclusao e reordenacao bem-sucedidas, alinhando o efeito operacional do legado.
 - `Cadastros > E-mails Payloads` possui CRUD linear v2 com listagem, filtros, formulario em linhas e editor JSON para o payload.
 - `Cadastros > Apps` possui listagem v2 com acoes de compilacao, publicacao Android/iOS e logs; formulario em linhas com arquivos privados S3 por empresa; e bridges server-side para sincronizar `config/clients.json` e disparar GitHub Actions sem expor token no client.
 - `Notificacoes` do painel possui rota v2 em `/notificacoes-painel`, com listagem server-side, filtros do legado, formulario em abas, vinculo por empresa, pre-visualizacao, duplicacao, publicacao e modal de usuarios visualizadores.
@@ -201,6 +202,7 @@ ObservaÃ§Ã£o:
   - resultado em tabela ou JSON;
   - exportaÃ§Ã£o e cÃ³pia;
   - restore local do workspace por usuÃ¡rio e tenant no navegador.
+  - execucao server-side sempre pelo `PainelB2BApi`, inclusive para fonte `ERP`, acompanhando o ajuste atual do legado.
 - `Ferramentas > HTTP Client` jÃ¡ possui:
   - abas de requisiÃ§Ã£o;
   - endpoint por catÃ¡logo da API ou URL custom;
@@ -370,6 +372,7 @@ Continuam como pÃ¡ginas prÃ³prias, com mais regra de negÃ³cio:
 - `ConfiguraÃ§Ãµes` com teste de integraÃ§Ã£o validando o estado disabled/enabled do botÃ£o `Salvar` conforme o dirty state.
 - `Configurações > Vendedores` com teste unitário para payload da Área Representante V2 e teste da bridge de `Vendedores` cobrindo bloqueio por cotas indisponíveis.
 - `Contatos` com testes de mapper e bridge cobrindo edição administrativa, normalização de payload e bloqueio de contatos internalizados.
+- `Controllers` com testes de bridge cobrindo Editor SQL no `PainelB2BApi`, invalidacao de cache completo em Componentes/Areas de Pagina e observabilidade de falha na renovacao de cache remoto.
 - `Templates de E-mails` com teste de componente cobrindo a aba `Editor`, o carregamento de variÃ¡veis e a abertura da prÃ©-visualizaÃ§Ã£o.
 - `Clientes` com testes do controller da listagem e do modal de usuÃ¡rios vinculados.
 - `Cadastros ERP > Gateways`, `Gateway Endpoints`, `Interfaces de Consulta`, `Acoes` e `Servicos` com testes unitarios de mapeadores, payloads e filtros usados pelas bridges v2.
