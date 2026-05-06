@@ -52,7 +52,10 @@ Base date: 2026-03-24
 - Clientes/Marketing needed CFO API-key parity and RD E-Commerce dark-mode contrast parity: v2 now exposes a CFO tab in `Integrações > Clientes`, persists `cro_apikey` as encrypted tenant parameter and uses semantic theme text for the RD callback helper.
 - Twenty-second batch checked: `navegacao-menu`.
 - Navegação/menu precisou de paridade para o token no menu do usuário master: v2 agora expõe o token da empresa ativa no menu do usuário por uma bridge de shell exclusiva para master. Banners legados de billing/pendência financeira e ordenação hardcoded de Loja de Apps/Cashback não foram migrados porque ainda não existe superfície equivalente no shell/módulos do v2.
-- Next step: continue with the next uncompleted inventory batch after `navegacao-menu`: `processos-relatorios`.
+- Deferred legacy points without current v2 surface are tracked in `_workspace/legacy-parity-2026-03-24/deferred.md`.
+- Twenty-third batch checked: `processos-relatorios`.
+- Downloads de processos de relatórios já estavam cobertos no v2 pelo tenant ativo por aba e download na mesma aba; a etapa adicionou cobertura explícita para a rota bloquear tenant divergente e retornar attachment válido.
+- Next step: continue with the next uncompleted inventory batch after `processos-relatorios`: `produtos-restricoes-excecoes`.
 
 ## Completed batches
 
@@ -78,6 +81,7 @@ Base date: 2026-03-24
 - `includes`: migrated friendly product-origin trace summaries in the order detail technical modal, with rule/field/source catalog parity, i18n labels, docs and mapper coverage.
 - `integracoes-clientes-marketing`: migrated CFO tab/API key support in client integrations, added encrypted `cro_apikey` payload parity, aligned RD E-Commerce helper contrast to theme tokens, and updated i18n/docs/E2E coverage.
 - `navegacao-menu`: migrated master user-menu token parity through a protected shell route and copy row, with UI/route coverage; legacy billing upgrade/financial banners and app-store/cashback hardcoded ordering were recorded as not applicable to current v2 surfaces.
+- `processos-relatorios`: no production migration needed; active-tab tenant downloads and same-tab file download were already implemented in v2, and route coverage was added for tenant mismatch plus attachment response.
 
 ## Known local noise excluded
 

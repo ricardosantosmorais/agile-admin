@@ -11,6 +11,7 @@
 - Billing upgrade and financial-pending banners were not migrated. They are tied to legacy `boot.php`, `includes/header.php`, `index.php`, Redis/cache and billing controller surfaces, and v2 has no equivalent billing-upgrade shell surface by product decision.
 - Hardcoded legacy menu ordering was not migrated. The affected legacy entries depend on app-store/cashback modules that do not exist as v2 routes yet.
 - Master user menu token parity was migrated. The v2 user menu now loads the active tenant platform token through a protected shell bridge and renders it as a copy row only for master users.
+- Deferred items are also tracked in `_workspace/legacy-parity-2026-03-24/deferred.md` so they remain visible for a future product/module decision.
 
 ## V2 changes
 
