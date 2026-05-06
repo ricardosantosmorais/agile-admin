@@ -65,7 +65,9 @@ Base date: 2026-03-24
 - Components precisou de paridade para decodificação de scripts legados, tipos/ordem de universos de banner e campos Frenet ocultos. Os placeholders de Apps já estavam presentes no v2 por `APP_DEFAULTS`.
 - Twenty-eighth batch checked: `agente-ia`.
 - Agente IA não teve migração de produção nesta etapa: os commits do legado pertencem ao chat/sidebar nativo do Agente IA, com agendamentos, histórico e CSS dark mode. O v2 atual só possui o embed externo de `Assistente de vendas IA`, então os pontos foram registrados como deferred até existir uma superfície equivalente.
-- Next step: continue with the next uncompleted inventory batch: `assets`.
+- Twenty-ninth batch checked: `assets`.
+- Assets não teve migração de produção por decisão de produto: o acesso rápido já é recalculado no shell React do v2 a partir do menu/sessão, e o reload por `ASSETS_VERSION` é mecanismo exclusivo do legado PHP.
+- Next step: continue with the next uncompleted inventory batch: `agile-store`.
 
 ## Completed batches
 
@@ -97,6 +99,7 @@ Base date: 2026-03-24
 - `autenticacao-sessao`: migrated session-token preference in remote cache clear and `403/TENANT_CONTEXT_INVALID` session-loss modal handling; Firebase token console logging was already absent in v2.
 - `components`: migrated HTML entity decoding for ERP scripts, completed legacy banner universe type/order support, hid Frenet partner token/invoice-only fields, and recorded Apps placeholders as already present in v2.
 - `agente-ia`: no production migration; legacy native Agent IA chat/sidebar schedule UX, history timezone parsing and dark-mode CSS were registered as deferred because v2 currently embeds an external sales assistant instead of owning that chat surface.
+- `assets`: no production migration; legacy quick-search bootstrap timing is already covered by the v2 React shell, and legacy `ASSETS_VERSION` reload is not applicable to the Next.js asset pipeline.
 
 ## Known local noise excluded
 
