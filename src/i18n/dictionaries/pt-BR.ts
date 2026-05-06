@@ -1974,6 +1974,7 @@ export const ptBR: TranslationDictionary = {
 		userCompanyId: 'ID da empresa',
 		userClusterHost: 'Cluster host',
 		userClusterApi: 'Cluster API',
+		userPlatformToken: 'Token',
 		userLastAccess: 'Último acesso',
 		copyLabel: 'Copiar {{label}}',
 		copied: 'Copiado',

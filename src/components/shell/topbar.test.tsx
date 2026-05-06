@@ -13,6 +13,7 @@ const flattenMenuItemsMock = vi.fn()
 const getNotificationsMock = vi.fn()
 const markNotificationsAsReadMock = vi.fn()
 const getChangelogMock = vi.fn()
+const getTenantDebugInfoMock = vi.fn()
 
 vi.mock('next/navigation', () => ({
   useRouter: () => useRouterMock(),
@@ -45,6 +46,7 @@ vi.mock('@/src/services/app-data', () => ({
       getNotifications: (...args: unknown[]) => getNotificationsMock(...args),
       markNotificationsAsRead: (...args: unknown[]) => markNotificationsAsReadMock(...args),
       getChangelog: (...args: unknown[]) => getChangelogMock(...args),
+      getTenantDebugInfo: (...args: unknown[]) => getTenantDebugInfoMock(...args),
     },
   },
 }))
@@ -112,6 +114,9 @@ describe('Topbar', () => {
     })
     markNotificationsAsReadMock.mockResolvedValue(undefined)
     getChangelogMock.mockResolvedValue([])
+    getTenantDebugInfoMock.mockResolvedValue({
+      platformToken: 'tenant-token-123',
+    })
   })
 
   afterEach(() => {
@@ -137,5 +142,17 @@ describe('Topbar', () => {
     await waitFor(() => {
       expect(getNotificationsMock).toHaveBeenCalledWith('1698203521854804')
     })
+  })
+
+  it('loads the platform token for master users when the user menu is opened', async () => {
+    renderWithProviders(<Topbar />)
+
+    fireEvent.click(screen.getByText('Ricardo Morais').closest('button')!)
+
+    await waitFor(() => {
+      expect(getTenantDebugInfoMock).toHaveBeenCalledWith('1698203521854804')
+    })
+
+    expect(await screen.findByText('tenant-token-123')).toBeInTheDocument()
   })
 })

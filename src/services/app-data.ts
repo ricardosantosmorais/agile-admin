@@ -16,6 +16,10 @@ import { HttpError, httpClient } from '@/src/services/http/http-client';
 const MOCK_LATENCY_MS = 120;
 const DASHBOARD_CACHE_TTL_MS = 5 * 60 * 1000;
 
+export type TenantDebugInfo = {
+	platformToken: string;
+};
+
 type DashboardSnapshotOptions = {
 	forceRefresh?: boolean;
 	previousStart?: string | null;
@@ -263,6 +267,12 @@ export const appData = {
 		},
 		async getChangelog(): Promise<ChangelogItem[]> {
 			return withLatency(clone(shellChangelog));
+		},
+		async getTenantDebugInfo(tenantId: string): Promise<TenantDebugInfo> {
+			return httpClient<TenantDebugInfo>(`/api/shell/tenant-debug?tenantId=${encodeURIComponent(tenantId)}`, {
+				method: 'GET',
+				cache: 'no-store',
+			});
 		},
 	},
 	dashboard: {

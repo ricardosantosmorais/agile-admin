@@ -1973,6 +1973,7 @@ export const enUS: TranslationDictionary = {
 		userCompanyId: 'Company ID',
 		userClusterHost: 'Cluster host',
 		userClusterApi: 'Cluster API',
+		userPlatformToken: 'Token',
 		userLastAccess: 'Last access',
 		copyLabel: 'Copy {{label}}',
 		copied: 'Copied',

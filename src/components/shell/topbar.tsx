@@ -90,11 +90,13 @@ export function Topbar() {
 	const [pendingReadReceipts, setPendingReadReceipts] = useState<NotificationReadReceipt[]>([]);
 	const [notificationsLoading, setNotificationsLoading] = useState(true);
 	const [notificationsError, setNotificationsError] = useState('');
+	const [tenantDebugInfo, setTenantDebugInfo] = useState<{ tenantId: string; platformToken: string } | null>(null);
 	const hasLoadedNotificationsRef = useRef(false);
 	const rootRef = useRef<HTMLDivElement | null>(null);
 	const tenantSearchInputRef = useRef<HTMLInputElement | null>(null);
 	const hasMarkedNotificationsRef = useRef(false);
 	const isMarkingNotificationsRef = useRef(false);
+	const tenantDebugInfoRequestRef = useRef('');
 	const changelogState = useAsyncData(() => appData.shell.getChangelog(), []);
 	const changelog = useMemo(() => changelogState.data ?? [], [changelogState.data]);
 	const unreadNotifications = useMemo(() => notifications.filter((item) => !item.lida).length, [notifications]);
@@ -135,6 +137,11 @@ export function Topbar() {
 	useEffect(() => {
 		hasLoadedNotificationsRef.current = false;
 	}, [currentTenant.id, session?.currentTenant.id, user?.id]);
+
+	useEffect(() => {
+		setTenantDebugInfo(null);
+		tenantDebugInfoRequestRef.current = '';
+	}, [currentTenant.id, user?.id]);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -203,6 +210,51 @@ export function Topbar() {
 			tenantSearchInputRef.current?.focus();
 		});
 	}, [activePanel]);
+
+	useEffect(() => {
+		let isMounted = true;
+
+		if (activePanel !== 'user' || !user?.master || !currentTenant.id || shouldBlockUnauthenticatedRedirect) {
+			return () => {
+				isMounted = false;
+			};
+		}
+
+		if (tenantDebugInfo?.tenantId === currentTenant.id || tenantDebugInfoRequestRef.current === currentTenant.id) {
+			return () => {
+				isMounted = false;
+			};
+		}
+
+		tenantDebugInfoRequestRef.current = currentTenant.id;
+
+		void appData.shell
+			.getTenantDebugInfo(currentTenant.id)
+			.then((info) => {
+				if (!isMounted) {
+					return;
+				}
+
+				setTenantDebugInfo({
+					tenantId: currentTenant.id,
+					platformToken: info.platformToken,
+				});
+			})
+			.catch(() => {
+				if (!isMounted) {
+					return;
+				}
+
+				setTenantDebugInfo({
+					tenantId: currentTenant.id,
+					platformToken: '',
+				});
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, [activePanel, currentTenant.id, shouldBlockUnauthenticatedRedirect, tenantDebugInfo?.tenantId, user?.master]);
 
 	useEffect(() => {
 		if (shouldBlockUnauthenticatedRedirect) {
@@ -503,6 +555,7 @@ export function Topbar() {
 											<InfoCopyRow label={t('shell.userCompanyId')} value={currentTenant.id} />
 											<InfoCopyRow label={t('shell.userClusterHost')} value={currentTenant.clusterHost} />
 											<InfoCopyRow label={t('shell.userClusterApi')} value={currentTenant.clusterApi} />
+											{user?.master ? <InfoCopyRow label={t('shell.userPlatformToken')} value={tenantDebugInfo?.platformToken} /> : null}
 											<InfoCopyRow label={t('shell.userLastAccess')} value={user?.ultimoAcesso} />
 										</div>
 									</div>
