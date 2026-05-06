@@ -57,7 +57,9 @@ Base date: 2026-03-24
 - Downloads de processos de relatórios já estavam cobertos no v2 pelo tenant ativo por aba e download na mesma aba; a etapa adicionou cobertura explícita para a rota bloquear tenant divergente e retornar attachment válido.
 - Twenty-fourth batch checked: `produtos-restricoes-excecoes`.
 - Restrições/Exceções x Produtos já tinham a UI e os mapeadores de dias/horários no v2; a etapa migrou a paridade faltante das bridges para normalizar horários `HH:MM` em `HH:MM:00` e limpar horários de dias inativos antes de salvar.
-- Next step: continue with the next uncompleted inventory batch: `cache-assets`.
+- Twenty-fifth batch checked: `cache-assets`.
+- Cache/assets não precisou de migração: todos os 26 commits alteravam apenas `boot.php` para bump/restauração de `ASSETS_VERSION`, um mecanismo de cache-busting exclusivo do legado PHP e já substituído pelo build do Next.js no v2.
+- Next step: continue with the next uncompleted inventory batch: `autenticacao-sessao`.
 
 ## Completed batches
 
@@ -85,6 +87,7 @@ Base date: 2026-03-24
 - `navegacao-menu`: migrated master user-menu token parity through a protected shell route and copy row, with UI/route coverage; legacy billing upgrade/financial banners and app-store/cashback hardcoded ordering were recorded as not applicable to current v2 surfaces.
 - `processos-relatorios`: no production migration needed; active-tab tenant downloads and same-tab file download were already implemented in v2, and route coverage was added for tenant mismatch plus attachment response.
 - `produtos-restricoes-excecoes`: migrated weekday time bridge normalization for product restrictions and exceptions, preserving the already-present v2 wizard UI/mappers and adding route coverage.
+- `cache-assets`: no migration needed; legacy-only `ASSETS_VERSION` bumps in `boot.php` are not applicable to the Next.js asset pipeline.
 
 ## Known local noise excluded
 
