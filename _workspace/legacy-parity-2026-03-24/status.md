@@ -46,7 +46,9 @@ Base date: 2026-03-24
 - Local admin port `8080` support is already covered by the v2 architecture because bridge API URLs come from environment variables instead of `HTTP_HOST`/frontend port checks.
 - Nineteenth batch checked: `.gitignore`.
 - The legacy local admin log ignore entry is already covered by the v2 `.gitignore` because `*.log` is ignored globally.
-- Next step: continue with the next uncompleted inventory batch after `.gitignore`: `includes`.
+- Twentieth batch checked: `includes`.
+- Includes needed friendly product-origin trace parity in `Pedidos`: v2 now translates tracked fields, final values, rule names, rule codes, technical origins and descriptions while keeping the complete JSON below for audit.
+- Next step: continue with the next uncompleted inventory batch after `includes`: `integracoes-clientes-marketing`.
 
 ## Completed batches
 
@@ -69,6 +71,7 @@ Base date: 2026-03-24
 - `.ebextensions`: no migration needed; legacy Elastic Beanstalk 4xx health-reporting configuration is not applicable to v2 and was ignored by product decision.
 - `geral`: no migration needed; legacy local-port `8080` API routing is already covered in v2 by env-based API base URL resolution.
 - `.gitignore`: no migration needed; legacy `tmp/admin-local.log` ignore is already covered by the v2 `*.log` rule.
+- `includes`: migrated friendly product-origin trace summaries in the order detail technical modal, with rule/field/source catalog parity, i18n labels, docs and mapper coverage.
 
 ## Known local noise excluded
 

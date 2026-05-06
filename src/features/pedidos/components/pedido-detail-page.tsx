@@ -37,7 +37,11 @@ import { useAuth } from '@/src/features/auth/hooks/use-auth'
 import { useFeatureAccess } from '@/src/features/auth/hooks/use-feature-access'
 import { usePedidoActions } from '@/src/features/pedidos/components/use-pedido-actions'
 import { pedidosClient } from '@/src/features/pedidos/services/pedidos-client'
-import { filterPedidoLogsByAccess, getPedidoProductTechnicalArtifacts } from '@/src/features/pedidos/services/pedidos-mappers'
+import {
+  filterPedidoLogsByAccess,
+  getPedidoProductTechnicalArtifacts,
+  type PedidoOriginTraceSummaryRow,
+} from '@/src/features/pedidos/services/pedidos-mappers'
 import { PEDIDO_DELIVERY_STATUS_OPTIONS } from '@/src/features/pedidos/services/pedidos-meta'
 import type { PedidoDetail } from '@/src/features/pedidos/services/pedidos-types'
 import { buildProdutoImageCandidates } from '@/src/features/produtos/services/produto-image-url'
@@ -49,7 +53,7 @@ import { useRouteParams } from '@/src/next/route-context'
 
 type RecordLike = Record<string, unknown>
 type ToastState = { message: string | null; tone: 'success' | 'error' }
-type JsonModalState = { title: string; content: string } | null
+type JsonModalState = { title: string; content: string; originTraceSummary?: PedidoOriginTraceSummaryRow[] } | null
 type DeliveryFormState = { id: string; status: string; rastreamento: string; codigo: string; prazo: string }
 type DetailSection = 'overview' | 'commercial' | 'products' | 'timeline' | 'technical'
 type MetricCardProps = {
@@ -391,7 +395,7 @@ export function PedidoDetailPage() {
                   </button>
                 ) : null}
                 {technicalArtifacts.originTrace ? (
-                  <button type="button" className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold" onClick={() => setJsonModal({ title: t('orders.fields.productTechnicalLog', 'Log técnico do produto'), content: technicalArtifacts.originTrace })}>
+                  <button type="button" className="app-button-secondary inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold" onClick={() => setJsonModal({ title: t('orders.fields.productTechnicalLog', 'Log técnico do produto'), content: technicalArtifacts.originTrace, originTraceSummary: technicalArtifacts.originTraceSummary })}>
                     <FileCode2 className="h-3.5 w-3.5" />
                     {t('orders.actions.viewProductTechnicalLog', 'Log técnico')}
                   </button>
@@ -844,6 +848,45 @@ export function PedidoDetailPage() {
               {t('orders.actions.copyJson', 'Copiar JSON')}
             </button>
           </div>
+          {jsonModal?.originTraceSummary?.length ? (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-600">
+                {t('orders.originTrace.summaryIntro', 'Resumo explicativo das regras aplicadas a cada campo rastreado. O JSON técnico completo permanece abaixo para auditoria.')}
+              </p>
+              <div className="app-table-shell overflow-x-auto rounded-[1rem]">
+                <table className="min-w-full border-collapse text-left text-xs">
+                  <thead className="app-table-muted text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[color:var(--app-muted)]">
+                    <tr>
+                      <th scope="col" className="px-3 py-2">{t('orders.originTrace.field', 'Campo')}</th>
+                      <th scope="col" className="px-3 py-2">{t('orders.originTrace.finalValue', 'Valor final')}</th>
+                      <th scope="col" className="px-3 py-2">{t('orders.originTrace.ruleName', 'Nome da regra')}</th>
+                      <th scope="col" className="px-3 py-2">{t('orders.originTrace.ruleCode', 'Código da regra')}</th>
+                      <th scope="col" className="px-3 py-2">{t('orders.originTrace.technicalOrigin', 'Origem técnica')}</th>
+                      <th scope="col" className="px-3 py-2">{t('orders.originTrace.description', 'Descrição')}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-slate-700">
+                    {jsonModal.originTraceSummary.map((row) => (
+                      <tr key={`${row.fieldCode}-${row.ruleCode}-${row.sourcePath}`} className="app-table-row-hover border-t border-line/60">
+                        <td className="px-3 py-2 align-top">
+                          <strong className="block text-slate-900">{row.fieldLabel}</strong>
+                          <code className="text-[0.68rem] text-slate-500">{row.fieldCode}</code>
+                        </td>
+                        <td className="px-3 py-2 align-top"><code>{row.value}</code></td>
+                        <td className="px-3 py-2 align-top">{row.ruleLabel}</td>
+                        <td className="px-3 py-2 align-top"><code>{row.ruleCode}</code></td>
+                        <td className="px-3 py-2 align-top">
+                          <strong className="block text-slate-900">{row.sourceLabel}</strong>
+                          <code className="text-[0.68rem] text-slate-500">{row.sourcePath}</code>
+                        </td>
+                        <td className="px-3 py-2 align-top">{row.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : null}
           <pre className="overflow-x-auto rounded-[1.25rem] bg-slate-950 p-4 text-xs leading-6 text-slate-100">{jsonModal?.content || ''}</pre>
         </div>
       </OverlayModal>

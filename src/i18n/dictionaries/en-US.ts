@@ -5361,6 +5361,15 @@ export const enUS: TranslationDictionary = {
 			productTechnicalLog: 'Product technical log',
 			cancelReason: 'Cancellation reason',
 		},
+		originTrace: {
+			summaryIntro: 'Friendly summary of the rules applied to each traced field. The full technical JSON remains below for audit.',
+			field: 'Field',
+			finalValue: 'Final value',
+			ruleName: 'Rule name',
+			ruleCode: 'Rule code',
+			technicalOrigin: 'Technical origin',
+			description: 'Description',
+		},
 		overview: {
 			order: 'Order',
 			amounts: 'Amounts',

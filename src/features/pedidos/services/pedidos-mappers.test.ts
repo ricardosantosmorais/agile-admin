@@ -87,4 +87,48 @@ describe('pedidos mappers', () => {
     expect(artifacts.priceMemory).toBe(JSON.stringify({ preco_venda: 10 }, null, 2))
     expect(artifacts.originTrace).toBe(JSON.stringify({ source: 'price_engine' }, null, 2))
   })
+
+  it('traduz a rastreabilidade tecnica do produto para linhas amigaveis', () => {
+    const artifacts = getPedidoProductTechnicalArtifacts({
+      metadata: {
+        origin_trace: {
+          fields: {
+            id_tabela_preco: {
+              value: 15,
+              rule: 'request_tabela_preco',
+              source_path: 'request.id_tabela_preco',
+            },
+            id_filial_estoque: {
+              value: true,
+              rule: 'fallback_filial_produto',
+              source_path: 'produto.id_filial_estoque',
+            },
+          },
+        },
+      },
+    })
+
+    expect(artifacts.originTraceSummary).toEqual([
+      {
+        fieldCode: 'id_tabela_preco',
+        fieldLabel: 'Tabela de preço',
+        value: '15',
+        ruleCode: 'request_tabela_preco',
+        ruleLabel: 'Tabela da requisição',
+        sourcePath: 'request.id_tabela_preco',
+        sourceLabel: 'Tabela de preço enviada na requisição',
+        description: 'A tabela de preço final do item coincidiu com a tabela enviada na requisição.',
+      },
+      {
+        fieldCode: 'id_filial_estoque',
+        fieldLabel: 'Filial de estoque',
+        value: 'true',
+        ruleCode: 'fallback_filial_produto',
+        ruleLabel: 'Uso da filial principal do produto',
+        sourcePath: 'produto.id_filial_estoque',
+        sourceLabel: 'Filial de estoque resolvida do produto',
+        description: 'A filial de estoque do item usou a própria filial principal do item.',
+      },
+    ])
+  })
 })

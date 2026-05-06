@@ -5115,6 +5115,15 @@ export const ptBR: TranslationDictionary = {
 			productTechnicalLog: 'Log técnico do produto',
 			cancelReason: 'Motivo do cancelamento',
 		},
+		originTrace: {
+			summaryIntro: 'Resumo explicativo das regras aplicadas a cada campo rastreado. O JSON técnico completo permanece abaixo para auditoria.',
+			field: 'Campo',
+			finalValue: 'Valor final',
+			ruleName: 'Nome da regra',
+			ruleCode: 'Código da regra',
+			technicalOrigin: 'Origem técnica',
+			description: 'Descrição',
+		},
 		overview: {
 			order: 'Pedido',
 			amounts: 'Valores',
