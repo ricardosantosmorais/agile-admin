@@ -5,7 +5,7 @@ Date range: 2026-03-24..2026-03-24
 
 | Date | Commit | Type | Disposition | Subject | Files |
 |---|---|---|---|---|---:|
-| 2026-03-24 | 99060e06c | new-feature-or-screen | compare-and-likely-migrate | feat: adiciona horarios por dia em excecoes e restricoes de produtos | 8 |
+| 2026-03-24 | 99060e06c | new-feature-or-screen | migrated | feat: adiciona horarios por dia em excecoes e restricoes de produtos | 8 |
 
 ## Detailed commits
 
@@ -13,7 +13,7 @@ Date range: 2026-03-24..2026-03-24
 
 - Date: 2026-03-24
 - Type: new-feature-or-screen
-- Disposition: compare-and-likely-migrate
+- Disposition: migrated
 - Files:
   - M assets/js/components/excecoes-produtos-wizard-form.js
   - M assets/js/components/restricoes-produtos-list.js

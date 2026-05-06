@@ -15,6 +15,13 @@ function generateNumericId() {
   return BigInt(`0x${randomBytes(8).toString('hex')}`).toString()
 }
 
+function normalizeWeekdayTime(value: unknown, fallback: string) {
+  const normalized = typeof value === 'string' ? value.trim() : ''
+  if (!normalized) return fallback
+  if (/^\d{2}:\d{2}$/.test(normalized)) return `${normalized}:00`
+  return normalized
+}
+
 function sanitizeRow(row: RestricaoProdutoApiRow, parentId: string, tenantId: string, index: number) {
   const next: Record<string, unknown> = {
     ...row,
@@ -49,10 +56,11 @@ function sanitizeRow(row: RestricaoProdutoApiRow, parentId: string, tenantId: st
     if (isActive) {
       const fromKey = `${key}_horario_de`
       const toKey = `${key}_horario_ate`
-      const fromValue = typeof next[fromKey] === 'string' ? next[fromKey] as string : ''
-      const toValue = typeof next[toKey] === 'string' ? next[toKey] as string : ''
-      next[fromKey] = fromValue?.trim() ? fromValue : '00:00:00'
-      next[toKey] = toValue?.trim() ? toValue : '23:59:00'
+      next[fromKey] = normalizeWeekdayTime(next[fromKey], '00:00:00')
+      next[toKey] = normalizeWeekdayTime(next[toKey], '23:59:00')
+    } else {
+      next[`${key}_horario_de`] = null
+      next[`${key}_horario_ate`] = null
     }
   }
 

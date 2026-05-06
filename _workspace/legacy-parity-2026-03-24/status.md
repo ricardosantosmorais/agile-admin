@@ -55,7 +55,9 @@ Base date: 2026-03-24
 - Deferred legacy points without current v2 surface are tracked in `_workspace/legacy-parity-2026-03-24/deferred.md`.
 - Twenty-third batch checked: `processos-relatorios`.
 - Downloads de processos de relatórios já estavam cobertos no v2 pelo tenant ativo por aba e download na mesma aba; a etapa adicionou cobertura explícita para a rota bloquear tenant divergente e retornar attachment válido.
-- Next step: continue with the next uncompleted inventory batch after `processos-relatorios`: `produtos-restricoes-excecoes`.
+- Twenty-fourth batch checked: `produtos-restricoes-excecoes`.
+- Restrições/Exceções x Produtos já tinham a UI e os mapeadores de dias/horários no v2; a etapa migrou a paridade faltante das bridges para normalizar horários `HH:MM` em `HH:MM:00` e limpar horários de dias inativos antes de salvar.
+- Next step: continue with the next uncompleted inventory batch: `cache-assets`.
 
 ## Completed batches
 
@@ -82,6 +84,7 @@ Base date: 2026-03-24
 - `integracoes-clientes-marketing`: migrated CFO tab/API key support in client integrations, added encrypted `cro_apikey` payload parity, aligned RD E-Commerce helper contrast to theme tokens, and updated i18n/docs/E2E coverage.
 - `navegacao-menu`: migrated master user-menu token parity through a protected shell route and copy row, with UI/route coverage; legacy billing upgrade/financial banners and app-store/cashback hardcoded ordering were recorded as not applicable to current v2 surfaces.
 - `processos-relatorios`: no production migration needed; active-tab tenant downloads and same-tab file download were already implemented in v2, and route coverage was added for tenant mismatch plus attachment response.
+- `produtos-restricoes-excecoes`: migrated weekday time bridge normalization for product restrictions and exceptions, preserving the already-present v2 wizard UI/mappers and adding route coverage.
 
 ## Known local noise excluded
 
