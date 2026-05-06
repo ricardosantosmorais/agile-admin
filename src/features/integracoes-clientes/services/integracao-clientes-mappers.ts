@@ -14,6 +14,7 @@ export type ClientesBranchRow = {
 
 export type ClientesValues = {
   cnpjaToken: string
+  croApiKey: string
   portalPedidos: string
   portalOrcamentos: string
   portalTitulos: string
@@ -22,6 +23,7 @@ export type ClientesValues = {
 
 export type ClientesMetadata = {
   cnpjaToken: ClientesFieldMeta
+  croApiKey: ClientesFieldMeta
   portalPedidos: ClientesFieldMeta
   portalOrcamentos: ClientesFieldMeta
   portalTitulos: ClientesFieldMeta
@@ -46,6 +48,7 @@ const EMPTY_META: ClientesFieldMeta = { updatedAt: '', updatedBy: '' }
 
 const EMPTY_VALUES: ClientesValues = {
   cnpjaToken: '',
+  croApiKey: '',
   portalPedidos: '',
   portalOrcamentos: '',
   portalTitulos: '',
@@ -88,6 +91,7 @@ export function createEmptyIntegracaoClientesRecord(): IntegracaoClientesRecord 
     values: { ...EMPTY_VALUES },
     metadata: {
       cnpjaToken: { ...EMPTY_META },
+      croApiKey: { ...EMPTY_META },
       portalPedidos: { ...EMPTY_META },
       portalOrcamentos: { ...EMPTY_META },
       portalTitulos: { ...EMPTY_META },
@@ -106,6 +110,7 @@ export function normalizeIntegracaoClientesRecord(payload: unknown): IntegracaoC
   const branches = asArray(branchesPayload.data).map((item) => asRecord(item))
 
   const cnpjaToken = getParameterByKey(parameters, 'cnpja_token')
+  const croApiKey = getParameterByKey(parameters, 'cro_apikey')
   const portalPedidos = getParameterByKey(parameters, 'portal_pedidos')
   const portalOrcamentos = getParameterByKey(parameters, 'portal_orcamentos')
   const portalTitulos = getParameterByKey(parameters, 'portal_titulos')
@@ -114,6 +119,7 @@ export function normalizeIntegracaoClientesRecord(payload: unknown): IntegracaoC
   return {
     values: {
       cnpjaToken: asString(cnpjaToken?.parametros).trim(),
+      croApiKey: asString(croApiKey?.parametros).trim(),
       portalPedidos: asString(portalPedidos?.parametros).trim(),
       portalOrcamentos: asString(portalOrcamentos?.parametros).trim(),
       portalTitulos: asString(portalTitulos?.parametros).trim(),
@@ -121,6 +127,7 @@ export function normalizeIntegracaoClientesRecord(payload: unknown): IntegracaoC
     },
     metadata: {
       cnpjaToken: extractFieldMeta(cnpjaToken),
+      croApiKey: extractFieldMeta(croApiKey),
       portalPedidos: extractFieldMeta(portalPedidos),
       portalOrcamentos: extractFieldMeta(portalOrcamentos),
       portalTitulos: extractFieldMeta(portalTitulos),
@@ -144,11 +151,13 @@ export function buildIntegracaoClientesSavePayload(
   branches: ClientesBranchRow[],
   options?: {
     includeCnpjaToken?: boolean
+    includeCroApiKey?: boolean
     unlockedBranchIds?: Set<string>
   },
 ): ClientesParameterPayload[] {
   const version = resolveTimestamp()
   const includeCnpjaToken = options?.includeCnpjaToken ?? true
+  const includeCroApiKey = options?.includeCroApiKey ?? true
   const unlockedBranchIds = options?.unlockedBranchIds ?? new Set<string>()
 
   const payload: ClientesParameterPayload[] = [
@@ -166,6 +175,16 @@ export function buildIntegracaoClientesSavePayload(
       parametros: values.cnpjaToken.trim(),
       integracao: 0,
       criptografado: values.cnpjaToken.trim().length > 0 ? 1 : 0,
+    })
+  }
+
+  if (includeCroApiKey) {
+    payload.push({
+      id_filial: null,
+      chave: 'cro_apikey',
+      parametros: values.croApiKey.trim(),
+      integracao: 0,
+      criptografado: values.croApiKey.trim().length > 0 ? 1 : 0,
     })
   }
 

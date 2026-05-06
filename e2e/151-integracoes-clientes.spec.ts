@@ -16,6 +16,7 @@ test.describe('Integrações > Clientes', () => {
 						parameters: {
 							data: [
 								{ chave: 'cnpja_token', parametros: 'token-cnpja', created_at: '2026-04-11 10:00:00', usuario: { nome: 'Admin Master' } },
+								{ chave: 'cro_apikey', parametros: 'token-cfo', created_at: '2026-04-11 10:00:30', usuario: { nome: 'Admin Master' } },
 								{ chave: 'portal_pedidos', parametros: '1', created_at: '2026-04-11 10:01:00', usuario: { nome: 'Admin Master' } },
 								{ chave: 'portal_orcamentos', parametros: '0' },
 								{ chave: 'portal_titulos', parametros: '1' },
@@ -50,6 +51,9 @@ test.describe('Integrações > Clientes', () => {
 		await waitForProtectedShell(page);
 		await expect(page).toHaveURL(/\/integracoes\/clientes(?:\?|$)/);
 		await expect(page.getByRole('button', { name: /cnpjá|cnpja/i })).toBeVisible();
+		await page.getByRole('button', { name: /^cfo$/i }).click();
+		await expect(page.getByText(/conselho federal de odontologia|federal dentistry council/i)).toBeVisible();
+		await expect(page.getByText(/numero_cro/i)).toBeVisible();
 
 		await page.getByRole('button', { name: /portal do cliente|client portal/i }).click();
 		await expect(page.getByText('Matriz')).toBeVisible();

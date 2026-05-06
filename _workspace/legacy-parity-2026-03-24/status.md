@@ -48,7 +48,9 @@ Base date: 2026-03-24
 - The legacy local admin log ignore entry is already covered by the v2 `.gitignore` because `*.log` is ignored globally.
 - Twentieth batch checked: `includes`.
 - Includes needed friendly product-origin trace parity in `Pedidos`: v2 now translates tracked fields, final values, rule names, rule codes, technical origins and descriptions while keeping the complete JSON below for audit.
-- Next step: continue with the next uncompleted inventory batch after `includes`: `integracoes-clientes-marketing`.
+- Twenty-first batch checked: `integracoes-clientes-marketing`.
+- Clientes/Marketing needed CFO API-key parity and RD E-Commerce dark-mode contrast parity: v2 now exposes a CFO tab in `Integrações > Clientes`, persists `cro_apikey` as encrypted tenant parameter and uses semantic theme text for the RD callback helper.
+- Next step: continue with the next uncompleted inventory batch after `integracoes-clientes-marketing`: `navegacao-menu`.
 
 ## Completed batches
 
@@ -72,6 +74,7 @@ Base date: 2026-03-24
 - `geral`: no migration needed; legacy local-port `8080` API routing is already covered in v2 by env-based API base URL resolution.
 - `.gitignore`: no migration needed; legacy `tmp/admin-local.log` ignore is already covered by the v2 `*.log` rule.
 - `includes`: migrated friendly product-origin trace summaries in the order detail technical modal, with rule/field/source catalog parity, i18n labels, docs and mapper coverage.
+- `integracoes-clientes-marketing`: migrated CFO tab/API key support in client integrations, added encrypted `cro_apikey` payload parity, aligned RD E-Commerce helper contrast to theme tokens, and updated i18n/docs/E2E coverage.
 
 ## Known local noise excluded
 

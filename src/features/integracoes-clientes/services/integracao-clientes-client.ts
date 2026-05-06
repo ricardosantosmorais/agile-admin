@@ -21,6 +21,7 @@ export const integracaoClientesClient = {
     branches: ClientesBranchRow[],
     options?: {
       includeCnpjaToken?: boolean
+      includeCroApiKey?: boolean
       unlockedBranchIds?: Set<string>
     },
   ) {

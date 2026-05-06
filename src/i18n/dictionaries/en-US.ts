@@ -875,6 +875,7 @@ export const enUS: TranslationDictionary = {
 		loading: 'Loading client integrations...',
 		tabs: {
 			cnpja: 'CNPJá',
+			cfo: 'CFO',
 			portal: 'Client Portal',
 		},
 		feedback: {
@@ -892,6 +893,12 @@ export const enUS: TranslationDictionary = {
 				title: 'Registration Data Query - CNPJá',
 				description: 'Integration settings with CNPJá for querying registration data at Receita Federal and Sintegra.',
 			},
+			cfo: {
+				title: 'CFO (Federal Dentistry Council)',
+				description: 'CFO API settings for querying dentistry professionals.',
+				instructionsTitle: 'CFO integration usage instructions',
+				instructions: 'Requires creating two mandatory fields in registration forms: numero_cro (title CRO Registration Number, integer type with size 5) and uf_cro (title CRO Registration State, UF selector field).',
+			},
 			portal: {
 				title: 'Client Portal',
 				description: 'Integration settings with the Client Portal module.',
@@ -901,6 +908,8 @@ export const enUS: TranslationDictionary = {
 		fields: {
 			token: 'Token',
 			tokenHelper: 'Token provided by CNPJá',
+			cfoApiKey: 'API Key',
+			cfoApiKeyHelper: 'CFO API access key',
 			portalOrders: 'Orders from Other Channels',
 			portalOrdersHelper: 'Indicates whether displaying orders from other sales channels is active in the Client Portal',
 			portalQuotes: 'Quotes',

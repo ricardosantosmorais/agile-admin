@@ -13,10 +13,12 @@ type UseIntegracaoClientesPageStateParams = {
 
 export function useIntegracaoClientesPageState({ initialRecord, values, setValues, branches, setBranches }: UseIntegracaoClientesPageStateParams) {
 	const [cnpjaTokenEditable, setCnpjaTokenEditable] = useState(false);
+	const [croApiKeyEditable, setCroApiKeyEditable] = useState(false);
 	const [unlockedBranchIds, setUnlockedBranchIds] = useState<Set<string>>(new Set());
 
 	const resetEditableState = useCallback((record: IntegracaoClientesRecord) => {
 		setCnpjaTokenEditable(!record.values.cnpjaToken);
+		setCroApiKeyEditable(!record.values.croApiKey);
 		setUnlockedBranchIds(new Set());
 	}, []);
 
@@ -69,6 +71,8 @@ export function useIntegracaoClientesPageState({ initialRecord, values, setValue
 	return {
 		cnpjaTokenEditable,
 		setCnpjaTokenEditable,
+		croApiKeyEditable,
+		setCroApiKeyEditable,
 		unlockedBranchIds,
 		hasChanges,
 		patchValues,

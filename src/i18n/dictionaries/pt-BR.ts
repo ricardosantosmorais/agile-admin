@@ -876,6 +876,7 @@ export const ptBR: TranslationDictionary = {
 		loading: 'Carregando integrações de clientes...',
 		tabs: {
 			cnpja: 'CNPJá',
+			cfo: 'CFO',
 			portal: 'Portal do Cliente',
 		},
 		feedback: {
@@ -893,6 +894,12 @@ export const ptBR: TranslationDictionary = {
 				title: 'Consulta de Dados Cadastrais - CNPJá',
 				description: 'Configurações de integração com a CNPJá para consulta de dados cadastrais na Receita Federal e Sintegra.',
 			},
+			cfo: {
+				title: 'CFO (Conselho Federal de Odontologia)',
+				description: 'Configurações da API do CFO para consulta de profissionais odontológicos.',
+				instructionsTitle: 'Instruções de uso da integração CFO',
+				instructions: 'Requer a criação de dois campos obrigatórios nos formulários de cadastro: numero_cro (título Número de Registro CRO, tipo inteiro com tamanho 5) e uf_cro (título UF Registro CRO, campo seletor de UF).',
+			},
 			portal: {
 				title: 'Portal do Cliente',
 				description: 'Configurações de integração com o módulo de Portal do Cliente.',
@@ -902,6 +909,8 @@ export const ptBR: TranslationDictionary = {
 		fields: {
 			token: 'Token',
 			tokenHelper: 'Token fornecido pelo CNPJá',
+			cfoApiKey: 'API Key',
+			cfoApiKeyHelper: 'Chave de acesso da API do CFO',
 			portalOrders: 'Pedidos de Outros Canais',
 			portalOrdersHelper: 'Indica se ficará ativa a exibição de pedidos de outros canais de venda no Portal do Cliente',
 			portalQuotes: 'Orçamentos',
