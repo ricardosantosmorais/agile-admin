@@ -85,4 +85,24 @@ describe('renovar-cache route', () => {
       }),
     }))
   })
+
+  it('prioriza o token da sessão ao limpar o cache direto no cluster', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(
+      JSON.stringify({ message: 'Cache renovado com sucesso.' }),
+      {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      },
+    ))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const response = await POST()
+
+    expect(response.status).toBe(200)
+    expect(fetchMock).toHaveBeenCalledWith('https://cluster.example/api/cache/clear', expect.objectContaining({
+      headers: expect.objectContaining({
+        Authorization: 'Bearer session-token',
+      }),
+    }))
+  })
 })

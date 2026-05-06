@@ -97,7 +97,7 @@ export async function POST() {
         Perfil: 'administrador',
         Empresa: currentTenantId,
         'X-Id-Empresa': currentTenantId,
-        Authorization: `Bearer ${platformToken || token}`,
+        Authorization: `Bearer ${token || platformToken}`,
       },
       cache: 'no-store',
     })

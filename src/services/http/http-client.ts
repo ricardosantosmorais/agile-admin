@@ -46,6 +46,32 @@ async function parseResponse(response: Response) {
 	return text ? { message: text } : null;
 }
 
+function getPayloadErrorCode(payload: unknown) {
+	if (typeof payload !== 'object' || payload === null) {
+		return '';
+	}
+
+	if ('code' in payload && typeof payload.code === 'string') {
+		return payload.code;
+	}
+
+	if (
+		'error' in payload
+		&& typeof payload.error === 'object'
+		&& payload.error !== null
+		&& 'code' in payload.error
+		&& typeof payload.error.code === 'string'
+	) {
+		return payload.error.code;
+	}
+
+	return '';
+}
+
+function isTenantContextInvalidResponse(status: number, payload: unknown) {
+	return status === 403 && getPayloadErrorCode(payload).toUpperCase() === 'TENANT_CONTEXT_INVALID';
+}
+
 function getRequestPath(input: RequestInfo | URL) {
 	if (typeof input === 'string') {
 		return input;
@@ -141,8 +167,14 @@ export async function httpClient<T>(input: RequestInfo | URL, init?: RequestInit
 			(typeof payload === 'object' && payload !== null && 'message' in payload && typeof payload.message === 'string' ? payload.message : null) ??
 			translateCurrentLocale('http.requestError', 'Não foi possível concluir a requisição.');
 
-		if (response.status === 401 && shouldNotifySessionLoss(path)) {
-			notifySessionLost(inferSessionLostReason(response.status, message), message, response.status, path);
+		const isTenantContextInvalid = isTenantContextInvalidResponse(response.status, payload);
+		if ((response.status === 401 || isTenantContextInvalid) && shouldNotifySessionLoss(path)) {
+			notifySessionLost(
+				isTenantContextInvalid ? 'tenant_context_invalid' : inferSessionLostReason(response.status, message),
+				message,
+				response.status,
+				path,
+			);
 		}
 
 		captureOperationalClientError({

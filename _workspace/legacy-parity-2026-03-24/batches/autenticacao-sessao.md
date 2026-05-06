@@ -5,9 +5,9 @@ Date range: 2026-03-30..2026-04-13
 
 | Date | Commit | Type | Disposition | Subject | Files |
 |---|---|---|---|---|---:|
-| 2026-03-30 | adc91efd3 | cache-or-assets | triage-needed | Usa token da sessao no limpar cache | 1 |
-| 2026-04-01 | 65d925106 | behavior-change | triage-needed | Remoção do Console log para exibição do token | 1 |
-| 2026-04-13 | 5c4500027 | ui-flow-or-visual | triage-needed | fix: exibir modal de desconexao no erro do ui-bootstrap | 1 |
+| 2026-03-30 | adc91efd3 | cache-or-assets | migrated | Usa token da sessao no limpar cache | 1 |
+| 2026-04-01 | 65d925106 | behavior-change | already-absent-v2 | Remoção do Console log para exibição do token | 1 |
+| 2026-04-13 | 5c4500027 | ui-flow-or-visual | migrated | fix: exibir modal de desconexao no erro do ui-bootstrap | 1 |
 
 ## Detailed commits
 
@@ -15,7 +15,7 @@ Date range: 2026-03-30..2026-04-13
 
 - Date: 2026-03-30
 - Type: cache-or-assets
-- Disposition: triage-needed
+- Disposition: migrated
 - Files:
   - M controllers/api-controller.php
 
@@ -23,7 +23,7 @@ Date range: 2026-03-30..2026-04-13
 
 - Date: 2026-04-01
 - Type: behavior-change
-- Disposition: triage-needed
+- Disposition: already-absent-v2
 - Files:
   - M includes/firebase-scripts.php
 
@@ -31,6 +31,6 @@ Date range: 2026-03-30..2026-04-13
 
 - Date: 2026-04-13
 - Type: ui-flow-or-visual
-- Disposition: triage-needed
+- Disposition: migrated
 - Files:
   - M assets/js/scripts.js

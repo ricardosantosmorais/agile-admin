@@ -59,7 +59,9 @@ Base date: 2026-03-24
 - Restrições/Exceções x Produtos já tinham a UI e os mapeadores de dias/horários no v2; a etapa migrou a paridade faltante das bridges para normalizar horários `HH:MM` em `HH:MM:00` e limpar horários de dias inativos antes de salvar.
 - Twenty-fifth batch checked: `cache-assets`.
 - Cache/assets não precisou de migração: todos os 26 commits alteravam apenas `boot.php` para bump/restauração de `ASSETS_VERSION`, um mecanismo de cache-busting exclusivo do legado PHP e já substituído pelo build do Next.js no v2.
-- Next step: continue with the next uncompleted inventory batch: `autenticacao-sessao`.
+- Twenty-sixth batch checked: `autenticacao-sessao`.
+- Autenticação/sessão precisou de paridade para limpeza de cache com token da sessão e para exibir o modal global de sessão encerrada em `403/TENANT_CONTEXT_INVALID`. A remoção do log de token Firebase do legado foi registrada como já ausente no v2, sem código equivalente a migrar.
+- Next step: continue with the next uncompleted inventory batch: `components`.
 
 ## Completed batches
 
@@ -88,6 +90,7 @@ Base date: 2026-03-24
 - `processos-relatorios`: no production migration needed; active-tab tenant downloads and same-tab file download were already implemented in v2, and route coverage was added for tenant mismatch plus attachment response.
 - `produtos-restricoes-excecoes`: migrated weekday time bridge normalization for product restrictions and exceptions, preserving the already-present v2 wizard UI/mappers and adding route coverage.
 - `cache-assets`: no migration needed; legacy-only `ASSETS_VERSION` bumps in `boot.php` are not applicable to the Next.js asset pipeline.
+- `autenticacao-sessao`: migrated session-token preference in remote cache clear and `403/TENANT_CONTEXT_INVALID` session-loss modal handling; Firebase token console logging was already absent in v2.
 
 ## Known local noise excluded
 

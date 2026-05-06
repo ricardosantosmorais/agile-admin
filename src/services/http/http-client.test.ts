@@ -41,6 +41,37 @@ describe('http-client session loss notifications', () => {
     expect(event.type).toBe(SESSION_LOST_EVENT)
   })
 
+  it('dispatches session lost for invalid tenant context responses', async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({
+      message: 'Contexto da sessao invalido.',
+      error: { code: 'TENANT_CONTEXT_INVALID' },
+    }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    }))
+
+    await expect(httpClient('/api/dashboard', { method: 'GET' })).rejects.toBeInstanceOf(HttpError)
+    expect(dispatchEventSpy).toHaveBeenCalledTimes(1)
+
+    const event = dispatchEventSpy.mock.calls[0][0] as CustomEvent
+    expect(event.type).toBe(SESSION_LOST_EVENT)
+    expect(event.detail).toEqual(expect.objectContaining({
+      reason: 'tenant_context_invalid',
+      status: 403,
+      path: '/api/dashboard',
+    }))
+  })
+
+  it('does not dispatch session lost for regular forbidden responses', async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ message: 'Acesso negado.' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    }))
+
+    await expect(httpClient('/api/dashboard', { method: 'GET' })).rejects.toBeInstanceOf(HttpError)
+    expect(dispatchEventSpy).not.toHaveBeenCalled()
+  })
+
   it('blocks protected requests locally while the session is locked in the client', async () => {
     setSessionClientPhase('ended')
 
