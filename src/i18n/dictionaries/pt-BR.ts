@@ -6996,6 +6996,13 @@ export const ptBR: TranslationDictionary = {
 		module: 'Módulo',
 		back: 'Voltar para Agile Store',
 		benefits: 'Principais ganhos',
+		pagination: 'Paginação da Agile Store',
+		videos: 'Vídeos',
+		video: 'Vídeo',
+		gallery: 'Galeria',
+		materials: 'Materiais',
+		material: 'Material',
+		history: 'Histórico',
 		actionSuccess: 'Ação enviada com sucesso.',
 		admin: {
 			eyebrow: 'Retaguarda',

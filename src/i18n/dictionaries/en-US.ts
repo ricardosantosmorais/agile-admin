@@ -6988,6 +6988,13 @@ export const enUS: TranslationDictionary = {
 		module: 'Module',
 		back: 'Back to Agile Store',
 		benefits: 'Key benefits',
+		pagination: 'Agile Store pagination',
+		videos: 'Videos',
+		video: 'Video',
+		gallery: 'Gallery',
+		materials: 'Materials',
+		material: 'Material',
+		history: 'History',
 		actionSuccess: 'Action sent successfully.',
 		admin: {
 			eyebrow: 'Backoffice',

@@ -70,6 +70,7 @@ export function AgileStoreListPage() {
   const [search, setSearch] = useState('')
   const [type, setType] = useState('')
   const [status, setStatus] = useState('')
+  const [page, setPage] = useState(1)
 
   useEffect(() => {
     let mounted = true
@@ -77,7 +78,7 @@ export function AgileStoreListPage() {
       setIsLoading(true)
       setError('')
       void agileStoreClient
-        .list({ page: 1, perpage: 12, q: search, tipo: type, status })
+        .list({ page, perpage: 12, q: search, tipo: type, status })
         .then((response) => {
           if (mounted) setData(response)
         })
@@ -93,9 +94,25 @@ export function AgileStoreListPage() {
       mounted = false
       window.clearTimeout(timer)
     }
-  }, [search, status, t, type])
+  }, [page, search, status, t, type])
 
   const types = useMemo(() => data?.filters.types ?? [], [data])
+  const pages = data?.meta.pages ?? 1
+
+  function updateSearch(value: string) {
+    setSearch(value)
+    setPage(1)
+  }
+
+  function updateType(value: string) {
+    setType(value)
+    setPage(1)
+  }
+
+  function updateStatus(value: string) {
+    setStatus(value)
+    setPage(1)
+  }
 
   return (
     <main className="space-y-5">
@@ -122,9 +139,9 @@ export function AgileStoreListPage() {
       <section className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_260px]">
         <label className="app-control flex items-center gap-2 rounded-2xl px-3 py-2">
           <Search className="h-4 w-4 text-slate-400" />
-          <input className="w-full border-0 bg-transparent text-sm outline-none" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t('agileStore.searchPlaceholder', 'Buscar por nome, tipo ou benefício')} />
+          <input className="w-full border-0 bg-transparent text-sm outline-none" value={search} onChange={(event) => updateSearch(event.target.value)} placeholder={t('agileStore.searchPlaceholder', 'Buscar por nome, tipo ou benefício')} />
         </label>
-        <select className="app-control rounded-2xl px-3 py-2 text-sm" value={type} onChange={(event) => setType(event.target.value)}>
+        <select className="app-control rounded-2xl px-3 py-2 text-sm" value={type} onChange={(event) => updateType(event.target.value)}>
           <option value="">{t('agileStore.allTypes', 'Todos os tipos')}</option>
           {types.map((item) => <option key={item} value={item}>{item}</option>)}
         </select>
@@ -134,7 +151,7 @@ export function AgileStoreListPage() {
             ['contratados', t('agileStore.onlyContracted', 'Contratados')],
             ['disponiveis', t('agileStore.available', 'Disponíveis')],
           ].map(([value, label]) => (
-            <button key={value} type="button" onClick={() => setStatus(value)} className={['flex-1 rounded-xl px-3 py-2 text-xs font-bold transition', status === value ? 'bg-accent text-white' : 'text-slate-500 hover:text-slate-950'].join(' ')}>
+            <button key={value} type="button" onClick={() => updateStatus(value)} className={['flex-1 rounded-xl px-3 py-2 text-xs font-bold transition', status === value ? 'bg-accent text-white' : 'text-slate-500 hover:text-slate-950'].join(' ')}>
               {label}
             </button>
           ))}
@@ -148,6 +165,23 @@ export function AgileStoreListPage() {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {data?.items.map((module) => <ModuleCard key={module.id} module={module} />)}
       </section>
+
+      {pages > 1 ? (
+        <nav className="flex flex-wrap items-center justify-center gap-2" aria-label={t('agileStore.pagination', 'Paginação da Agile Store')}>
+          {Array.from({ length: pages }, (_, index) => index + 1).map((item) => (
+            <button
+              key={item}
+              type="button"
+              aria-label={`Página ${item}`}
+              aria-current={page === item ? 'page' : undefined}
+              onClick={() => setPage(item)}
+              className={['h-10 min-w-10 rounded-xl border px-3 text-sm font-bold transition', page === item ? 'border-accent bg-accent text-white' : 'border-line bg-white text-slate-600 hover:text-slate-950'].join(' ')}
+            >
+              {item}
+            </button>
+          ))}
+        </nav>
+      ) : null}
     </main>
   )
 }

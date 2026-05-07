@@ -96,6 +96,54 @@ describe('agile-store pages', () => {
     expect(screen.getByRole('link', { name: /SAC/i })).toHaveAttribute('href', '/agile-store/mod_sac')
   })
 
+  it('renders pagination controls and loads the selected Agile Store page', async () => {
+    listMock.mockResolvedValue({
+      items: [moduleFixture],
+      summary: { totalModules: 25, activeContracts: 0 },
+      filters: { types: ['Atendimento'] },
+      meta: { page: 1, perPage: 12, total: 25, pages: 3 },
+    })
+
+    render(<AgileStoreListPage />)
+
+    expect(await screen.findByRole('heading', { name: 'SAC' })).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Página 2' }))
+
+    await waitFor(() => expect(listMock).toHaveBeenLastCalledWith({ page: 2, perpage: 12, q: '', tipo: '', status: '' }))
+  })
+
+  it('renders detail media, history and visible action restrictions from the legacy detail surface', async () => {
+    detailMock.mockResolvedValue({
+      ...moduleFixture,
+      actions: {
+        contratar: {
+          permitido: false,
+          message: 'Disponível apenas para empresas operando.',
+        },
+      },
+      media: [
+        { type: 'video', url: 'https://example.com/video', title: 'Demonstração', description: 'Fluxo completo' },
+        { type: 'screenshot', url: 'https://example.com/image.png', title: 'Painel do SAC', description: 'Visão geral' },
+        { type: 'manual', url: 'https://example.com/manual.pdf', title: 'Manual', description: 'Guia de uso' },
+      ],
+      history: [
+        { id: 'hist-1', action: 'contratar', status: 'falha', createdAt: '2026-05-07 10:00:00', message: 'Falha ao executar script.' },
+      ],
+    })
+
+    render(<AgileStoreDetailPage moduleId="mod_sac" permissions={{ canContract: true, canCancel: true }} />)
+
+    expect(await screen.findByRole('heading', { name: 'SAC' })).toBeInTheDocument()
+    expect(screen.getByText('Disponível apenas para empresas operando.')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Vídeos' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Demonstração/i })).toHaveAttribute('href', 'https://example.com/video')
+    expect(screen.getByRole('img', { name: 'Painel do SAC' })).toHaveAttribute('src', 'https://example.com/image.png')
+    expect(screen.getByRole('link', { name: /Manual/i })).toHaveAttribute('href', 'https://example.com/manual.pdf')
+    expect(screen.getByRole('heading', { name: 'Histórico' })).toBeInTheDocument()
+    expect(screen.getByText('Falha ao executar script.')).toBeInTheDocument()
+  })
+
   it('renders a blocked action message in detail instead of calling the API', async () => {
     detailMock.mockResolvedValue({
       ...moduleFixture,
@@ -116,7 +164,8 @@ describe('agile-store pages', () => {
     expect(screen.getByText('Disponivel apenas para empresas operando.')).toBeInTheDocument()
   })
 
-  it('runs contract action when enabled', async () => {
+  it('confirms before running contract action when enabled', async () => {
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
     detailMock.mockResolvedValue(moduleFixture)
     actionMock.mockResolvedValue({ success: true })
 
@@ -125,7 +174,9 @@ describe('agile-store pages', () => {
     expect(await screen.findByRole('heading', { name: 'SAC' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Contratar módulo' }))
 
+    expect(confirmSpy).toHaveBeenCalledWith('Confirme a contratação deste módulo para a empresa atual.')
     await waitFor(() => expect(actionMock).toHaveBeenCalledWith('mod_sac', 'contract'))
+    confirmSpy.mockRestore()
   })
 
   it('renders the Agile Store admin backoffice and runs billing actions', async () => {

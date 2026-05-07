@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, CheckCircle2, RefreshCcw, Store, XCircle } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, FileText, ImageIcon, Lock, PlayCircle, RefreshCcw, Store, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { agileStoreClient } from '@/src/features/agile-store/services/agile-store-client'
@@ -26,6 +26,30 @@ function actionLabel(action: AgileStoreAction) {
     cancel: 'Descontratar módulo',
     retry: 'Reprocessar solicitação',
   }[action]
+}
+
+function actionConfirmation(action: AgileStoreAction) {
+  return {
+    contract: 'Confirme a contratação deste módulo para a empresa atual.',
+    cancel: 'Confirme o cancelamento deste módulo para a empresa atual.',
+    retry: 'A última ação com falha será executada novamente para esta empresa.',
+  }[action]
+}
+
+function mediaGroup(mediaType: string) {
+  const type = mediaType.toLowerCase()
+  if (type.includes('video')) return 'video'
+  if (type.includes('screenshot') || type.includes('imagem') || type.includes('image') || type.includes('foto')) return 'screenshot'
+  return 'material'
+}
+
+function historyTitle(action: string) {
+  const titles: Record<string, string> = {
+    contratar: 'Contratação',
+    descontratar: 'Descontratação',
+    reprocessar: 'Reprocessamento',
+  }
+  return titles[action] ?? (action || 'Movimento')
 }
 
 function ActionIcon({ action }: { action: AgileStoreAction }) {
@@ -80,7 +104,10 @@ export function AgileStoreDetailPage({ moduleId, permissions }: { moduleId: stri
     const action = actionForStatus(module.contractStatus)
     const actionStatus = getAgileStoreActionStatus(module, action, resolvedPermissions)
     if (!actionStatus.enabled) {
-      setActionMessage(actionStatus.message)
+      setActionMessage('')
+      return
+    }
+    if (!window.confirm(actionConfirmation(action))) {
       return
     }
 
@@ -108,6 +135,10 @@ export function AgileStoreDetailPage({ moduleId, permissions }: { moduleId: stri
 
   const status = getAgileStoreStatusInfo(module.contractStatus)
   const action = actionForStatus(module.contractStatus)
+  const actionStatus = getAgileStoreActionStatus(module, action, resolvedPermissions)
+  const videos = module.media.filter((item) => mediaGroup(item.type) === 'video')
+  const screenshots = module.media.filter((item) => mediaGroup(item.type) === 'screenshot')
+  const materials = module.media.filter((item) => mediaGroup(item.type) === 'material')
 
   return (
     <main className="space-y-5">
@@ -140,6 +171,12 @@ export function AgileStoreDetailPage({ moduleId, permissions }: { moduleId: stri
             <p className="text-sm font-semibold text-slate-500">{module.billingCycle === 'mensal' ? 'por mês' : module.billingCycle}</p>
           </div>
           {module.trial.available && module.trial.days > 0 ? <p className="mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm font-bold text-amber-700">{module.trial.days} dias grátis</p> : null}
+          {!actionStatus.enabled ? (
+            <div className="mt-4 flex gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
+              <Lock className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>{actionStatus.message}</span>
+            </div>
+          ) : null}
           <button
             type="button"
             onClick={() => void runAction()}
@@ -158,6 +195,80 @@ export function AgileStoreDetailPage({ moduleId, permissions }: { moduleId: stri
           <h2 className="text-lg font-extrabold text-slate-950">{t('agileStore.benefits', 'Principais ganhos')}</h2>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {module.benefits.map((benefit) => <div key={benefit} className="rounded-2xl border border-line bg-surface px-4 py-3 text-sm font-semibold text-slate-700">{benefit}</div>)}
+          </div>
+        </section>
+      ) : null}
+
+      {videos.length ? (
+        <section className="app-shell-card-modern rounded-[1.6rem] p-5">
+          <h2 className="text-lg font-extrabold text-slate-950">{t('agileStore.videos', 'Vídeos')}</h2>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {videos.map((item) => (
+              <a key={item.url} href={item.url} target="_blank" rel="noopener noreferrer" className="flex gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-accent/40 hover:text-slate-950">
+                <PlayCircle className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+                <span>
+                  <strong className="block text-slate-950">{item.title || t('agileStore.video', 'Vídeo')}</strong>
+                  {item.description ? <span className="mt-1 block text-xs font-medium text-muted">{item.description}</span> : null}
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {screenshots.length ? (
+        <section className="app-shell-card-modern rounded-[1.6rem] p-5">
+          <h2 className="text-lg font-extrabold text-slate-950">{t('agileStore.gallery', 'Galeria')}</h2>
+          <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {screenshots.map((item) => (
+              <figure key={item.url} className="overflow-hidden rounded-2xl border border-line bg-surface">
+                <a href={item.url} target="_blank" rel="noopener noreferrer" className="block">
+                  <img src={item.url} alt={item.title || module.name} className="aspect-video w-full object-cover" />
+                </a>
+                {(item.title || item.description) ? (
+                  <figcaption className="px-4 py-3 text-sm">
+                    {item.title ? <strong className="block text-slate-950">{item.title}</strong> : null}
+                    {item.description ? <span className="mt-1 block text-xs font-medium text-muted">{item.description}</span> : null}
+                  </figcaption>
+                ) : null}
+              </figure>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {materials.length ? (
+        <section className="app-shell-card-modern rounded-[1.6rem] p-5">
+          <h2 className="text-lg font-extrabold text-slate-950">{t('agileStore.materials', 'Materiais')}</h2>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {materials.map((item) => (
+              <a key={item.url} href={item.url} target="_blank" rel="noopener noreferrer" className="flex gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-accent/40 hover:text-slate-950">
+                <FileText className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+                <span>
+                  <strong className="block text-slate-950">{item.title || t('agileStore.material', 'Material')}</strong>
+                  {item.description ? <span className="mt-1 block text-xs font-medium text-muted">{item.description}</span> : null}
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {module.history.length ? (
+        <section className="app-shell-card-modern rounded-[1.6rem] p-5">
+          <h2 className="text-lg font-extrabold text-slate-950">{t('agileStore.history', 'Histórico')}</h2>
+          <div className="mt-4 space-y-3">
+            {module.history.map((item) => (
+              <div key={item.id || `${item.action}-${item.createdAt}`} className="flex gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-slate-700">
+                <ImageIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+                <div>
+                  <strong className="text-slate-950">{historyTitle(item.action)}</strong>
+                  {item.status ? <span className="ml-2 rounded-full bg-white px-2 py-0.5 text-xs font-bold text-slate-600">{item.status}</span> : null}
+                  {item.message ? <p className="mt-1 font-medium">{item.message}</p> : null}
+                  {item.createdAt ? <p className="mt-1 text-xs font-medium text-muted">{item.createdAt}</p> : null}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       ) : null}
