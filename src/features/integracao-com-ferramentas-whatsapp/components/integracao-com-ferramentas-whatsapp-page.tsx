@@ -17,7 +17,6 @@ import {
 	Sparkles,
 	Trash2,
 	Webhook,
-	X,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -242,7 +241,7 @@ export function IntegracaoComFerramentasWhatsappPage() {
 	const canOpen = isRootAgileecommerceAdmin(session)
 
 	const accountReference = providerForm?.account_reference || 'whatsapp-corporativo'
-	const templates = setup?.templates || []
+	const templates = useMemo(() => setup?.templates || [], [setup?.templates])
 	const signupConfig = setup?.signup_config || {}
 	const embeddedSignup = setup?.embedded_signup || {}
 	const providerMetadata = typeof setup?.provider_account?.metadata_json === 'object' && setup?.provider_account?.metadata_json !== null ? setup.provider_account.metadata_json as Record<string, unknown> : {}

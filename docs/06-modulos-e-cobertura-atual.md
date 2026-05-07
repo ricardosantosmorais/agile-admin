@@ -160,13 +160,16 @@ ObservaÃ§Ã£o:
 
 ## ObservaÃ§Ãµes atuais de cobertura
 
-- `Dashboard` carrega fases e grÃ¡ficos sob demanda, mantendo a carga completa apenas na exportaÃ§Ã£o de PDF.
+- `Dashboard` carrega fases e gráficos sob demanda, controla requisições duplicadas/obsoletas por ciclo e mantém a carga completa apenas na exportação de PDF.
 - `Cadastros > Componentes` possui listagem, formulario em abas, upload para CDN publica de componentes, editor JSON e aba de campos com modal, opcoes personalizadas, exclusao e reordenacao.
+- `Cadastros > Componentes`, `Componentes Campos` e `Areas de Pagina` invalidam o cache completo da empresa ativa apos gravacao, exclusao e reordenacao bem-sucedidas, alinhando o efeito operacional do legado.
 - `Cadastros > E-mails Payloads` possui CRUD linear v2 com listagem, filtros, formulario em linhas e editor JSON para o payload.
-- `Cadastros > Apps` possui listagem v2 com acoes de compilacao, publicacao Android/iOS e logs; formulario em linhas com arquivos privados S3 por empresa; e bridges server-side para sincronizar `config/clients.json` e disparar GitHub Actions sem expor token no client.
+- `Cadastros > Apps` possui listagem v2 com acoes de compilacao, publicacao Android/iOS e logs; formulario em linhas com placeholders/defaults dos textos do app, arquivos privados S3 por empresa; e bridges server-side para sincronizar `config/clients.json` e disparar GitHub Actions sem expor token no client.
 - `Notificacoes` do painel possui rota v2 em `/notificacoes-painel`, com listagem server-side, filtros do legado, formulario em abas, vinculo por empresa, pre-visualizacao, duplicacao, publicacao e modal de usuarios visualizadores.
 - `Cadastros > Categorias de Tarefas`, `Tarefas` e `Grupos de Relatorios` possuem CRUDs v2 com bridges dedicadas, formularios em linhas e lookups lazy para fases, categorias e empresas quando aplicavel.
 - `Cadastros > Relatorios v2` possui rota de cadastro separada da execucao operacional, com dados gerais, editor SQL executavel e mapeamento de campos da query.
+- `Filiais` cobre os complementos do legado para filial selecionavel, tabela de preco, variacao, distancia maxima e UFs de excecao/restricao, com normalizacao antes de salvar.
+- `Grupos de filiais` cobre os lookups complementares de filial NF e tabela de preco, alem da filial padrao.
 - `ConfiguraÃ§Ãµes > Clientes` lÃª e grava parÃ¢metros do tenant direto em `empresas/parametros`, seguindo o contrato do legado.
 - `ConfiguraÃ§Ãµes > Entregas` usa o mesmo contrato de parÃ¢metros e complementa o carregamento com `formas_entrega` para o campo padrÃ£o.
 - `ConfiguraÃ§Ãµes > Geral` combina `empresas/parametros`, `configuracoes_empresa` e atualizaÃ§Ã£o parcial de `empresas` para os campos estruturais do tenant.
@@ -199,6 +202,7 @@ ObservaÃ§Ã£o:
   - resultado em tabela ou JSON;
   - exportaÃ§Ã£o e cÃ³pia;
   - restore local do workspace por usuÃ¡rio e tenant no navegador.
+  - execucao server-side sempre pelo `PainelB2BApi`, inclusive para fonte `ERP`, acompanhando o ajuste atual do legado.
 - `Ferramentas > HTTP Client` jÃ¡ possui:
   - abas de requisiÃ§Ã£o;
   - endpoint por catÃ¡logo da API ou URL custom;
@@ -226,9 +230,11 @@ ObservaÃ§Ã£o:
   - `Cadastros > Parâmetros Grupo` agora já possui CRUD próprio no v2 em `/integracao-com-erp/cadastros/parametros-grupo`, com listagem server-side, formulário linear e bridge root-only fiel ao contrato do legado;
   - `Cadastros > Parâmetros Cadastro` agora já possui CRUD próprio no v2 em `/integracao-com-erp/cadastros/parametros-cadastro`, com lookups lazy para `Parâmetros Grupo` e `Templates`, regras condicionais por `tipo_entrada` e bridge root-only fiel ao contrato do legado;
   - `Cadastros > Queries` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/queries`, com listagem server-side, formulário em abas, editor SQL Monaco, execução contra integradores ativos e aba de mapeamento em edição;
-  - `Cadastros > Scripts` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/scripts`, com listagem server-side e formulário direto com editor Monaco cuja linguagem acompanha o select do legado;
+  - `Cadastros > Scripts` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/scripts`, com listagem server-side, formulário direto com editor Monaco cuja linguagem acompanha o select do legado e decodificação de entidades HTML ao carregar scripts legados;
   - `Cadastros > Endpoints` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/endpoints`, com listagem server-side, campos condicionais por `tipo_retorno` e aba de perfis em edição;
+  - `Cadastros > Serviços` mantém paridade do modo `dataset_consolidado` do legado, exibindo campos de mapeamento consolidado apenas para `endpoint_gateway`, limpando payload obsoleto fora desse modo e preservando o modal operacional de log com copiar conteúdo e download;
   - páginas diretas já disponíveis no v2 para `Parâmetros`, `Imagens`, `API`, `Banco de Dados`, `Instalação do Integrador`, `Dashboard ERP`, `Rotinas Integradas`, `Serviços` e `Serviços com Falha`;
+  - `Integrações > Logística > Frenet` preserva somente os campos visíveis do legado atual, ocultando `Token Parceiro` e `Enviar apenas pedidos com nota fiscal` enquanto mantém o payload compatível;
   - bridges dedicadas em `app/api/integracoes/*` para todos os módulos do menu;
   - bridge dedicada em `app/api/integracao-com-erp/*` para configuração e leitura operacional do dashboard ERP;
   - `Gateways de Pagamento` com listagem, formulário novo, edição por id e regras condicionais do legado reaproveitadas no CRUD do v2;
@@ -245,7 +251,12 @@ ObservaÃ§Ã£o:
 - `ManutenÃ§Ã£o > Campos de formulÃ¡rios` jÃ¡ possui:
   - listagem server-side com filtros por `id`, `id_formulario`, `codigo`, `titulo`, `tipo`, `protegido` e `ativo`;
   - criaÃ§Ã£o e ediÃ§Ã£o com reaproveitamento da base CRUD, incluindo serializaÃ§Ã£o para campos opcionais e dependentes do tipo do campo;
-  - bridges dedicadas via `app/api/formularios-campos` e `app/api/formularios`, sem fallback para `/legacy/...`.
+  - bridges dedicadas via `app/api/formularios-campos` e `app/api/formularios`, sem fallback para `/legacy/...`;
+  - invalidação segmentada de cache após gravação, exclusão e reordenação bem-sucedidas, alinhada aos serviços `Formulario` e `FormularioCampo` do legado.
+- `Consultas > Envios de Formulários` já possui:
+  - listagem e detalhe com resolução de pessoa por `cliente` ou `contato`, seguindo a prioridade de nome e documento do legado;
+  - filtro de cliente expandido para pesquisar também contatos;
+  - exportação com `data_envio`, `cnpj_cpf`, `nome_fantasia` e valores enviados por campo.
 - `ManutenÃ§Ã£o > Logs` jÃ¡ possui:
   - listagem server-side com filtros por `id_registro`, `mÃ³dulo`, `usuÃ¡rio`, perÃ­odo e `aÃ§Ã£o`;
   - modal de detalhe por registro com dados do evento e snapshots JSON anterior/novo;
@@ -360,6 +371,10 @@ Continuam como pÃ¡ginas prÃ³prias, com mais regra de negÃ³cio:
 - `Topbar` com teste unitÃ¡rio para identificaÃ§Ã£o do tenant master e carregamento do painel de notificaÃ§Ãµes.
 - `Pedidos` com teste unitÃ¡rio das aÃ§Ãµes operacionais e E2E cobrindo listagem, detalhe e abertura de todas as abas principais.
 - `ConfiguraÃ§Ãµes` com teste de integraÃ§Ã£o validando o estado disabled/enabled do botÃ£o `Salvar` conforme o dirty state.
+- `Configurações > Vendedores` com teste unitário para payload da Área Representante V2 e teste da bridge de `Vendedores` cobrindo bloqueio por cotas indisponíveis.
+- `Contatos` com testes de mapper e bridge cobrindo edição administrativa, normalização de payload e bloqueio de contatos internalizados.
+- `Controllers` com testes de bridge cobrindo Editor SQL no `PainelB2BApi`, invalidacao de cache completo em Componentes/Areas de Pagina e observabilidade de falha na renovacao de cache remoto.
+- `Dashboard` com testes do coordenador de requisições e do hook sequenciado cobrindo deduplicação, abort de ciclos obsoletos e propagação de `AbortSignal`.
 - `Templates de E-mails` com teste de componente cobrindo a aba `Editor`, o carregamento de variÃ¡veis e a abertura da prÃ©-visualizaÃ§Ã£o.
 - `Clientes` com testes do controller da listagem e do modal de usuÃ¡rios vinculados.
 - `Cadastros ERP > Gateways`, `Gateway Endpoints`, `Interfaces de Consulta`, `Acoes` e `Servicos` com testes unitarios de mapeadores, payloads e filtros usados pelas bridges v2.

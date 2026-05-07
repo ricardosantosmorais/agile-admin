@@ -1,49 +1,53 @@
-﻿# 40. MÃ³dulo ConfiguraÃ§Ãµes > Pedidos, PreÃ§os, Produtos e Vendedores
+# 40. Módulo Configurações > Pedidos, Preços, Produtos e Vendedores
 
 ## Objetivo
-Migrar os formulÃ¡rios diretos de parÃ¢metros restantes do grupo `ConfiguraÃ§Ãµes`, mantendo o contrato do legado baseado em `empresas/parametros`.
+Migrar os formulários diretos de parâmetros restantes do grupo `Configurações`, mantendo o contrato do legado baseado em `empresas/parametros`.
 
 ## Escopo desta entrega
-- `ConfiguraÃ§Ãµes > Pedidos`
-- `ConfiguraÃ§Ãµes > PreÃ§os`
-- `ConfiguraÃ§Ãµes > Produtos`
-- `ConfiguraÃ§Ãµes > Vendedores`
+- `Configurações > Pedidos`
+- `Configurações > Preços`
+- `Configurações > Produtos`
+- `Configurações > Vendedores`
 
-## PadrÃ£o adotado
-- formulÃ¡rio direto, sem listagem intermediÃ¡ria;
-- leitura de parÃ¢metros em `empresas/parametros`;
+## Padrão adotado
+- formulário direto, sem listagem intermediária;
+- leitura de parâmetros em `empresas/parametros`;
 - envio parcial apenas com campos alterados;
-- botÃ£o `Salvar` habilitado sÃ³ quando houver mudanÃ§a;
-- feedback visual de loading no botÃ£o de salvar;
-- cards por seÃ§Ã£o, no mesmo padrÃ£o dos demais itens jÃ¡ migrados de `ConfiguraÃ§Ãµes`.
+- botão `Salvar` habilitado só quando houver mudança;
+- feedback visual de loading no botão de salvar;
+- cards por seção, no mesmo padrão dos demais itens já migrados de `Configurações`.
 
 ## Particularidades
 
 ### Pedidos
-- concentra regras de checkout, pagamento, split e experiÃªncia;
-- mantÃ©m os enums operacionais do legado, como atualizaÃ§Ã£o de carrinho e tipo de split.
+- concentra regras de checkout, pagamento, split e experiência;
+- mantém os enums operacionais do legado, como atualização de carrinho e tipo de split;
+- preserva a chave legada `exibe_juros_parcelas`, usada para exibir informação de juros das condições nas parcelas do cartão no checkout.
 
-### PreÃ§os
-- alÃ©m dos parÃ¢metros, carrega lookups auxiliares de:
+### Preços
+- além dos parâmetros, carrega lookups auxiliares de:
   - formas de pagamento;
-  - condiÃ§Ãµes de pagamento;
-  - tabelas de preÃ§o.
+  - condições de pagamento;
+  - tabelas de preço.
 
 ### Produtos
-- normaliza os campos legados que ainda chegam como `1/0` em algumas empresas para valores compatÃ­veis com o formulÃ¡rio atual, especialmente nos controles de visibilidade por perfil.
+- normaliza os campos legados que ainda chegam como `1/0` em algumas empresas para valores compatíveis com o formulário atual, especialmente nos controles de visibilidade por perfil.
 
 ### Vendedores
-- adiciona uma seÃ§Ã£o especÃ­fica de disponibilidade semanal;
-- usa janelas de meia em meia hora compatÃ­veis com os parÃ¢metros originais do legado.
+- adiciona uma seção específica de disponibilidade semanal;
+- usa janelas de meia em meia hora compatíveis com os parâmetros originais do legado.
+- preserva a Área Representante V2 do legado com `area_representante`, `preco_flexivel`, `acrescimo_maximo`, `desconto_maximo` e `quantidade_cotas_vendedor`;
+- mantém `quantidade_cotas_vendedor` editável apenas para usuário master;
+- o cadastro de vendedores envia `area_vendedor` e a bridge bloqueia nova ativação quando a Área V2 não está ativa ou quando não há licenças disponíveis.
 
 ## Testes
-- cobertura unitÃ¡ria mÃ­nima criada para os mapeadores dos quatro formulÃ¡rios;
-- a cobertura E2E especÃ­fica deste bloco ainda depende do bootstrap autenticado estÃ¡vel do ambiente Playwright local, entÃ£o o gap segue registrado como pendÃªncia operacional.
+- cobertura unitária mínima criada para os mapeadores dos quatro formulários;
+- a cobertura E2E específica deste bloco ainda depende do bootstrap autenticado estável do ambiente Playwright local, então o gap segue registrado como pendência operacional.
 
 ## Performance
-- as telas de configuracoes com contrato fixo agora consultam apenas as chaves de `empresas/parametros` usadas pela propria tela.
-- `Configuracoes > Precos` e `Configuracoes > Inicio` resolvem no carregamento inicial apenas o valor selecionado (`id + nome`) dos campos de autocomplete.
-- as demais opcoes desses campos passam a ser carregadas sob demanda via `/api/lookups/*`.
+- as telas de configurações com contrato fixo agora consultam apenas as chaves de `empresas/parametros` usadas pela própria tela.
+- `Configurações > Preços` e `Configurações > Início` resolvem no carregamento inicial apenas o valor selecionado (`id + nome`) dos campos de autocomplete.
+- as demais opções desses campos passam a ser carregadas sob demanda via `/api/lookups/*`.
 
 ## Arquivos principais
 - `src/features/configuracoes-pedidos/components/configuracoes-pedidos-page.tsx`
@@ -56,4 +60,3 @@ Migrar os formulÃ¡rios diretos de parÃ¢metros restantes do grupo `Configura�
 - `app/api/configuracoes/precos/route.ts`
 - `app/api/configuracoes/produtos/route.ts`
 - `app/api/configuracoes/vendedores/route.ts`
-

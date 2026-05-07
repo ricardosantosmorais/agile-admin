@@ -10,6 +10,11 @@ export type ConfiguracoesVendedoresBaseFieldKey =
   | 'tipo_vendedor'
   | 'tipo_vendedor_padrao'
   | 'altera_carrinho_cliente'
+  | 'area_representante'
+  | 'preco_flexivel'
+  | 'acrescimo_maximo'
+  | 'desconto_maximo'
+  | 'quantidade_cotas_vendedor'
 
 export type ConfiguracoesVendedoresScheduleFieldKey =
   | 'acesso_vendedor_0'
@@ -42,6 +47,7 @@ export type ConfiguracoesVendedoresSectionKey =
   | 'access'
   | 'rules'
   | 'types'
+  | 'representativeArea'
   | 'availability'
 
 export type ConfiguracoesVendedoresFormValues = Record<ConfiguracoesVendedoresFieldKey, string>
@@ -64,10 +70,13 @@ export type ConfiguracoesVendedoresRecord = {
 export type ConfiguracoesVendedoresFieldDefinition = {
   key: ConfiguracoesVendedoresBaseFieldKey
   section: Exclude<ConfiguracoesVendedoresSectionKey, 'availability'>
-  type: 'enum'
+  type: 'enum' | 'decimal' | 'integer'
   label: string
   helper?: string
-  options: ConfiguracoesVendedoresOption[]
+  options?: ConfiguracoesVendedoresOption[]
+  visibleWhenAreaV2?: boolean
+  masterOnly?: boolean
+  masterOnlyEdit?: boolean
 }
 
 export type ConfiguracoesVendedoresScheduleDay = {

@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server'
 import { readAuthSession } from '@/src/features/auth/services/auth-session'
 import { asArray, asRecord } from '@/src/lib/api-payload'
 import { externalAdminApiFetch } from '@/src/services/http/external-admin-api'
-import { serverApiFetch } from '@/src/services/http/server-api'
 
 export type ApiRecord = Record<string, unknown>
 

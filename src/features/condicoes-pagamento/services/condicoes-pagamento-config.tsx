@@ -64,7 +64,7 @@ export const CONDICOES_PAGAMENTO_CONFIG: CrudModuleConfig = {
   breadcrumbModuleKey: 'routes.condicoesPagamento',
   breadcrumbModule: 'Condições de pagamento',
   listEmbed: '',
-  formEmbed: 'filiais.filial',
+  formEmbed: 'filiais.filial,restricoes,excecoes',
   defaultFilters: {
     page: 1,
     perPage: 15,

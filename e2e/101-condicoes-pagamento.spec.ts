@@ -11,7 +11,7 @@ import {
 
 test.setTimeout(180_000)
 
-test('creates, filters, edits, checks branches tab and deletes payment terms through the UI', async ({ page }) => {
+test('creates, filters, edits, checks relation tabs and deletes payment terms through the UI', async ({ page }) => {
   const suffix = Date.now()
   const code = `CP-${suffix}`
   const name = `Prazo E2E ${suffix}`
@@ -33,6 +33,10 @@ test('creates, filters, edits, checks branches tab and deletes payment terms thr
 
   await page.getByRole('button', { name: /filiais|branches/i }).click()
   await expect(page.getByText(/nenhuma filial vinculada|no linked branches/i)).toBeVisible({ timeout: 30_000 })
+  await page.getByRole('button', { name: /restri[cç][oõ]es|restrictions/i }).click()
+  await expect(page.getByText(/nenhum registro foi encontrado|no records were found/i)).toBeVisible({ timeout: 30_000 })
+  await page.getByRole('button', { name: /exce[cç][oõ]es|exceptions/i }).click()
+  await expect(page.getByText(/nenhum registro foi encontrado|no records were found/i)).toBeVisible({ timeout: 30_000 })
 
   await openFinancialModule(page, {
     linkName: /^condi[cç][õo]es de pagamento|payment terms$/i,

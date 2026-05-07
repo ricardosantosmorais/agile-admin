@@ -5,6 +5,7 @@
   ConfiguracoesVendedoresRecord,
   ConfiguracoesVendedoresScheduleDay,
 } from '@/src/features/configuracoes-vendedores/types/configuracoes-vendedores'
+import { parseLocalizedNumber } from '@/src/lib/value-parsers'
 
 type ApiRecord = Record<string, unknown>
 type Translate = (key: string, fallback: string) => string
@@ -45,6 +46,11 @@ export function getConfiguracoesVendedoresFieldDefinitions(t: Translate): Config
     { key: 'tipo_vendedor', section: 'types', type: 'enum', label: t('configuracoes.sellers.fields.tipo_vendedor.label', 'Tipos aceitos para ativação e login'), helper: t('configuracoes.sellers.fields.tipo_vendedor.helper', 'Define quais tipos de vendedores podem ativar e acessar a área.'), options: [...personOptions] },
     { key: 'tipo_cliente', section: 'types', type: 'enum', label: t('configuracoes.sellers.fields.tipo_cliente.label', 'Tipos aceitos para cadastro'), helper: t('configuracoes.sellers.fields.tipo_cliente.helper', 'Define quais tipos de clientes podem ser cadastrados pelo vendedor.'), options: [...personOptions] },
     { key: 'tipo_vendedor_padrao', section: 'types', type: 'enum', label: t('configuracoes.sellers.fields.tipo_vendedor_padrao.label', 'Tipo padrão'), helper: t('configuracoes.sellers.fields.tipo_vendedor_padrao.helper', 'Tipo de vendedor definido como padrão.'), options: [{ value: 'PF', label: t('configuracoes.sellers.options.person.pf', 'Pessoa física') }, { value: 'PJ', label: t('configuracoes.sellers.options.person.pj', 'Pessoa jurídica') }] },
+    { key: 'area_representante', section: 'representativeArea', type: 'enum', label: t('configuracoes.sellers.fields.area_representante.label', 'Área Representante'), helper: t('configuracoes.sellers.fields.area_representante.helper', 'Indica qual versão da área do representante está ativa.'), options: [{ value: 'v1', label: 'V1' }, { value: 'v2', label: 'V2' }], masterOnly: true },
+    { key: 'preco_flexivel', section: 'representativeArea', type: 'enum', label: t('configuracoes.sellers.fields.preco_flexivel.label', 'Preço Flexível'), helper: t('configuracoes.sellers.fields.preco_flexivel.helper', 'Indica se permite preço flexível na Área Representante V2.'), options: [{ value: 'S', label: t('common.yes', 'Sim') }, { value: 'N', label: t('common.no', 'Não') }], visibleWhenAreaV2: true },
+    { key: 'acrescimo_maximo', section: 'representativeArea', type: 'decimal', label: t('configuracoes.sellers.fields.acrescimo_maximo.label', 'Acréscimo Máximo'), helper: t('configuracoes.sellers.fields.acrescimo_maximo.helper', 'Percentual máximo de acréscimo permitido.'), visibleWhenAreaV2: true },
+    { key: 'desconto_maximo', section: 'representativeArea', type: 'decimal', label: t('configuracoes.sellers.fields.desconto_maximo.label', 'Desconto Máximo'), helper: t('configuracoes.sellers.fields.desconto_maximo.helper', 'Percentual máximo de desconto permitido.'), visibleWhenAreaV2: true },
+    { key: 'quantidade_cotas_vendedor', section: 'representativeArea', type: 'integer', label: t('configuracoes.sellers.fields.quantidade_cotas_vendedor.label', 'Quantidade de Licenças Vendedor'), helper: t('configuracoes.sellers.fields.quantidade_cotas_vendedor.helper', 'Quantidade de licenças para vendedores na Área Representante V2.'), visibleWhenAreaV2: true, masterOnlyEdit: true },
   ]
 }
 
@@ -66,6 +72,32 @@ export const configuracoesVendedoresParameterKeys = [
   ...configuracoesVendedoresFieldDefinitions.map((field) => field.key),
   ...configuracoesVendedoresScheduleDays.flatMap((day) => [day.toggleKey, day.fromKey, day.toKey]),
 ]
+
+function normalizeSellerParameterValue(key: ConfiguracoesVendedoresFieldKey, value: string) {
+  if (key === 'area_representante' && value === 'v1') {
+    return null
+  }
+
+  if (key === 'preco_flexivel') {
+    return value || null
+  }
+
+  if (key === 'acrescimo_maximo' || key === 'desconto_maximo') {
+    const parsed = parseLocalizedNumber(value)
+    return parsed === null ? null : parsed.toFixed(2)
+  }
+
+  if (key === 'quantidade_cotas_vendedor') {
+    const parsed = Number(String(value ?? '').trim())
+    if (!Number.isFinite(parsed)) {
+      return null
+    }
+
+    return Math.max(0, Math.trunc(parsed))
+  }
+
+  return value
+}
 
 export function createEmptyConfiguracoesVendedoresForm(): ConfiguracoesVendedoresFormValues {
   const values = {} as ConfiguracoesVendedoresFormValues
@@ -128,9 +160,8 @@ export function buildDirtyConfiguracoesVendedoresPayload(
     ...changedKeys.map((key) => ({
       id_filial: null,
       chave: key,
-      parametros: String(currentValues[key] ?? '').trim(),
+      parametros: normalizeSellerParameterValue(key, String(currentValues[key] ?? '').trim()),
     })),
   ]
 }
-
 

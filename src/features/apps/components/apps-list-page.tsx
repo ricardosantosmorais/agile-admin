@@ -51,7 +51,7 @@ export function AppsListPage() {
   const client = useMemo(() => ({
     ...appsClient,
     list: (...args: Parameters<typeof appsClient.list>) => appsClient.list(...args),
-  }), [refreshToken])
+  }), [])
 
   function closeAction(refresh?: boolean) {
     setDeployAction(null)

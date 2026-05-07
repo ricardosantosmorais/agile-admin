@@ -98,8 +98,9 @@ function resolveTimestamp() {
 }
 
 function createEmptyValues(): IntegracaoLogisticaValues {
+  const booleanKeys = new Set<IntegracaoLogisticaFieldKey>(integracaoLogisticaBooleanKeys)
   return integracaoLogisticaParameterKeys.reduce((accumulator, key) => {
-    accumulator[key] = key === 'frenet_ambiente' ? 'homologacao' : ''
+    accumulator[key] = key === 'frenet_ambiente' ? 'homologacao' : booleanKeys.has(key) ? '0' : ''
     return accumulator
   }, {} as IntegracaoLogisticaValues)
 }

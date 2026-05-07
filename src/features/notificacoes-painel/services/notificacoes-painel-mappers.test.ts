@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildNotificacaoPainelPayload, normalizeNotificacaoPainelRecord } from '@/src/features/notificacoes-painel/services/notificacoes-painel-mappers'
+import { buildNotificacaoPainelPayload, normalizeNotificacaoPainelRecord, NOTIFICACAO_PAINEL_CHANNEL_OPTIONS } from '@/src/features/notificacoes-painel/services/notificacoes-painel-mappers'
 
 describe('notificacoes-painel mappers', () => {
   it('normalizes API datetime fields to date inputs and linked companies', () => {
@@ -54,7 +54,7 @@ describe('notificacoes-painel mappers', () => {
     const payload = buildNotificacaoPainelPayload({
       id: '10',
       titulo: 'Nova versão',
-      canal: 'novidades',
+      canal: 'email',
       mensagem: '<p>Conteúdo</p>',
       data_inicio: '2026-04-10',
       data_fim: '2026-04-11',
@@ -66,7 +66,7 @@ describe('notificacoes-painel mappers', () => {
     expect(payload).toMatchObject({
       id: '10',
       titulo: 'Nova versão',
-      canal: 'novidades',
+      canal: 'email',
       mensagem: '<p>Conteúdo</p>',
       data_inicio: '2026-04-10 00:00:00',
       data_fim: '2026-04-11 23:59:59',
@@ -74,5 +74,9 @@ describe('notificacoes-painel mappers', () => {
       registrar_changelog: false,
       publicado: false,
     })
+  })
+
+  it('keeps only legacy-supported panel notification channels', () => {
+    expect(NOTIFICACAO_PAINEL_CHANNEL_OPTIONS.map((option) => option.value)).toEqual(['todos', 'admin', 'email'])
   })
 })

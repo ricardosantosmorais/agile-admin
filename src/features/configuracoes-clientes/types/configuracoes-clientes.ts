@@ -13,6 +13,7 @@ export type ConfiguracoesClientesFieldKey =
   | 'seleciona_regiao'
   | 'seleciona_vendedor'
   | 'senha_forte'
+  | 'permite_cadastro_contato_duplicado'
   | 'tipo_cliente_ativacao'
   | 'tipo_cliente'
   | 'tipo_cliente_login'

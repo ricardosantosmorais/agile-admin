@@ -56,6 +56,11 @@ export function ConfiguracoesVendedoresPage() {
         title: t('configuracoes.sellers.sections.types.title', 'Tipos'),
         description: t('configuracoes.sellers.sections.types.description', 'Regras por tipo de pessoa para vendedores e clientes.'),
       },
+      {
+        key: 'representativeArea',
+        title: t('configuracoes.sellers.sections.representativeArea.title', 'Área Representante V2'),
+        description: t('configuracoes.sellers.sections.representativeArea.description', 'Parâmetros comerciais e cotas de uso para a nova área do representante.'),
+      },
     ],
     [t],
   )
@@ -159,11 +164,11 @@ export function ConfiguracoesVendedoresPage() {
         values={values}
         metadata={metadata}
         canSave={canSave}
+        isMasterUser={Boolean(user?.master)}
         patch={patch}
         t={t}
       />
     </ManualFormPageShell>
   )
 }
-
 

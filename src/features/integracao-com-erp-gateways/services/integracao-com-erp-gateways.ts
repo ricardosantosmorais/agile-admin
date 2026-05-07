@@ -1,6 +1,6 @@
 import type { CrudListFilters, CrudRecord } from '@/src/components/crud-base/types'
 
-export const GATEWAY_AUTH_OPTIONS = ['NoAuth', 'Basic', 'Bearer', 'AWSSignature', 'Token', 'OAuth2', 'OAuth2Winthor', 'None'] as const
+export const GATEWAY_AUTH_OPTIONS = ['NoAuth', 'Basic', 'Bearer', 'AWSSignature', 'Token', 'OAuth2', 'OAuth2Cookie', 'OAuth2Winthor', 'None'] as const
 export const GATEWAY_VERB_OPTIONS = ['get', 'post', 'put', 'patch', 'delete'] as const
 export const GATEWAY_ACCESS_OPTIONS = [
 	{ value: 'privado', label: 'Privado' },

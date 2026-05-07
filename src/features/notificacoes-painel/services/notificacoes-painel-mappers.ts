@@ -6,7 +6,6 @@ export const NOTIFICACAO_PAINEL_CHANNEL_OPTIONS = [
   { value: 'todos', labelKey: 'panelNotifications.channels.all', label: 'Todos' },
   { value: 'admin', labelKey: 'panelNotifications.channels.admin', label: 'Admin' },
   { value: 'email', labelKey: 'panelNotifications.channels.email', label: 'E-mail' },
-  { value: 'novidades', labelKey: 'panelNotifications.channels.news', label: 'Novidades' },
 ] as const
 
 export function getNotificacaoPainelChannelLabel(value: unknown) {

@@ -26,6 +26,7 @@ Essa abordagem servirÃ¡ de base para outros itens de `ConfiguraÃ§Ãµes` que
 - escrita por lote no mesmo endpoint
 - inclusÃ£o de `versao` no payload de escrita
 - campos sem validaÃ§Ã£o de negÃ³cio adicional no frontend
+- `seleciona_filial` usa os perfis `cliente`, `vendedor`, `todos` e `nao`; valores booleanos antigos continuam sendo normalizados como `todos`/`nao`
 
 ## DiferenÃ§as intencionais para o v2
 - layout agrupado por seÃ§Ãµes, em vez da sequÃªncia contÃ­nua do legado

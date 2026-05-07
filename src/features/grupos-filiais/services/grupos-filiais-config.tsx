@@ -1,13 +1,19 @@
 import type { CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
-import { toLookupOption } from '@/src/lib/lookup-options'
+import { nullableLookupId, toLookupOption } from '@/src/lib/lookup-options'
 
 function normalizeLookup(record: CrudRecord) {
   const relatedBranch = [record.id_filial_padrao_lookup, record.filial_padrao, record.filial]
     .find((value) => value && typeof value === 'object' && value !== null) as { id?: unknown; nome_fantasia?: unknown; nome?: unknown; label?: unknown } | undefined
+  const relatedInvoiceBranch = [record.id_filial_nf_lookup, record.filial_nf]
+    .find((value) => value && typeof value === 'object' && value !== null) as { id?: unknown; nome_fantasia?: unknown; nome?: unknown; label?: unknown } | undefined
+  const relatedPriceTable = [record.id_tabela_preco_lookup, record.tabela_preco]
+    .find((value) => value && typeof value === 'object' && value !== null) as { id?: unknown; nome?: unknown; label?: unknown } | undefined
 
   return {
     ...record,
     id_filial_padrao_lookup: toLookupOption(relatedBranch, ['label', 'nome_fantasia', 'nome'], record.id_filial_padrao),
+    id_filial_nf_lookup: toLookupOption(relatedInvoiceBranch, ['label', 'nome_fantasia', 'nome'], record.id_filial_nf),
+    id_tabela_preco_lookup: toLookupOption(relatedPriceTable, ['label', 'nome'], record.id_tabela_preco),
   }
 }
 
@@ -46,12 +52,21 @@ export const GRUPOS_FILIAIS_CONFIG: CrudModuleConfig = {
       { key: 'codigo', labelKey: 'simpleCrud.fields.code', label: 'Código', type: 'text' },
       { key: 'nome', labelKey: 'simpleCrud.fields.name', label: 'Nome', type: 'text', required: true },
       { key: 'id_filial_padrao', labelKey: 'basicRegistrations.branchGroups.fields.defaultBranch', label: 'Filial padrão', type: 'lookup', optionsResource: 'filiais', lookupStateKey: 'id_filial_padrao_lookup' },
+      { key: 'id_filial_nf', labelKey: 'basicRegistrations.branchGroups.fields.invoiceBranch', label: 'Filial NF', type: 'lookup', optionsResource: 'filiais', lookupStateKey: 'id_filial_nf_lookup' },
+      { key: 'id_tabela_preco', labelKey: 'basicRegistrations.branchGroups.fields.priceTable', label: 'Tabela de preço', type: 'lookup', optionsResource: 'tabelas_preco', lookupStateKey: 'id_tabela_preco_lookup' },
     ],
   }],
+  formEmbed: 'filial_padrao,filial_nf,tabela_preco',
   normalizeRecord: normalizeLookup,
   beforeSave: (record) => ({
     ...record,
-    id_filial_padrao: String(record.id_filial_padrao || '').trim() || null,
+    codigo: String(record.codigo || '').trim() || null,
+    nome: String(record.nome || '').trim(),
+    id_filial_padrao: nullableLookupId(record.id_filial_padrao_lookup ?? record.id_filial_padrao),
+    id_filial_nf: nullableLookupId(record.id_filial_nf_lookup ?? record.id_filial_nf),
+    id_tabela_preco: nullableLookupId(record.id_tabela_preco_lookup ?? record.id_tabela_preco),
     id_filial_padrao_lookup: undefined,
+    id_filial_nf_lookup: undefined,
+    id_tabela_preco_lookup: undefined,
   }),
 }

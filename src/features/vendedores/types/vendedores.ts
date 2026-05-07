@@ -7,6 +7,7 @@ export type VendedorFormRecord = {
   id: string
   ativo: boolean
   bloqueado: boolean
+  area_vendedor: boolean
   codigo: string
   codigo_ativacao: string
   tipo: VendedorType
@@ -40,4 +41,3 @@ export type VendedorLinkedUser = {
   email: string
   nome?: string | null
 }
-

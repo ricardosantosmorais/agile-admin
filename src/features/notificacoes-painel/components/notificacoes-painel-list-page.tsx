@@ -80,7 +80,6 @@ export function NotificacoesPainelListPage() {
         { value: 'todos', label: t('panelNotifications.channels.all', 'Todos') },
         { value: 'admin', label: t('panelNotifications.channels.admin', 'Admin') },
         { value: 'email', label: t('panelNotifications.channels.email', 'E-mail') },
-        { value: 'novidades', label: t('panelNotifications.channels.news', 'Novidades') },
       ] },
     },
     {

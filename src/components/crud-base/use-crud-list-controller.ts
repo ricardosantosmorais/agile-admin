@@ -11,7 +11,8 @@ export function useCrudListController(
   canDelete: boolean,
   canSelectRow?: (record: CrudListResponse['data'][number]) => boolean,
 ) {
-  const storageKey = `${config.key}-list-state`
+  const { defaultFilters, key, listEmbed, normalizeRecord } = config
+  const storageKey = `${key}-list-state`
   const persistedState = useMemo(() => {
     const parsed = readSessionState<{ filters?: CrudListFilters; filtersDraft?: CrudListFilters; filtersExpanded?: boolean }>(storageKey)
     if (!parsed?.filters || !parsed.filtersDraft) {
@@ -19,14 +20,14 @@ export function useCrudListController(
     }
 
     return {
-      filters: { ...config.defaultFilters, ...parsed.filters },
-      filtersDraft: { ...config.defaultFilters, ...parsed.filtersDraft },
+      filters: { ...defaultFilters, ...parsed.filters },
+      filtersDraft: { ...defaultFilters, ...parsed.filtersDraft },
       filtersExpanded: parsed.filtersExpanded === true,
     }
-  }, [config.defaultFilters, storageKey])
+  }, [defaultFilters, storageKey])
 
-  const [filters, setFilters] = useState<CrudListFilters>(persistedState?.filters ?? config.defaultFilters)
-  const [filtersDraft, setFiltersDraft] = useState<CrudListFilters>(persistedState?.filtersDraft ?? config.defaultFilters)
+  const [filters, setFilters] = useState<CrudListFilters>(persistedState?.filters ?? defaultFilters)
+  const [filtersDraft, setFiltersDraft] = useState<CrudListFilters>(persistedState?.filtersDraft ?? defaultFilters)
   const [filtersExpanded, setFiltersExpanded] = useState(persistedState?.filtersExpanded ?? false)
   const [response, setResponse] = useState<CrudListResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -57,12 +58,12 @@ export function useCrudListController(
       setError(null)
 
       try {
-        const nextResponse = await client.list(filters, config.listEmbed)
+        const nextResponse = await client.list(filters, listEmbed)
         if (!alive) return
-        setResponse(config.normalizeRecord
+        setResponse(normalizeRecord
           ? {
               ...nextResponse,
-              data: nextResponse.data.map((record) => (config.normalizeRecord?.(record) ?? record) as CrudListRecord),
+              data: nextResponse.data.map((record) => (normalizeRecord(record) ?? record) as CrudListRecord),
             }
           : nextResponse)
         clearSelection()
@@ -78,7 +79,7 @@ export function useCrudListController(
     return () => {
       alive = false
     }
-  }, [clearSelection, client, config.listEmbed, filters])
+  }, [clearSelection, client, filters, listEmbed, normalizeRecord])
 
   useEffect(() => {
     writeSessionState(storageKey, { filters, filtersDraft, filtersExpanded })
@@ -93,8 +94,8 @@ export function useCrudListController(
   }
 
   function clearFilters() {
-    setFilters(config.defaultFilters)
-    setFiltersDraft(config.defaultFilters)
+    setFilters(defaultFilters)
+    setFiltersDraft(defaultFilters)
   }
 
   function setPerPage(perPage: number) {

@@ -49,4 +49,12 @@ describe('integracao-logistica-mappers', () => {
 		expect(payload.find((item) => item.chave === 'iboltt_company_id' && item.id_filial === '10')).toMatchObject({ parametros: 'company-10', criptografado: 0 });
 		expect(payload.find((item) => item.chave === 'iboltt_token' && item.id_filial === '10')).toMatchObject({ parametros: 'iboltt-secret', criptografado: 1 });
 	});
+
+	it('usa zero como default para o parametro Frenet de nota fiscal oculto no formulario', () => {
+		const record = createEmptyIntegracaoLogisticaRecord();
+		const payload = buildIntegracaoLogisticaSavePayload(record.values, {});
+
+		expect(record.values.frenet_nota_fiscal).toBe('0');
+		expect(payload.find((item) => item.chave === 'frenet_nota_fiscal')).toMatchObject({ parametros: '0' });
+	});
 });

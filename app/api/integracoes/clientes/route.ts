@@ -3,7 +3,7 @@ import { readAuthSession } from '@/src/features/auth/services/auth-session';
 import { buildCompanyParametersPath, buildLookupPath } from '@/src/lib/company-parameters-query';
 import { serverApiFetch } from '@/src/services/http/server-api';
 
-const INTEGRACAO_CLIENTES_PARAMETER_KEYS = ['cnpja_token', 'portal_token', 'portal_pedidos', 'portal_orcamentos', 'portal_titulos', 'portal_notas_fiscais'] as const;
+const INTEGRACAO_CLIENTES_PARAMETER_KEYS = ['cnpja_token', 'cro_apikey', 'portal_token', 'portal_pedidos', 'portal_orcamentos', 'portal_titulos', 'portal_notas_fiscais'] as const;
 
 function getErrorMessage(payload: unknown, fallback: string) {
 	if (typeof payload === 'object' && payload !== null) {

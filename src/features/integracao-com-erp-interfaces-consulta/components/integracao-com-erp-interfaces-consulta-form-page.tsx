@@ -1,7 +1,7 @@
 ﻿'use client'
 
 import { Building2, CheckCircle2, Code2, Database, Edit3, Eye, Layers, Loader2, Play, Plus, RefreshCcw, RotateCcw, Search, ShieldCheck, Sparkles } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import type { CrudRecord } from '@/src/components/crud-base/types'
 import { AppDataTable } from '@/src/components/data-table/app-data-table'
@@ -264,7 +264,7 @@ function TemplateLinksPanel({ id, readOnly }: { id: string; readOnly: boolean })
 	const [error, setError] = useState<string | null>(null)
 	const [modalTemplateId, setModalTemplateId] = useState<string | null>(null)
 
-	async function loadRows() {
+	const loadRows = useCallback(async () => {
 		setLoading(true)
 		setError(null)
 		try {
@@ -275,9 +275,9 @@ function TemplateLinksPanel({ id, readOnly }: { id: string; readOnly: boolean })
 		} finally {
 			setLoading(false)
 		}
-	}
+	}, [id])
 
-	useEffect(() => { void loadRows() }, [id])
+	useEffect(() => { void loadRows() }, [loadRows])
 
 	const columns: AppDataTableColumn<LinkRow, never>[] = [
 		{ id: 'template', label: 'Template', cell: (row) => <span className="block whitespace-normal font-semibold text-[color:var(--app-text)] [overflow-wrap:anywhere]">{String(row.template || '-')}</span> },
@@ -317,7 +317,7 @@ function OverrideLinksPanel({ id, readOnly }: { id: string; readOnly: boolean })
 	const [error, setError] = useState<string | null>(null)
 	const [modalEmpresaId, setModalEmpresaId] = useState<string | null>(null)
 
-	async function loadRows() {
+	const loadRows = useCallback(async () => {
 		setLoading(true)
 		setError(null)
 		try {
@@ -328,9 +328,9 @@ function OverrideLinksPanel({ id, readOnly }: { id: string; readOnly: boolean })
 		} finally {
 			setLoading(false)
 		}
-	}
+	}, [id])
 
-	useEffect(() => { void loadRows() }, [id])
+	useEffect(() => { void loadRows() }, [loadRows])
 
 	const columns: AppDataTableColumn<LinkRow, never>[] = [
 		{ id: 'empresa', label: 'Empresa', cell: (row) => <span className="block whitespace-normal font-semibold text-[color:var(--app-text)] [overflow-wrap:anywhere]">{String(row.empresa || row.id_empresa || '-')}</span> },
@@ -440,7 +440,7 @@ function InterfaceConfigModal({ mode, interfaceId, targetId, open, onClose, onSa
 		setDraft((current) => ({ ...current, [key]: value }))
 	}
 
-	function applyModalResult(result: Record<string, unknown>) {
+	const applyModalResult = useCallback((result: Record<string, unknown>) => {
 		setData(result)
 		const gateway = (result.gateway_endpoint || {}) as Record<string, unknown>
 		const empresa = (result.empresa || {}) as Record<string, unknown>
@@ -463,9 +463,9 @@ function InterfaceConfigModal({ mode, interfaceId, targetId, open, onClose, onSa
 		setRetornoMaps(formatJson(result.retorno_maps || []))
 		setAliasValidation((result.validation || null) as AliasValidation)
 		setQueryResult(null)
-	}
+	}, [])
 
-	async function loadModal() {
+	const loadModal = useCallback(async () => {
 		if (!open) return
 		setLoading(true)
 		setError(null)
@@ -480,9 +480,9 @@ function InterfaceConfigModal({ mode, interfaceId, targetId, open, onClose, onSa
 		} finally {
 			setLoading(false)
 		}
-	}
+	}, [applyModalResult, interfaceId, mode, open, targetId])
 
-	useEffect(() => { void loadModal() }, [open, targetId, mode, interfaceId])
+	useEffect(() => { void loadModal() }, [loadModal])
 
 	async function reloadTemplate(templateId: string) {
 		patch('id_template', templateId)
@@ -906,7 +906,6 @@ function InterfaceConfigModal({ mode, interfaceId, targetId, open, onClose, onSa
 						<QueryWorkbench
 							mode={mode}
 							draft={draft}
-							patch={patch}
 							querySql={querySql}
 							setQuerySql={setQuerySql}
 							queryVariables={queryVariables}
@@ -943,7 +942,6 @@ function InterfaceConfigModal({ mode, interfaceId, targetId, open, onClose, onSa
 function QueryWorkbench({
 	mode,
 	draft,
-	patch,
 	querySql,
 	setQuerySql,
 	queryVariables,
@@ -957,7 +955,6 @@ function QueryWorkbench({
 }: {
 	mode: ModalMode
 	draft: Record<string, unknown>
-	patch: (key: string, value: unknown) => void
 	querySql: string
 	setQuerySql: (value: string) => void
 	queryVariables: Array<Record<string, unknown>>

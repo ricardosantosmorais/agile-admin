@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { serverApiFetch } from '@/src/services/http/server-api'
-import { getErrorMessage, normalizeSavedPayload, requireNotificationSession } from '@/app/api/notificacoes-painel/_shared'
+import { getErrorMessage, loadNotification, normalizeSavedPayload, requireNotificationSession } from '@/app/api/notificacoes-painel/_shared'
 import type { CrudRecord } from '@/src/components/crud-base/types'
+
+function canalEnviaPushPainel(canal: unknown) {
+  return ['admin', 'todos'].includes(String(canal ?? '').toLowerCase())
+}
 
 export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { session, response } = await requireNotificationSession()
@@ -16,25 +20,32 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     return NextResponse.json({ message: 'Informe a empresa para inclusão.' }, { status: 400 })
   }
 
-  const pushPayload: CrudRecord[] = [{
-    id_notificacao: id,
-    id_empresa: idEmpresa,
-    titulo: 'Notificação',
-    mensagem: titulo,
-    tipo: 'informacao',
-    notificar_navegador: false,
-    ativo: false,
-  }]
+  const loaded = await loadNotification(id, session.token, session.currentTenantId)
+  if (!loaded.ok || !loaded.record) {
+    return NextResponse.json({ message: getErrorMessage(loaded.payload, 'Não foi possível carregar a notificação.') }, { status: loaded.status || 404 })
+  }
 
-  const push = await serverApiFetch('notificacoes_push', {
-    method: 'POST',
-    token: session.token,
-    tenantId: session.currentTenantId,
-    body: pushPayload,
-  })
+  if (canalEnviaPushPainel(loaded.record.canal)) {
+    const pushPayload: CrudRecord[] = [{
+      id_notificacao: id,
+      id_empresa: idEmpresa,
+      titulo: 'Notificação',
+      mensagem: titulo,
+      tipo: 'informacao',
+      notificar_navegador: false,
+      ativo: false,
+    }]
 
-  if (!push.ok) {
-    return NextResponse.json({ message: getErrorMessage(push.payload, 'Não foi possível criar a notificação push da empresa.') }, { status: push.status || 400 })
+    const push = await serverApiFetch('notificacoes_push', {
+      method: 'POST',
+      token: session.token,
+      tenantId: session.currentTenantId,
+      body: pushPayload,
+    })
+
+    if (!push.ok) {
+      return NextResponse.json({ message: getErrorMessage(push.payload, 'Não foi possível criar a notificação push da empresa.') }, { status: push.status || 400 })
+    }
   }
 
   const result = await serverApiFetch('notificacoes_painel/empresas', {

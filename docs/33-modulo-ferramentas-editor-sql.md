@@ -20,9 +20,7 @@ Escopo atual migrado para o v2:
 - o módulo foi tratado como página operacional própria;
 - a integração não passa pela `api-v3`; usa APIs externas específicas configuradas por ambiente;
 - o tenant ativo continua sendo resolvido pelo contexto autenticado do v2;
-- para `ERP`, o destino externo respeita a mesma regra do legado:
-  - quando `protheus_tipo_integracao=api`, usa `AgileSync`;
-  - caso contrário, usa `PainelB2B`;
+- para execução de SQL, inclusive fonte `ERP`, o destino externo segue o legado atual e usa sempre o `PainelB2BApi`;
 - o restore do workspace é totalmente local, sem depender de backend adicional;
 - o autocomplete mais agressivo foi desabilitado por enquanto para priorizar fluidez do editor; as sugestões continuam disponíveis manualmente por `Ctrl+Space`.
 
@@ -39,8 +37,6 @@ Para funcionar localmente, o módulo depende destas variáveis:
 
 - `ADMIN_URL_API_PAINELB2B`
 - `ADMIN_API_PAINELB2B_TOKEN`
-- `ADMIN_URL_API_AGILESYNC`
-- `ADMIN_API_AGILESYNC_TOKEN`
 
 ## Cobertura
 Cobertura mínima atual:

@@ -21,8 +21,12 @@ export type CatalogProductRelation = {
 
 export type CatalogUniverseType =
   | 'canal_distribuicao'
+  | 'colecao'
+  | 'departamento'
   | 'filial'
+  | 'fornecedor'
   | 'grupo'
+  | 'marca'
   | 'rede'
   | 'segmento'
   | 'tabela_preco'
@@ -34,8 +38,12 @@ export type CatalogUniverseRecord = {
   restricao?: boolean
   uf?: string | null
   canal_distribuicao?: { id?: string; nome?: string | null } | null
+  colecao?: { id?: string; nome?: string | null } | null
+  departamento?: { id?: string; nome?: string | null } | null
   filial?: { id?: string; nome?: string | null; nome_fantasia?: string | null } | null
+  fornecedor?: { id?: string; nome?: string | null; nome_fantasia?: string | null; razao_social?: string | null } | null
   grupo?: { id?: string; nome?: string | null } | null
+  marca?: { id?: string; nome?: string | null } | null
   rede?: { id?: string; nome?: string | null } | null
   segmento?: { id?: string; nome?: string | null } | null
   tabela_preco?: { id?: string; nome?: string | null } | null

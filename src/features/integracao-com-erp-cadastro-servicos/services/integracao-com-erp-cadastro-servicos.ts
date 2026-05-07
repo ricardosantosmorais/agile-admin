@@ -77,10 +77,17 @@ export function normalizeServicoCadastroRecord(record: CrudRecord): CrudRecord {
 }
 
 export function buildServicoCadastroPayload(record: CrudRecord): CrudRecord {
+	const tipoObjeto = asTrimmedString(record.tipo_objeto)
+	const gatewayTransformationMode = tipoObjeto === 'endpoint_gateway' && asTrimmedString(record.modo_transformacao_gateway) === 'dataset_consolidado'
+		? 'dataset_consolidado'
+		: 'registro'
+	const datasetSourcePath = gatewayTransformationMode === 'dataset_consolidado'
+		? asTrimmedString(record.dataset_source_path) || null
+		: null
 	const payload: CrudRecord = {
 		nome: asTrimmedString(record.nome),
 		id_template: asTrimmedString(record.id_template) || null,
-		tipo_objeto: asTrimmedString(record.tipo_objeto),
+		tipo_objeto: tipoObjeto,
 		id_objeto: asTrimmedString(record.id_objeto) || null,
 		nome_objeto: asTrimmedString(record.nome_objeto) || null,
 		fonte_dados: asTrimmedString(record.fonte_dados) || null,
@@ -90,8 +97,8 @@ export function buildServicoCadastroPayload(record: CrudRecord): CrudRecord {
 		intervalo_execucao: asTrimmedString(record.intervalo_execucao) || null,
 		filtro_sql: asTrimmedString(record.filtro_sql) || null,
 		id_gateway_endpoint: asTrimmedString(record.id_gateway_endpoint) || null,
-		modo_transformacao_gateway: asTrimmedString(record.modo_transformacao_gateway) || 'registro',
-		dataset_source_path: asTrimmedString(record.dataset_source_path) || null,
+		modo_transformacao_gateway: gatewayTransformationMode,
+		dataset_source_path: datasetSourcePath,
 		mapeamento: asTrimmedString(record.mapeamento) || null,
 		ativo: asBoolean(record.ativo) ? 1 : 0,
 		compara_delecao: asBoolean(record.compara_delecao) ? 1 : 0,

@@ -41,6 +41,7 @@ Essa composição foi necessária porque o legado não é um CRUD linear:
 - preenchimento automático do campo `Link` a partir do objeto selecionado no `Tipo de link`;
 - link manual e target;
 - cadastro e exclusão de regras de exibição na aba dedicada;
+- tipos de universo na ordem do legado: Canal de Distribuição, Coleção, Departamento, Filial, Fornecedor, Grupo de Cliente, Marca, Rede de Cliente, Segmento de Cliente, Tabela de Preço e UF do Cliente;
 - seleção e persistência das URLs associadas ao banner.
 
 ## Ajustes do v2

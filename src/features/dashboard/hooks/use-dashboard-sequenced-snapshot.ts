@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createDashboardRequestCoordinator, createDashboardSnapshotRequestKey } from '@/src/features/dashboard/services/dashboard-request-pressure';
 import { dashboardPresets, type DashboardSnapshot } from '@/src/features/dashboard/types/dashboard';
 import { appData } from '@/src/services/app-data';
 
@@ -220,6 +221,8 @@ export function useDashboardSequencedSnapshot(tenantId: string) {
 	const [refreshToken, setRefreshToken] = useState(0);
 	const forceRefreshRef = useRef(false);
 	const cycleForceRefreshRef = useRef(false);
+	const requestCycleRef = useRef(0);
+	const requestCoordinatorRef = useRef(createDashboardRequestCoordinator());
 	const phaseWaitersRef = useRef<
 		Array<{
 			phaseIds: DashboardPhaseId[];
@@ -243,6 +246,13 @@ export function useDashboardSequencedSnapshot(tenantId: string) {
 	);
 
 	useEffect(() => {
+		const coordinator = requestCoordinatorRef.current;
+		return () => {
+			coordinator.abortAll();
+		};
+	}, []);
+
+	useEffect(() => {
 		if (typeof window === 'undefined') {
 			return;
 		}
@@ -258,6 +268,9 @@ export function useDashboardSequencedSnapshot(tenantId: string) {
 
 	useEffect(() => {
 		const baseSnapshot = createEmptySnapshot(selectedRangeLabel);
+		const nextCycleId = requestCycleRef.current + 1;
+		requestCycleRef.current = nextCycleId;
+		requestCoordinatorRef.current.abortStaleCycles(nextCycleId);
 		cycleForceRefreshRef.current = forceRefreshRef.current;
 		forceRefreshRef.current = false;
 
@@ -281,24 +294,39 @@ export function useDashboardSequencedSnapshot(tenantId: string) {
 		const baseSnapshot = createEmptySnapshot(selectedRangeLabel);
 		const phaseId = phaseDefinition.id;
 		const phaseBlocks = phaseDefinition.blocks;
+		const cycleId = requestCycleRef.current;
+		const phaseOptions = {
+			forceRefresh: cycleForceRefreshRef.current,
+			previousStart: selectedPreviousRange?.start ?? null,
+			previousEnd: selectedPreviousRange?.end ?? null,
+		};
+		const requestKey = createDashboardSnapshotRequestKey({
+			tenantId,
+			startDate: selectedRange.start,
+			endDate: selectedRange.end,
+			rangeLabel: selectedRangeLabel,
+			blocks: phaseBlocks,
+			...phaseOptions,
+		});
 		let cancelled = false;
 
 		async function loadPhase() {
 			try {
-				const partial = await appData.dashboard.getSnapshotByBlocks(tenantId, selectedRange.start, selectedRange.end, selectedRangeLabel, phaseBlocks, {
-					forceRefresh: cycleForceRefreshRef.current,
-					previousStart: selectedPreviousRange?.start ?? null,
-					previousEnd: selectedPreviousRange?.end ?? null,
-				});
+				const partial = await requestCoordinatorRef.current.run(requestKey, cycleId, ({ signal }) =>
+					appData.dashboard.getSnapshotByBlocks(tenantId, selectedRange.start, selectedRange.end, selectedRangeLabel, phaseBlocks, {
+						...phaseOptions,
+						signal,
+					}),
+				);
 
-				if (cancelled) {
+				if (cancelled || requestCycleRef.current !== cycleId) {
 					return;
 				}
 
 				setSnapshot((current) => mergePhaseSnapshot(current ?? baseSnapshot, partial, phaseId));
 				setCompletedPhases((current) => (current.includes(phaseId) ? current : [...current, phaseId]));
 			} catch (phaseError) {
-				if (cancelled) {
+				if (cancelled || requestCycleRef.current !== cycleId) {
 					return;
 				}
 

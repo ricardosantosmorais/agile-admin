@@ -22,7 +22,7 @@ function nullableString(value: unknown): string | null {
 	return text.length > 0 ? text : null;
 }
 
-function normalizeGatewaySavePayload(input: GatewayPayload): GatewayPayload {
+export function normalizeGatewaySavePayload(input: GatewayPayload): GatewayPayload {
 	const payload: GatewayPayload = { ...input };
 
 	payload.ativo = normalizeBoolean(input.ativo);

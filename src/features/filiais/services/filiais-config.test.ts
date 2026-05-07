@@ -15,6 +15,13 @@ describe('filiais config', () => {
       desconto_retira: 5,
       acrescimo_retira: 2.5,
       id_grupo: '10',
+      grupo: { id: '10', nome: 'Grupo CE' },
+      id_tabela_preco: '7',
+      tabela_preco: { id: '7', nome: 'Tabela varejo' },
+      variacao: 1.5,
+      distancia_maxima: 25,
+      ufs_excecao: 'ce, pe',
+      ufs_restricao: 'SP,RJ',
     })
 
     expect(record).toMatchObject({
@@ -27,7 +34,12 @@ describe('filiais config', () => {
       peso_minimo: '12,345',
       desconto_retira: '5,00',
       acrescimo_retira: '2,50',
-      id_grupo_lookup: { id: '10', label: '10' },
+      id_grupo_lookup: { id: '10', label: 'Grupo CE' },
+      id_tabela_preco_lookup: { id: '7', label: 'Tabela varejo' },
+      variacao: '1,50',
+      distancia_maxima: '25',
+      ufs_excecao: 'CE,PE',
+      ufs_restricao: 'SP,RJ',
     })
   })
 
@@ -46,10 +58,17 @@ describe('filiais config', () => {
       posicao: 3,
       contato: 'Equipe filial',
       id_grupo_lookup: { id: '10', label: 'Grupo 10' },
+      id_tabela_preco_lookup: { id: '7', label: 'Tabela varejo' },
+      selecionavel: true,
+      variacao: '1,50',
+      distancia_maxima: '25',
+      ufs_excecao: ' ce, PE, pe, invalido, RJ ',
+      ufs_restricao: 'sp, rj',
     })
 
     expect(payload).toMatchObject({
       id_grupo: '10',
+      id_tabela_preco: '7',
       cnpj: '12345678000199',
       ddd: '85',
       telefone: '33334444',
@@ -63,8 +82,14 @@ describe('filiais config', () => {
       limite_itens_pedido: 20,
       posicao: 3,
       contato: 'Equipe filial',
+      selecionavel: true,
+      variacao: 1.5,
+      distancia_maxima: 25,
+      ufs_excecao: 'CE,PE,RJ',
+      ufs_restricao: 'SP,RJ',
     })
     expect(payload?.id_grupo_lookup).toBeUndefined()
+    expect(payload?.id_tabela_preco_lookup).toBeUndefined()
     expect(payload).not.toHaveProperty('pessoa_contato')
   })
 

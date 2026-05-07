@@ -8,6 +8,9 @@ type TestVariable = {
 	token: string
 	description: string
 	default_value: string
+	display_value?: string
+	resolved_by_context?: boolean
+	editable?: boolean
 }
 
 function extractRows(response: unknown) {
@@ -31,6 +34,12 @@ function boolFromRequest(value: unknown) {
 	if (typeof value === 'number') return value === 1
 	if (typeof value === 'string') return ['1', 'true', 'sim', 'yes', 'y'].includes(value.trim().toLowerCase())
 	return false
+}
+
+function maskContextValue(value: unknown) {
+	const text = String(value ?? '').trim()
+	if (text.length <= 4) return '********'
+	return `${text.slice(0, 2)}******${text.slice(-2)}`
 }
 
 export async function POST(request: NextRequest) {
@@ -90,6 +99,7 @@ export async function POST(request: NextRequest) {
 		'@empresa.id',
 		'@empresa.codigo',
 		'@oauth2.token',
+		'@oauth2.cookie',
 	])
 
 	const variables = new Map<string, TestVariable>()
@@ -101,6 +111,9 @@ export async function POST(request: NextRequest) {
 				token,
 				description: 'Valor necessário para executar o endpoint.',
 				default_value: '',
+				display_value: '',
+				resolved_by_context: false,
+				editable: true,
 			})
 		}
 	}
@@ -122,26 +135,48 @@ export async function POST(request: NextRequest) {
 		variables.set(key, { ...item, default_value: trimmed })
 	}
 
+	const paramsResponse = variables.size ? await serverApiFetch(
+		`empresas/parametros?id_empresa=${encodeURIComponent(String(body.id_empresa || sessionOrResponse.currentTenantId || ''))}&order=chave,posicao&perpage=1000`,
+		{
+			method: 'GET',
+			token: sessionOrResponse.token,
+			tenantId: sessionOrResponse.currentTenantId,
+		},
+	) : null
+	if (paramsResponse?.ok) {
+		const contextParams = new Map<string, Record<string, unknown>>()
+		for (const row of asArray<Record<string, unknown>>(asRecord(paramsResponse.payload).data)) {
+			const keys = [row.chave, row.chave_plataforma]
+				.map((key) => String(key || '').trim())
+				.filter(Boolean)
+				.map((key) => `@${key.replace(/^@+/, '')}`.toLowerCase())
+			for (const key of keys) contextParams.set(key, row)
+		}
+		for (const [key, item] of variables.entries()) {
+			const row = contextParams.get(key)
+			if (!row) continue
+			variables.set(key, {
+				...item,
+				description: 'Resolvido automaticamente pelo contexto da empresa logada.',
+				default_value: '',
+				display_value: maskContextValue(row.parametros),
+				resolved_by_context: true,
+				editable: false,
+			})
+		}
+	}
+
 	let result = Array.from(variables.values()).sort((a, b) => a.token.toLowerCase().localeCompare(b.token.toLowerCase()))
 
-	if (boolFromRequest(body.hide_context_vars)) {
-		const paramsResponse = await serverApiFetch(
-			`empresas/parametros?id_empresa=${encodeURIComponent(String(body.id_empresa || sessionOrResponse.currentTenantId || ''))}&order=chave,posicao&perpage=1000`,
-			{
-				method: 'GET',
-				token: sessionOrResponse.token,
-				tenantId: sessionOrResponse.currentTenantId,
-			},
+	if (boolFromRequest(body.hide_context_vars) && paramsResponse?.ok) {
+		const prefilled = new Set(
+			asArray<Record<string, unknown>>(asRecord(paramsResponse.payload).data)
+				.flatMap((row) => [row.chave, row.chave_plataforma])
+				.map((key) => String(key || '').trim())
+				.filter(Boolean)
+				.map((key) => `@${key.replace(/^@+/, '')}`.toLowerCase()),
 		)
-		if (paramsResponse.ok) {
-			const prefilled = new Set(
-				asArray<Record<string, unknown>>(asRecord(paramsResponse.payload).data)
-					.map((row) => String(row.chave || '').trim())
-					.filter(Boolean)
-					.map((key) => `@${key.replace(/^@+/, '')}`.toLowerCase()),
-			)
-			result = result.filter((item) => !prefilled.has(item.token.toLowerCase()))
-		}
+		result = result.filter((item) => !prefilled.has(item.token.toLowerCase()))
 	}
 
 	return NextResponse.json({ data: { variaveis: result } })

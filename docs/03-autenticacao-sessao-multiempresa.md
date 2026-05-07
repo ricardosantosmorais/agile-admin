@@ -103,6 +103,7 @@ Tempos padrão atuais:
 - aviso: `120s`
 
 Também há interceptação automática de `401` no `httpClient`, que dispara o fluxo global de perda de sessão.
+Respostas `403` com código explícito `TENANT_CONTEXT_INVALID` seguem o mesmo fluxo de modal final, preservando 403 comum de permissão como erro operacional da tela.
 
 ## Comportamento final de inatividade
 - após 2 horas sem atividade, o app abre apenas o modal de aviso;

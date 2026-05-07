@@ -36,6 +36,7 @@ export function getConfiguracoesPedidosFieldDefinitions(t: Translate): Configura
     { key: 'forma_condicao_pagamento_filial_pedido', section: 'payment', type: 'enum', label: t('configuracoes.orders.fields.forma_condicao_pagamento_filial_pedido.label', 'Formas e condições por filial'), helper: t('configuracoes.orders.fields.forma_condicao_pagamento_filial_pedido.helper', 'Filtra formas e condições pela filial do pedido.'), options: [...yesNoOptions] },
     { key: 'exige_pagamento_total', section: 'payment', type: 'enum', label: t('configuracoes.orders.fields.exige_pagamento_total.label', 'Exige pagamento total'), helper: t('configuracoes.orders.fields.exige_pagamento_total.helper', 'Exige autorização de pagamento de todos os pedidos para concluir a compra.'), options: [...yesNoOptions] },
     { key: 'pix_unico', section: 'payment', type: 'enum', label: t('configuracoes.orders.fields.pix_unico.label', 'PIX único'), helper: t('configuracoes.orders.fields.pix_unico.helper', 'Gera um código PIX único para múltiplas encomendas.'), options: [...yesNoOptions] },
+    { key: 'exibe_juros_parcelas', section: 'payment', type: 'enum', label: t('configuracoes.orders.fields.exibe_juros_parcelas.label', 'Exibe juros das condições'), helper: t('configuracoes.orders.fields.exibe_juros_parcelas.helper', 'Indica se a plataforma exibe a informação de juros das condições de pagamento nas parcelas do cartão no checkout.'), options: [...yesNoOptions] },
     { key: 'tentativas_pagamento', section: 'payment', type: 'text', label: t('configuracoes.orders.fields.tentativas_pagamento.label', 'Tentativas de pagamento'), helper: t('configuracoes.orders.fields.tentativas_pagamento.helper', 'Bloqueia por uma hora após a quantidade definida de tentativas.'), inputMode: 'numeric' },
     { key: 'validade_link_pagamento_horas', section: 'payment', type: 'text', label: t('configuracoes.orders.fields.validade_link_pagamento_horas.label', 'Validade do link de pagamento (horas)'), helper: t('configuracoes.orders.fields.validade_link_pagamento_horas.helper', 'Se não informado, o padrão é de 24 horas.'), inputMode: 'numeric' },
     { key: 'internalizar_orcamentos', section: 'payment', type: 'enum', label: t('configuracoes.orders.fields.internalizar_orcamentos.label', 'Internalizar orçamentos'), helper: t('configuracoes.orders.fields.internalizar_orcamentos.helper', 'Marca pedidos de orçamento para internalização no ERP.'), options: [...yesNoOptions] },
@@ -121,5 +122,4 @@ export function buildDirtyConfiguracoesPedidosPayload(
     })),
   ]
 }
-
 

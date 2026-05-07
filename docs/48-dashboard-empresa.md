@@ -49,6 +49,12 @@ O frontend divide a carga em fases para reduzir tempo percebido:
 | `marketingMix` | `marketing_mix` | Mix e receita por incentivo |
 | `marketingTops` | `marketing_tops` | Top cupons e promoções |
 
+O hook `useDashboardSequencedSnapshot` controla a pressão de requisições do dashboard:
+
+- se duas chamadas idênticas entram no mesmo ciclo de carga, a segunda reaproveita a requisição em andamento;
+- quando tenant, período, comparação ou atualização iniciam um novo ciclo, as requisições antigas recebem `AbortSignal` e respostas obsoletas são ignoradas;
+- as seções pesadas continuam sendo solicitadas por viewport, e a carga completa fica reservada para a exportação de PDF.
+
 ## Regra Comercial
 
 A API do dashboard da empresa usa a lista de status válidos do `RelatorioController::validStatuses()`.

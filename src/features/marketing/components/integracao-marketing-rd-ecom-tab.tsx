@@ -61,7 +61,7 @@ export function IntegracaoMarketingRdEcomTab(props: Props) {
 							<Copy className="h-4 w-4" />
 						</button>
 					</div>
-					<p className="text-xs text-slate-500">
+					<p className="text-xs text-(--app-text-muted)">
 						{t('integrationsMarketing.rdEcomInstructions.callbackHelper', 'Use esta URL exatamente como está no campo URLs de Callback do aplicativo RD.')}
 					</p>
 				</div>

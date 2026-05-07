@@ -49,22 +49,8 @@ export const generalFields: TextFieldDefinition[] = [
 
 export const frenetFields: TextFieldDefinition[] = [
 	{ key: 'frenet_token', labelKey: 'integrationsLogistics.fields.token', helperKey: 'integrationsLogistics.helpers.frenetToken', fallback: 'Token' },
-	{
-		key: 'frenet_token_parceiro',
-		labelKey: 'integrationsLogistics.fields.partnerToken',
-		helperKey: 'integrationsLogistics.helpers.frenetPartnerToken',
-		fallback: 'Token Parceiro',
-	},
 ];
-
-export const frenetBooleans: BooleanFieldDefinition[] = [
-	{
-		key: 'frenet_nota_fiscal',
-		labelKey: 'integrationsLogistics.fields.onlyInvoiceOrders',
-		helperKey: 'integrationsLogistics.helpers.onlyInvoiceOrders',
-		fallback: 'Enviar apenas pedidos com nota fiscal',
-	},
-];
+export const frenetBooleans: BooleanFieldDefinition[] = [];
 
 export const frenetEnvironment: BooleanFieldDefinition = {
 	key: 'frenet_ambiente',

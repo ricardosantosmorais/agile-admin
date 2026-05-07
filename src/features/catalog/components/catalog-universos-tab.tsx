@@ -15,10 +15,14 @@ import type { CatalogLookupOption, CatalogUniverseRecord, CatalogUniverseType } 
 import { useI18n } from '@/src/i18n/use-i18n'
 import { BRAZILIAN_STATES } from '@/src/lib/brazil'
 
-const UNIVERSE_TYPES: Array<{ value: CatalogUniverseType; label: string }> = [
+export const CATALOG_UNIVERSE_TYPES: Array<{ value: CatalogUniverseType; label: string }> = [
   { value: 'canal_distribuicao', label: 'Canal de distribuição' },
+  { value: 'colecao', label: 'Coleção' },
+  { value: 'departamento', label: 'Departamento' },
   { value: 'filial', label: 'Filial' },
+  { value: 'fornecedor', label: 'Fornecedor' },
   { value: 'grupo', label: 'Grupo de clientes' },
+  { value: 'marca', label: 'Marca' },
   { value: 'rede', label: 'Rede de clientes' },
   { value: 'segmento', label: 'Segmento de clientes' },
   { value: 'tabela_preco', label: 'Tabela de preço' },
@@ -44,7 +48,7 @@ type CatalogUniversosTabProps = {
 }
 
 function universeTypeLabel(type: CatalogUniverseType, t: ReturnType<typeof useI18n>['t']) {
-  const entry = UNIVERSE_TYPES.find((item) => item.value === type)
+  const entry = CATALOG_UNIVERSE_TYPES.find((item) => item.value === type)
   return entry ? t(`catalog.universos.types.${type}`, entry.label) : type
 }
 
@@ -52,10 +56,18 @@ function universeValueLabel(item: CatalogUniverseRecord) {
   switch (item.tipo) {
     case 'canal_distribuicao':
       return item.canal_distribuicao?.nome || '-'
+    case 'colecao':
+      return item.colecao?.nome || '-'
+    case 'departamento':
+      return item.departamento?.nome || '-'
     case 'filial':
       return item.filial?.nome_fantasia || item.filial?.nome || '-'
+    case 'fornecedor':
+      return item.fornecedor?.nome_fantasia || item.fornecedor?.razao_social || item.fornecedor?.nome || '-'
     case 'grupo':
       return item.grupo?.nome || '-'
+    case 'marca':
+      return item.marca?.nome || '-'
     case 'rede':
       return item.rede?.nome || '-'
     case 'segmento':
@@ -69,14 +81,22 @@ function universeValueLabel(item: CatalogUniverseRecord) {
   }
 }
 
-function universeLookupResource(type: CatalogUniverseType) {
+export function getCatalogUniverseLookupResource(type: CatalogUniverseType) {
   switch (type) {
     case 'canal_distribuicao':
       return 'canais_distribuicao'
+    case 'colecao':
+      return 'colecoes'
+    case 'departamento':
+      return 'departamentos'
     case 'filial':
       return 'filiais'
+    case 'fornecedor':
+      return 'fornecedores'
     case 'grupo':
       return 'grupos'
+    case 'marca':
+      return 'marcas'
     case 'rede':
       return 'redes'
     case 'segmento':
@@ -94,12 +114,22 @@ function universeLookupOption(item: CatalogUniverseRecord): CatalogLookupOption 
       return item.canal_distribuicao?.id
         ? { id: item.canal_distribuicao.id, label: item.canal_distribuicao.nome || item.canal_distribuicao.id }
         : null
+    case 'colecao':
+      return item.colecao?.id ? { id: item.colecao.id, label: item.colecao.nome || item.colecao.id } : null
+    case 'departamento':
+      return item.departamento?.id ? { id: item.departamento.id, label: item.departamento.nome || item.departamento.id } : null
     case 'filial':
       return item.filial?.id
         ? { id: item.filial.id, label: item.filial.nome_fantasia || item.filial.nome || item.filial.id }
         : null
+    case 'fornecedor':
+      return item.fornecedor?.id
+        ? { id: item.fornecedor.id, label: item.fornecedor.nome_fantasia || item.fornecedor.razao_social || item.fornecedor.nome || item.fornecedor.id }
+        : null
     case 'grupo':
       return item.grupo?.id ? { id: item.grupo.id, label: item.grupo.nome || item.grupo.id } : null
+    case 'marca':
+      return item.marca?.id ? { id: item.marca.id, label: item.marca.nome || item.marca.id } : null
     case 'rede':
       return item.rede?.id ? { id: item.rede.id, label: item.rede.nome || item.rede.id } : null
     case 'segmento':
@@ -109,6 +139,37 @@ function universeLookupOption(item: CatalogUniverseRecord): CatalogLookupOption 
     default:
       return null
   }
+}
+
+export function buildCatalogUniversePayload(draft: UniverseDraft) {
+  const payload: Record<string, unknown> = {
+    tipo: draft.tipo,
+    restricao: draft.restricao,
+  }
+
+  if (draft.tipo === 'uf') {
+    if (draft.uf) {
+      payload.uf = draft.uf
+    }
+    return payload
+  }
+
+  if (!draft.objeto) {
+    return payload
+  }
+
+  if (draft.tipo === 'canal_distribuicao') payload.id_canal_distribuicao = draft.objeto.id
+  if (draft.tipo === 'colecao') payload.id_colecao = draft.objeto.id
+  if (draft.tipo === 'departamento') payload.id_departamento = draft.objeto.id
+  if (draft.tipo === 'filial') payload.id_filial = draft.objeto.id
+  if (draft.tipo === 'fornecedor') payload.id_fornecedor = draft.objeto.id
+  if (draft.tipo === 'grupo') payload.id_grupo = draft.objeto.id
+  if (draft.tipo === 'marca') payload.id_marca = draft.objeto.id
+  if (draft.tipo === 'rede') payload.id_rede = draft.objeto.id
+  if (draft.tipo === 'segmento') payload.id_segmento = draft.objeto.id
+  if (draft.tipo === 'tabela_preco') payload.id_tabela_preco = draft.objeto.id
+
+  return payload
 }
 
 export function CatalogUniversosTab({
@@ -134,7 +195,7 @@ export function CatalogUniversosTab({
     uf: '',
   })
 
-  const lookupResource = useMemo(() => universeLookupResource(draft.tipo), [draft.tipo])
+  const lookupResource = useMemo(() => getCatalogUniverseLookupResource(draft.tipo), [draft.tipo])
 
   function resetDraft() {
     setEditingUniverseId(null)
@@ -170,30 +231,19 @@ export function CatalogUniversosTab({
   }
 
   async function handleCreateOrUpdate() {
-    const payload: Record<string, unknown> = {
-      tipo: draft.tipo,
-      restricao: draft.restricao,
-    }
-
     if (draft.tipo === 'uf') {
       if (!draft.uf) {
         setModalFeedback(t('catalog.universos.selectUf', 'Selecione uma UF.'))
         return
       }
-      payload.uf = draft.uf
     } else {
       if (!draft.objeto) {
         setModalFeedback(t('catalog.universos.selectValue', 'Selecione um valor para a regra.'))
         return
       }
-
-      if (draft.tipo === 'canal_distribuicao') payload.id_canal_distribuicao = draft.objeto.id
-      if (draft.tipo === 'filial') payload.id_filial = draft.objeto.id
-      if (draft.tipo === 'grupo') payload.id_grupo = draft.objeto.id
-      if (draft.tipo === 'rede') payload.id_rede = draft.objeto.id
-      if (draft.tipo === 'segmento') payload.id_segmento = draft.objeto.id
-      if (draft.tipo === 'tabela_preco') payload.id_tabela_preco = draft.objeto.id
     }
+
+    const payload = buildCatalogUniversePayload(draft)
 
     try {
       if (editingUniverseId) {
@@ -297,7 +347,7 @@ export function CatalogUniversosTab({
               className={inputClasses()}
               disabled={readOnly}
             >
-              {UNIVERSE_TYPES.map((type) => (
+              {CATALOG_UNIVERSE_TYPES.map((type) => (
                 <option key={type.value} value={type.value}>{universeTypeLabel(type.value, t)}</option>
               ))}
             </select>

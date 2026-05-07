@@ -10,6 +10,9 @@ Escopo atual migrado para o v2:
 - atualização de observações internas;
 - atualização operacional de entrega com status, rastreamento, código e prazo;
 - visualização de logs e payloads JSON no detalhe;
+- filtro de logs técnicos para usuários não master, preservando logs operacionais visíveis;
+- ações master nos itens do pedido para abrir memória de preço e rastreabilidade técnica quando o payload existir;
+- resumo amigável da rastreabilidade técnica do produto com campo, valor final, regra, origem e descrição, mantendo o JSON completo para auditoria;
 - ações operacionais de aprovar pagamento e cancelar pedido com motivo.
 
 ## Decisões

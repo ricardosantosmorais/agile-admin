@@ -1,12 +1,13 @@
 'use client';
 
-import { Building2, Globe2 } from 'lucide-react';
+import { Building2, Globe2, IdCard } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AccessDeniedState } from '@/src/features/auth/components/access-denied-state';
 import { useFeatureAccess } from '@/src/features/auth/hooks/use-feature-access';
 import { useAuth } from '@/src/features/auth/hooks/use-auth';
 import { TabbedIntegrationFormPage } from '@/src/features/integracoes/components/tabbed-integration-form-page';
 import { IntegracaoClientesCnpjaTab } from '@/src/features/integracoes-clientes/components/integracao-clientes-cnpja-tab';
+import { IntegracaoClientesCfoTab } from '@/src/features/integracoes-clientes/components/integracao-clientes-cfo-tab';
 import { IntegracaoClientesPortalTab } from '@/src/features/integracoes-clientes/components/integracao-clientes-portal-tab';
 import { useI18n } from '@/src/i18n/use-i18n';
 import { useIntegracaoClientesPageState } from './integracao-clientes-page-state';
@@ -31,7 +32,7 @@ export function IntegracaoClientesPage() {
 	const [error, setError] = useState<Error | null>(null);
 	const [loading, setLoading] = useState(true);
 
-	const { cnpjaTokenEditable, setCnpjaTokenEditable, unlockedBranchIds, hasChanges, patchValues, updateBranchToken, unlockBranch, lockBranch, resetEditableState } =
+	const { cnpjaTokenEditable, setCnpjaTokenEditable, croApiKeyEditable, setCroApiKeyEditable, unlockedBranchIds, hasChanges, patchValues, updateBranchToken, unlockBranch, lockBranch, resetEditableState } =
 		useIntegracaoClientesPageState({
 			initialRecord,
 			values,
@@ -82,6 +83,7 @@ export function IntegracaoClientesPage() {
 				setFeedback(null);
 				await integracaoClientesClient.save(values, branches, {
 					includeCnpjaToken: cnpjaTokenEditable,
+					includeCroApiKey: croApiKeyEditable,
 					unlockedBranchIds,
 				});
 				const refreshed = await integracaoClientesClient.get();
@@ -100,7 +102,7 @@ export function IntegracaoClientesPage() {
 				setSaving(false);
 			}
 		},
-		[branches, canSave, cnpjaTokenEditable, resetEditableState, t, unlockedBranchIds, values],
+		[branches, canSave, cnpjaTokenEditable, croApiKeyEditable, resetEditableState, t, unlockedBranchIds, values],
 	);
 
 	const breadcrumbs = useMemo(
@@ -141,6 +143,32 @@ export function IntegracaoClientesPage() {
 				),
 			},
 			{
+				key: 'cfo',
+				label: t('integrationsClients.tabs.cfo', 'CFO'),
+				icon: <IdCard className="h-4 w-4" />,
+				content: (
+					<IntegracaoClientesCfoTab
+						value={values.croApiKey}
+						initialValue={initialRecord.values.croApiKey}
+						editable={croApiKeyEditable}
+						saving={saving}
+						canEdit={canEdit}
+						metadata={record.metadata.croApiKey}
+						locale={locale}
+						onChange={(value) => patchValues('croApiKey', value)}
+						onEnable={() => {
+							setCroApiKeyEditable(true);
+							patchValues('croApiKey', '');
+						}}
+						onCancel={() => {
+							setCroApiKeyEditable(false);
+							patchValues('croApiKey', initialRecord.values.croApiKey);
+						}}
+						t={t}
+					/>
+				),
+			},
+			{
 				key: 'portal',
 				label: t('integrationsClients.tabs.portal', 'Portal do Cliente'),
 				icon: <Globe2 className="h-4 w-4" />,
@@ -172,10 +200,13 @@ export function IntegracaoClientesPage() {
 			branches,
 			canEdit,
 			cnpjaTokenEditable,
+			croApiKeyEditable,
 			initialRecord.branches,
 			initialRecord.values.cnpjaToken,
+			initialRecord.values.croApiKey,
 			locale,
 			record.metadata.cnpjaToken,
+			record.metadata.croApiKey,
 			record.metadata.portalNotasFiscais,
 			record.metadata.portalOrcamentos,
 			record.metadata.portalPedidos,
@@ -184,6 +215,7 @@ export function IntegracaoClientesPage() {
 			patchValues,
 			saving,
 			setCnpjaTokenEditable,
+			setCroApiKeyEditable,
 			t,
 			unlockBranch,
 			unlockedBranchIds,

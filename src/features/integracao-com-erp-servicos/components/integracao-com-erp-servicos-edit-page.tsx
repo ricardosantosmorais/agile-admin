@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock3, Eye, FileCode2, History, Info, Loader2, Play, RefreshCcw, RotateCw, Save, Settings2, StopCircle } from 'lucide-react';
+import { Clock3, Copy, Download, Eye, FileCode2, History, Info, Loader2, Play, RefreshCcw, RotateCw, Save, Settings2, StopCircle } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppDataTable } from '@/src/components/data-table/app-data-table';
 import { DataTableFiltersCard } from '@/src/components/data-table/data-table-filters';
@@ -20,6 +20,7 @@ import { AccessDeniedState } from '@/src/features/auth/components/access-denied-
 import { useFeatureAccess } from '@/src/features/auth/hooks/use-feature-access';
 import { useAuth } from '@/src/features/auth/hooks/use-auth';
 import { integracaoComErpServicosClient } from '@/src/features/integracao-com-erp-servicos/services/integracao-com-erp-servicos-client';
+import { buildExecutionLogDownloadFileName } from '@/src/features/integracao-com-erp-servicos/services/integracao-com-erp-servicos-log-actions';
 import type {
 	IntegracaoComErpServicoExecutionDetailResponse,
 	IntegracaoComErpServicoExecutionDetailRecord,
@@ -421,6 +422,39 @@ export function IntegracaoComErpServicosEditPage({ serviceId }: Props) {
 		},
 		[t],
 	);
+
+	const handleCopyExecutionLogContent = useCallback(async () => {
+		if (!executionLogModal) {
+			return;
+		}
+
+		try {
+			const clipboard = typeof navigator !== 'undefined' ? navigator.clipboard : null;
+			if (!clipboard?.writeText) {
+				throw new Error('clipboard_unavailable');
+			}
+			await clipboard.writeText(executionLogModal.content);
+			setFeedback({ tone: 'success', message: t('maintenance.erpIntegration.servicesEdit.feedback.executionLogCopied', 'Conteúdo do log copiado para a área de transferência.') });
+		} catch {
+			setFeedback({ tone: 'error', message: t('maintenance.erpIntegration.servicesEdit.feedback.executionLogCopyError', 'Não foi possível copiar o conteúdo do log.') });
+		}
+	}, [executionLogModal, t]);
+
+	const handleDownloadExecutionLogContent = useCallback(() => {
+		if (!executionLogModal || typeof document === 'undefined') {
+			return;
+		}
+
+		const blob = new Blob([executionLogModal.content], { type: 'text/plain;charset=utf-8' });
+		const objectUrl = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = objectUrl;
+		link.download = buildExecutionLogDownloadFileName(executionLogModal);
+		document.body.appendChild(link);
+		link.click();
+		link.remove();
+		URL.revokeObjectURL(objectUrl);
+	}, [executionLogModal]);
 
 	const executionDetailColumns = useMemo(
 		() =>
@@ -1087,11 +1121,23 @@ export function IntegracaoComErpServicosEditPage({ serviceId }: Props) {
 					>
 						{executionLogModal ? (
 							<div className="space-y-3">
-								{executionLogModal.fileName ? (
-									<div className="text-sm text-(--app-text)">
-										<strong>Arquivo:</strong> {executionLogModal.fileName}
+								<div className="flex flex-wrap items-center justify-between gap-3">
+									{executionLogModal.fileName ? (
+										<div className="text-sm text-(--app-text)">
+											<strong>{t('maintenance.erpIntegration.servicesEdit.executions.fileLabel', 'Arquivo')}:</strong> {executionLogModal.fileName}
+										</div>
+									) : <div />}
+									<div className="flex flex-wrap gap-2">
+										<button type="button" className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold" onClick={() => void handleCopyExecutionLogContent()}>
+											<Copy className="h-4 w-4" aria-hidden="true" />
+											{t('maintenance.erpIntegration.servicesEdit.executions.actions.copyContent', 'Copiar conteúdo')}
+										</button>
+										<button type="button" className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold" onClick={handleDownloadExecutionLogContent}>
+											<Download className="h-4 w-4" aria-hidden="true" />
+											{t('maintenance.erpIntegration.servicesEdit.executions.actions.downloadContent', 'Baixar arquivo')}
+										</button>
 									</div>
-								) : null}
+								</div>
 								<pre className="app-control-muted max-h-[70vh] overflow-auto rounded-2xl p-4 text-sm whitespace-pre-wrap">{executionLogModal.content}</pre>
 							</div>
 						) : null}

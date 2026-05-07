@@ -21,4 +21,30 @@ describe('integracao-com-erp-cadastro-servicos', () => {
 			obrigatorio: 0,
 		})
 	})
+
+	it('limpa dataset consolidado quando o servico nao e endpoint gateway', () => {
+		expect(buildServicoCadastroPayload({
+			nome: 'Pedidos',
+			tipo_objeto: 'query',
+			modo_transformacao_gateway: 'dataset_consolidado',
+			dataset_source_path: 'data.items',
+		})).toMatchObject({
+			tipo_objeto: 'query',
+			modo_transformacao_gateway: 'registro',
+			dataset_source_path: null,
+		})
+	})
+
+	it('limpa caminho consolidado quando o modo volta para registro', () => {
+		expect(buildServicoCadastroPayload({
+			nome: 'Pedidos',
+			tipo_objeto: 'endpoint_gateway',
+			modo_transformacao_gateway: 'registro',
+			dataset_source_path: 'data.items',
+		})).toMatchObject({
+			tipo_objeto: 'endpoint_gateway',
+			modo_transformacao_gateway: 'registro',
+			dataset_source_path: null,
+		})
+	})
 })

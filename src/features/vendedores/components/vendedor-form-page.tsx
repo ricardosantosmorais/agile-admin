@@ -170,6 +170,15 @@ export function VendedorFormPage({ id: forcedId }: { id?: string }) {
                   <BooleanSegmentedField value={form.bloqueado} onChange={(value) => patch('bloqueado', value)} disabled={readOnly} />
                 </FormRow>
 
+                <FormRow label={t('people.sellers.fields.areaVendedor', 'Utiliza Área V2')}>
+                  <div className="space-y-2">
+                    <BooleanSegmentedField value={form.area_vendedor} onChange={(value) => patch('area_vendedor', value)} disabled={readOnly} />
+                    <p className="text-xs leading-5 text-[color:var(--app-muted)]">
+                      {t('people.sellers.helpers.areaVendedor', 'A ativação depende da Área Representante V2 habilitada e de licenças disponíveis.')}
+                    </p>
+                  </div>
+                </FormRow>
+
                 <FormRow label={t('simpleCrud.fields.code', 'Code')}>
                   <input className={inputClasses()} value={form.codigo} onChange={(event) => patch('codigo', event.target.value)} disabled={readOnly} />
                 </FormRow>

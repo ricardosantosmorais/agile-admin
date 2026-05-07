@@ -38,6 +38,14 @@ function optionFromValue(value: unknown, label: unknown): LookupOption | null {
 	return { id, label: String(label || id) }
 }
 
+function isEndpointGatewayMode(form: Record<string, unknown>) {
+	return String(form.tipo_objeto || '') === 'endpoint_gateway'
+}
+
+function isConsolidatedDatasetMode(form: Record<string, unknown>) {
+	return isEndpointGatewayMode(form) && String(form.modo_transformacao_gateway || 'registro') === 'dataset_consolidado'
+}
+
 async function loadServicoOptions(path: string, query: string, page: number, perPage: number) {
 	const glue = path.includes('?') ? '&' : '?'
 	const params = new URLSearchParams({ q: query, page: String(page), perPage: String(perPage) })
@@ -147,8 +155,8 @@ export const INTEGRACAO_COM_ERP_CADASTRO_SERVICOS_CONFIG: CrudModuleConfig = {
 				{ key: 'canal_execucao', labelKey: 'maintenance.erpIntegration.catalogs.items.servicos.fields.channel', label: 'Canal de Execução', type: 'select', options: [...SERVICO_CHANNEL_OPTIONS] },
 				{ key: 'filtro_sql', labelKey: 'maintenance.erpIntegration.catalogs.items.servicos.fields.sqlFilter', label: 'Filtro SQL', type: 'textarea', rows: 3 },
 				{ key: 'intervalo_execucao', labelKey: 'maintenance.erpIntegration.catalogs.items.servicos.fields.interval', label: 'Intervalo de Execução (min)', type: 'select', options: SERVICO_INTERVAL_OPTIONS },
-				{ key: 'modo_transformacao_gateway', labelKey: 'maintenance.erpIntegration.catalogs.items.servicos.fields.gatewayTransformMode', label: 'Modo do Mapeamento', type: 'select', options: [{ value: 'registro', label: 'Por registro' }, { value: 'dataset_consolidado', label: 'Dataset consolidado' }] },
-				{ key: 'dataset_source_path', labelKey: 'maintenance.erpIntegration.catalogs.items.servicos.fields.datasetSourcePath', label: 'Caminho da Coleção Consolidada', type: 'text', maxLength: 255, placeholder: 'conta_receber_cadastro', helperText: 'Informe o caminho da coleção a consolidar no retorno bruto do endpoint, por exemplo conta_receber_cadastro ou data.items.' },
+				{ key: 'modo_transformacao_gateway', labelKey: 'maintenance.erpIntegration.catalogs.items.servicos.fields.gatewayTransformMode', label: 'Modo do Mapeamento', type: 'select', options: [{ value: 'registro', label: 'Por registro' }, { value: 'dataset_consolidado', label: 'Dataset consolidado' }], hidden: ({ form }) => !isEndpointGatewayMode(form) },
+				{ key: 'dataset_source_path', labelKey: 'maintenance.erpIntegration.catalogs.items.servicos.fields.datasetSourcePath', label: 'Caminho da Coleção Consolidada', type: 'text', maxLength: 255, placeholder: 'conta_receber_cadastro', helperText: 'Informe o caminho da coleção a consolidar no retorno bruto do endpoint, por exemplo conta_receber_cadastro ou data.items.', hidden: ({ form }) => !isConsolidatedDatasetMode(form), required: true },
 			],
 		},
 		{
@@ -177,4 +185,3 @@ export const INTEGRACAO_COM_ERP_CADASTRO_SERVICOS_CONFIG: CrudModuleConfig = {
 	normalizeRecord: normalizeServicoCadastroRecord,
 	beforeSave: buildServicoCadastroPayload,
 }
-

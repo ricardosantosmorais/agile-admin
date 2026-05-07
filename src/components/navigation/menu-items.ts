@@ -64,6 +64,7 @@ import {
 	Ban,
 	Waypoints,
 	MessageCircle,
+	Store,
 } from 'lucide-react';
 import { DynamicIcon } from 'lucide-react/dynamic.mjs';
 import { isIconPickerIconValue, normalizeIconPickerValue } from '@/src/components/ui/icon-picker-catalog';
@@ -195,6 +196,10 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 	'emails-payloads-form': '/cadastros/emails-payloads/novo',
 	'apps-list': '/cadastros/apps',
 	'apps-form': '/cadastros/apps/novo',
+	'app-store-list': '/agile-store',
+	'app-store-admin': '/agile-store/admin',
+	'sac-dashboard': '/sac',
+	'sac-chamados': '/sac',
 	'relatorios-list': '/relatorios',
 	'relatorios-v2-list': '/relatorios',
 	'configuracoes-clientes-form': '/configuracoes/clientes',
@@ -396,6 +401,7 @@ const SYSTEM_ICON_KEY_MAP: Record<string, LucideIcon> = {
 	crown: ShieldCheck,
 	'building-2': Building2,
 	store: Warehouse,
+	'app-store': Store,
 	truck: Truck,
 	'credit-card': HandCoins,
 	megaphone: Sparkles,

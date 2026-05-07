@@ -29,6 +29,7 @@ type Props = {
   values: ConfiguracoesVendedoresFormValues
   metadata: Partial<Record<keyof ConfiguracoesVendedoresFormValues, FieldMetadata>>
   canSave: boolean
+  isMasterUser: boolean
   patch: <K extends keyof ConfiguracoesVendedoresFormValues>(key: K, value: ConfiguracoesVendedoresFormValues[K]) => void
   t: (key: string, fallback: string, params?: Record<string, string>) => string
 }
@@ -40,6 +41,7 @@ export function ConfiguracoesVendedoresFormSections({
   values,
   metadata,
   canSave,
+  isMasterUser,
   patch,
   t,
 }: Props) {
@@ -49,27 +51,49 @@ export function ConfiguracoesVendedoresFormSections({
         <SectionCard key={section.key} title={section.title} description={section.description}>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {fieldDefinitions.filter((field) => field.section === section.key).map((field) => {
+              if (field.masterOnly && !isMasterUser) {
+                return null
+              }
+              if (field.visibleWhenAreaV2 && values.area_representante !== 'v2') {
+                return null
+              }
+
               const fieldMeta = metadata[field.key]
+              const disabled = !canSave || (field.masterOnlyEdit && !isMasterUser)
 
               return (
                 <div key={field.key} className="app-control-muted rounded-[1.15rem] p-4">
                   <FormField label={field.label} asLabel={false}>
-                    <select
-                      value={values[field.key] ?? ''}
-                      onChange={(event) => patch(field.key, event.target.value)}
-                      disabled={!canSave}
-                      className={inputClasses()}
-                    >
-                      <option value="">{t('common.select', 'Selecione')}</option>
-                      {field.options.map((option) => (
-                        <option key={`${field.key}-${option.value}`} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
+                    {field.type === 'enum' ? (
+                      <select
+                        value={values[field.key] ?? ''}
+                        onChange={(event) => patch(field.key, event.target.value)}
+                        disabled={disabled}
+                        className={inputClasses()}
+                      >
+                        <option value="">{t('common.select', 'Selecione')}</option>
+                        {(field.options ?? []).map((option) => (
+                          <option key={`${field.key}-${option.value}`} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        value={values[field.key] ?? ''}
+                        onChange={(event) => patch(field.key, event.target.value)}
+                        disabled={disabled}
+                        className={inputClasses()}
+                        inputMode={field.type === 'integer' ? 'numeric' : 'decimal'}
+                        min={field.type === 'integer' ? 0 : undefined}
+                        step={field.type === 'integer' ? 1 : undefined}
+                        type={field.type === 'integer' ? 'number' : 'text'}
+                      />
+                    )}
                   </FormField>
 
                   {field.helper ? <p className="mt-2 text-xs leading-5 text-[color:var(--app-muted)]">{field.helper}</p> : null}
+                  {field.masterOnlyEdit && !isMasterUser ? <p className="mt-2 text-xs leading-5 text-[color:var(--app-muted)]">{t('configuracoes.sellers.masterOnlyEdit', 'Somente usuário master pode alterar este valor.')}</p> : null}
                   {fieldMeta ? (
                     <p className="mt-2 text-xs leading-5 text-[color:var(--app-muted)]">
                       {t('configuracoes.home.lastUpdated', 'Ãšltima alteraÃ§Ã£o: {{date}} por {{user}}', {

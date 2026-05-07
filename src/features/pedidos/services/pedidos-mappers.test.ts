@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { normalizePedidoDetail, normalizePedidoListRecord } from '@/src/features/pedidos/services/pedidos-mappers'
+import { PEDIDO_DELIVERY_STATUS_OPTIONS } from '@/src/features/pedidos/services/pedidos-meta'
+import {
+  filterPedidoLogsByAccess,
+  getPedidoProductTechnicalArtifacts,
+  isTechnicalPedidoLog,
+  normalizePedidoDetail,
+  normalizePedidoListRecord,
+} from '@/src/features/pedidos/services/pedidos-mappers'
 
 describe('pedidos mappers', () => {
   it('normaliza a listagem com status e flags operacionais', () => {
@@ -40,5 +47,88 @@ describe('pedidos mappers', () => {
     expect(detail.status_label).toBe('Aguardando pagamento')
     expect(detail.canApprovePayment).toBe(true)
     expect(detail.canCancel).toBe(true)
+  })
+
+  it('mantem os status de entrega adicionados no legado', () => {
+    expect(PEDIDO_DELIVERY_STATUS_OPTIONS.map((option) => option.value)).toEqual([
+      'aguardando',
+      'pronto_retirada',
+      'coletado',
+      'devolvido',
+      'em_transporte',
+      'entregue',
+      'solicitado',
+    ])
+  })
+
+  it('filtra logs tecnicos para usuarios que nao sao master', () => {
+    const logs = [
+      { codigo: 'checkout', descricao: 'Operacional' },
+      { codigo: 'processing_price', descricao: 'Tecnico' },
+      { codigo: 'origin_trace_snapshot', descricao: 'Rastreabilidade' },
+    ]
+
+    expect(isTechnicalPedidoLog(logs[1])).toBe(true)
+    expect(isTechnicalPedidoLog(logs[2])).toBe(true)
+    expect(filterPedidoLogsByAccess(logs, false)).toEqual([logs[0]])
+    expect(filterPedidoLogsByAccess(logs, true)).toEqual(logs)
+  })
+
+  it('normaliza artefatos tecnicos do produto para acoes master no detalhe', () => {
+    const artifacts = getPedidoProductTechnicalArtifacts({
+      memoria_preco: { preco_venda: 10 },
+      metadata: {
+        origin_trace: {
+          source: 'price_engine',
+        },
+      },
+    })
+
+    expect(artifacts.priceMemory).toBe(JSON.stringify({ preco_venda: 10 }, null, 2))
+    expect(artifacts.originTrace).toBe(JSON.stringify({ source: 'price_engine' }, null, 2))
+  })
+
+  it('traduz a rastreabilidade tecnica do produto para linhas amigaveis', () => {
+    const artifacts = getPedidoProductTechnicalArtifacts({
+      metadata: {
+        origin_trace: {
+          fields: {
+            id_tabela_preco: {
+              value: 15,
+              rule: 'request_tabela_preco',
+              source_path: 'request.id_tabela_preco',
+            },
+            id_filial_estoque: {
+              value: true,
+              rule: 'fallback_filial_produto',
+              source_path: 'produto.id_filial_estoque',
+            },
+          },
+        },
+      },
+    })
+
+    expect(artifacts.originTraceSummary).toEqual([
+      {
+        fieldCode: 'id_tabela_preco',
+        fieldLabel: 'Tabela de preço',
+        value: '15',
+        ruleCode: 'request_tabela_preco',
+        ruleLabel: 'Tabela da requisição',
+        sourcePath: 'request.id_tabela_preco',
+        sourceLabel: 'Tabela de preço enviada na requisição',
+        description: 'A tabela de preço final do item coincidiu com a tabela enviada na requisição.',
+      },
+      {
+        fieldCode: 'id_filial_estoque',
+        fieldLabel: 'Filial de estoque',
+        value: 'true',
+        ruleCode: 'fallback_filial_produto',
+        ruleLabel: 'Uso da filial principal do produto',
+        sourcePath: 'produto.id_filial_estoque',
+        sourceLabel: 'Filial de estoque resolvida do produto',
+        description: 'A filial de estoque do item usou a própria filial principal do item.',
+      },
+    ])
   })
 })
