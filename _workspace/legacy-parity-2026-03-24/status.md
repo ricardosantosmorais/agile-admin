@@ -77,7 +77,9 @@ Base date: 2026-03-24
 - SAC configurações migrou configuração do módulo, cadastros de áreas, assuntos e responsáveis por área, bridges administrativas `sac/admin/*`, mapeadores, i18n, docs e cobertura focada. A etapa não adicionou item fixo ao menu; a superfície continua dependente das permissões dinâmicas `SAC_FUNC_CONFIGURAR_MODULO` e `SAC_FUNC_CONFIGURAR_AREAS`.
 - Thirty-fourth batch checked: `agile-store/admin-backoffice`.
 - Retaguarda da Agile Store migrou dashboard administrativo, filtros, métricas, performance por módulo, visitas/eventos, contratações/faturamento, ações de marcar faturamento e descontratar contrato por ID, bridges `app-store/admin/*`, mapeadores, i18n e docs. A etapa não adicionou item fixo ao menu; apenas mapeia o componente dinâmico `app-store-admin` para `/agile-store/admin`.
-- Next step: continue `agile-store` with SAC attachment upload or close remaining non-applicable catalog/script backoffice scope.
+- Thirty-fifth batch checked: `agile-store/sac-admin-anexos`.
+- SAC anexos migrou upload de arquivos na resposta ao cliente, incluindo input multi-arquivo na modal do chamado, envio `multipart/form-data`, validação de extensão/tamanho conforme legado, upload S3 privado por tenant antes do POST para API v3 e renderização de anexos no histórico.
+- Next step: close remaining non-applicable Agile Store catalog/script administration scope or define a product surface for it.
 
 ## Completed batches
 
@@ -115,6 +117,7 @@ Base date: 2026-03-24
 - `agile-store/sac-admin-acoes-avancadas`: migrated fine-grained SAC action permissions, lookup bridges, relational filters, own-ticket restriction, internal note, status change, assignment and transfer forms with `updated_at` concurrency protection.
 - `agile-store/sac-admin-configuracoes`: migrated SAC module settings, area/subject/responsible administration, API v3 bridges, mappers, i18n, docs and focused regression coverage without adding fixed menu items.
 - `agile-store/admin-backoffice`: migrated Agile Store management dashboard, module performance, visits/events, contracts/billing, administrative billing status and cancellation actions, dynamic `app-store-admin` route mapping, API v3 bridges, mappers, i18n, docs and focused coverage.
+- `agile-store/sac-admin-anexos`: migrated SAC response attachment upload with multipart bridge, S3 private tenant upload, legacy extension/10MB validation, API v3 `anexos` payload parity, timeline attachment rendering, i18n, docs and focused coverage.
 
 ## Known local noise excluded
 

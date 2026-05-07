@@ -19,9 +19,13 @@ import { GET as listUsers } from '@/app/api/sac/usuarios/route'
 const {
   readAuthSessionMock,
   serverApiFetchMock,
+  s3SendMock,
+  putObjectCommandMock,
 } = vi.hoisted(() => ({
   readAuthSessionMock: vi.fn(),
   serverApiFetchMock: vi.fn(),
+  s3SendMock: vi.fn(),
+  putObjectCommandMock: vi.fn((input: Record<string, unknown>) => ({ input })),
 }))
 
 vi.mock('@/src/features/auth/services/auth-session', () => ({
@@ -32,14 +36,24 @@ vi.mock('@/src/services/http/server-api', () => ({
   serverApiFetch: serverApiFetchMock,
 }))
 
+vi.mock('@aws-sdk/client-s3', () => ({
+  PutObjectCommand: putObjectCommandMock,
+  S3Client: vi.fn(() => ({ send: s3SendMock })),
+}))
+
 describe('sac admin routes', () => {
   beforeEach(() => {
     readAuthSessionMock.mockReset()
     serverApiFetchMock.mockReset()
+    s3SendMock.mockReset()
+    putObjectCommandMock.mockClear()
     readAuthSessionMock.mockResolvedValue({
       token: 'session-token',
       currentTenantId: 'empresa-1',
     })
+    vi.stubEnv('UPLOAD_S3_ACCESS_KEY_ID', 'access-key')
+    vi.stubEnv('UPLOAD_S3_SECRET_ACCESS_KEY', 'secret-key')
+    s3SendMock.mockResolvedValue({})
     serverApiFetchMock.mockResolvedValue({ ok: true, status: 200, payload: { data: {} } })
   })
 
@@ -87,6 +101,53 @@ describe('sac admin routes', () => {
         token: 'session-token',
         tenantId: 'empresa-1',
         body: { mensagem: 'Resposta ao cliente', status: 'aguardando_cliente', updated_at: '2026-05-07 10:00:00' },
+      }),
+    )
+  })
+
+  it('uploads SAC response attachments before forwarding the legacy anexos contract', async () => {
+    const formData = new FormData()
+    const file = new File(['conteudo-pdf'], 'comprovante.pdf', { type: 'application/pdf' })
+    Object.defineProperty(file, 'arrayBuffer', {
+      value: vi.fn().mockResolvedValue(new TextEncoder().encode('conteudo-pdf').buffer),
+    })
+    formData.set('action', 'respond')
+    formData.set('mensagem', 'Segue comprovante')
+    formData.set('status', 'aguardando_cliente')
+    formData.set('updated_at', '2026-05-07 10:00:00')
+    formData.append('anexos[]', file)
+
+    const response = await runTicketAction({
+      headers: new Headers({ 'content-type': 'multipart/form-data' }),
+      formData: vi.fn().mockResolvedValue(formData),
+    } as unknown as Request, { params: Promise.resolve({ id: '42' }) })
+
+    expect(response.status).toBe(200)
+    expect(putObjectCommandMock).toHaveBeenCalledWith(expect.objectContaining({
+      Bucket: 'agileecommerce-files',
+      ContentType: 'application/pdf',
+      ACL: 'private',
+    }))
+    expect(putObjectCommandMock.mock.calls[0]?.[0]?.Key).toMatch(/^empresa-1\/.+\.pdf$/)
+    expect(serverApiFetchMock).toHaveBeenCalledWith(
+      'sac/admin/chamados/42/responder',
+      expect.objectContaining({
+        method: 'POST',
+        token: 'session-token',
+        tenantId: 'empresa-1',
+        body: expect.objectContaining({
+          mensagem: 'Segue comprovante',
+          status: 'aguardando_cliente',
+          updated_at: '2026-05-07 10:00:00',
+          anexos: [
+            expect.objectContaining({
+              arquivo: expect.stringMatching(/\.pdf$/),
+              nome_arquivo_original: 'comprovante.pdf',
+              tipo_mime: 'application/pdf',
+              tamanho: file.size,
+            }),
+          ],
+        }),
       }),
     )
   })

@@ -68,6 +68,21 @@ export const sacAdminClient = {
       body: JSON.stringify({ action, ...payload }),
     })
   },
+  async respond(id: string, payload: Record<string, unknown>, attachments: File[] = []) {
+    const formData = new FormData()
+    formData.set('action', 'respond')
+    for (const [key, value] of Object.entries(payload)) {
+      if (value !== undefined && value !== null) formData.set(key, String(value))
+    }
+    for (const file of attachments) {
+      formData.append('anexos[]', file)
+    }
+    return httpClient(`/api/sac/chamados/${encodeURIComponent(id)}/action`, {
+      method: 'POST',
+      cache: 'no-store',
+      body: formData,
+    })
+  },
   async areas() {
     return normalizeSacAreas(await httpClient<{ data?: Array<Record<string, unknown>> }>('/api/sac/areas', {
       method: 'GET',

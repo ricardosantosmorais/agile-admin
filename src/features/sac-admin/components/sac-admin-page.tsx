@@ -1,6 +1,6 @@
 'use client'
 
-import { RefreshCcw, Search, Send, TicketCheck, X } from 'lucide-react'
+import { Paperclip, RefreshCcw, Search, Send, TicketCheck, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '@/src/features/auth/hooks/use-auth'
 import { getSacAdminPermissions, getSacStatusInfo } from '@/src/features/sac-admin/services/sac-admin-mappers'
@@ -75,7 +75,7 @@ function TicketDetailModal({
   isLoading: boolean
   onClose: () => void
   onAction: (action: SacTicketAction, payload: Record<string, unknown>) => Promise<void>
-  onRespond: (message: string) => Promise<void>
+  onRespond: (message: string, files: File[]) => Promise<void>
   permissions: SacAdminPermissions
   areas: SacLookupOption[]
   subjects: SacLookupOption[]
@@ -83,6 +83,8 @@ function TicketDetailModal({
 }) {
   const { t } = useI18n()
   const [message, setMessage] = useState('')
+  const [responseFiles, setResponseFiles] = useState<File[]>([])
+  const [fileInputKey, setFileInputKey] = useState(0)
   const [internalNote, setInternalNote] = useState('')
   const [statusValue, setStatusValue] = useState('em_atendimento')
   const [statusMessage, setStatusMessage] = useState('')
@@ -91,12 +93,15 @@ function TicketDetailModal({
   const [transferSubjectId, setTransferSubjectId] = useState('')
   const [transferReason, setTransferReason] = useState('')
   const ticket = detail?.ticket
+  const canSubmitResponse = message.trim().length > 0 || responseFiles.length > 0
 
   async function submitResponse() {
     const normalized = message.trim()
-    if (!normalized) return
-    await onRespond(normalized)
+    if (!normalized && responseFiles.length === 0) return
+    await onRespond(normalized, responseFiles)
     setMessage('')
+    setResponseFiles([])
+    setFileInputKey((current) => current + 1)
   }
 
   async function submitAction(action: SacTicketAction, payload: Record<string, unknown>, afterSuccess: () => void) {
@@ -148,6 +153,23 @@ function TicketDetailModal({
                     <span className="text-xs text-muted">{formatDate(item.createdAt)}</span>
                   </div>
                   <p className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-700">{item.message}</p>
+                  {item.attachments.length ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {item.attachments.map((attachment) => (
+                        attachment.url ? (
+                          <a key={attachment.id || attachment.url || attachment.name} href={attachment.url} target="_blank" rel="noreferrer" className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-line px-2.5 py-1 text-xs font-bold text-slate-700 hover:text-slate-950">
+                            <Paperclip className="h-3.5 w-3.5 shrink-0" />
+                            <span className="truncate">{attachment.name || attachment.url}</span>
+                          </a>
+                        ) : (
+                          <span key={attachment.id || attachment.name} className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-line px-2.5 py-1 text-xs font-bold text-slate-500">
+                            <Paperclip className="h-3.5 w-3.5 shrink-0" />
+                            <span className="truncate">{attachment.name}</span>
+                          </span>
+                        )
+                      ))}
+                    </div>
+                  ) : null}
                 </article>
               ))}
               {!isLoading && !detail?.messages.length ? <div className="rounded-lg border border-dashed border-line p-4 text-sm text-muted">{t('sacAdmin.noMessages', 'Nenhuma mensagem registrada.')}</div> : null}
@@ -168,7 +190,22 @@ function TicketDetailModal({
               <div className="rounded-lg border border-line p-4">
                 <label htmlFor="sac-response-message" className="text-sm font-extrabold text-slate-950">{t('sacAdmin.responseLabel', 'Resposta ao cliente')}</label>
                 <textarea id="sac-response-message" value={message} onChange={(event) => setMessage(event.target.value)} className="app-control mt-3 min-h-32 w-full rounded-lg px-3 py-2 text-sm" />
-                <button type="button" onClick={() => void submitResponse()} disabled={!message.trim()} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">
+                <label htmlFor="sac-response-files" className="mt-3 block text-sm font-extrabold text-slate-950">{t('sacAdmin.attachments', 'Anexos')}</label>
+                <input
+                  key={fileInputKey}
+                  id="sac-response-files"
+                  type="file"
+                  multiple
+                  accept=".doc,.docx,.odt,.jpg,.jpeg,.gif,.png,.pdf,.xls,.xlsx,.txt,.zip"
+                  onChange={(event) => setResponseFiles(Array.from(event.target.files ?? []))}
+                  className="app-control mt-2 w-full rounded-lg px-3 py-2 text-sm"
+                />
+                <p className="mt-2 text-xs text-muted">
+                  {responseFiles.length > 0
+                    ? t('sacAdmin.filesSelected', `${responseFiles.length} arquivo(s) selecionado(s).`).replace('{count}', String(responseFiles.length))
+                    : t('sacAdmin.noFilesSelected', 'Nenhum arquivo selecionado.')}
+                </p>
+                <button type="button" onClick={() => void submitResponse()} disabled={!canSubmitResponse} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">
                   <Send className="h-4 w-4" />
                   {t('sacAdmin.respond', 'Responder')}
                 </button>
@@ -429,13 +466,13 @@ export function SacAdminPage({ permissions: providedPermissions }: SacAdminPageP
     }
   }
 
-  async function respondToTicket(message: string) {
+  async function respondToTicket(message: string, files: File[]) {
     if (!detail?.ticket) return
-    await sacAdminClient.action(detail.ticket.id, 'respond', {
+    await sacAdminClient.respond(detail.ticket.id, {
       mensagem: message,
       status: 'aguardando_cliente',
       updated_at: detail.ticket.updatedAt,
-    })
+    }, files)
     setDetail(await sacAdminClient.detail(detail.ticket.id))
     void loadData()
   }

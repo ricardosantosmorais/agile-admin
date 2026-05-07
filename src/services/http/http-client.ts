@@ -158,7 +158,7 @@ export async function httpClient<T>(input: RequestInfo | URL, init?: RequestInit
 
 	const response = await fetch(input, {
 		...init,
-		headers: buildTenantContextHeaders(path, init?.headers, { defaultContentType: 'application/json' }),
+		headers: buildTenantContextHeaders(path, init?.headers, { defaultContentType: init?.body instanceof FormData ? null : 'application/json' }),
 	});
 	const payload = await parseResponse(response);
 

@@ -10,6 +10,7 @@ const {
   areasMock,
   listMock,
   moduleConfigMock,
+  respondMock,
   saveAreaMock,
   saveAreaResponsibleMock,
   saveConfigMock,
@@ -25,6 +26,7 @@ const {
   areasMock: vi.fn(),
   listMock: vi.fn(),
   moduleConfigMock: vi.fn(),
+  respondMock: vi.fn(),
   saveAreaMock: vi.fn(),
   saveAreaResponsibleMock: vi.fn(),
   saveConfigMock: vi.fn(),
@@ -43,6 +45,7 @@ vi.mock('@/src/features/sac-admin/services/sac-admin-client', () => ({
     detail: detailMock,
     list: listMock,
     moduleConfig: moduleConfigMock,
+    respond: respondMock,
     saveArea: saveAreaMock,
     saveAreaResponsible: saveAreaResponsibleMock,
     saveConfig: saveConfigMock,
@@ -107,6 +110,7 @@ describe('SacAdminPage', () => {
     detailMock.mockReset()
     listMock.mockReset()
     moduleConfigMock.mockReset()
+    respondMock.mockReset()
     saveAreaMock.mockReset()
     saveAreaResponsibleMock.mockReset()
     saveConfigMock.mockReset()
@@ -130,7 +134,14 @@ describe('SacAdminPage', () => {
     })
     detailMock.mockResolvedValue({
       ticket: ticketFixture,
-      messages: [{ id: 'm1', authorType: 'cliente', authorName: 'Cliente Alfa', message: 'Preciso de ajuda', createdAt: '2026-05-07 09:00:00', attachments: [] }],
+      messages: [{
+        id: 'm1',
+        authorType: 'cliente',
+        authorName: 'Cliente Alfa',
+        message: 'Preciso de ajuda',
+        createdAt: '2026-05-07 09:00:00',
+        attachments: [{ id: 'a1', name: 'foto-produto.png', url: 'https://arquivos.local/foto-produto.png' }],
+      }],
       events: [],
       items: [],
       attachments: [],
@@ -148,20 +159,25 @@ describe('SacAdminPage', () => {
   })
 
   it('opens ticket detail and sends a customer response through the client', async () => {
-    actionMock.mockResolvedValue({ success: true })
+    respondMock.mockResolvedValue({ success: true })
 
     render(<SacAdminPage permissions={{ canViewDashboard: true, canList: true, canView: true, canRespond: true, canAddInternalNote: false, canChangeStatus: true }} />)
 
     fireEvent.click(await screen.findByRole('button', { name: /abrir SAC-42/i }))
     expect(await screen.findByRole('heading', { name: 'SAC-42' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'foto-produto.png' })).toHaveAttribute('href', 'https://arquivos.local/foto-produto.png')
+
+    const file = new File(['conteudo-pdf'], 'comprovante.pdf', { type: 'application/pdf' })
     fireEvent.change(screen.getByLabelText('Resposta ao cliente'), { target: { value: 'Resposta ao cliente' } })
+    fireEvent.change(screen.getByLabelText('Anexos'), { target: { files: [file] } })
+    expect(screen.getByText('1 arquivo(s) selecionado(s).')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Responder' }))
 
-    await waitFor(() => expect(actionMock).toHaveBeenCalledWith('42', 'respond', expect.objectContaining({
+    await waitFor(() => expect(respondMock).toHaveBeenCalledWith('42', expect.objectContaining({
       mensagem: 'Resposta ao cliente',
       status: 'aguardando_cliente',
       updated_at: '2026-05-07 10:00:00',
-    })))
+    }), [file]))
   })
 
   it('hides response actions when the user cannot respond', async () => {

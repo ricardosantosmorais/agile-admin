@@ -7,7 +7,7 @@ A fatia administrativa do SAC cobre a operação principal de chamados:
 - dashboard resumido em `/sac`;
 - listagem de chamados com filtros de status, cliente, protocolo, área, assunto e responsável;
 - detalhe do chamado com dados principais, histórico de mensagens e anexos vinculados às mensagens;
-- resposta ao cliente, preservando `updated_at` para proteção contra edição concorrente;
+- resposta ao cliente com anexos, preservando `updated_at` para proteção contra edição concorrente;
 - nota interna, alteração de status, atribuição de responsável e transferência entre área/assunto, também preservando `updated_at`;
 - restrição de listagem por responsável quando o perfil não possui `SAC_FUNC_LISTAR_TODOS`, conforme o legado;
 - configurações do módulo SAC com `ativo`, e-mails permitidos, fechamento automático e prazo de reabertura;
@@ -44,6 +44,8 @@ As bridges do v2 ficam em `app/api/sac/*` e encaminham para:
 
 As chamadas preservam token de sessão e tenant ativo por aba. A listagem mantém o padrão do legado com ordenação default por `ultima_interacao_em desc`.
 
+No envio de resposta com anexos, a bridge recebe `multipart/form-data`, valida as extensões e o limite de 10MB por arquivo conforme o legado, grava os arquivos no bucket privado por tenant e encaminha para a API v3 o contrato `anexos[]` com `arquivo`, `nome_arquivo_original`, `tipo_mime` e `tamanho`.
+
 ## Permissões
 
 A feature `sac` reconhece componentes e chaves do legado como:
@@ -66,9 +68,8 @@ A UI usa a leitura local de acesso para liberar listagem, visualização, respos
 
 ## Fora Desta Fatia
 
-Ainda não foram migrados nesta etapa:
+Ainda não foi migrado nesta etapa:
 
-- upload/gestão completa de anexos na resposta;
 - retaguarda de gestão da Agile Store.
 
-Esses itens permanecem registrados na evidência do batch `agile-store` para as próximas fatias.
+Esse item permanece registrado na evidência do batch `agile-store` para decisão de produto antes de abrir uma superfície de catálogo/script no v2.
