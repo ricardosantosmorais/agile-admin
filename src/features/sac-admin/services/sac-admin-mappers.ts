@@ -1,0 +1,202 @@
+import type {
+  SacAdminPermissions,
+  SacAttachment,
+  SacDashboard,
+  SacEvent,
+  SacMessage,
+  SacRawDashboardResponse,
+  SacRawTicket,
+  SacRawTicketDetailResponse,
+  SacRawTicketListResponse,
+  SacStatus,
+  SacTicket,
+  SacTicketDetail,
+  SacTicketListResponse,
+} from '@/src/features/sac-admin/types/sac-admin'
+import type { AuthSession } from '@/src/features/auth/types/auth'
+import { getFeatureAccess } from '@/src/features/auth/services/permissions'
+
+function text(value: unknown) {
+  return String(value ?? '').trim()
+}
+
+function number(value: unknown, fallback = 0) {
+  const parsed = Number(value ?? fallback)
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
+function boolean(value: unknown) {
+  return value === true || value === 1 || value === '1' || value === 'true'
+}
+
+function array<T>(value: T[] | null | undefined): T[] {
+  return Array.isArray(value) ? value : []
+}
+
+function object(value: unknown): Record<string, unknown> {
+  return typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
+}
+
+function chartPoint(item: Record<string, unknown>) {
+  return {
+    label: text(item.label),
+    total: number(item.total),
+  }
+}
+
+export function normalizeSacDashboard(response: SacRawDashboardResponse): SacDashboard {
+  const data = response.data ?? {}
+  const summary = object(data.resumo)
+  const charts = data.graficos ?? {}
+  const rankings = data.rankings ?? {}
+
+  return {
+    period: {
+      start: text(data.periodo?.data_inicial),
+      end: text(data.periodo?.data_final),
+    },
+    summary: {
+      opened: number(summary.abertos_periodo),
+      closed: number(summary.fechados_periodo),
+      backlog: number(summary.backlog_atual),
+      pendingAction: number(summary.pendentes_atuacao),
+      firstResponseMinutes: number(summary.tempo_primeira_resposta_minutos),
+      resolutionHours: number(summary.tempo_resolucao_horas),
+      firstResponseSlaPercent: number(summary.sla_primeira_resposta_percentual),
+      resolutionSlaPercent: number(summary.sla_resolucao_percentual),
+      reopened: number(summary.reaberturas_periodo),
+      closedByCustomer: number(summary.fechados_cliente),
+      closedByInactivity: number(summary.fechados_inatividade),
+    },
+    charts: {
+      evolution: array(charts.evolucao).map((item) => ({
+        date: text(item.data),
+        label: text(item.label),
+        opened: number(item.abertos),
+        closed: number(item.fechados),
+      })),
+      status: array(charts.status).map((item) => chartPoint(item as Record<string, unknown>)),
+      areas: array(charts.areas).map((item) => chartPoint(item as Record<string, unknown>)),
+    },
+    rankings: {
+      pending: array(rankings.atuacao).map((item) => ({
+        id: text(item.id),
+        protocol: text(item.protocolo),
+        title: text(item.titulo),
+        areaName: text(item.area),
+        lastInteractionAt: text(item.ultima_interacao_em),
+      })),
+    },
+  }
+}
+
+export function normalizeSacTicket(raw: SacRawTicket): SacTicket {
+  return {
+    id: text(raw.id),
+    protocol: text(raw.protocolo),
+    title: text(raw.titulo),
+    status: text(raw.status) as SacStatus,
+    description: text(raw.descricao),
+    customerName: text(raw.cliente_nome),
+    customerDocument: text(raw.cliente_documento),
+    areaName: text(raw.area_nome),
+    subjectName: text(raw.assunto_nome),
+    orderCode: text(raw.pedido),
+    assigneeName: text(raw.responsavel_nome),
+    createdAt: text(raw.created_at),
+    updatedAt: text(raw.updated_at),
+    lastInteractionAt: text(raw.ultima_interacao_em),
+    canReopen: boolean(raw.pode_reabrir),
+    reopenUntil: text(raw.prazo_reabertura_ate),
+  }
+}
+
+export function normalizeSacTicketListResponse(response: SacRawTicketListResponse): SacTicketListResponse {
+  const items = array(response.data).map(normalizeSacTicket)
+  const meta = response.meta ?? {}
+  const page = number(meta.page, 1)
+  const perPage = number(meta.perpage ?? meta.perPage, 15)
+  const total = number(meta.total, items.length)
+  return {
+    items,
+    meta: {
+      page,
+      perPage,
+      total,
+      pages: number(meta.pages, Math.max(Math.ceil(total / Math.max(perPage, 1)), 1)),
+    },
+  }
+}
+
+function normalizeAttachment(raw: Record<string, unknown>): SacAttachment {
+  return {
+    id: text(raw.id),
+    name: text(raw.nome_arquivo_original),
+    url: text(raw.arquivo_url),
+  }
+}
+
+function normalizeMessage(raw: Record<string, unknown>): SacMessage {
+  return {
+    id: text(raw.id),
+    authorType: text(raw.autor_tipo),
+    authorName: text(raw.autor_nome || raw.autor_nome_exibicao),
+    message: text(raw.mensagem),
+    createdAt: text(raw.created_at),
+    attachments: array(raw.anexos as Array<Record<string, unknown>> | null | undefined).map(normalizeAttachment),
+  }
+}
+
+function normalizeEvent(raw: Record<string, unknown>): SacEvent {
+  return {
+    id: text(raw.id),
+    type: text(raw.tipo_evento),
+    description: text(raw.descricao),
+    createdAt: text(raw.created_at),
+  }
+}
+
+export function normalizeSacTicketDetail(response: SacRawTicketDetailResponse): SacTicketDetail {
+  const data = response.data ?? {}
+  return {
+    ticket: normalizeSacTicket(data.chamado ?? {}),
+    messages: array(data.mensagens).map(normalizeMessage),
+    events: array(data.eventos).map(normalizeEvent),
+    items: array(data.itens).map((item) => ({
+      id: text(item.id),
+      sku: text(item.sku),
+      productName: text(item.nome_produto),
+      quantity: number(item.quantidade),
+    })),
+    attachments: array(data.anexos).map(normalizeAttachment),
+  }
+}
+
+export function getSacStatusInfo(status: SacStatus) {
+  const normalized = text(status)
+  const map: Record<string, { label: string; tone: 'success' | 'warning' | 'danger' | 'info' | 'muted' }> = {
+    novo: { label: 'Novo', tone: 'info' },
+    em_atendimento: { label: 'Em atendimento', tone: 'info' },
+    aguardando_cliente: { label: 'Aguardando cliente', tone: 'warning' },
+    solucao_proposta: { label: 'Solução proposta', tone: 'warning' },
+    resolvido_cliente: { label: 'Resolvido pelo cliente', tone: 'success' },
+    fechado_inatividade: { label: 'Fechado por inatividade', tone: 'muted' },
+    reaberto: { label: 'Reaberto', tone: 'danger' },
+    pendentes_atuacao: { label: 'Pendentes de atuação', tone: 'warning' },
+    abertos: { label: 'Abertos', tone: 'info' },
+    fechados: { label: 'Fechados', tone: 'success' },
+  }
+  return map[normalized] ?? { label: normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : 'Não informado', tone: 'muted' }
+}
+
+export function getSacAdminPermissions(session: AuthSession | null): SacAdminPermissions {
+  const access = getFeatureAccess(session, 'sac')
+  return {
+    canViewDashboard: access.canOpen || access.canView,
+    canList: access.canList || access.canOpen,
+    canView: access.canView || access.canList || access.canOpen,
+    canRespond: access.canEdit,
+    canAddInternalNote: access.canEdit,
+    canChangeStatus: access.canEdit,
+  }
+}

@@ -32,3 +32,24 @@ Foi migrada a superfície pública da Agile Store:
 ## Validação focada
 
 - `.\npxw.cmd vitest run src\features\agile-store\services\agile-store-mappers.test.ts app\api\agile-store\route.test.ts src\features\agile-store\components\agile-store-pages.test.tsx`
+- `.\npxw.cmd vitest run src\features\sac-admin\services\sac-admin-mappers.test.ts app\api\sac\route.test.ts src\features\sac-admin\components\sac-admin-page.test.tsx`
+
+## Fatia SAC admin operacional
+
+Foi migrada a superfície principal de operação do SAC:
+
+- rota `/sac` com dashboard resumido, filtros e listagem de chamados;
+- bridges `app/api/sac/*` para `sac/admin/dashboard`, `sac/admin/chamados`, detalhe e ações;
+- normalização de dashboard, chamados, mensagens, eventos, itens e anexos;
+- modal de detalhe com histórico e resposta ao cliente;
+- ordenação default por `ultima_interacao_em desc`, preservando o comportamento legado;
+- permissão local `sac` e menu para `sac-dashboard`/`sac-chamados`;
+- documentação em `docs/51-modulo-sac-admin.md`.
+
+### Fora desta fatia SAC
+
+| Área | Motivo |
+|---|---|
+| Áreas, assuntos e configurações do SAC | São cadastros/configurações próprios, com contratos e permissões separadas. |
+| Upload completo de anexos na resposta | A resposta sem anexos foi migrada primeiro; upload requer fluxo de arquivos dedicado. |
+| Transferência, atribuição, nota interna e status com formulários completos | As bridges existem, mas a UI operacional completa fica para a próxima fatia. |
