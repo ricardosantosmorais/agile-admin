@@ -1,15 +1,19 @@
 import type {
   SacAdminPermissions,
+  SacArea,
+  SacAreaResponsible,
   SacAttachment,
   SacDashboard,
   SacEvent,
   SacMessage,
   SacLookupOption,
+  SacModuleConfig,
   SacRawDashboardResponse,
   SacRawTicket,
   SacRawTicketDetailResponse,
   SacRawTicketListResponse,
   SacStatus,
+  SacSubject,
   SacTicket,
   SacTicketDetail,
   SacTicketListResponse,
@@ -199,6 +203,57 @@ export function normalizeSacLookupOptions(response: { data?: Array<Record<string
       active: item.ativo === undefined ? true : boolean(item.ativo),
     }))
     .filter((item) => item.id && item.name)
+}
+
+export function normalizeSacModuleConfig(response: { data?: Record<string, unknown> | null }): SacModuleConfig {
+  const data = object(response.data)
+  return {
+    active: boolean(data.ativo),
+    contracted: boolean(data.contratado),
+    allowedEmails: text(data.emails_permitidos_texto || array(data.emails_permitidos as string[] | null | undefined).join('\n')),
+    autoCloseDays: number(data.fechamento_automatico_dias, 7),
+    reopenDays: number(data.prazo_reabertura_dias, 7),
+  }
+}
+
+export function normalizeSacAreas(response: { data?: Array<Record<string, unknown>> | null }): SacArea[] {
+  return array(response.data)
+    .map((item) => ({
+      id: text(item.id),
+      name: text(item.nome || item.name),
+      active: item.ativo === undefined ? true : boolean(item.ativo),
+      showResponsibleName: boolean(item.mostrar_nome_responsavel_cliente),
+      slaHours: number(item.sla_horas),
+      totalTickets: number(item.total_chamados),
+    }))
+    .filter((item) => item.id && item.name)
+}
+
+export function normalizeSacSubjects(response: { data?: Array<Record<string, unknown>> | null }): SacSubject[] {
+  return array(response.data)
+    .map((item) => ({
+      id: text(item.id),
+      areaId: text(item.id_sac_area),
+      name: text(item.nome || item.name),
+      active: item.ativo === undefined ? true : boolean(item.ativo),
+      allowOrderLink: boolean(item.permite_vinculo_pedido),
+      requireOrder: boolean(item.obriga_pedido),
+      totalTickets: number(item.total_chamados),
+    }))
+    .filter((item) => item.id && item.name)
+}
+
+export function normalizeSacAreaResponsibles(response: { data?: Array<Record<string, unknown>> | null }): SacAreaResponsible[] {
+  return array(response.data)
+    .map((item) => ({
+      id: text(item.id),
+      areaId: text(item.id_sac_area),
+      userId: text(item.id_usuario),
+      userName: text(item.usuario_nome),
+      userEmail: text(item.usuario_email),
+      active: item.ativo === undefined ? true : boolean(item.ativo),
+    }))
+    .filter((item) => item.id && item.userId)
 }
 
 function hasSacPermission(session: AuthSession | null, code: string) {

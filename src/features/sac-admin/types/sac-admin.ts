@@ -172,3 +172,36 @@ export type SacLookupOption = {
   name: string
   active: boolean
 }
+
+export type SacModuleConfig = {
+  active: boolean
+  contracted: boolean
+  allowedEmails: string
+  autoCloseDays: number
+  reopenDays: number
+}
+
+export type SacArea = SacLookupOption & {
+  showResponsibleName: boolean
+  slaHours: number
+  totalTickets: number
+}
+
+export type SacSubject = {
+  id: string
+  areaId: string
+  name: string
+  active: boolean
+  allowOrderLink: boolean
+  requireOrder: boolean
+  totalTickets: number
+}
+
+export type SacAreaResponsible = {
+  id: string
+  areaId: string
+  userId: string
+  userName: string
+  userEmail: string
+  active: boolean
+}

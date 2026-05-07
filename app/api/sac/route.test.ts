@@ -4,7 +4,16 @@ import { GET as listTickets } from '@/app/api/sac/chamados/route'
 import { GET as getTicketDetail } from '@/app/api/sac/chamados/[id]/route'
 import { POST as runTicketAction } from '@/app/api/sac/chamados/[id]/action/route'
 import { GET as listAreas } from '@/app/api/sac/areas/route'
+import { POST as saveArea } from '@/app/api/sac/areas/route'
+import { DELETE as deleteArea } from '@/app/api/sac/areas/[id]/route'
+import { GET as listAreaResponsibles } from '@/app/api/sac/areas/[id]/responsaveis/route'
+import { POST as saveAreaResponsible } from '@/app/api/sac/areas/[id]/responsaveis/route'
+import { DELETE as deleteAreaResponsible } from '@/app/api/sac/areas/responsaveis/[id]/route'
 import { GET as listSubjects } from '@/app/api/sac/assuntos/route'
+import { POST as saveSubject } from '@/app/api/sac/assuntos/route'
+import { DELETE as deleteSubject } from '@/app/api/sac/assuntos/[id]/route'
+import { GET as getConfig } from '@/app/api/sac/configuracoes/route'
+import { POST as saveConfig } from '@/app/api/sac/configuracoes/route'
 import { GET as listUsers } from '@/app/api/sac/usuarios/route'
 
 const {
@@ -90,6 +99,47 @@ describe('sac admin routes', () => {
     expect(serverApiFetchMock).toHaveBeenNthCalledWith(1, 'sac/admin/areas', expect.objectContaining({ method: 'GET' }))
     expect(serverApiFetchMock).toHaveBeenNthCalledWith(2, 'sac/admin/assuntos?id_sac_area=area-1', expect.objectContaining({ method: 'GET' }))
     expect(serverApiFetchMock).toHaveBeenNthCalledWith(3, 'sac/admin/usuarios', expect.objectContaining({ method: 'GET' }))
+  })
+
+  it('forwards SAC module configuration load and save', async () => {
+    await getConfig()
+    await saveConfig(new Request('http://localhost/api/sac/configuracoes', {
+      method: 'POST',
+      body: JSON.stringify({ ativo: 1, emails_permitidos: 'sac@empresa.com', fechamento_automatico_dias: 7, prazo_reabertura_dias: 3 }),
+    }))
+
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(1, 'sac/admin/configuracoes', expect.objectContaining({ method: 'GET' }))
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(2, 'sac/admin/configuracoes', expect.objectContaining({
+      method: 'POST',
+      body: { ativo: 1, emails_permitidos: 'sac@empresa.com', fechamento_automatico_dias: 7, prazo_reabertura_dias: 3 },
+    }))
+  })
+
+  it('forwards SAC area, subject and responsible management mutations', async () => {
+    await saveArea(new Request('http://localhost/api/sac/areas', {
+      method: 'POST',
+      body: JSON.stringify({ id: 'area-1', nome: 'Atendimento', mostrar_nome_responsavel_cliente: 1, sla_horas: 24, ativo: 1 }),
+    }))
+    await deleteArea(new Request('http://localhost/api/sac/areas/area-1', { method: 'DELETE' }), { params: Promise.resolve({ id: 'area-1' }) })
+    await saveSubject(new Request('http://localhost/api/sac/assuntos', {
+      method: 'POST',
+      body: JSON.stringify({ id: 'subject-1', id_sac_area: 'area-1', nome: 'Pedido', permite_vinculo_pedido: 1, obriga_pedido: 0, ativo: 1 }),
+    }))
+    await deleteSubject(new Request('http://localhost/api/sac/assuntos/subject-1', { method: 'DELETE' }), { params: Promise.resolve({ id: 'subject-1' }) })
+    await listAreaResponsibles(new Request('http://localhost/api/sac/areas/area-1/responsaveis'), { params: Promise.resolve({ id: 'area-1' }) })
+    await saveAreaResponsible(new Request('http://localhost/api/sac/areas/area-1/responsaveis', {
+      method: 'POST',
+      body: JSON.stringify({ id: 'resp-1', id_usuario: 'user-1', ativo: 1 }),
+    }), { params: Promise.resolve({ id: 'area-1' }) })
+    await deleteAreaResponsible(new Request('http://localhost/api/sac/areas/responsaveis/resp-1', { method: 'DELETE' }), { params: Promise.resolve({ id: 'resp-1' }) })
+
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(1, 'sac/admin/areas', expect.objectContaining({ method: 'POST' }))
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(2, 'sac/admin/areas/area-1', expect.objectContaining({ method: 'DELETE' }))
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(3, 'sac/admin/assuntos', expect.objectContaining({ method: 'POST' }))
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(4, 'sac/admin/assuntos/subject-1', expect.objectContaining({ method: 'DELETE' }))
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(5, 'sac/admin/areas/area-1/responsaveis', expect.objectContaining({ method: 'GET' }))
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(6, 'sac/admin/areas/area-1/responsaveis', expect.objectContaining({ method: 'POST' }))
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(7, 'sac/admin/areas/responsaveis/resp-1', expect.objectContaining({ method: 'DELETE' }))
   })
 
   it('rejects SAC requests without a session', async () => {

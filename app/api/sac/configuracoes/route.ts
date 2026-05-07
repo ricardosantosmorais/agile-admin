@@ -1,20 +1,19 @@
 import { NextResponse } from 'next/server'
-import { forwardSearchParams, getErrorMessage, requireSacSession } from '@/app/api/sac/_shared'
+import { getErrorMessage, requireSacSession } from '@/app/api/sac/_shared'
 import { serverApiFetch } from '@/src/services/http/server-api'
 
-export async function GET(request: Request) {
+export async function GET() {
   const { session, response } = await requireSacSession()
   if (!session) return response
 
-  const query = forwardSearchParams(request, ['id_sac_area'])
-  const result = await serverApiFetch(`sac/admin/assuntos${query ? `?${query}` : ''}`, {
+  const result = await serverApiFetch('sac/admin/configuracoes', {
     method: 'GET',
     token: session.token,
     tenantId: session.currentTenantId,
   })
 
   if (!result.ok) {
-    return NextResponse.json({ message: getErrorMessage(result.payload, 'Nao foi possivel carregar os assuntos do SAC.') }, { status: result.status || 400 })
+    return NextResponse.json({ message: getErrorMessage(result.payload, 'Nao foi possivel carregar as configuracoes do SAC.') }, { status: result.status || 400 })
   }
 
   return NextResponse.json(result.payload)
@@ -25,7 +24,7 @@ export async function POST(request: Request) {
   if (!session) return response
 
   const body = await request.json().catch(() => ({}))
-  const result = await serverApiFetch('sac/admin/assuntos', {
+  const result = await serverApiFetch('sac/admin/configuracoes', {
     method: 'POST',
     token: session.token,
     tenantId: session.currentTenantId,
@@ -33,7 +32,7 @@ export async function POST(request: Request) {
   })
 
   if (!result.ok) {
-    return NextResponse.json({ message: getErrorMessage(result.payload, 'Nao foi possivel salvar o assunto do SAC.') }, { status: result.status || 400 })
+    return NextResponse.json({ message: getErrorMessage(result.payload, 'Nao foi possivel salvar as configuracoes do SAC.') }, { status: result.status || 400 })
   }
 
   return NextResponse.json(result.payload)

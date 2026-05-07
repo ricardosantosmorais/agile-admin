@@ -4,19 +4,31 @@ import { SacAdminPage } from '@/src/features/sac-admin/components/sac-admin-page
 
 const {
   actionMock,
+  areaResponsiblesMock,
   dashboardMock,
   detailMock,
   areasMock,
   listMock,
+  moduleConfigMock,
+  saveAreaMock,
+  saveAreaResponsibleMock,
+  saveConfigMock,
+  saveSubjectMock,
   subjectsMock,
   tMock,
   usersMock,
 } = vi.hoisted(() => ({
   actionMock: vi.fn(),
+  areaResponsiblesMock: vi.fn(),
   dashboardMock: vi.fn(),
   detailMock: vi.fn(),
   areasMock: vi.fn(),
   listMock: vi.fn(),
+  moduleConfigMock: vi.fn(),
+  saveAreaMock: vi.fn(),
+  saveAreaResponsibleMock: vi.fn(),
+  saveConfigMock: vi.fn(),
+  saveSubjectMock: vi.fn(),
   subjectsMock: vi.fn(),
   tMock: vi.fn((_key: string, fallback?: string) => fallback ?? _key),
   usersMock: vi.fn(),
@@ -25,10 +37,16 @@ const {
 vi.mock('@/src/features/sac-admin/services/sac-admin-client', () => ({
   sacAdminClient: {
     action: actionMock,
+    areaResponsibles: areaResponsiblesMock,
     areas: areasMock,
     dashboard: dashboardMock,
     detail: detailMock,
     list: listMock,
+    moduleConfig: moduleConfigMock,
+    saveArea: saveAreaMock,
+    saveAreaResponsible: saveAreaResponsibleMock,
+    saveConfig: saveConfigMock,
+    saveSubject: saveSubjectMock,
     subjects: subjectsMock,
     users: usersMock,
   },
@@ -83,15 +101,27 @@ const ticketFixture = {
 describe('SacAdminPage', () => {
   beforeEach(() => {
     actionMock.mockReset()
+    areaResponsiblesMock.mockReset()
     areasMock.mockReset()
     dashboardMock.mockReset()
     detailMock.mockReset()
     listMock.mockReset()
+    moduleConfigMock.mockReset()
+    saveAreaMock.mockReset()
+    saveAreaResponsibleMock.mockReset()
+    saveConfigMock.mockReset()
+    saveSubjectMock.mockReset()
     subjectsMock.mockReset()
     tMock.mockClear()
     usersMock.mockReset()
-    areasMock.mockResolvedValue([{ id: 'area-1', name: 'Atendimento', active: true }])
-    subjectsMock.mockResolvedValue([{ id: 'subject-1', name: 'Pedido', active: true }])
+    areaResponsiblesMock.mockResolvedValue([{ id: 'resp-1', areaId: 'area-1', userId: 'user-1', userName: 'Maria', userEmail: 'maria@empresa.com', active: true }])
+    areasMock.mockResolvedValue([{ id: 'area-1', name: 'Atendimento', active: true, showResponsibleName: true, slaHours: 24, totalTickets: 0 }])
+    moduleConfigMock.mockResolvedValue({ active: true, contracted: true, allowedEmails: 'sac@empresa.com', autoCloseDays: 7, reopenDays: 3 })
+    saveAreaMock.mockResolvedValue({ success: true })
+    saveAreaResponsibleMock.mockResolvedValue({ success: true })
+    saveConfigMock.mockResolvedValue({ success: true })
+    saveSubjectMock.mockResolvedValue({ success: true })
+    subjectsMock.mockResolvedValue([{ id: 'subject-1', areaId: 'area-1', name: 'Pedido', active: true, allowOrderLink: true, requireOrder: false, totalTickets: 0 }])
     usersMock.mockResolvedValue([{ id: 'user-1', name: 'Maria', active: true }])
     dashboardMock.mockResolvedValue(dashboardFixture)
     listMock.mockResolvedValue({
@@ -194,6 +224,63 @@ describe('SacAdminPage', () => {
       id_sac_assunto: 'subject-1',
       motivo: 'Encaminhar para atendimento',
       updated_at: '2026-05-07 10:00:00',
+    })))
+  })
+
+  it('manages SAC module configuration and area subjects without fixed menu entries', async () => {
+    render(<SacAdminPage permissions={{
+      canViewDashboard: true,
+      canList: true,
+      canListAll: true,
+      canView: true,
+      canRespond: false,
+      canAddInternalNote: false,
+      canChangeStatus: false,
+      canConfigureModule: true,
+      canConfigureAreas: true,
+    }} />)
+
+    expect(await screen.findByRole('heading', { name: 'Configurações do SAC' })).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('E-mails permitidos'), { target: { value: 'sac@empresa.com\nsuporte@empresa.com' } })
+    fireEvent.change(screen.getByLabelText('Fechamento automático'), { target: { value: '10' } })
+    fireEvent.change(screen.getByLabelText('Prazo para reabertura'), { target: { value: '4' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Salvar configurações' }))
+
+    await waitFor(() => expect(saveConfigMock).toHaveBeenCalledWith({
+      ativo: 1,
+      emails_permitidos: 'sac@empresa.com\nsuporte@empresa.com',
+      fechamento_automatico_dias: 10,
+      prazo_reabertura_dias: 4,
+    }))
+
+    expect(await screen.findByRole('heading', { name: 'Áreas e assuntos' })).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('Nome da área'), { target: { value: 'Suporte técnico' } })
+    fireEvent.change(screen.getByLabelText('SLA da área'), { target: { value: '12' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Salvar área' }))
+
+    await waitFor(() => expect(saveAreaMock).toHaveBeenCalledWith(expect.objectContaining({
+      nome: 'Suporte técnico',
+      sla_horas: 12,
+      ativo: 1,
+    })))
+
+    fireEvent.change(screen.getByLabelText('Nome do assunto'), { target: { value: 'Troca' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Salvar assunto' }))
+
+    await waitFor(() => expect(saveSubjectMock).toHaveBeenCalledWith(expect.objectContaining({
+      id_sac_area: 'area-1',
+      nome: 'Troca',
+      permite_vinculo_pedido: 1,
+      obriga_pedido: 0,
+      ativo: 1,
+    })))
+
+    fireEvent.change(screen.getByLabelText('Usuário responsável'), { target: { value: 'user-1' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Salvar responsável' }))
+
+    await waitFor(() => expect(saveAreaResponsibleMock).toHaveBeenCalledWith('area-1', expect.objectContaining({
+      id_usuario: 'user-1',
+      ativo: 1,
     })))
   })
 })

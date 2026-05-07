@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest'
 import {
   getSacAdminPermissions,
   getSacStatusInfo,
+  normalizeSacAreas,
+  normalizeSacAreaResponsibles,
+  normalizeSacModuleConfig,
   normalizeSacLookupOptions,
+  normalizeSacSubjects,
   normalizeSacDashboard,
   normalizeSacTicketDetail,
   normalizeSacTicketListResponse,
@@ -104,6 +108,51 @@ describe('sac-admin mappers', () => {
     expect(normalizeSacLookupOptions({ data: [{ id: 1, nome: 'Financeiro', ativo: 1 }, { id: 2, nome: '', ativo: 1 }] })).toEqual([
       { id: '1', name: 'Financeiro', active: true },
     ])
+  })
+
+  it('normalizes SAC configuration entities for the admin settings surface', () => {
+    expect(normalizeSacModuleConfig({
+      data: {
+        ativo: 1,
+        contratado: true,
+        emails_permitidos_texto: 'sac@empresa.com',
+        fechamento_automatico_dias: '10',
+        prazo_reabertura_dias: 3,
+      },
+    })).toEqual({
+      active: true,
+      contracted: true,
+      allowedEmails: 'sac@empresa.com',
+      autoCloseDays: 10,
+      reopenDays: 3,
+    })
+
+    expect(normalizeSacAreas({ data: [{ id: 'a1', nome: 'Atendimento', ativo: 1, mostrar_nome_responsavel_cliente: 0, sla_horas: '24', total_chamados: '2' }] })[0]).toMatchObject({
+      id: 'a1',
+      name: 'Atendimento',
+      active: true,
+      showResponsibleName: false,
+      slaHours: 24,
+      totalTickets: 2,
+    })
+
+    expect(normalizeSacSubjects({ data: [{ id: 's1', id_sac_area: 'a1', nome: 'Pedido', permite_vinculo_pedido: 1, obriga_pedido: 0, ativo: 1, total_chamados: 0 }] })[0]).toMatchObject({
+      id: 's1',
+      areaId: 'a1',
+      name: 'Pedido',
+      allowOrderLink: true,
+      requireOrder: false,
+      active: true,
+    })
+
+    expect(normalizeSacAreaResponsibles({ data: [{ id: 'r1', id_sac_area: 'a1', id_usuario: 'u1', usuario_nome: 'Maria', usuario_email: 'maria@empresa.com', ativo: 1 }] })[0]).toMatchObject({
+      id: 'r1',
+      areaId: 'a1',
+      userId: 'u1',
+      userName: 'Maria',
+      userEmail: 'maria@empresa.com',
+      active: true,
+    })
   })
 
   it('keeps SAC action permissions aligned with the legacy permission codes', () => {

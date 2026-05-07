@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '@/src/features/auth/hooks/use-auth'
 import { getSacAdminPermissions, getSacStatusInfo } from '@/src/features/sac-admin/services/sac-admin-mappers'
 import { sacAdminClient } from '@/src/features/sac-admin/services/sac-admin-client'
-import type { SacAdminPermissions, SacDashboard, SacLookupOption, SacTicket, SacTicketAction, SacTicketDetail } from '@/src/features/sac-admin/types/sac-admin'
+import type { SacAdminPermissions, SacArea, SacAreaResponsible, SacDashboard, SacLookupOption, SacModuleConfig, SacSubject, SacTicket, SacTicketAction, SacTicketDetail } from '@/src/features/sac-admin/types/sac-admin'
 import { useI18n } from '@/src/i18n/use-i18n'
 
 type SacAdminPageProps = {
@@ -255,16 +255,30 @@ export function SacAdminPage({ permissions: providedPermissions }: SacAdminPageP
   const [detail, setDetail] = useState<SacTicketDetail | null>(null)
   const [detailError, setDetailError] = useState('')
   const [isDetailLoading, setIsDetailLoading] = useState(false)
-  const [areas, setAreas] = useState<SacLookupOption[]>([])
-  const [subjects, setSubjects] = useState<SacLookupOption[]>([])
+  const [areas, setAreas] = useState<SacArea[]>([])
+  const [subjects, setSubjects] = useState<SacSubject[]>([])
   const [users, setUsers] = useState<SacLookupOption[]>([])
+  const [areaResponsibles, setAreaResponsibles] = useState<SacAreaResponsible[]>([])
   const [areaFilter, setAreaFilter] = useState('')
   const [subjectFilter, setSubjectFilter] = useState('')
   const [assigneeFilter, setAssigneeFilter] = useState('')
+  const [moduleConfig, setModuleConfig] = useState<SacModuleConfig>({ active: false, contracted: false, allowedEmails: '', autoCloseDays: 7, reopenDays: 7 })
+  const [settingsError, setSettingsError] = useState('')
+  const [selectedConfigAreaId, setSelectedConfigAreaId] = useState('')
+  const [areaName, setAreaName] = useState('')
+  const [areaSlaHours, setAreaSlaHours] = useState('24')
+  const [areaActive, setAreaActive] = useState(true)
+  const [areaShowResponsible, setAreaShowResponsible] = useState(false)
+  const [subjectName, setSubjectName] = useState('')
+  const [subjectActive, setSubjectActive] = useState(true)
+  const [subjectAllowOrderLink, setSubjectAllowOrderLink] = useState(true)
+  const [subjectRequireOrder, setSubjectRequireOrder] = useState(false)
+  const [responsibleUserId, setResponsibleUserId] = useState('')
+  const [responsibleActive, setResponsibleActive] = useState(true)
 
   const loadLookups = useCallback(async () => {
     try {
-      const shouldLoadUsers = permissions.canListAll || permissions.canAssign
+      const shouldLoadUsers = permissions.canListAll || permissions.canAssign || permissions.canConfigureAreas
       const [areaResult, subjectResult, userResult] = await Promise.all([
         sacAdminClient.areas(),
         sacAdminClient.subjects(areaFilter || undefined),
@@ -278,7 +292,7 @@ export function SacAdminPage({ permissions: providedPermissions }: SacAdminPageP
       setSubjects([])
       setUsers([])
     }
-  }, [areaFilter, permissions.canAssign, permissions.canListAll])
+  }, [areaFilter, permissions.canAssign, permissions.canConfigureAreas, permissions.canListAll])
 
   const loadData = useCallback(async () => {
     if (!permissions.canList && !permissions.canViewDashboard) {
@@ -313,6 +327,93 @@ export function SacAdminPage({ permissions: providedPermissions }: SacAdminPageP
     void loadLookups()
   }, [loadLookups])
 
+  useEffect(() => {
+    if (!permissions.canConfigureModule) return
+    void sacAdminClient.moduleConfig()
+      .then(setModuleConfig)
+      .catch((reason) => setSettingsError(reason instanceof Error ? reason.message : t('sacAdmin.errors.settings', 'Não foi possível carregar as configurações do SAC.')))
+  }, [permissions.canConfigureModule, t])
+
+  useEffect(() => {
+    if (selectedConfigAreaId || !areas.length) return
+    const firstArea = areas[0]
+    setSelectedConfigAreaId(firstArea.id)
+    setAreaName(firstArea.name)
+    setAreaSlaHours(String(firstArea.slaHours ?? 0))
+    setAreaActive(firstArea.active)
+    setAreaShowResponsible(firstArea.showResponsibleName)
+  }, [areas, selectedConfigAreaId])
+
+  useEffect(() => {
+    if (!permissions.canConfigureAreas || !selectedConfigAreaId) {
+      setAreaResponsibles([])
+      return
+    }
+    void sacAdminClient.areaResponsibles(selectedConfigAreaId)
+      .then(setAreaResponsibles)
+      .catch(() => setAreaResponsibles([]))
+  }, [permissions.canConfigureAreas, selectedConfigAreaId])
+
+  function selectConfigArea(areaId: string) {
+    setSelectedConfigAreaId(areaId)
+    const area = areas.find((item) => item.id === areaId)
+    setAreaName(area?.name ?? '')
+    setAreaSlaHours(String(area?.slaHours ?? 24))
+    setAreaActive(area?.active ?? true)
+    setAreaShowResponsible(area?.showResponsibleName ?? false)
+    setSubjectName('')
+    setSubjectActive(true)
+    setSubjectAllowOrderLink(true)
+    setSubjectRequireOrder(false)
+    setResponsibleUserId('')
+    setResponsibleActive(true)
+  }
+
+  async function saveModuleConfig() {
+    await sacAdminClient.saveConfig({
+      ativo: moduleConfig.active ? 1 : 0,
+      emails_permitidos: moduleConfig.allowedEmails,
+      fechamento_automatico_dias: Number(moduleConfig.autoCloseDays),
+      prazo_reabertura_dias: Number(moduleConfig.reopenDays),
+    })
+    setModuleConfig(await sacAdminClient.moduleConfig())
+  }
+
+  async function saveAreaSettings() {
+    await sacAdminClient.saveArea({
+      id: selectedConfigAreaId,
+      nome: areaName.trim(),
+      mostrar_nome_responsavel_cliente: areaShowResponsible ? 1 : 0,
+      sla_horas: Number(areaSlaHours),
+      ativo: areaActive ? 1 : 0,
+    })
+    await loadLookups()
+  }
+
+  async function saveSubjectSettings() {
+    await sacAdminClient.saveSubject({
+      id: '',
+      id_sac_area: selectedConfigAreaId,
+      nome: subjectName.trim(),
+      permite_vinculo_pedido: subjectAllowOrderLink ? 1 : 0,
+      obriga_pedido: subjectRequireOrder ? 1 : 0,
+      ativo: subjectActive ? 1 : 0,
+    })
+    setSubjectName('')
+    await loadLookups()
+  }
+
+  async function saveAreaResponsibleSettings() {
+    await sacAdminClient.saveAreaResponsible(selectedConfigAreaId, {
+      id: '',
+      id_usuario: responsibleUserId,
+      ativo: responsibleActive ? 1 : 0,
+    })
+    setResponsibleUserId('')
+    setResponsibleActive(true)
+    setAreaResponsibles(await sacAdminClient.areaResponsibles(selectedConfigAreaId))
+  }
+
   async function openTicket(id: string) {
     if (!permissions.canView) return
     setSelectedId(id)
@@ -346,7 +447,7 @@ export function SacAdminPage({ permissions: providedPermissions }: SacAdminPageP
     void loadData()
   }
 
-  if (!permissions.canList && !permissions.canViewDashboard) {
+  if (!permissions.canList && !permissions.canViewDashboard && !permissions.canConfigureAreas && !permissions.canConfigureModule) {
     return (
       <main className="space-y-4">
         <h1 className="text-2xl font-extrabold text-foreground">SAC</h1>
@@ -421,6 +522,128 @@ export function SacAdminPage({ permissions: providedPermissions }: SacAdminPageP
 
       {error ? <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</div> : null}
       {isLoading ? <div className="rounded-lg border border-dashed border-line bg-surface px-4 py-8 text-center text-sm text-muted">{t('common.loading', 'Carregando...')}</div> : null}
+
+      {permissions.canConfigureModule || permissions.canConfigureAreas ? (
+        <section className="grid gap-4 xl:grid-cols-[360px_minmax(0,1fr)]">
+          {permissions.canConfigureModule ? (
+            <div className="rounded-lg border border-line bg-white p-4">
+              <h2 className="text-base font-extrabold text-slate-950">{t('sacAdmin.settingsTitle', 'Configurações do SAC')}</h2>
+              {settingsError ? <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">{settingsError}</div> : null}
+              <div className="mt-4 space-y-3">
+                <label className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                  <input type="checkbox" checked={moduleConfig.active} onChange={(event) => setModuleConfig((current) => ({ ...current, active: event.target.checked }))} />
+                  {t('sacAdmin.moduleActive', 'Módulo ativo')}
+                </label>
+                <label className="block text-sm font-bold text-slate-900">
+                  {t('sacAdmin.allowedEmails', 'E-mails permitidos')}
+                  <textarea value={moduleConfig.allowedEmails} onChange={(event) => setModuleConfig((current) => ({ ...current, allowedEmails: event.target.value }))} className="app-control mt-2 min-h-24 w-full rounded-lg px-3 py-2 text-sm" />
+                </label>
+                <label className="block text-sm font-bold text-slate-900">
+                  {t('sacAdmin.autoCloseDays', 'Fechamento automático')}
+                  <input type="number" min={0} value={moduleConfig.autoCloseDays} onChange={(event) => setModuleConfig((current) => ({ ...current, autoCloseDays: Number(event.target.value) }))} className="app-control mt-2 w-full rounded-lg px-3 py-2 text-sm" />
+                </label>
+                <label className="block text-sm font-bold text-slate-900">
+                  {t('sacAdmin.reopenDays', 'Prazo para reabertura')}
+                  <input type="number" min={0} value={moduleConfig.reopenDays} onChange={(event) => setModuleConfig((current) => ({ ...current, reopenDays: Number(event.target.value) }))} className="app-control mt-2 w-full rounded-lg px-3 py-2 text-sm" />
+                </label>
+                <button type="button" onClick={() => void saveModuleConfig()} className="inline-flex w-full items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white">
+                  {t('sacAdmin.saveSettings', 'Salvar configurações')}
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          {permissions.canConfigureAreas ? (
+            <div className="rounded-lg border border-line bg-white p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-base font-extrabold text-slate-950">{t('sacAdmin.areaSettingsTitle', 'Áreas e assuntos')}</h2>
+                <select value={selectedConfigAreaId} onChange={(event) => selectConfigArea(event.target.value)} className="app-control rounded-lg px-3 py-2 text-sm">
+                  {areas.map((area) => <option key={area.id} value={area.id}>{area.name}</option>)}
+                </select>
+              </div>
+              <div className="mt-4 grid gap-4 lg:grid-cols-3">
+                <div className="space-y-3 rounded-lg border border-line p-4">
+                  <h3 className="text-sm font-extrabold text-slate-950">{t('sacAdmin.areaFormTitle', 'Área')}</h3>
+                  <label className="block text-sm font-bold text-slate-900">
+                    {t('sacAdmin.areaName', 'Nome da área')}
+                    <input value={areaName} onChange={(event) => setAreaName(event.target.value)} className="app-control mt-2 w-full rounded-lg px-3 py-2 text-sm" />
+                  </label>
+                  <label className="block text-sm font-bold text-slate-900">
+                    {t('sacAdmin.areaSla', 'SLA da área')}
+                    <input type="number" min={0} value={areaSlaHours} onChange={(event) => setAreaSlaHours(event.target.value)} className="app-control mt-2 w-full rounded-lg px-3 py-2 text-sm" />
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                    <input type="checkbox" checked={areaShowResponsible} onChange={(event) => setAreaShowResponsible(event.target.checked)} />
+                    {t('sacAdmin.showResponsibleName', 'Mostrar responsável ao cliente')}
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                    <input type="checkbox" checked={areaActive} onChange={(event) => setAreaActive(event.target.checked)} />
+                    {t('common.active', 'Ativo')}
+                  </label>
+                  <button type="button" onClick={() => void saveAreaSettings()} disabled={!areaName.trim()} className="inline-flex w-full items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">
+                    {t('sacAdmin.saveArea', 'Salvar área')}
+                  </button>
+                </div>
+                <div className="space-y-3 rounded-lg border border-line p-4">
+                  <h3 className="text-sm font-extrabold text-slate-950">{t('sacAdmin.subjectFormTitle', 'Assunto')}</h3>
+                  <label className="block text-sm font-bold text-slate-900">
+                    {t('sacAdmin.subjectName', 'Nome do assunto')}
+                    <input value={subjectName} onChange={(event) => setSubjectName(event.target.value)} className="app-control mt-2 w-full rounded-lg px-3 py-2 text-sm" />
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                    <input type="checkbox" checked={subjectAllowOrderLink} onChange={(event) => setSubjectAllowOrderLink(event.target.checked)} />
+                    {t('sacAdmin.allowOrderLink', 'Permite vínculo com pedido')}
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                    <input type="checkbox" checked={subjectRequireOrder} onChange={(event) => setSubjectRequireOrder(event.target.checked)} />
+                    {t('sacAdmin.requireOrder', 'Obriga pedido')}
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                    <input type="checkbox" checked={subjectActive} onChange={(event) => setSubjectActive(event.target.checked)} />
+                    {t('common.active', 'Ativo')}
+                  </label>
+                  <button type="button" onClick={() => void saveSubjectSettings()} disabled={!selectedConfigAreaId || !subjectName.trim()} className="inline-flex w-full items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">
+                    {t('sacAdmin.saveSubject', 'Salvar assunto')}
+                  </button>
+                  <div className="space-y-2 pt-2">
+                    {subjects.filter((subject) => subject.areaId === selectedConfigAreaId).map((subject) => (
+                      <div key={subject.id} className="flex items-center justify-between gap-3 rounded-lg bg-surface px-3 py-2 text-sm">
+                        <span className="font-semibold text-slate-900">{subject.name}</span>
+                        <span className="text-xs text-muted">{subject.active ? t('common.active', 'Ativo') : t('common.inactive', 'Inativo')}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-3 rounded-lg border border-line p-4">
+                  <h3 className="text-sm font-extrabold text-slate-950">{t('sacAdmin.responsibleFormTitle', 'Responsável')}</h3>
+                  <label className="block text-sm font-bold text-slate-900">
+                    {t('sacAdmin.responsibleUser', 'Usuário responsável')}
+                    <select value={responsibleUserId} onChange={(event) => setResponsibleUserId(event.target.value)} className="app-control mt-2 w-full rounded-lg px-3 py-2 text-sm">
+                      <option value="">{t('common.select', 'Selecione')}</option>
+                      {users.map((user) => <option key={user.id} value={user.id}>{user.name}</option>)}
+                    </select>
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                    <input type="checkbox" checked={responsibleActive} onChange={(event) => setResponsibleActive(event.target.checked)} />
+                    {t('common.active', 'Ativo')}
+                  </label>
+                  <button type="button" onClick={() => void saveAreaResponsibleSettings()} disabled={!selectedConfigAreaId || !responsibleUserId} className="inline-flex w-full items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">
+                    {t('sacAdmin.saveResponsible', 'Salvar responsável')}
+                  </button>
+                  <div className="space-y-2 pt-2">
+                    {areaResponsibles.map((responsible) => (
+                      <div key={responsible.id} className="rounded-lg bg-surface px-3 py-2 text-sm">
+                        <p className="font-semibold text-slate-900">{responsible.userName || responsible.userId}</p>
+                        <p className="text-xs text-muted">{responsible.userEmail || (responsible.active ? t('common.active', 'Ativo') : t('common.inactive', 'Inativo'))}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       <section className="overflow-hidden rounded-lg border border-line bg-white">
         <div className="border-b border-line px-4 py-3">

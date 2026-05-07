@@ -73,7 +73,9 @@ Base date: 2026-03-24
 - SAC admin operacional migrou `/sac` com dashboard resumido, listagem, detalhe, resposta ao cliente, bridges `sac/admin/*`, mapeamento de permissÃ£o/menu e documentaÃ§Ã£o. Ãreas, assuntos, configuraÃ§Ãµes, upload completo e aÃ§Ãµes operacionais avanÃ§adas permanecem deferred para fatias prÃ³prias.
 - Thirty-second batch checked: `agile-store/sac-admin-acoes-avancadas`.
 - SAC ações avançadas migrou permissões finas, lookups de áreas/assuntos/usuários, filtros relacionais, restrição de listagem por responsável sem `SAC_FUNC_LISTAR_TODOS`, nota interna, alteração de status, atribuição e transferência com `updated_at`. A etapa não adicionou item fixo ao menu; segue dependente do menu dinâmico vindo do banco/perfil.
-- Next step: continue `agile-store` with SAC configuration or management backoffice.
+- Thirty-third batch checked: `agile-store/sac-admin-configuracoes`.
+- SAC configurações migrou configuração do módulo, cadastros de áreas, assuntos e responsáveis por área, bridges administrativas `sac/admin/*`, mapeadores, i18n, docs e cobertura focada. A etapa não adicionou item fixo ao menu; a superfície continua dependente das permissões dinâmicas `SAC_FUNC_CONFIGURAR_MODULO` e `SAC_FUNC_CONFIGURAR_AREAS`.
+- Next step: continue `agile-store` with management backoffice.
 
 ## Completed batches
 
@@ -109,6 +111,7 @@ Base date: 2026-03-24
 - `agile-store` public slice: migrated public Store list/detail/action surface, API v3 bridges, route mapping, permission feature and docs. SAC admin and management backoffice remain for follow-up slices.
 - `agile-store/sac-admin-operacional`: migrated SAC dashboard/list/detail/customer-response surface, API v3 bridges, route mapping, permission feature, i18n, docs and regression coverage. SAC configuration and Agile Store management backoffice remain for follow-up slices.
 - `agile-store/sac-admin-acoes-avancadas`: migrated fine-grained SAC action permissions, lookup bridges, relational filters, own-ticket restriction, internal note, status change, assignment and transfer forms with `updated_at` concurrency protection.
+- `agile-store/sac-admin-configuracoes`: migrated SAC module settings, area/subject/responsible administration, API v3 bridges, mappers, i18n, docs and focused regression coverage without adding fixed menu items.
 
 ## Known local noise excluded
 

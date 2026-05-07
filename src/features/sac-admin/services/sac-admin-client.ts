@@ -1,4 +1,4 @@
-import { normalizeSacDashboard, normalizeSacLookupOptions, normalizeSacTicketDetail, normalizeSacTicketListResponse } from '@/src/features/sac-admin/services/sac-admin-mappers'
+import { normalizeSacAreaResponsibles, normalizeSacAreas, normalizeSacDashboard, normalizeSacLookupOptions, normalizeSacModuleConfig, normalizeSacSubjects, normalizeSacTicketDetail, normalizeSacTicketListResponse } from '@/src/features/sac-admin/services/sac-admin-mappers'
 import type {
   SacRawDashboardResponse,
   SacRawTicketDetailResponse,
@@ -69,14 +69,14 @@ export const sacAdminClient = {
     })
   },
   async areas() {
-    return normalizeSacLookupOptions(await httpClient<{ data?: Array<Record<string, unknown>> }>('/api/sac/areas', {
+    return normalizeSacAreas(await httpClient<{ data?: Array<Record<string, unknown>> }>('/api/sac/areas', {
       method: 'GET',
       cache: 'no-store',
     }))
   },
   async subjects(areaId?: string) {
     const query = buildQuery({ id_sac_area: areaId })
-    return normalizeSacLookupOptions(await httpClient<{ data?: Array<Record<string, unknown>> }>(`/api/sac/assuntos${query ? `?${query}` : ''}`, {
+    return normalizeSacSubjects(await httpClient<{ data?: Array<Record<string, unknown>> }>(`/api/sac/assuntos${query ? `?${query}` : ''}`, {
       method: 'GET',
       cache: 'no-store',
     }))
@@ -86,5 +86,63 @@ export const sacAdminClient = {
       method: 'GET',
       cache: 'no-store',
     }))
+  },
+  async moduleConfig() {
+    return normalizeSacModuleConfig(await httpClient<{ data?: Record<string, unknown> }>('/api/sac/configuracoes', {
+      method: 'GET',
+      cache: 'no-store',
+    }))
+  },
+  async saveConfig(payload: Record<string, unknown>) {
+    return httpClient('/api/sac/configuracoes', {
+      method: 'POST',
+      cache: 'no-store',
+      body: JSON.stringify(payload),
+    })
+  },
+  async saveArea(payload: Record<string, unknown>) {
+    return httpClient('/api/sac/areas', {
+      method: 'POST',
+      cache: 'no-store',
+      body: JSON.stringify(payload),
+    })
+  },
+  async deleteArea(id: string) {
+    return httpClient(`/api/sac/areas/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      cache: 'no-store',
+    })
+  },
+  async saveSubject(payload: Record<string, unknown>) {
+    return httpClient('/api/sac/assuntos', {
+      method: 'POST',
+      cache: 'no-store',
+      body: JSON.stringify(payload),
+    })
+  },
+  async deleteSubject(id: string) {
+    return httpClient(`/api/sac/assuntos/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      cache: 'no-store',
+    })
+  },
+  async areaResponsibles(areaId: string) {
+    return normalizeSacAreaResponsibles(await httpClient<{ data?: Array<Record<string, unknown>> }>(`/api/sac/areas/${encodeURIComponent(areaId)}/responsaveis`, {
+      method: 'GET',
+      cache: 'no-store',
+    }))
+  },
+  async saveAreaResponsible(areaId: string, payload: Record<string, unknown>) {
+    return httpClient(`/api/sac/areas/${encodeURIComponent(areaId)}/responsaveis`, {
+      method: 'POST',
+      cache: 'no-store',
+      body: JSON.stringify(payload),
+    })
+  },
+  async deleteAreaResponsible(id: string) {
+    return httpClient(`/api/sac/areas/responsaveis/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      cache: 'no-store',
+    })
   },
 }
