@@ -67,7 +67,9 @@ Base date: 2026-03-24
 - Agente IA não teve migração de produção nesta etapa: os commits do legado pertencem ao chat/sidebar nativo do Agente IA, com agendamentos, histórico e CSS dark mode. O v2 atual só possui o embed externo de `Assistente de vendas IA`, então os pontos foram registrados como deferred até existir uma superfície equivalente.
 - Twenty-ninth batch checked: `assets`.
 - Assets não teve migração de produção por decisão de produto: o acesso rápido já é recalculado no shell React do v2 a partir do menu/sessão, e o reload por `ASSETS_VERSION` é mecanismo exclusivo do legado PHP.
-- Next step: continue with the next uncompleted inventory batch: `agile-store`.
+- Thirtieth batch started: `agile-store`.
+- Agile Store foi dividida em fatias. Nesta etapa foi migrada a superfície pública da loja: listagem, detalhe, ações de contratação/descontratação/reprocessamento, bridges para API v3, permissão/menu e documentação. SAC admin e retaguarda de gestão permanecem registrados para fatias próprias.
+- Next step: continue `agile-store` with the SAC admin or management backoffice slice.
 
 ## Completed batches
 
@@ -100,6 +102,7 @@ Base date: 2026-03-24
 - `components`: migrated HTML entity decoding for ERP scripts, completed legacy banner universe type/order support, hid Frenet partner token/invoice-only fields, and recorded Apps placeholders as already present in v2.
 - `agente-ia`: no production migration; legacy native Agent IA chat/sidebar schedule UX, history timezone parsing and dark-mode CSS were registered as deferred because v2 currently embeds an external sales assistant instead of owning that chat surface.
 - `assets`: no production migration; legacy quick-search bootstrap timing is already covered by the v2 React shell, and legacy `ASSETS_VERSION` reload is not applicable to the Next.js asset pipeline.
+- `agile-store` public slice: migrated public Store list/detail/action surface, API v3 bridges, route mapping, permission feature and docs. SAC admin and management backoffice remain for follow-up slices.
 
 ## Known local noise excluded
 

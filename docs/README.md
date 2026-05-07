@@ -84,7 +84,8 @@ O v2 reaproveita a mesma base de produto, mas com outra arquitetura:
 46. [Proposta do Dashboard Root Comercial v2](./47-dashboard-root-comercial-v2.md)
 47. [Dashboard da Empresa](./48-dashboard-empresa.md)
 48. [Módulo Integrações > Clientes e Marketing](./49-modulo-integracoes-clientes-marketing.md)
-49. [ADRs](./adr/README.md)
+49. [Módulo Agile Store](./50-modulo-agile-store.md)
+50. [ADRs](./adr/README.md)
 
 ## Fontes principais usadas
 

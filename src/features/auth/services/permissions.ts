@@ -6,6 +6,7 @@ export type FeatureKey =
 	| 'componentes'
 	| 'emailsPayloads'
 	| 'apps'
+	| 'agileStore'
 	| 'categoriasTarefas'
 	| 'tarefas'
 	| 'relatoriosGrupos'
@@ -170,6 +171,11 @@ const featureConfigs: Record<FeatureKey, FeatureConfig> = {
 	apps: {
 		label: 'Apps',
 		matchers: ['apps', 'apps-list', 'apps-form', 'cadastros apps'],
+	},
+	agileStore: {
+		label: 'Agile Store',
+		matchers: ['app_store', 'app-store', 'agile store', 'loja de aplicativos', 'app-store-list', 'APP_STORE'],
+		allowOpenWithoutAction: true,
 	},
 	categoriasTarefas: {
 		label: 'Categorias de Tarefas',
