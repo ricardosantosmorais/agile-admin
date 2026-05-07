@@ -4,6 +4,7 @@ import type {
   SacDashboard,
   SacEvent,
   SacMessage,
+  SacLookupOption,
   SacRawDashboardResponse,
   SacRawTicket,
   SacRawTicketDetailResponse,
@@ -15,6 +16,7 @@ import type {
 } from '@/src/features/sac-admin/types/sac-admin'
 import type { AuthSession } from '@/src/features/auth/types/auth'
 import { getFeatureAccess } from '@/src/features/auth/services/permissions'
+import { normalizeSearchValue } from '@/src/lib/text-normalization'
 
 function text(value: unknown) {
   return String(value ?? '').trim()
@@ -189,14 +191,49 @@ export function getSacStatusInfo(status: SacStatus) {
   return map[normalized] ?? { label: normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : 'Não informado', tone: 'muted' }
 }
 
+export function normalizeSacLookupOptions(response: { data?: Array<Record<string, unknown>> | null }): SacLookupOption[] {
+  return array(response.data)
+    .map((item) => ({
+      id: text(item.id),
+      name: text(item.nome || item.name),
+      active: item.ativo === undefined ? true : boolean(item.ativo),
+    }))
+    .filter((item) => item.id && item.name)
+}
+
+function hasSacPermission(session: AuthSession | null, code: string) {
+  if (!session || session.user.master) return true
+  const normalizedCode = normalizeSearchValue(code)
+  const upperCode = code.toUpperCase()
+  return session.user.funcionalidades.some((permission) => {
+    if (permission.ativo === false) return false
+    const searchable = [
+      permission.id,
+      permission.nome,
+      permission.chave,
+      permission.slug,
+      permission.componente,
+      permission.acao ?? '',
+      permission.url ?? '',
+      permission.clique ?? '',
+    ].join(' ')
+    return searchable.toUpperCase().includes(upperCode) || normalizeSearchValue(searchable).includes(normalizedCode)
+  })
+}
+
 export function getSacAdminPermissions(session: AuthSession | null): SacAdminPermissions {
   const access = getFeatureAccess(session, 'sac')
   return {
-    canViewDashboard: access.canOpen || access.canView,
-    canList: access.canList || access.canOpen,
-    canView: access.canView || access.canList || access.canOpen,
-    canRespond: access.canEdit,
-    canAddInternalNote: access.canEdit,
-    canChangeStatus: access.canEdit,
+    canViewDashboard: access.canOpen || access.canView || hasSacPermission(session, 'SAC_DASHBOARD'),
+    canList: access.canList || access.canOpen || hasSacPermission(session, 'SAC_FUNC_LISTAR_PROPRIOS') || hasSacPermission(session, 'SAC_FUNC_LISTAR_TODOS'),
+    canListAll: hasSacPermission(session, 'SAC_FUNC_LISTAR_TODOS'),
+    canView: access.canView || access.canList || access.canOpen || hasSacPermission(session, 'SAC_FUNC_VISUALIZAR'),
+    canRespond: hasSacPermission(session, 'SAC_FUNC_RESPONDER'),
+    canAddInternalNote: hasSacPermission(session, 'SAC_FUNC_NOTA_INTERNA'),
+    canChangeStatus: hasSacPermission(session, 'SAC_FUNC_ALTERAR_STATUS'),
+    canAssign: hasSacPermission(session, 'SAC_FUNC_ATRIBUIR_RESPONSAVEL'),
+    canTransfer: hasSacPermission(session, 'SAC_FUNC_TRANSFERIR'),
+    canConfigureAreas: hasSacPermission(session, 'SAC_FUNC_CONFIGURAR_AREAS'),
+    canConfigureModule: hasSacPermission(session, 'SAC_FUNC_CONFIGURAR_MODULO'),
   }
 }

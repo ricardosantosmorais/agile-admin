@@ -1,4 +1,4 @@
-import { normalizeSacDashboard, normalizeSacTicketDetail, normalizeSacTicketListResponse } from '@/src/features/sac-admin/services/sac-admin-mappers'
+import { normalizeSacDashboard, normalizeSacLookupOptions, normalizeSacTicketDetail, normalizeSacTicketListResponse } from '@/src/features/sac-admin/services/sac-admin-mappers'
 import type {
   SacRawDashboardResponse,
   SacRawTicketDetailResponse,
@@ -15,6 +15,9 @@ export type SacTicketListFilters = {
   protocolo?: string
   data_inicial?: string
   data_final?: string
+  id_sac_area?: string
+  id_sac_assunto?: string
+  id_usuario_responsavel?: string
 }
 
 export type SacDashboardFilters = {
@@ -64,5 +67,24 @@ export const sacAdminClient = {
       cache: 'no-store',
       body: JSON.stringify({ action, ...payload }),
     })
+  },
+  async areas() {
+    return normalizeSacLookupOptions(await httpClient<{ data?: Array<Record<string, unknown>> }>('/api/sac/areas', {
+      method: 'GET',
+      cache: 'no-store',
+    }))
+  },
+  async subjects(areaId?: string) {
+    const query = buildQuery({ id_sac_area: areaId })
+    return normalizeSacLookupOptions(await httpClient<{ data?: Array<Record<string, unknown>> }>(`/api/sac/assuntos${query ? `?${query}` : ''}`, {
+      method: 'GET',
+      cache: 'no-store',
+    }))
+  },
+  async users() {
+    return normalizeSacLookupOptions(await httpClient<{ data?: Array<Record<string, unknown>> }>('/api/sac/usuarios', {
+      method: 'GET',
+      cache: 'no-store',
+    }))
   },
 }

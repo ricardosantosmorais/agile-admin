@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import {
+  getSacAdminPermissions,
   getSacStatusInfo,
+  normalizeSacLookupOptions,
   normalizeSacDashboard,
   normalizeSacTicketDetail,
   normalizeSacTicketListResponse,
 } from '@/src/features/sac-admin/services/sac-admin-mappers'
+import type { AuthSession } from '@/src/features/auth/types/auth'
 
 describe('sac-admin mappers', () => {
   it('normalizes the dashboard summary and chart series from api v3', () => {
@@ -95,5 +98,43 @@ describe('sac-admin mappers', () => {
     expect(getSacStatusInfo('pendentes_atuacao')).toEqual({ label: 'Pendentes de atuação', tone: 'warning' })
     expect(getSacStatusInfo('resolvido_cliente')).toEqual({ label: 'Resolvido pelo cliente', tone: 'success' })
     expect(getSacStatusInfo('desconhecido')).toEqual({ label: 'Desconhecido', tone: 'muted' })
+  })
+
+  it('normalizes lookup options from SAC areas, subjects and users payloads', () => {
+    expect(normalizeSacLookupOptions({ data: [{ id: 1, nome: 'Financeiro', ativo: 1 }, { id: 2, nome: '', ativo: 1 }] })).toEqual([
+      { id: '1', name: 'Financeiro', active: true },
+    ])
+  })
+
+  it('keeps SAC action permissions aligned with the legacy permission codes', () => {
+    const session = {
+      token: 'token',
+      currentTenant: { id: 'empresa-1', nome: 'Empresa', codigo: '1', status: 'ativo' },
+      tenants: [],
+      user: {
+        id: 'u1',
+        nome: 'User',
+        email: 'user@test.local',
+        cargo: '',
+        avatarFallback: 'U',
+        ultimoAcesso: '',
+        master: false,
+        funcionalidades: [
+          { id: 'sac', nome: 'SAC', chave: 'SAC', slug: 'sac', componente: 'sac-chamados', ativo: true },
+          { id: 'list-all', nome: 'Listar todos', chave: 'SAC_FUNC_LISTAR_TODOS', slug: 'SAC_FUNC_LISTAR_TODOS', componente: 'sac-chamados', ativo: true, idFuncionalidadePai: 'sac' },
+          { id: 'note', nome: 'Nota interna', chave: 'SAC_FUNC_NOTA_INTERNA', slug: 'SAC_FUNC_NOTA_INTERNA', componente: 'sac-chamados', ativo: true, idFuncionalidadePai: 'sac' },
+          { id: 'assign', nome: 'Atribuir responsável', chave: 'SAC_FUNC_ATRIBUIR_RESPONSAVEL', slug: 'SAC_FUNC_ATRIBUIR_RESPONSAVEL', componente: 'sac-chamados', ativo: true, idFuncionalidadePai: 'sac' },
+          { id: 'transfer', nome: 'Transferir', chave: 'SAC_FUNC_TRANSFERIR', slug: 'SAC_FUNC_TRANSFERIR', componente: 'sac-chamados', ativo: true, idFuncionalidadePai: 'sac' },
+        ],
+      },
+    } satisfies AuthSession
+
+    expect(getSacAdminPermissions(session)).toMatchObject({
+      canListAll: true,
+      canAddInternalNote: true,
+      canAssign: true,
+      canTransfer: true,
+      canRespond: false,
+    })
   })
 })

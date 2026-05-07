@@ -71,7 +71,9 @@ Base date: 2026-03-24
 - Agile Store foi dividida em fatias. Nesta etapa foi migrada a superfície pública da loja: listagem, detalhe, ações de contratação/descontratação/reprocessamento, bridges para API v3, permissão/menu e documentação. SAC admin e retaguarda de gestão permanecem registrados para fatias próprias.
 - Thirty-first batch checked: `agile-store/sac-admin-operacional`.
 - SAC admin operacional migrou `/sac` com dashboard resumido, listagem, detalhe, resposta ao cliente, bridges `sac/admin/*`, mapeamento de permissÃ£o/menu e documentaÃ§Ã£o. Ãreas, assuntos, configuraÃ§Ãµes, upload completo e aÃ§Ãµes operacionais avanÃ§adas permanecem deferred para fatias prÃ³prias.
-- Next step: continue `agile-store` with SAC configuration/advanced actions or management backoffice.
+- Thirty-second batch checked: `agile-store/sac-admin-acoes-avancadas`.
+- SAC ações avançadas migrou permissões finas, lookups de áreas/assuntos/usuários, filtros relacionais, restrição de listagem por responsável sem `SAC_FUNC_LISTAR_TODOS`, nota interna, alteração de status, atribuição e transferência com `updated_at`. A etapa não adicionou item fixo ao menu; segue dependente do menu dinâmico vindo do banco/perfil.
+- Next step: continue `agile-store` with SAC configuration or management backoffice.
 
 ## Completed batches
 
@@ -106,6 +108,7 @@ Base date: 2026-03-24
 - `assets`: no production migration; legacy quick-search bootstrap timing is already covered by the v2 React shell, and legacy `ASSETS_VERSION` reload is not applicable to the Next.js asset pipeline.
 - `agile-store` public slice: migrated public Store list/detail/action surface, API v3 bridges, route mapping, permission feature and docs. SAC admin and management backoffice remain for follow-up slices.
 - `agile-store/sac-admin-operacional`: migrated SAC dashboard/list/detail/customer-response surface, API v3 bridges, route mapping, permission feature, i18n, docs and regression coverage. SAC configuration and Agile Store management backoffice remain for follow-up slices.
+- `agile-store/sac-admin-acoes-avancadas`: migrated fine-grained SAC action permissions, lookup bridges, relational filters, own-ticket restriction, internal note, status change, assignment and transfer forms with `updated_at` concurrency protection.
 
 ## Known local noise excluded
 

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '@/src/features/auth/hooks/use-auth'
 import { getSacAdminPermissions, getSacStatusInfo } from '@/src/features/sac-admin/services/sac-admin-mappers'
 import { sacAdminClient } from '@/src/features/sac-admin/services/sac-admin-client'
-import type { SacAdminPermissions, SacDashboard, SacTicket, SacTicketDetail } from '@/src/features/sac-admin/types/sac-admin'
+import type { SacAdminPermissions, SacDashboard, SacLookupOption, SacTicket, SacTicketAction, SacTicketDetail } from '@/src/features/sac-admin/types/sac-admin'
 import { useI18n } from '@/src/i18n/use-i18n'
 
 type SacAdminPageProps = {
@@ -16,6 +16,15 @@ const STATUS_FILTERS = [
   { value: 'pendentes_atuacao', labelKey: 'sacAdmin.filters.pending', fallback: 'Pendentes' },
   { value: 'abertos', labelKey: 'sacAdmin.filters.open', fallback: 'Abertos' },
   { value: 'fechados', labelKey: 'sacAdmin.filters.closed', fallback: 'Fechados' },
+]
+
+const ACTION_STATUS_OPTIONS = [
+  { value: 'em_atendimento', labelKey: 'sacAdmin.statusOptions.inProgress', fallback: 'Em atendimento' },
+  { value: 'aguardando_cliente', labelKey: 'sacAdmin.statusOptions.waitingCustomer', fallback: 'Aguardando cliente' },
+  { value: 'solucao_proposta', labelKey: 'sacAdmin.statusOptions.solutionProposed', fallback: 'Solução proposta' },
+  { value: 'resolvido_cliente', labelKey: 'sacAdmin.statusOptions.resolvedByCustomer', fallback: 'Resolvido pelo cliente' },
+  { value: 'fechado_inatividade', labelKey: 'sacAdmin.statusOptions.closedByInactivity', fallback: 'Fechado por inatividade' },
+  { value: 'reaberto', labelKey: 'sacAdmin.statusOptions.reopened', fallback: 'Reaberto' },
 ]
 
 function formatDate(value: string) {
@@ -54,18 +63,33 @@ function TicketDetailModal({
   error,
   isLoading,
   onClose,
+  onAction,
   onRespond,
   permissions,
+  areas,
+  subjects,
+  users,
 }: {
   detail: SacTicketDetail | null
   error: string
   isLoading: boolean
   onClose: () => void
+  onAction: (action: SacTicketAction, payload: Record<string, unknown>) => Promise<void>
   onRespond: (message: string) => Promise<void>
   permissions: SacAdminPermissions
+  areas: SacLookupOption[]
+  subjects: SacLookupOption[]
+  users: SacLookupOption[]
 }) {
   const { t } = useI18n()
   const [message, setMessage] = useState('')
+  const [internalNote, setInternalNote] = useState('')
+  const [statusValue, setStatusValue] = useState('em_atendimento')
+  const [statusMessage, setStatusMessage] = useState('')
+  const [assigneeId, setAssigneeId] = useState('')
+  const [transferAreaId, setTransferAreaId] = useState('')
+  const [transferSubjectId, setTransferSubjectId] = useState('')
+  const [transferReason, setTransferReason] = useState('')
   const ticket = detail?.ticket
 
   async function submitResponse() {
@@ -73,6 +97,15 @@ function TicketDetailModal({
     if (!normalized) return
     await onRespond(normalized)
     setMessage('')
+  }
+
+  async function submitAction(action: SacTicketAction, payload: Record<string, unknown>, afterSuccess: () => void) {
+    if (!ticket) return
+    await onAction(action, {
+      ...payload,
+      updated_at: ticket.updatedAt,
+    })
+    afterSuccess()
   }
 
   return (
@@ -145,6 +178,62 @@ function TicketDetailModal({
                 {t('sacAdmin.readOnlyDetail', 'Você pode visualizar o chamado, mas não possui permissão para responder.')}
               </div>
             )}
+            {permissions.canAddInternalNote ? (
+              <div className="rounded-lg border border-line p-4">
+                <label htmlFor="sac-internal-note" className="text-sm font-extrabold text-slate-950">{t('sacAdmin.internalNote', 'Nota interna')}</label>
+                <textarea id="sac-internal-note" value={internalNote} onChange={(event) => setInternalNote(event.target.value)} className="app-control mt-3 min-h-24 w-full rounded-lg px-3 py-2 text-sm" />
+                <button type="button" onClick={() => void submitAction('internal-note', { mensagem: internalNote.trim() }, () => setInternalNote(''))} disabled={!internalNote.trim()} className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">
+                  {t('sacAdmin.saveInternalNote', 'Salvar nota')}
+                </button>
+              </div>
+            ) : null}
+
+            {permissions.canChangeStatus ? (
+              <div className="rounded-lg border border-line p-4">
+                <label htmlFor="sac-status-value" className="text-sm font-extrabold text-slate-950">{t('sacAdmin.statusValue', 'Novo status')}</label>
+                <select id="sac-status-value" value={statusValue} onChange={(event) => setStatusValue(event.target.value)} className="app-control mt-3 w-full rounded-lg px-3 py-2 text-sm">
+                  {ACTION_STATUS_OPTIONS.map((item) => <option key={item.value} value={item.value}>{t(item.labelKey, item.fallback)}</option>)}
+                </select>
+                <label htmlFor="sac-status-message" className="mt-3 block text-sm font-extrabold text-slate-950">{t('sacAdmin.statusMessage', 'Mensagem de status')}</label>
+                <textarea id="sac-status-message" value={statusMessage} onChange={(event) => setStatusMessage(event.target.value)} className="app-control mt-3 min-h-20 w-full rounded-lg px-3 py-2 text-sm" />
+                <button type="button" onClick={() => void submitAction('status', { status: statusValue, mensagem: statusMessage.trim() }, () => setStatusMessage(''))} className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white">
+                  {t('sacAdmin.changeStatus', 'Alterar status')}
+                </button>
+              </div>
+            ) : null}
+
+            {permissions.canAssign ? (
+              <div className="rounded-lg border border-line p-4">
+                <label htmlFor="sac-assign-user" className="text-sm font-extrabold text-slate-950">{t('sacAdmin.assigneeField', 'Responsável')}</label>
+                <select id="sac-assign-user" value={assigneeId} onChange={(event) => setAssigneeId(event.target.value)} className="app-control mt-3 w-full rounded-lg px-3 py-2 text-sm">
+                  <option value="">{t('common.select', 'Selecione')}</option>
+                  {users.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                </select>
+                <button type="button" onClick={() => void submitAction('assign', { id_usuario_responsavel: assigneeId }, () => setAssigneeId(''))} disabled={!assigneeId} className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">
+                  {t('sacAdmin.assign', 'Atribuir')}
+                </button>
+              </div>
+            ) : null}
+
+            {permissions.canTransfer ? (
+              <div className="rounded-lg border border-line p-4">
+                <label htmlFor="sac-transfer-area" className="text-sm font-extrabold text-slate-950">{t('sacAdmin.transferArea', 'Área de destino')}</label>
+                <select id="sac-transfer-area" value={transferAreaId} onChange={(event) => setTransferAreaId(event.target.value)} className="app-control mt-3 w-full rounded-lg px-3 py-2 text-sm">
+                  <option value="">{t('common.select', 'Selecione')}</option>
+                  {areas.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                </select>
+                <label htmlFor="sac-transfer-subject" className="mt-3 block text-sm font-extrabold text-slate-950">{t('sacAdmin.transferSubject', 'Assunto de destino')}</label>
+                <select id="sac-transfer-subject" value={transferSubjectId} onChange={(event) => setTransferSubjectId(event.target.value)} className="app-control mt-3 w-full rounded-lg px-3 py-2 text-sm">
+                  <option value="">{t('common.select', 'Selecione')}</option>
+                  {subjects.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                </select>
+                <label htmlFor="sac-transfer-reason" className="mt-3 block text-sm font-extrabold text-slate-950">{t('sacAdmin.transferReason', 'Motivo da transferência')}</label>
+                <textarea id="sac-transfer-reason" value={transferReason} onChange={(event) => setTransferReason(event.target.value)} className="app-control mt-3 min-h-20 w-full rounded-lg px-3 py-2 text-sm" />
+                <button type="button" onClick={() => void submitAction('transfer', { id_sac_area: transferAreaId, id_sac_assunto: transferSubjectId, motivo: transferReason.trim() }, () => { setTransferAreaId(''); setTransferSubjectId(''); setTransferReason('') })} disabled={!transferAreaId || !transferSubjectId || !transferReason.trim()} className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">
+                  {t('sacAdmin.transfer', 'Transferir')}
+                </button>
+              </div>
+            ) : null}
           </aside>
         </div>
       </section>
@@ -166,6 +255,30 @@ export function SacAdminPage({ permissions: providedPermissions }: SacAdminPageP
   const [detail, setDetail] = useState<SacTicketDetail | null>(null)
   const [detailError, setDetailError] = useState('')
   const [isDetailLoading, setIsDetailLoading] = useState(false)
+  const [areas, setAreas] = useState<SacLookupOption[]>([])
+  const [subjects, setSubjects] = useState<SacLookupOption[]>([])
+  const [users, setUsers] = useState<SacLookupOption[]>([])
+  const [areaFilter, setAreaFilter] = useState('')
+  const [subjectFilter, setSubjectFilter] = useState('')
+  const [assigneeFilter, setAssigneeFilter] = useState('')
+
+  const loadLookups = useCallback(async () => {
+    try {
+      const shouldLoadUsers = permissions.canListAll || permissions.canAssign
+      const [areaResult, subjectResult, userResult] = await Promise.all([
+        sacAdminClient.areas(),
+        sacAdminClient.subjects(areaFilter || undefined),
+        shouldLoadUsers ? sacAdminClient.users() : Promise.resolve([]),
+      ])
+      setAreas(areaResult)
+      setSubjects(subjectResult)
+      setUsers(userResult)
+    } catch {
+      setAreas([])
+      setSubjects([])
+      setUsers([])
+    }
+  }, [areaFilter, permissions.canAssign, permissions.canListAll])
 
   const loadData = useCallback(async () => {
     if (!permissions.canList && !permissions.canViewDashboard) {
@@ -175,9 +288,10 @@ export function SacAdminPage({ permissions: providedPermissions }: SacAdminPageP
     setIsLoading(true)
     setError('')
     try {
+      const responsibleFilter = permissions.canListAll ? assigneeFilter : session?.user.id
       const [dashboardResult, listResult] = await Promise.all([
-        permissions.canViewDashboard ? sacAdminClient.dashboard({}) : Promise.resolve(null),
-        permissions.canList ? sacAdminClient.list({ status, cliente: search, protocolo: search }) : Promise.resolve(null),
+        permissions.canViewDashboard ? sacAdminClient.dashboard({ id_usuario_responsavel: responsibleFilter }) : Promise.resolve(null),
+        permissions.canList ? sacAdminClient.list({ status, cliente: search, protocolo: search, id_sac_area: areaFilter, id_sac_assunto: subjectFilter, id_usuario_responsavel: responsibleFilter }) : Promise.resolve(null),
       ])
       if (dashboardResult) setDashboard(dashboardResult)
       if (listResult) setTickets(listResult.items)
@@ -186,7 +300,7 @@ export function SacAdminPage({ permissions: providedPermissions }: SacAdminPageP
     } finally {
       setIsLoading(false)
     }
-  }, [permissions.canList, permissions.canViewDashboard, search, status, t])
+  }, [areaFilter, assigneeFilter, permissions.canList, permissions.canListAll, permissions.canViewDashboard, search, session?.user.id, status, subjectFilter, t])
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -194,6 +308,10 @@ export function SacAdminPage({ permissions: providedPermissions }: SacAdminPageP
     }, 120)
     return () => window.clearTimeout(timer)
   }, [loadData])
+
+  useEffect(() => {
+    void loadLookups()
+  }, [loadLookups])
 
   async function openTicket(id: string) {
     if (!permissions.canView) return
@@ -217,6 +335,13 @@ export function SacAdminPage({ permissions: providedPermissions }: SacAdminPageP
       status: 'aguardando_cliente',
       updated_at: detail.ticket.updatedAt,
     })
+    setDetail(await sacAdminClient.detail(detail.ticket.id))
+    void loadData()
+  }
+
+  async function runTicketAction(action: SacTicketAction, payload: Record<string, unknown>) {
+    if (!detail?.ticket) return
+    await sacAdminClient.action(detail.ticket.id, action, payload)
     setDetail(await sacAdminClient.detail(detail.ticket.id))
     void loadData()
   }
@@ -266,6 +391,31 @@ export function SacAdminPage({ permissions: providedPermissions }: SacAdminPageP
             <Search className="h-4 w-4 text-muted" />
             <input value={search} onChange={(event) => setSearch(event.target.value)} className="w-full border-0 bg-transparent text-sm outline-none" placeholder={t('sacAdmin.searchPlaceholder', 'Cliente ou protocolo')} />
           </label>
+        </div>
+        <div className="mt-3 grid gap-3 md:grid-cols-3">
+          <label className="text-xs font-bold uppercase tracking-[0.12em] text-muted">
+            {t('sacAdmin.areaFilter', 'Área')}
+            <select value={areaFilter} onChange={(event) => { setAreaFilter(event.target.value); setSubjectFilter('') }} className="app-control mt-2 w-full rounded-lg px-3 py-2 text-sm normal-case tracking-normal text-foreground">
+              <option value="">{t('common.all', 'Todos')}</option>
+              {areas.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+            </select>
+          </label>
+          <label className="text-xs font-bold uppercase tracking-[0.12em] text-muted">
+            {t('sacAdmin.subjectFilter', 'Assunto')}
+            <select value={subjectFilter} onChange={(event) => setSubjectFilter(event.target.value)} className="app-control mt-2 w-full rounded-lg px-3 py-2 text-sm normal-case tracking-normal text-foreground">
+              <option value="">{t('common.all', 'Todos')}</option>
+              {subjects.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+            </select>
+          </label>
+          {permissions.canListAll ? (
+            <label className="text-xs font-bold uppercase tracking-[0.12em] text-muted">
+              {t('sacAdmin.assigneeFilter', 'Responsável pelo chamado')}
+              <select value={assigneeFilter} onChange={(event) => setAssigneeFilter(event.target.value)} className="app-control mt-2 w-full rounded-lg px-3 py-2 text-sm normal-case tracking-normal text-foreground">
+                <option value="">{t('common.all', 'Todos')}</option>
+                {users.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+              </select>
+            </label>
+          ) : null}
         </div>
       </section>
 
@@ -319,8 +469,12 @@ export function SacAdminPage({ permissions: providedPermissions }: SacAdminPageP
           error={detailError}
           isLoading={isDetailLoading}
           onClose={() => setSelectedId('')}
+          onAction={runTicketAction}
           onRespond={respondToTicket}
           permissions={permissions}
+          areas={areas}
+          subjects={subjects}
+          users={users}
         />
       ) : null}
     </main>

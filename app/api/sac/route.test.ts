@@ -3,6 +3,9 @@ import { GET as getDashboard } from '@/app/api/sac/dashboard/route'
 import { GET as listTickets } from '@/app/api/sac/chamados/route'
 import { GET as getTicketDetail } from '@/app/api/sac/chamados/[id]/route'
 import { POST as runTicketAction } from '@/app/api/sac/chamados/[id]/action/route'
+import { GET as listAreas } from '@/app/api/sac/areas/route'
+import { GET as listSubjects } from '@/app/api/sac/assuntos/route'
+import { GET as listUsers } from '@/app/api/sac/usuarios/route'
 
 const {
   readAuthSessionMock,
@@ -77,6 +80,16 @@ describe('sac admin routes', () => {
         body: { mensagem: 'Resposta ao cliente', status: 'aguardando_cliente', updated_at: '2026-05-07 10:00:00' },
       }),
     )
+  })
+
+  it('forwards SAC lookup requests without adding fixed menu assumptions', async () => {
+    await listAreas()
+    await listSubjects(new Request('http://localhost/api/sac/assuntos?id_sac_area=area-1'))
+    await listUsers()
+
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(1, 'sac/admin/areas', expect.objectContaining({ method: 'GET' }))
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(2, 'sac/admin/assuntos?id_sac_area=area-1', expect.objectContaining({ method: 'GET' }))
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(3, 'sac/admin/usuarios', expect.objectContaining({ method: 'GET' }))
   })
 
   it('rejects SAC requests without a session', async () => {

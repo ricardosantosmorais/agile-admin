@@ -154,10 +154,21 @@ export type SacTicketDetail = {
 export type SacAdminPermissions = {
   canViewDashboard: boolean
   canList: boolean
+  canListAll?: boolean
   canView: boolean
   canRespond: boolean
   canAddInternalNote: boolean
   canChangeStatus: boolean
+  canAssign?: boolean
+  canTransfer?: boolean
+  canConfigureAreas?: boolean
+  canConfigureModule?: boolean
 }
 
 export type SacTicketAction = 'respond' | 'internal-note' | 'status' | 'assign' | 'transfer'
+
+export type SacLookupOption = {
+  id: string
+  name: string
+  active: boolean
+}
