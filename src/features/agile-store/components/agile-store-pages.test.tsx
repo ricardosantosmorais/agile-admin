@@ -5,11 +5,17 @@ import { AgileStoreDetailPage } from '@/src/features/agile-store/components/agil
 
 const {
   actionMock,
+  adminCancelContractMock,
+  adminDashboardMock,
+  adminUpdateBillingStatusMock,
   detailMock,
   listMock,
   tMock,
 } = vi.hoisted(() => ({
   actionMock: vi.fn(),
+  adminCancelContractMock: vi.fn(),
+  adminDashboardMock: vi.fn(),
+  adminUpdateBillingStatusMock: vi.fn(),
   detailMock: vi.fn(),
   listMock: vi.fn(),
   tMock: vi.fn((_key: string, fallback?: string) => fallback ?? _key),
@@ -18,6 +24,9 @@ const {
 vi.mock('@/src/features/agile-store/services/agile-store-client', () => ({
   agileStoreClient: {
     action: actionMock,
+    adminCancelContract: adminCancelContractMock,
+    adminDashboard: adminDashboardMock,
+    adminUpdateBillingStatus: adminUpdateBillingStatusMock,
     detail: detailMock,
     list: listMock,
   },
@@ -62,6 +71,9 @@ const moduleFixture = {
 describe('agile-store pages', () => {
   beforeEach(() => {
     actionMock.mockReset()
+    adminCancelContractMock.mockReset()
+    adminDashboardMock.mockReset()
+    adminUpdateBillingStatusMock.mockReset()
     detailMock.mockReset()
     listMock.mockReset()
     tMock.mockClear()
@@ -114,5 +126,35 @@ describe('agile-store pages', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Contratar módulo' }))
 
     await waitFor(() => expect(actionMock).toHaveBeenCalledWith('mod_sac', 'contract'))
+  })
+
+  it('renders the Agile Store admin backoffice and runs billing actions', async () => {
+    const { AgileStoreAdminPage } = await import('@/src/features/agile-store/components/agile-store-admin-page')
+    adminDashboardMock.mockResolvedValue({
+      period: { scope: 'periodo', start: '2026-05-01', end: '2026-05-07', granularity: 'dia' },
+      summary: { modules: 1, visits: 120, visitorCompanies: 40, periodContracts: 12, periodCancellations: 3, activeContracts: 20, freeContracts: 4, failures: 1, mrr: 1990.5 },
+      moduleOptions: [{ id: 'mod_sac', name: 'SAC' }],
+      modules: [{ id: 'mod_sac', name: 'SAC', type: 'Atendimento', status: 'publicado', highlighted: true, icon: 'far fa-headset', primaryColor: '#39aba4', visits: 80, periodContracts: 10, periodCancellations: 2, activeContracts: 15, freeContracts: 3, failures: 1, mrr: 1490.5, conversion: 13, growth: 8 }],
+      trend: [{ label: '07/05', visits: 9, conversions: 2, cancellations: 1 }],
+      visits: [{ id: 'visit-1', companyName: 'Cliente Alfa', companyDocument: '00.000.000/0001-00', moduleName: 'SAC', moduleType: 'Atendimento', userName: 'Maria', userEmail: 'maria@empresa.com', visitedAt: '2026-05-07 09:00:00', ip: '127.0.0.1', conversionStatus: 'convertido' }],
+      customers: [{ id: 'contract-1', companyName: 'Cliente Alfa', companyDocument: '00.000.000/0001-00', moduleName: 'SAC', moduleType: 'Atendimento', status: 'ativo', value: 149.9, currency: 'BRL', billingCycle: 'mensal', trialDays: 15, trialUntil: '2026-05-20', firstBillingAt: '2026-06-01', billingDay: '1', billingStatus: 'pendente', expectedBillingStatus: 'faturado', contractedAt: '2026-05-07 10:00:00', contractedBy: 'Joao', canCancelContract: true }],
+      events: [{ id: 'event-1', action: 'contratar', moduleName: 'SAC', companyName: 'Cliente Alfa', userName: 'Joao', createdAt: '2026-05-07 10:00:00', ip: '127.0.0.1' }],
+    })
+    adminUpdateBillingStatusMock.mockResolvedValue({ success: true })
+    adminCancelContractMock.mockResolvedValue({ success: true })
+
+    render(<AgileStoreAdminPage />)
+
+    expect(await screen.findByRole('heading', { name: 'Gestão da Agile Store' })).toBeInTheDocument()
+    expect(screen.getByText('MRR contratado')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Performance por módulo' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Contratações e faturamento' })).toBeInTheDocument()
+    expect((await screen.findAllByText('Cliente Alfa')).length).toBeGreaterThan(0)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Marcar faturado' }))
+    await waitFor(() => expect(adminUpdateBillingStatusMock).toHaveBeenCalledWith('contract-1', 'faturado'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Descontratar módulo' }))
+    await waitFor(() => expect(adminCancelContractMock).toHaveBeenCalledWith('contract-1'))
   })
 })

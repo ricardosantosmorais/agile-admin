@@ -2,6 +2,9 @@ import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { GET as listModules } from '@/app/api/agile-store/route'
 import { GET as getModuleDetail } from '@/app/api/agile-store/[id]/route'
 import { POST as runModuleAction } from '@/app/api/agile-store/[id]/action/route'
+import { GET as getAdminDashboard } from '@/app/api/agile-store/admin/dashboard/route'
+import { POST as updateAdminBilling } from '@/app/api/agile-store/admin/contratacoes/[id]/faturamento/route'
+import { POST as adminCancelContract } from '@/app/api/agile-store/admin/contratacoes/[id]/descontratar/route'
 
 const {
   readAuthSessionMock,
@@ -101,5 +104,47 @@ describe('agile-store routes', () => {
 
     expect(response.status).toBe(401)
     expect(serverApiFetchMock).not.toHaveBeenCalled()
+  })
+
+  it('forwards admin dashboard filters to api v3 without creating menu entries', async () => {
+    const request = new Request('http://localhost/api/agile-store/admin/dashboard?escopo=periodo&inicio=2026-05-01&fim=2026-05-07&id_modulo=mod_sac&faturamento_status=pendente&q=cliente')
+
+    const response = await getAdminDashboard(request)
+
+    expect(response.status).toBe(200)
+    expect(serverApiFetchMock).toHaveBeenCalledWith(
+      'app-store/admin/dashboard?escopo=periodo&inicio=2026-05-01&fim=2026-05-07&id_modulo=mod_sac&faturamento_status=pendente&q=cliente',
+      expect.objectContaining({
+        method: 'GET',
+        token: 'session-token',
+        tenantId: 'empresa-1',
+      }),
+    )
+  })
+
+  it('forwards admin billing and cancellation actions by contract id', async () => {
+    const billingRequest = new Request('http://localhost/api/agile-store/admin/contratacoes/contract-1/faturamento', {
+      method: 'POST',
+      body: JSON.stringify({ status: 'faturado' }),
+    })
+    const cancelRequest = new Request('http://localhost/api/agile-store/admin/contratacoes/contract-1/descontratar', {
+      method: 'POST',
+    })
+
+    await updateAdminBilling(billingRequest, { params: Promise.resolve({ id: 'contract-1' }) })
+    await adminCancelContract(cancelRequest, { params: Promise.resolve({ id: 'contract-1' }) })
+
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(1, 'app-store/admin/contratacoes/contract-1/faturamento', expect.objectContaining({
+      method: 'POST',
+      body: { status: 'faturado' },
+      token: 'session-token',
+      tenantId: 'empresa-1',
+    }))
+    expect(serverApiFetchMock).toHaveBeenNthCalledWith(2, 'app-store/admin/contratacoes/contract-1/descontratar', expect.objectContaining({
+      method: 'POST',
+      body: {},
+      token: 'session-token',
+      tenantId: 'empresa-1',
+    }))
   })
 })

@@ -75,7 +75,9 @@ Base date: 2026-03-24
 - SAC ações avançadas migrou permissões finas, lookups de áreas/assuntos/usuários, filtros relacionais, restrição de listagem por responsável sem `SAC_FUNC_LISTAR_TODOS`, nota interna, alteração de status, atribuição e transferência com `updated_at`. A etapa não adicionou item fixo ao menu; segue dependente do menu dinâmico vindo do banco/perfil.
 - Thirty-third batch checked: `agile-store/sac-admin-configuracoes`.
 - SAC configurações migrou configuração do módulo, cadastros de áreas, assuntos e responsáveis por área, bridges administrativas `sac/admin/*`, mapeadores, i18n, docs e cobertura focada. A etapa não adicionou item fixo ao menu; a superfície continua dependente das permissões dinâmicas `SAC_FUNC_CONFIGURAR_MODULO` e `SAC_FUNC_CONFIGURAR_AREAS`.
-- Next step: continue `agile-store` with management backoffice.
+- Thirty-fourth batch checked: `agile-store/admin-backoffice`.
+- Retaguarda da Agile Store migrou dashboard administrativo, filtros, métricas, performance por módulo, visitas/eventos, contratações/faturamento, ações de marcar faturamento e descontratar contrato por ID, bridges `app-store/admin/*`, mapeadores, i18n e docs. A etapa não adicionou item fixo ao menu; apenas mapeia o componente dinâmico `app-store-admin` para `/agile-store/admin`.
+- Next step: continue `agile-store` with SAC attachment upload or close remaining non-applicable catalog/script backoffice scope.
 
 ## Completed batches
 
@@ -112,6 +114,7 @@ Base date: 2026-03-24
 - `agile-store/sac-admin-operacional`: migrated SAC dashboard/list/detail/customer-response surface, API v3 bridges, route mapping, permission feature, i18n, docs and regression coverage. SAC configuration and Agile Store management backoffice remain for follow-up slices.
 - `agile-store/sac-admin-acoes-avancadas`: migrated fine-grained SAC action permissions, lookup bridges, relational filters, own-ticket restriction, internal note, status change, assignment and transfer forms with `updated_at` concurrency protection.
 - `agile-store/sac-admin-configuracoes`: migrated SAC module settings, area/subject/responsible administration, API v3 bridges, mappers, i18n, docs and focused regression coverage without adding fixed menu items.
+- `agile-store/admin-backoffice`: migrated Agile Store management dashboard, module performance, visits/events, contracts/billing, administrative billing status and cancellation actions, dynamic `app-store-admin` route mapping, API v3 bridges, mappers, i18n, docs and focused coverage.
 
 ## Known local noise excluded
 

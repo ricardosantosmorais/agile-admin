@@ -197,6 +197,7 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 	'apps-list': '/cadastros/apps',
 	'apps-form': '/cadastros/apps/novo',
 	'app-store-list': '/agile-store',
+	'app-store-admin': '/agile-store/admin',
 	'sac-dashboard': '/sac',
 	'sac-chamados': '/sac',
 	'relatorios-list': '/relatorios',

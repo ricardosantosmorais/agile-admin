@@ -135,3 +135,110 @@ export type AgileStoreListResponse = {
     types: string[]
   }
 }
+
+export type AgileStoreAdminDashboardRawResponse = {
+  data?: Record<string, unknown> | null
+}
+
+export type AgileStoreAdminPeriod = {
+  scope: string
+  start: string
+  end: string
+  granularity: string
+}
+
+export type AgileStoreAdminSummary = {
+  modules: number
+  visits: number
+  visitorCompanies: number
+  periodContracts: number
+  periodCancellations: number
+  activeContracts: number
+  freeContracts: number
+  failures: number
+  mrr: number
+}
+
+export type AgileStoreAdminModuleOption = {
+  id: string
+  name: string
+}
+
+export type AgileStoreAdminModuleMetric = AgileStoreAdminModuleOption & {
+  type: string
+  status: string
+  highlighted: boolean
+  icon: string
+  primaryColor: string
+  visits: number
+  periodContracts: number
+  periodCancellations: number
+  activeContracts: number
+  freeContracts: number
+  failures: number
+  mrr: number
+  conversion: number
+  growth: number
+}
+
+export type AgileStoreAdminTrendPoint = {
+  label: string
+  visits: number
+  conversions: number
+  cancellations: number
+}
+
+export type AgileStoreAdminVisit = {
+  id: string
+  companyName: string
+  companyDocument: string
+  moduleName: string
+  moduleType: string
+  userName: string
+  userEmail: string
+  visitedAt: string
+  ip: string
+  conversionStatus: string
+}
+
+export type AgileStoreAdminCustomer = {
+  id: string
+  companyName: string
+  companyDocument: string
+  moduleName: string
+  moduleType: string
+  status: string
+  value: number
+  currency: string
+  billingCycle: string
+  trialDays: number
+  trialUntil: string
+  firstBillingAt: string
+  billingDay: string
+  billingStatus: string
+  expectedBillingStatus: 'faturado' | 'cancelado'
+  contractedAt: string
+  contractedBy: string
+  canCancelContract: boolean
+}
+
+export type AgileStoreAdminEvent = {
+  id: string
+  action: string
+  moduleName: string
+  companyName: string
+  userName: string
+  createdAt: string
+  ip: string
+}
+
+export type AgileStoreAdminDashboard = {
+  period: AgileStoreAdminPeriod
+  summary: AgileStoreAdminSummary
+  moduleOptions: AgileStoreAdminModuleOption[]
+  modules: AgileStoreAdminModuleMetric[]
+  trend: AgileStoreAdminTrendPoint[]
+  visits: AgileStoreAdminVisit[]
+  customers: AgileStoreAdminCustomer[]
+  events: AgileStoreAdminEvent[]
+}
