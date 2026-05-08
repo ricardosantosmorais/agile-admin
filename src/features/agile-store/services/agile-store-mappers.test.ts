@@ -58,6 +58,35 @@ describe('agile-store mappers', () => {
     expect(response.meta).toEqual({ page: 2, perPage: 12, total: 1, pages: 1 })
   })
 
+  it('normalizes enveloped detail payload from the API bridge', () => {
+    const module = normalizeAgileStoreDetail({
+      data: {
+        id: 'mod_sac',
+        nome: 'SAC',
+        tipo: 'Atendimento',
+        resumo: 'Centralize chamados e SLA.',
+        preco: '490.00',
+        moeda: 'BRL',
+        ciclo_cobranca: 'mensal',
+        metadata: { beneficios: ['Chamados organizados'] },
+        teste_gratis: { disponivel: true, dias: 15 },
+        contratacao: { status: 'cancelado' },
+      },
+    } as unknown as Parameters<typeof normalizeAgileStoreDetail>[0])
+
+    expect(module).toMatchObject({
+      id: 'mod_sac',
+      name: 'SAC',
+      type: 'Atendimento',
+      summary: 'Centralize chamados e SLA.',
+      price: 490,
+      billingCycle: 'mensal',
+      benefits: ['Chamados organizados'],
+      trial: { available: true, days: 15 },
+      contractStatus: 'cancelado',
+    })
+  })
+
   it('uses action policy to block actions before permission checks', () => {
     const module = normalizeAgileStoreDetail({
       id: 'mod_sac',

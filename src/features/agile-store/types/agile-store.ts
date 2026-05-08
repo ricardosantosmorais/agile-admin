@@ -65,6 +65,10 @@ export type AgileStoreRawListResponse = {
   } | null
 }
 
+export type AgileStoreRawDetailResponse = AgileStoreRawModule | {
+  data?: AgileStoreRawModule | null
+}
+
 export type AgileStoreContractStatus =
   | 'ativo'
   | 'pendente_ativacao'

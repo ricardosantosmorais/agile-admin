@@ -4,6 +4,7 @@ import type {
   AgileStoreListResponse,
   AgileStoreModule,
   AgileStorePermissions,
+  AgileStoreRawDetailResponse,
   AgileStoreRawHistoryItem,
   AgileStoreRawListResponse,
   AgileStoreRawMedia,
@@ -56,7 +57,15 @@ function normalizeHistory(item: AgileStoreRawHistoryItem): AgileStoreModule['his
   }
 }
 
-export function normalizeAgileStoreDetail(module: AgileStoreRawModule): AgileStoreModule {
+function unwrapDetailPayload(response: AgileStoreRawDetailResponse): AgileStoreRawModule {
+  if ('data' in response && response.data && typeof response.data === 'object') {
+    return response.data
+  }
+  return response as AgileStoreRawModule
+}
+
+export function normalizeAgileStoreDetail(response: AgileStoreRawDetailResponse): AgileStoreModule {
+  const module = unwrapDetailPayload(response)
   return {
     id: text(module.id),
     name: text(module.nome),

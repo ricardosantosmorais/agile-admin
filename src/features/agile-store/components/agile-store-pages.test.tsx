@@ -89,11 +89,21 @@ describe('agile-store pages', () => {
 
     render(<AgileStoreListPage />)
 
-    expect(await screen.findByRole('heading', { name: 'Agile Store' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Módulos para ampliar a operação' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Agile Store' })).not.toBeInTheDocument()
     expect(await screen.findByRole('heading', { name: 'SAC' })).toBeInTheDocument()
     expect(screen.getByText('Central de atendimento integrada.')).toBeInTheDocument()
     expect(screen.getByText('15 dias grátis')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /SAC/i })).toHaveAttribute('href', '/agile-store/mod_sac')
+  })
+
+  it('uses the shared skeleton loading state in the Agile Store list', () => {
+    listMock.mockReturnValue(new Promise(() => undefined))
+
+    render(<AgileStoreListPage />)
+
+    expect(screen.getByRole('heading', { name: 'Carregando módulos' })).toBeInTheDocument()
+    expect(screen.getByText('Preparando o catálogo de módulos da Agile Store.')).toBeInTheDocument()
   })
 
   it('renders pagination controls and loads the selected Agile Store page', async () => {
@@ -142,6 +152,15 @@ describe('agile-store pages', () => {
     expect(screen.getByRole('link', { name: /Manual/i })).toHaveAttribute('href', 'https://example.com/manual.pdf')
     expect(screen.getByRole('heading', { name: 'Histórico' })).toBeInTheDocument()
     expect(screen.getByText('Falha ao executar script.')).toBeInTheDocument()
+  })
+
+  it('uses the shared skeleton loading state in the Agile Store detail', () => {
+    detailMock.mockReturnValue(new Promise(() => undefined))
+
+    render(<AgileStoreDetailPage moduleId="mod_sac" permissions={{ canContract: true, canCancel: true }} />)
+
+    expect(screen.getByRole('heading', { name: 'Carregando módulo' })).toBeInTheDocument()
+    expect(screen.getByText('Buscando as informações comerciais e materiais do módulo.')).toBeInTheDocument()
   })
 
   it('renders a blocked action message in detail instead of calling the API', async () => {

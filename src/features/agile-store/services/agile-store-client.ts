@@ -1,7 +1,7 @@
 import { httpClient } from '@/src/services/http/http-client'
 import { normalizeAgileStoreAdminDashboard } from '@/src/features/agile-store/services/agile-store-admin-mappers'
 import { normalizeAgileStoreDetail, normalizeAgileStoreListResponse } from '@/src/features/agile-store/services/agile-store-mappers'
-import type { AgileStoreAction, AgileStoreAdminDashboardRawResponse, AgileStoreRawListResponse, AgileStoreRawModule } from '@/src/features/agile-store/types/agile-store'
+import type { AgileStoreAction, AgileStoreAdminDashboardRawResponse, AgileStoreRawDetailResponse, AgileStoreRawListResponse } from '@/src/features/agile-store/types/agile-store'
 
 export type AgileStoreListFilters = {
   page?: number
@@ -50,7 +50,7 @@ export const agileStoreClient = {
     return normalizeAgileStoreListResponse(response)
   },
   async detail(id: string) {
-    const response = await httpClient<AgileStoreRawModule>(`/api/agile-store/${encodeURIComponent(id)}`, {
+    const response = await httpClient<AgileStoreRawDetailResponse>(`/api/agile-store/${encodeURIComponent(id)}`, {
       method: 'GET',
       cache: 'no-store',
     })
