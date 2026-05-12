@@ -36,3 +36,11 @@ Date range: 2026-04-06..2026-04-28
 - Files:
   - M assets/js/components/apps-list.js
   - M controllers/apps-controller.php
+
+## V2 check result
+
+- Checked against the current v2 Apps module after `master` merge.
+- No production migration needed.
+- `f08412579`: already covered by `app/api/apps/_apps-github.ts`, where the GitHub branch falls back to `develop`.
+- `c28adc182`: not applicable; v2 does not use legacy PHP `boot.php` app-level HTTPS redirect.
+- `017723209`: already covered by React state/list architecture. `AppsLogsModal` is controlled by `AppsListPage` state, and `APPS_CONFIG` already separates `nome_app` and `identificador_app` sort/filter keys in the corrected legacy order.
