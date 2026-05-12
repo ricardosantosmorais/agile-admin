@@ -18,6 +18,8 @@ import { useFormState } from '@/src/hooks/use-form-state'
 import { useFooterActionsVisibility } from '@/src/hooks/use-footer-actions-visibility'
 import { useI18n } from '@/src/i18n/use-i18n'
 
+type CatalogAccessOverride = Partial<ReturnType<typeof useFeatureAccess>>
+
 type CatalogTab = {
   key: string
   label: string
@@ -110,6 +112,7 @@ type TabbedCatalogFormPageProps = {
   id?: string
   tabs: CatalogTab[]
   formEmbed?: string
+  accessOverride?: CatalogAccessOverride
 }
 
 export function TabbedCatalogFormPage({
@@ -118,10 +121,12 @@ export function TabbedCatalogFormPage({
   id,
   tabs,
   formEmbed,
+  accessOverride,
 }: TabbedCatalogFormPageProps) {
   const { t } = useI18n()
   const router = useRouter()
-  const access = useFeatureAccess(config.featureKey)
+  const defaultAccess = useFeatureAccess(config.featureKey)
+  const access = { ...defaultAccess, ...accessOverride }
   const isEditing = Boolean(id)
   const readOnly = isEditing ? !access.canEdit && access.canView : false
   const canAccess = isEditing ? access.canEdit || access.canView : access.canCreate

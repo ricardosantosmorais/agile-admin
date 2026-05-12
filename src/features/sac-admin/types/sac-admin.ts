@@ -27,8 +27,13 @@ export type SacRawDashboardResponse = {
       evolucao?: Array<Record<string, unknown>> | null
       status?: SacChartPoint[] | null
       areas?: SacChartPoint[] | null
+      assuntos?: SacChartPoint[] | null
+      responsaveis?: SacChartPoint[] | null
+      fechamentos?: SacChartPoint[] | null
+      idade_backlog?: SacChartPoint[] | null
     } | null
     rankings?: {
+      clientes?: Array<Record<string, unknown>> | null
       atuacao?: Array<Record<string, unknown>> | null
     } | null
   } | null
@@ -56,8 +61,13 @@ export type SacDashboard = {
     evolution: Array<{ date: string; label: string; opened: number; closed: number }>
     status: Array<{ label: string; total: number }>
     areas: Array<{ label: string; total: number }>
+    subjects: Array<{ label: string; total: number }>
+    responsibles: Array<{ label: string; total: number }>
+    closings: Array<{ label: string; total: number }>
+    backlogAge: Array<{ label: string; total: number }>
   }
   rankings: {
+    customers: Array<{ id: string; name: string; total: number }>
     pending: Array<{ id: string; protocol: string; title: string; areaName: string; lastInteractionAt: string }>
   }
 }

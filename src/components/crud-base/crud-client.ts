@@ -88,6 +88,7 @@ const CRUD_OPTIONS_PATHS: Record<CrudResource, string> = {
 	promocoes: '/api/lookups/promocoes',
 	compre_ganhe: '/api/compre-e-ganhe',
 	brindes: '/api/lookups/brindes',
+	sac_areas: '/api/sac/areas',
 };
 
 function buildParams(filters: CrudListFilters, embed?: string) {

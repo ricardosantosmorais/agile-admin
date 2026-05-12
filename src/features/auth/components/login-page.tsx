@@ -52,6 +52,12 @@ export function LoginPage() {
   }, [])
 
   useEffect(() => {
+    if (status === 'authenticated') {
+      router.replace(searchParams.get('from') || '/dashboard')
+    }
+  }, [router, searchParams, status])
+
+  useEffect(() => {
     if (status === 'unauthenticated') {
       invalidateSession()
     }

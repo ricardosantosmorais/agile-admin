@@ -198,8 +198,10 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 	'apps-form': '/cadastros/apps/novo',
 	'app-store-list': '/agile-store',
 	'app-store-admin': '/agile-store/admin',
-	'sac-dashboard': '/sac',
-	'sac-chamados': '/sac',
+	'sac-dashboard': '/sac/dashboard',
+	'sac-chamados': '/sac/chamados',
+	'sac-areas-assuntos': '/sac/areas-assuntos',
+	'sac-configuracoes': '/sac/configuracoes',
 	'relatorios-list': '/relatorios',
 	'relatorios-v2-list': '/relatorios',
 	'configuracoes-clientes-form': '/configuracoes/clientes',
@@ -253,6 +255,13 @@ const IMPLEMENTED_COMPONENT_ROUTES: Record<string, string> = {
 const IMPLEMENTED_CLICK_ROUTES: Record<string, string> = {
 	'renew-cache': '/renovar-cache',
 };
+
+const DIRECT_COMPONENT_MENU_LABELS = new Set([
+	'sac-dashboard',
+	'sac-chamados',
+	'sac-areas-assuntos',
+	'sac-configuracoes',
+]);
 
 const ROOT_MENU: LegacyRootDefinition[] = [
 	{ key: 'dashboard', label: 'Inicio', icon: LayoutDashboard, component: 'dashboard' },
@@ -586,6 +595,15 @@ function resolveIcon(permission: AuthPermission): LucideIcon {
 	return matched?.icon ?? ScrollText;
 }
 
+function resolvePermissionLabel(permission: AuthPermission, locale: Locale) {
+	const normalizedComponent = normalizeSearchValue(permission.componente ?? '');
+	if (DIRECT_COMPONENT_MENU_LABELS.has(normalizedComponent)) {
+		return translateMenuLabel(locale, normalizedComponent, permission.nome);
+	}
+
+	return translateMenuFromCandidates(locale, [permission.componente, permission.slug, permission.chave, permission.id], permission.nome);
+}
+
 function buildDynamicMenu(session: AuthSession, locale: Locale): MenuItem[] {
 	const permissions = session.user.funcionalidades.filter(isMenuPermission).sort(sortPermissions);
 	const levelOne = permissions.filter((permission) => Number(permission.nivel ?? 0) === 1);
@@ -598,7 +616,7 @@ function buildDynamicMenu(session: AuthSession, locale: Locale): MenuItem[] {
 			.filter((permission) => !hiddenComponents.has(normalizeSearchValue(permission.componente ?? '')))
 			.map((permission) => ({
 				key: permission.id || permission.chave || permission.slug,
-				label: translateMenuFromCandidates(locale, [permission.componente, permission.slug, permission.chave, permission.id], permission.nome),
+				label: resolvePermissionLabel(permission, locale),
 				icon: resolveIcon(permission),
 				...resolvePermissionRoute(permission),
 			}))
@@ -606,11 +624,11 @@ function buildDynamicMenu(session: AuthSession, locale: Locale): MenuItem[] {
 
 		if (children.length) {
 			return {
-				key: parent.id || parent.chave || parent.slug,
-				label: translateMenuFromCandidates(locale, [parent.componente, parent.slug, parent.chave, parent.id], parent.nome),
-				icon: resolveIcon(parent),
-				children,
-			} satisfies MenuItem;
+			key: parent.id || parent.chave || parent.slug,
+			label: resolvePermissionLabel(parent, locale),
+			icon: resolveIcon(parent),
+			children,
+		} satisfies MenuItem;
 		}
 
 		if (hiddenComponents.has(normalizeSearchValue(parent.componente ?? ''))) {
@@ -620,7 +638,7 @@ function buildDynamicMenu(session: AuthSession, locale: Locale): MenuItem[] {
 		const route = resolvePermissionRoute(parent);
 		return {
 			key: parent.id || parent.chave || parent.slug,
-			label: translateMenuFromCandidates(locale, [parent.componente, parent.slug, parent.chave, parent.id], parent.nome),
+			label: resolvePermissionLabel(parent, locale),
 			icon: resolveIcon(parent),
 			...route,
 		} satisfies MenuItem;

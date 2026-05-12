@@ -83,8 +83,17 @@ export function normalizeSacDashboard(response: SacRawDashboardResponse): SacDas
       })),
       status: array(charts.status).map((item) => chartPoint(item as Record<string, unknown>)),
       areas: array(charts.areas).map((item) => chartPoint(item as Record<string, unknown>)),
+      subjects: array(charts.assuntos).map((item) => chartPoint(item as Record<string, unknown>)),
+      responsibles: array(charts.responsaveis).map((item) => chartPoint(item as Record<string, unknown>)),
+      closings: array(charts.fechamentos).map((item) => chartPoint(item as Record<string, unknown>)),
+      backlogAge: array(charts.idade_backlog).map((item) => chartPoint(item as Record<string, unknown>)),
     },
     rankings: {
+      customers: array(rankings.clientes).map((item) => ({
+        id: text(item.id),
+        name: text(item.nome || item.cliente || item.label),
+        total: number(item.total),
+      })),
       pending: array(rankings.atuacao).map((item) => ({
         id: text(item.id),
         protocol: text(item.protocolo),
