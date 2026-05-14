@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { GET } from '@/app/api/catalogos-digitais/route'
+import { GET, POST } from '@/app/api/catalogos-digitais/route'
+import { GET as GET_DETAIL } from '@/app/api/catalogos-digitais/[id]/route'
 
 const {
   readAuthSessionMock,
@@ -62,5 +63,47 @@ describe('catalogos-digitais route', () => {
 
     expect(response.status).toBe(401)
     expect(serverApiFetchMock).not.toHaveBeenCalled()
+  })
+
+  it('loads a catalog detail by active tenant and embeds products', async () => {
+    const response = await GET_DETAIL(new Request('http://localhost/api/catalogos-digitais/CAT-1'), { params: Promise.resolve({ id: 'CAT-1' }) })
+
+    expect(response.status).toBe(200)
+    expect(serverApiFetchMock).toHaveBeenCalledWith(
+      'catalogos_digitais?id_empresa=empresa-1&id=CAT-1&embed=produtos&perpage=1',
+      expect.objectContaining({
+        method: 'GET',
+        token: 'session-token',
+        tenantId: 'empresa-1',
+      }),
+    )
+  })
+
+  it('saves a catalog payload with tenant context', async () => {
+    const request = new Request('http://localhost/api/catalogos-digitais', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: 'CAT-1',
+        nome: 'Campanha Junho',
+        metadata: '{}',
+      }),
+    })
+
+    const response = await POST(request)
+
+    expect(response.status).toBe(200)
+    expect(serverApiFetchMock).toHaveBeenCalledWith(
+      'catalogos_digitais',
+      expect.objectContaining({
+        method: 'POST',
+        token: 'session-token',
+        tenantId: 'empresa-1',
+        body: expect.objectContaining({
+          id: 'CAT-1',
+          id_empresa: 'empresa-1',
+          nome: 'Campanha Junho',
+        }),
+      }),
+    )
   })
 })

@@ -28,6 +28,8 @@ vi.mock('@/src/features/auth/hooks/use-auth', () => ({
         funcionalidades: [
           { id: '1', chave: 'CATALOGOS_DIGITAIS', componente: 'catalogos-studio', nome: 'Catálogos Digitais', slug: 'catalogos-digitais', ativo: true },
           { id: '2', chave: 'CATALOGOS_DIGITAIS_LISTAR', componente: 'catalogos-studio', nome: 'Listar catálogos', slug: 'catalogos-digitais-listar', acao: 'listar', ativo: true, idFuncionalidadePai: '1' },
+          { id: '3', chave: 'CATALOGOS_DIGITAIS_CRIAR', componente: 'catalogos-studio', nome: 'Criar catálogos', slug: 'catalogos-digitais-criar', acao: 'criar', ativo: true, idFuncionalidadePai: '1' },
+          { id: '4', chave: 'CATALOGOS_DIGITAIS_EDITAR', componente: 'catalogos-studio', nome: 'Editar catálogos', slug: 'catalogos-digitais-editar', acao: 'editar', ativo: true, idFuncionalidadePai: '1' },
         ],
       },
     },
@@ -78,6 +80,8 @@ describe('CatalogosDigitaisListPage', () => {
     expect(screen.getAllByText('Pública').length).toBeGreaterThan(0)
     expect(screen.getByText('Atenção: o módulo Catálogos Digitais ainda não está contratado para sua loja.')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Contratar na Agile Store' })).toHaveAttribute('href', '/agile-store/mod_catalogos_digitais')
+    expect(screen.getByRole('link', { name: 'Novo catálogo' })).toHaveAttribute('href', '/catalogos-digitais/novo')
+    expect(screen.getAllByRole('link', { name: 'Editar catálogo Campanha Maio' })[0]).toHaveAttribute('href', '/catalogos-digitais/CAT-1/editar')
     await waitFor(() => expect(listMock).toHaveBeenCalledWith({ page: 1, perpage: 15, q: '', status: '' }))
   })
 })

@@ -47,22 +47,28 @@ This phase should not continue blindly from the old queue. It starts from the ne
 
 ## Next step
 
-`catalogos-digitais` is partially migrated and temporarily parked because the local/base data is outdated for closing the studio flow safely.
+`catalogos-digitais` resumed after the local/base data update. The first studio slice is migrated.
 
-First slice completed in v2:
+Completed in v2:
 
 - dynamic menu component `catalogos-studio` mapped to `/catalogos-digitais`;
 - feature access key `catalogosDigitais` mapped to legacy permissions;
 - bridge/list client for `catalogos_digitais`;
 - App Store contract lookup for `mod_catalogos_digitais`;
 - v2 list page with search, status, contract warning and table.
+- `Novo catalogo` action on the list;
+- edit action on each catalog row;
+- `/catalogos-digitais/novo` create route;
+- `/catalogos-digitais/[id]/editar` edit route;
+- detail bridge using `embed=produtos`;
+- save bridge preserving the legacy snapshot data for products/sections;
+- first studio form slice for general data and publication fields.
 
 Next slice:
 
-- legacy components/controllers/scripts for catalog studio;
-- studio create/edit UI;
 - sections, image upload, product/collection import and pricing;
 - preview/PDF/publication contracts.
+- final visual validation of the complete studio.
 
 `agile-store-ajustes` completed in this slice:
 
@@ -75,4 +81,4 @@ Next slice:
 
 Evidence: `evidence/agile-store-ajustes-feedback.md`.
 
-Active next batch: `pedidos-logistica`.
+Active next batch remains `catalogos-digitais` until the remaining studio slices are closed.

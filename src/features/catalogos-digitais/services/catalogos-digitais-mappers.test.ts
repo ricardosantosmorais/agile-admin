@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeCatalogosDigitaisListResponse } from '@/src/features/catalogos-digitais/services/catalogos-digitais-mappers'
+import {
+  createEmptyCatalogoDigitalForm,
+  normalizeCatalogoDigitalDetail,
+  normalizeCatalogosDigitaisListResponse,
+  toCatalogoDigitalSavePayload,
+} from '@/src/features/catalogos-digitais/services/catalogos-digitais-mappers'
 
 describe('catalogos-digitais-mappers', () => {
   it('normalizes catalog rows from metadata snapshot and app store contract', () => {
@@ -69,5 +74,113 @@ describe('catalogos-digitais-mappers', () => {
       active: true,
     })
     expect(response.appStore.contracted).toBe(false)
+  })
+
+  it('normalizes detail snapshot for the first studio edit slice', () => {
+    const form = normalizeCatalogoDigitalDetail({
+      data: {
+        id: 'CAT-1',
+        codigo: 'CAT-1',
+        nome: 'Campanha Maio',
+        descricao: 'Ofertas para clientes especiais',
+        ativo: 1,
+        mostrar_preco: 1,
+        metadata: JSON.stringify({
+          modelo: 'campanha_promocional',
+          template: 'executivo',
+          objetivo: 'promocional',
+          modo_publicacao: 'publica',
+          vigencia_inicio: '2026-05-01',
+          vigencia_fim: '2026-05-31',
+          snapshot: {
+            nome: 'Campanha Maio',
+            chamada_capa: 'Ofertas para clientes especiais',
+            produtos: [{ id: 'PROD-1' }],
+            secoes: [{ id: 'sec-1', tipo: 'titulo' }],
+            saidas: {
+              modo_publicacao: 'publica',
+              exibir_preco: true,
+            },
+          },
+        }),
+      },
+    })
+
+    expect(form).toMatchObject({
+      id: 'CAT-1',
+      code: 'CAT-1',
+      name: 'Campanha Maio',
+      coverCall: 'Ofertas para clientes especiais',
+      model: 'campanha_promocional',
+      template: 'executivo',
+      objective: 'promocional',
+      publicationMode: 'publica',
+      validFrom: '2026-05-01',
+      validTo: '2026-05-31',
+      showPrice: true,
+      active: true,
+    })
+    expect(form.products).toHaveLength(1)
+    expect(form.sections).toHaveLength(1)
+  })
+
+  it('builds a save payload preserving products and sections from the legacy snapshot', () => {
+    const form = {
+      ...createEmptyCatalogoDigitalForm(),
+      id: 'CAT-1',
+      code: 'CAT-1',
+      name: 'Campanha Junho',
+      coverCall: 'Ofertas renovadas',
+      model: 'campanha_promocional',
+      template: 'executivo',
+      objective: 'promocional',
+      publicationMode: 'restrita_cliente',
+      validFrom: '2026-06-01',
+      validTo: '2026-06-30',
+      showPrice: false,
+      active: true,
+      products: [{ id: 'PROD-1' }],
+      sections: [{ id: 'sec-1', tipo: 'titulo' }],
+      snapshot: {
+        origem_produtos: 'colecao',
+        produtos: [{ id: 'PROD-1' }],
+        secoes: [{ id: 'sec-1', tipo: 'titulo' }],
+        saidas: {
+          modo_publicacao: 'publica',
+          exibir_preco: true,
+        },
+      },
+    }
+
+    const payload = toCatalogoDigitalSavePayload(form)
+    const metadata = JSON.parse(String(payload.metadata)) as Record<string, unknown>
+    const snapshot = metadata.snapshot as Record<string, unknown>
+    const outputs = snapshot.saidas as Record<string, unknown>
+
+    expect(payload).toMatchObject({
+      id: 'CAT-1',
+      codigo: 'CAT-1',
+      nome: 'Campanha Junho',
+      descricao: 'Ofertas renovadas',
+      status: 'pronto',
+      origem_produtos: 'colecao',
+      restrito: true,
+      publicado: true,
+      mostrar_preco: false,
+      ativo: true,
+    })
+    expect(snapshot.produtos).toEqual([{ id: 'PROD-1' }])
+    expect(snapshot.secoes).toEqual([{ id: 'sec-1', tipo: 'titulo' }])
+    expect(outputs).toMatchObject({
+      modo_publicacao: 'restrita_cliente',
+      exibir_preco: false,
+    })
+    expect(metadata).toMatchObject({
+      produto_count: 1,
+      secao_count: 1,
+      modo_publicacao: 'restrita_cliente',
+      vigencia_inicio: '2026-06-01',
+      vigencia_fim: '2026-06-30',
+    })
   })
 })

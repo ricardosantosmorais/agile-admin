@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { AlertTriangle, ExternalLink, RefreshCcw, Search, Store } from 'lucide-react'
+import { AlertTriangle, ExternalLink, Pencil, Plus, RefreshCcw, Search, Store } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { AppDataTable } from '@/src/components/data-table/app-data-table'
 import type { AppDataTableColumn } from '@/src/components/data-table/types'
@@ -137,10 +137,18 @@ export function CatalogosDigitaisListPage() {
         title={t('digitalCatalogs.title', 'Catálogos Digitais')}
         breadcrumbs={[{ label: t('routes.dashboard', 'Início'), href: '/dashboard' }, { label: t('routes.catalogo', 'Catálogo') }, { label: t('digitalCatalogs.title', 'Catálogos Digitais') }]}
         actions={
-          <button type="button" onClick={listState.reload} className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold">
-            <RefreshCcw className="h-4 w-4" />
-            {t('common.refresh', 'Atualizar')}
-          </button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {access.canCreate ? (
+              <Link href="/catalogos-digitais/novo" className="app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold">
+                <Plus className="h-4 w-4" />
+                {t('digitalCatalogs.new', 'Novo catálogo')}
+              </Link>
+            ) : null}
+            <button type="button" onClick={listState.reload} className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold">
+              <RefreshCcw className="h-4 w-4" />
+              {t('common.refresh', 'Atualizar')}
+            </button>
+          </div>
         }
       />
 
@@ -189,6 +197,16 @@ export function CatalogosDigitaisListPage() {
             getRowId={(item) => item.id || item.code}
             columns={columns}
             emptyMessage={t('digitalCatalogs.empty', 'Nenhum catálogo digital encontrado.')}
+            rowActions={(item) => [
+              {
+                id: 'edit',
+                label: `${t('digitalCatalogs.editCatalog', 'Editar catálogo')} ${item.name}`,
+                icon: Pencil,
+                href: `/catalogos-digitais/${encodeURIComponent(item.id)}/editar`,
+                visible: access.canEdit || access.canView,
+              },
+            ]}
+            actionsLabel={t('digitalCatalogs.columns.actions', 'Ações')}
             mobileCard={{
               title: (item) => item.name,
               subtitle: (item) => item.description || item.code,

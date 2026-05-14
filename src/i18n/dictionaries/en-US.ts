@@ -6983,6 +6983,8 @@ export const enUS: TranslationDictionary = {
 	},
 	digitalCatalogs: {
 		title: 'Digital Catalogs',
+		new: 'New catalog',
+		editCatalog: 'Edit catalog',
 		listTitle: 'Created catalogs',
 		listDescription: 'First v2 surface to track digital catalogs, status, publication, validity, and product volume.',
 		searchPlaceholder: 'Search by name, code, or status',
@@ -7017,6 +7019,7 @@ export const enUS: TranslationDictionary = {
 			sections: 'Blocks',
 			validity: 'Validity',
 			url: 'URL',
+			actions: 'Actions',
 		},
 	},
 	agileStore: {

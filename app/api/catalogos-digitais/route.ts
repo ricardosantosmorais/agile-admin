@@ -33,6 +33,14 @@ function findCatalogModule(payload: unknown) {
   }) ?? null
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value) ? value as Record<string, unknown> : {}
+}
+
+function catalogCode() {
+  return `CAT-${new Date().toISOString().replace(/\D/g, '').slice(0, 14)}-${Math.random().toString(16).slice(2, 10)}`
+}
+
 export async function GET(request: Request) {
   const session = await readAuthSession()
   if (!session) {
@@ -74,4 +82,33 @@ export async function GET(request: Request) {
     ...(typeof catalogsResult.payload === 'object' && catalogsResult.payload !== null ? catalogsResult.payload : { data: [] }),
     appStore: appStoreResult.ok ? findCatalogModule(appStoreResult.payload) : { id: MODULE_ID, error: appStoreResult.payload },
   })
+}
+
+export async function POST(request: Request) {
+  const session = await readAuthSession()
+  if (!session) {
+    return NextResponse.json({ message: 'Sessao expirada.' }, { status: 401 })
+  }
+
+  const body = asRecord(await request.json().catch(() => ({})))
+  const id = String(body.id || '').trim() || catalogCode()
+  const payload = {
+    ...body,
+    id,
+    codigo: String(body.codigo || id).trim() || id,
+    id_empresa: session.currentTenantId,
+  }
+
+  const result = await serverApiFetch('catalogos_digitais', {
+    method: 'POST',
+    token: session.token,
+    tenantId: session.currentTenantId,
+    body: payload,
+  })
+
+  if (!result.ok) {
+    return NextResponse.json({ message: getErrorMessage(result.payload, 'Nao foi possivel salvar o catalogo digital.') }, { status: result.status || 400 })
+  }
+
+  return NextResponse.json(result.payload)
 }

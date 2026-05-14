@@ -6991,6 +6991,8 @@ export const ptBR: TranslationDictionary = {
 	},
 	digitalCatalogs: {
 		title: 'Catálogos Digitais',
+		new: 'Novo catálogo',
+		editCatalog: 'Editar catálogo',
 		listTitle: 'Catálogos criados',
 		listDescription: 'Primeira superfície v2 para acompanhar catálogos digitais, status, publicação, vigência e volume de produtos.',
 		searchPlaceholder: 'Buscar por nome, código ou status',
@@ -7025,6 +7027,7 @@ export const ptBR: TranslationDictionary = {
 			sections: 'Blocos',
 			validity: 'Vigência',
 			url: 'URL',
+			actions: 'Ações',
 		},
 	},
 	agileStore: {

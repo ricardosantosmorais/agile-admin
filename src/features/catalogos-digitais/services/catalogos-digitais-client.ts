@@ -1,6 +1,6 @@
 import { httpClient } from '@/src/services/http/http-client'
-import { normalizeCatalogosDigitaisListResponse } from '@/src/features/catalogos-digitais/services/catalogos-digitais-mappers'
-import type { CatalogosDigitaisRawResponse } from '@/src/features/catalogos-digitais/types/catalogos-digitais'
+import { normalizeCatalogoDigitalDetail, normalizeCatalogosDigitaisListResponse, toCatalogoDigitalSavePayload } from '@/src/features/catalogos-digitais/services/catalogos-digitais-mappers'
+import type { CatalogoDigitalFormRecord, CatalogosDigitaisRawResponse } from '@/src/features/catalogos-digitais/types/catalogos-digitais'
 
 export type CatalogosDigitaisFilters = {
   page?: number
@@ -29,5 +29,19 @@ export const catalogosDigitaisClient = {
       cache: 'no-store',
     })
     return normalizeCatalogosDigitaisListResponse(response)
+  },
+  async detail(id: string) {
+    const response = await httpClient<unknown>(`/api/catalogos-digitais/${encodeURIComponent(id)}`, {
+      method: 'GET',
+      cache: 'no-store',
+    })
+    return normalizeCatalogoDigitalDetail(response)
+  },
+  async save(form: CatalogoDigitalFormRecord) {
+    return httpClient('/api/catalogos-digitais', {
+      method: 'POST',
+      cache: 'no-store',
+      body: JSON.stringify(toCatalogoDigitalSavePayload(form)),
+    })
   },
 }

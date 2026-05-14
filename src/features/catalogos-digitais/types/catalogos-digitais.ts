@@ -55,3 +55,21 @@ export type CatalogosDigitaisListResponse = {
   }
   appStore: CatalogosDigitaisAppStoreSummary
 }
+
+export type CatalogoDigitalFormRecord = {
+  id: string
+  code: string
+  name: string
+  coverCall: string
+  model: string
+  template: string
+  objective: string
+  publicationMode: string
+  validFrom: string
+  validTo: string
+  showPrice: boolean
+  active: boolean
+  products: unknown[]
+  sections: unknown[]
+  snapshot: Record<string, unknown>
+}

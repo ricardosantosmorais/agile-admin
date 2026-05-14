@@ -6,6 +6,7 @@ import type {
   CatalogosDigitaisRawAppStoreSummary,
   CatalogosDigitaisRawCatalog,
   CatalogosDigitaisRawResponse,
+  CatalogoDigitalFormRecord,
 } from '@/src/features/catalogos-digitais/types/catalogos-digitais'
 
 const MODULE_ID = 'mod_catalogos_digitais'
@@ -44,6 +45,22 @@ function normalizePublicationMode(value: unknown) {
 
 function snapshotFrom(metadata: Record<string, unknown>) {
   return asRecord(metadata.snapshot)
+}
+
+function firstCatalogFrom(response: unknown): CatalogosDigitaisRawCatalog {
+  const record = asRecord(response)
+  const data = record.data
+  if (Array.isArray(data)) return asRecord(data[0])
+  return asRecord(data || response)
+}
+
+function arrayValue(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : []
+}
+
+function stringValue(value: unknown, fallback = '') {
+  const text = asString(value).trim()
+  return text || fallback
 }
 
 export function normalizeCatalogoDigital(row: CatalogosDigitaisRawCatalog): CatalogosDigitaisCatalog {
@@ -100,5 +117,106 @@ export function normalizeCatalogosDigitaisListResponse(response: CatalogosDigita
       pages: numberValue(meta.pages || 1) || 1,
     },
     appStore: normalizeCatalogosDigitaisAppStoreSummary(response.appStore),
+  }
+}
+
+export function createEmptyCatalogoDigitalForm(): CatalogoDigitalFormRecord {
+  return {
+    id: '',
+    code: '',
+    name: '',
+    coverCall: '',
+    model: 'campanha_promocional',
+    template: 'executivo',
+    objective: 'promocional',
+    publicationMode: 'nao_publicar',
+    validFrom: '',
+    validTo: '',
+    showPrice: true,
+    active: true,
+    products: [],
+    sections: [],
+    snapshot: {},
+  }
+}
+
+export function normalizeCatalogoDigitalDetail(response: unknown): CatalogoDigitalFormRecord {
+  const row = firstCatalogFrom(response)
+  const metadata = parseMetadata(row.metadata)
+  const snapshot = snapshotFrom(metadata)
+  const outputs = asRecord(snapshot.saidas)
+  const form = createEmptyCatalogoDigitalForm()
+
+  return {
+    ...form,
+    id: stringValue(row.id),
+    code: stringValue(row.codigo || row.id),
+    name: stringValue(snapshot.nome || row.nome),
+    coverCall: stringValue(snapshot.chamada_capa || row.descricao),
+    model: stringValue(snapshot.modelo || metadata.modelo, form.model),
+    template: stringValue(snapshot.template || metadata.template, form.template),
+    objective: stringValue(snapshot.objetivo || metadata.objetivo, form.objective),
+    publicationMode: normalizePublicationMode(outputs.modo_publicacao || metadata.modo_publicacao),
+    validFrom: stringValue(snapshot.vigencia_inicio || outputs.vigencia_inicio || metadata.vigencia_inicio),
+    validTo: stringValue(snapshot.vigencia_fim || outputs.vigencia_fim || metadata.vigencia_fim),
+    showPrice: outputs.exibir_preco === undefined ? asBoolean(row.mostrar_preco) : asBoolean(outputs.exibir_preco),
+    active: row.ativo === undefined ? true : asBoolean(row.ativo),
+    products: arrayValue(snapshot.produtos),
+    sections: arrayValue(snapshot.secoes),
+    snapshot,
+  }
+}
+
+export function toCatalogoDigitalSavePayload(form: CatalogoDigitalFormRecord): Record<string, unknown> {
+  const snapshotOutputs = asRecord(form.snapshot.saidas)
+  const products = arrayValue(form.products.length ? form.products : form.snapshot.produtos)
+  const sections = arrayValue(form.sections.length ? form.sections : form.snapshot.secoes)
+  const publicationMode = normalizePublicationMode(form.publicationMode)
+  const snapshot = {
+    ...form.snapshot,
+    nome: form.name.trim(),
+    chamada_capa: form.coverCall.trim(),
+    modelo: form.model,
+    template: form.template,
+    objetivo: form.objective,
+    vigencia_inicio: form.validFrom,
+    vigencia_fim: form.validTo,
+    produtos: products,
+    secoes: sections,
+    saidas: {
+      ...snapshotOutputs,
+      modo_publicacao: publicationMode,
+      exibir_preco: form.showPrice,
+      vigencia_inicio: form.validFrom,
+      vigencia_fim: form.validTo,
+    },
+  }
+  const origemProdutos = stringValue(form.snapshot.origem_produtos, 'manual')
+  const metadata = {
+    snapshot,
+    produto_count: products.length,
+    secao_count: sections.length,
+    modelo: form.model,
+    template: form.template,
+    objetivo: form.objective,
+    modo_publicacao: publicationMode,
+    vigencia_inicio: form.validFrom,
+    vigencia_fim: form.validTo,
+    precos_dinamicos: asBoolean(form.snapshot.precos_dinamicos),
+    precificacao: asRecord(form.snapshot.precificacao),
+  }
+
+  return {
+    ...(form.id ? { id: form.id } : {}),
+    ...(form.code ? { codigo: form.code } : {}),
+    nome: form.name.trim(),
+    descricao: form.coverCall.trim(),
+    status: products.length >= 1 ? 'pronto' : 'rascunho',
+    origem_produtos: ['manual', 'colecao', 'filtros'].includes(origemProdutos) ? origemProdutos : 'manual',
+    ativo: form.active,
+    restrito: ['restrita_cliente', 'restrita_vendedor', 'restrita_todos'].includes(publicationMode),
+    publicado: publicationMode !== 'nao_publicar',
+    mostrar_preco: form.showPrice,
+    metadata: JSON.stringify(metadata),
   }
 }
