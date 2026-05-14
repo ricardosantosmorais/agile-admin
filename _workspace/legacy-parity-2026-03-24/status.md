@@ -85,7 +85,9 @@ Base date: 2026-03-24
 - Arquivos precisou de paridade para o download direto de formatos sem preview: v2 agora abre diretamente arquivos nao previewaveis e mantem modal apenas para PDF/imagens, alem de nome acessivel nos botoes de acao da tabela compartilhada.
 - Thirty-eighth batch checked: `banners/universos`.
 - Banners/universos nao precisou de nova migracao: os commits legados de universos por contexto e autocomplete aberto sem digitacao ja estavam cobertos no v2 por `CatalogUniversosTab`, `BannerFormPage` e `LookupSelect`.
-- Next step: check the next pending legacy batch, likely `autenticacao/sessao` or `contatos`, confirming file-by-file before any implementation.
+- Thirty-ninth batch checked: `autenticacao/sessao`.
+- Autenticacao/sessao nao precisou de nova migracao: limpar cache ja prioriza token da sessao no v2, nao existe log de token FCM equivalente, e 401/TENANT_CONTEXT_INVALID ja disparam o fluxo global de sessao encerrada.
+- Next step: check the next pending legacy batch, `contatos`, confirming file-by-file before any implementation.
 
 ## Completed batches
 
@@ -127,6 +129,7 @@ Base date: 2026-03-24
 - `apps`: no production migration needed; GitHub branch `develop`, list order/filter mapping and logs modal stability are already covered by the current v2 Apps architecture.
 - `arquivos`: migrated direct open/download parity for files without embedded preview and added accessible labels to shared table action buttons; previewable formats remain in the v2 modal.
 - `banners/universos`: no additional migration needed; banner universe context types and open-on-focus lookup behavior are already covered by the v2 catalog universe implementation.
+- `autenticacao/sessao`: no additional migration needed; renew-cache token precedence, absence of FCM token logging and session-loss modal handling are already covered in v2.
 
 ## Known local noise excluded
 
