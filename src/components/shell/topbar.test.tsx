@@ -129,6 +129,25 @@ describe('Topbar', () => {
     expect(screen.getByRole('button', { name: /cescom distribuidor - 1698203521854804/i })).toBeInTheDocument()
   })
 
+  it('shows quick access items from the current menu data', async () => {
+    getMenuItemsMock.mockReturnValue([{ key: 'pedidos', label: 'Pedidos' }])
+    flattenMenuItemsMock.mockReturnValue([
+      {
+        key: 'pedidos-list',
+        label: 'Pedidos',
+        groupLabel: 'Vendas',
+        to: '/pedidos',
+      },
+    ])
+
+    renderWithProviders(<Topbar />)
+
+    fireEvent.focus(screen.getByPlaceholderText(/acesso rápido|quick access/i))
+
+    expect(await screen.findByRole('link', { name: /pedidos/i })).toHaveAttribute('href', '/pedidos')
+    expect(screen.getByText('Vendas')).toBeInTheDocument()
+  })
+
   it('requests notifications when the panel is opened', async () => {
     getNotificationsMock.mockResolvedValueOnce({
       items: [],

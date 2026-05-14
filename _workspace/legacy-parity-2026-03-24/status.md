@@ -87,7 +87,9 @@ Base date: 2026-03-24
 - Banners/universos nao precisou de nova migracao: os commits legados de universos por contexto e autocomplete aberto sem digitacao ja estavam cobertos no v2 por `CatalogUniversosTab`, `BannerFormPage` e `LookupSelect`.
 - Thirty-ninth batch checked: `autenticacao/sessao`.
 - Autenticacao/sessao nao precisou de nova migracao: limpar cache ja prioriza token da sessao no v2, nao existe log de token FCM equivalente, e 401/TENANT_CONTEXT_INVALID ja disparam o fluxo global de sessao encerrada.
-- Next step: check the next pending legacy batch, `contatos`, confirming file-by-file before any implementation.
+- Fortieth batch checked: `assets`.
+- Assets nao precisou de migracao runtime: acesso rapido do v2 ja deriva do menu em estado React e nao depende de coleta de DOM pos-bootstrap; reload por `ASSETS_VERSION` do legado nao se aplica ao shell Next.js. Adicionada cobertura focada do acesso rapido.
+- Next step: check the next pending legacy batch, `docs`, confirming file-by-file before any implementation.
 
 ## Completed batches
 
@@ -130,6 +132,7 @@ Base date: 2026-03-24
 - `arquivos`: migrated direct open/download parity for files without embedded preview and added accessible labels to shared table action buttons; previewable formats remain in the v2 modal.
 - `banners/universos`: no additional migration needed; banner universe context types and open-on-focus lookup behavior are already covered by the v2 catalog universe implementation.
 - `autenticacao/sessao`: no additional migration needed; renew-cache token precedence, absence of FCM token logging and session-loss modal handling are already covered in v2.
+- `assets`: no runtime migration needed; quick access is state-driven in the v2 shell and legacy `ASSETS_VERSION` reload does not apply to the Next.js runtime. Added focused topbar coverage for quick access.
 
 ## Known local noise excluded
 
