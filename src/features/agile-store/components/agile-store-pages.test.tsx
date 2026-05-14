@@ -38,6 +38,10 @@ vi.mock('@/src/i18n/use-i18n', () => ({
   }),
 }))
 
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/agile-store/admin',
+}))
+
 vi.mock('@/src/features/auth/hooks/use-auth', () => ({
   useAuth: () => ({
     session: null,
@@ -198,7 +202,7 @@ describe('agile-store pages', () => {
     confirmSpy.mockRestore()
   })
 
-  it('renders the Agile Store admin backoffice and runs billing actions', async () => {
+  it('renders the Agile Store admin backoffice with v2 shell and confirms admin actions', async () => {
     const { AgileStoreAdminPage } = await import('@/src/features/agile-store/components/agile-store-admin-page')
     adminDashboardMock.mockResolvedValue({
       period: { scope: 'periodo', start: '2026-05-01', end: '2026-05-07', granularity: 'dia' },
@@ -216,15 +220,23 @@ describe('agile-store pages', () => {
     render(<AgileStoreAdminPage />)
 
     expect(await screen.findByRole('heading', { name: 'Gestão da Agile Store' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Início' })).toHaveAttribute('href', '/dashboard')
+    expect(await screen.findByTestId('agile-store-admin-line-chart')).toBeInTheDocument()
     expect(screen.getByText('MRR contratado')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Performance por módulo' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Contratações e faturamento' })).toBeInTheDocument()
     expect((await screen.findAllByText('Cliente Alfa')).length).toBeGreaterThan(0)
 
     fireEvent.click(screen.getByRole('button', { name: 'Marcar faturado' }))
+    expect(adminUpdateBillingStatusMock).not.toHaveBeenCalled()
+    expect(screen.getByRole('alertdialog', { name: 'Confirmar faturamento?' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Sim, marcar faturado' }))
     await waitFor(() => expect(adminUpdateBillingStatusMock).toHaveBeenCalledWith('contract-1', 'faturado'))
 
     fireEvent.click(screen.getByRole('button', { name: 'Descontratar módulo' }))
+    expect(adminCancelContractMock).not.toHaveBeenCalled()
+    expect(screen.getByRole('alertdialog', { name: 'Confirmar descontratação?' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Sim, descontratar' }))
     await waitFor(() => expect(adminCancelContractMock).toHaveBeenCalledWith('contract-1'))
   })
 })
