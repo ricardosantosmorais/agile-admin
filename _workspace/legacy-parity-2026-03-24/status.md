@@ -89,7 +89,7 @@ Base date: 2026-03-24
 - Autenticacao/sessao nao precisou de nova migracao: limpar cache ja prioriza token da sessao no v2, nao existe log de token FCM equivalente, e 401/TENANT_CONTEXT_INVALID ja disparam o fluxo global de sessao encerrada.
 - Fortieth batch checked: `assets`.
 - Assets nao precisou de migracao runtime: acesso rapido do v2 ja deriva do menu em estado React e nao depende de coleta de DOM pos-bootstrap; reload por `ASSETS_VERSION` do legado nao se aplica ao shell Next.js. Adicionada cobertura focada do acesso rapido.
-- Next step: check the next pending legacy batch, `docs`, confirming file-by-file before any implementation.
+- Next step: check the next pending legacy batch, `integracao-erp/gateway-endpoints`, confirming file-by-file before any implementation.
 
 ## Completed batches
 
