@@ -47,7 +47,7 @@ This phase should not continue blindly from the old queue. It starts from the ne
 
 ## Next step
 
-Continue `catalogos-digitais` because it is the largest and most product-relevant new surface.
+`catalogos-digitais` is partially migrated and temporarily parked because the local/base data is outdated for closing the studio flow safely.
 
 First slice completed in v2:
 
@@ -63,3 +63,16 @@ Next slice:
 - studio create/edit UI;
 - sections, image upload, product/collection import and pricing;
 - preview/PDF/publication contracts.
+
+`agile-store-ajustes` completed in this slice:
+
+- contract/cancel feedback modal with legacy motives;
+- `feedback_motivo` and `feedback_mensagem` forwarded by the v2 bridge;
+- feedback rendered in detail history and Agile Store admin tables;
+- detail benefits fallback updated to the latest legacy metadata order;
+- video poster fields mapped from the API payload;
+- static legacy material files intentionally left as API-delivered URLs.
+
+Evidence: `evidence/agile-store-ajustes-feedback.md`.
+
+Active next batch: `pedidos-logistica`.

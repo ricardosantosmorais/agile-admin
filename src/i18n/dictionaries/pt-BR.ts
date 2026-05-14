@@ -7060,6 +7060,12 @@ export const ptBR: TranslationDictionary = {
 		historyEmpty: 'Ainda não há movimentações para este módulo.',
 		detailDescriptionFallback: 'Detalhes do módulo selecionado na Agile Store.',
 		actionSuccess: 'Ação enviada com sucesso.',
+		feedback: 'Feedback',
+		feedbackMotive: 'Motivo',
+		feedbackMotivePlaceholder: 'Selecione um motivo',
+		feedbackMessage: 'Mensagem opcional',
+		feedbackMessagePlaceholder: 'Se quiser, registre um comentário para acompanhamento.',
+		feedbackRequired: 'Selecione um motivo para continuar.',
 		admin: {
 			eyebrow: 'Retaguarda',
 			title: 'Gestão da Agile Store',

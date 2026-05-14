@@ -69,8 +69,20 @@ describe('agile store admin mappers', () => {
           faturamento_status_efetivo: 'pendente',
           contratado_em: '2026-05-07 10:00:00',
           contratado_por: 'Joao',
+          feedback_motivo: 'Melhorar operação',
+          feedback_mensagem: 'Solicitação interna.',
         }],
-        events: [{ id: 'event-1', acao: 'contratar', modulo_nome: 'SAC', empresa_nome: 'Cliente Alfa', usuario: 'Joao', created_at: '2026-05-07 10:00:00', ip: '127.0.0.1' }],
+        events: [{
+          id: 'event-1',
+          acao: 'contratar',
+          modulo_nome: 'SAC',
+          empresa_nome: 'Cliente Alfa',
+          usuario: 'Joao',
+          created_at: '2026-05-07 10:00:00',
+          ip: '127.0.0.1',
+          feedback_motivo: 'Melhorar operação',
+          feedback_mensagem: 'Solicitação interna.',
+        }],
       },
     })
 
@@ -94,6 +106,12 @@ describe('agile store admin mappers', () => {
       billingStatus: 'pendente',
       expectedBillingStatus: 'faturado',
       canCancelContract: true,
+      feedbackMotive: 'Melhorar operação',
+      feedbackMessage: 'Solicitação interna.',
+    }))
+    expect(result.events[0]).toEqual(expect.objectContaining({
+      feedbackMotive: 'Melhorar operação',
+      feedbackMessage: 'Solicitação interna.',
     }))
     expect(result.visits[0]).toEqual(expect.objectContaining({
       companyName: 'Cliente Alfa',

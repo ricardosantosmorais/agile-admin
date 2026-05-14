@@ -7052,6 +7052,12 @@ export const enUS: TranslationDictionary = {
 		historyEmpty: 'There are no movements for this module yet.',
 		detailDescriptionFallback: 'Details for the selected Agile Store module.',
 		actionSuccess: 'Action sent successfully.',
+		feedback: 'Feedback',
+		feedbackMotive: 'Reason',
+		feedbackMotivePlaceholder: 'Select a reason',
+		feedbackMessage: 'Optional message',
+		feedbackMessagePlaceholder: 'Optionally add a comment for follow-up.',
+		feedbackRequired: 'Select a reason to continue.',
 		admin: {
 			eyebrow: 'Backoffice',
 			title: 'Agile Store Management',

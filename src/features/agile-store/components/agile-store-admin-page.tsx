@@ -169,6 +169,17 @@ function conversionTone(status: string) {
   return 'neutral' as const
 }
 
+function FeedbackNote({ motive, message, label }: { motive: string; message: string; label: string }) {
+  if (!motive && !message) return null
+
+  return (
+    <div className="mt-2 rounded-[0.8rem] border border-line/70 bg-[color:var(--app-soft)]/65 px-3 py-2 text-xs">
+      <strong className="block text-[color:var(--app-text)]">{motive || label}</strong>
+      {message ? <span className="mt-1 block break-words leading-5 text-[color:var(--app-muted)]">{message}</span> : null}
+    </div>
+  )
+}
+
 function actionCopy(action: PendingAction | null) {
   if (!action) {
     return { title: '', description: '', confirmLabel: '', tone: 'default' as const }
@@ -433,7 +444,17 @@ export function AgileStoreAdminPage() {
         ),
       },
       { id: 'billing', header: 'Faturamento', cell: (item) => <StatusBadge tone={billingTone(item.billingStatus)}>{billingStatusLabel(item.billingStatus)}</StatusBadge> },
-      { id: 'contractedAt', header: 'Contratação', cell: (item) => <div>{formatDateTime(item.contractedAt)}<small className="block text-[color:var(--app-muted)]">{item.contractedBy || '-'}</small></div> },
+      {
+        id: 'contractedAt',
+        header: 'Contratação',
+        cell: (item) => (
+          <div className="min-w-0">
+            {formatDateTime(item.contractedAt)}
+            <small className="block text-[color:var(--app-muted)]">{item.contractedBy || '-'}</small>
+            <FeedbackNote motive={item.feedbackMotive} message={item.feedbackMessage} label={t('agileStore.feedback', 'Feedback')} />
+          </div>
+        ),
+      },
       {
         id: 'actions',
         header: 'Ações',
@@ -485,19 +506,28 @@ export function AgileStoreAdminPage() {
         },
       },
     ],
-    [isSubmitting],
+    [isSubmitting, t],
   )
 
   const eventColumns = useMemo<Array<AppDataTableColumn<AgileStoreAdminEvent>>>(
     () => [
-      { id: 'event', header: 'Movimento', cell: (item) => <strong className="text-[color:var(--app-text)]">{eventLabel(item.action)}</strong> },
+      {
+        id: 'event',
+        header: 'Movimento',
+        cell: (item) => (
+          <div className="min-w-0">
+            <strong className="text-[color:var(--app-text)]">{eventLabel(item.action)}</strong>
+            <FeedbackNote motive={item.feedbackMotive} message={item.feedbackMessage} label={t('agileStore.feedback', 'Feedback')} />
+          </div>
+        ),
+      },
       { id: 'module', header: 'Produto', cell: (item) => item.moduleName || '-' },
       { id: 'customer', header: 'Cliente', cell: (item) => item.companyName || '-' },
       { id: 'user', header: 'Usuário', cell: (item) => item.userName || '-' },
       { id: 'createdAt', header: 'Data', cell: (item) => formatDateTime(item.createdAt) },
       { id: 'ip', header: 'IP', cell: (item) => item.ip || '-' },
     ],
-    [],
+    [t],
   )
 
   const pendingCopy = actionCopy(pendingAction)

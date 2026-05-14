@@ -187,19 +187,31 @@ describe('agile-store pages', () => {
     expect(screen.getByText('Disponivel apenas para empresas operando.')).toBeInTheDocument()
   })
 
-  it('confirms before running contract action when enabled', async () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+  it('requires legacy feedback before running contract action when enabled', async () => {
     detailMock.mockResolvedValue(moduleFixture)
     actionMock.mockResolvedValue({ success: true })
 
     render(<AgileStoreDetailPage moduleId="mod_sac" permissions={{ canContract: true, canCancel: true }} />)
 
     expect(await screen.findByRole('heading', { name: 'SAC' })).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Contratar módulo' }))
+    fireEvent.click(screen.getByRole('button', { name: /Contratar/ }))
 
-    expect(confirmSpy).toHaveBeenCalledWith('Confirme a contratação deste módulo para a empresa atual.')
-    await waitFor(() => expect(actionMock).toHaveBeenCalledWith('mod_sac', 'contract'))
-    confirmSpy.mockRestore()
+    expect(screen.getByRole('dialog', { name: /Contratar/ })).toBeInTheDocument()
+    fireEvent.click(screen.getAllByRole('button', { name: /Contratar/ }).at(-1)!)
+    expect(actionMock).not.toHaveBeenCalled()
+    expect(screen.getByText('Selecione um motivo para continuar.')).toBeInTheDocument()
+
+    const motiveSelect = screen.getByRole('combobox') as HTMLSelectElement
+    const motive = Array.from(motiveSelect.options).find((option) => option.textContent?.includes('Melhorar'))
+    expect(motive).toBeTruthy()
+    fireEvent.change(motiveSelect, { target: { value: motive?.value } })
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Solicitação interna.' } })
+    fireEvent.click(screen.getAllByRole('button', { name: /Contratar/ }).at(-1)!)
+
+    await waitFor(() => expect(actionMock).toHaveBeenCalledWith('mod_sac', 'contract', {
+      motive: motive?.value,
+      message: 'Solicitação interna.',
+    }))
   })
 
   it('renders the Agile Store admin backoffice with v2 shell and confirms admin actions', async () => {
@@ -211,8 +223,8 @@ describe('agile-store pages', () => {
       modules: [{ id: 'mod_sac', name: 'SAC', type: 'Atendimento', status: 'publicado', highlighted: true, icon: 'far fa-headset', primaryColor: '#39aba4', visits: 80, periodContracts: 10, periodCancellations: 2, activeContracts: 15, freeContracts: 3, failures: 1, mrr: 1490.5, conversion: 13, growth: 8 }],
       trend: [{ label: '07/05', visits: 9, conversions: 2, cancellations: 1 }],
       visits: [{ id: 'visit-1', companyName: 'Cliente Alfa', companyDocument: '00.000.000/0001-00', moduleName: 'SAC', moduleType: 'Atendimento', userName: 'Maria', userEmail: 'maria@empresa.com', visitedAt: '2026-05-07 09:00:00', ip: '127.0.0.1', conversionStatus: 'convertido' }],
-      customers: [{ id: 'contract-1', companyName: 'Cliente Alfa', companyDocument: '00.000.000/0001-00', moduleName: 'SAC', moduleType: 'Atendimento', status: 'ativo', value: 149.9, currency: 'BRL', billingCycle: 'mensal', trialDays: 15, trialUntil: '2026-05-20', firstBillingAt: '2026-06-01', billingDay: '1', billingStatus: 'pendente', expectedBillingStatus: 'faturado', contractedAt: '2026-05-07 10:00:00', contractedBy: 'Joao', canCancelContract: true }],
-      events: [{ id: 'event-1', action: 'contratar', moduleName: 'SAC', companyName: 'Cliente Alfa', userName: 'Joao', createdAt: '2026-05-07 10:00:00', ip: '127.0.0.1' }],
+      customers: [{ id: 'contract-1', companyName: 'Cliente Alfa', companyDocument: '00.000.000/0001-00', moduleName: 'SAC', moduleType: 'Atendimento', status: 'ativo', value: 149.9, currency: 'BRL', billingCycle: 'mensal', trialDays: 15, trialUntil: '2026-05-20', firstBillingAt: '2026-06-01', billingDay: '1', billingStatus: 'pendente', expectedBillingStatus: 'faturado', contractedAt: '2026-05-07 10:00:00', contractedBy: 'Joao', canCancelContract: true, feedbackMotive: 'Melhorar operação', feedbackMessage: 'Solicitação interna.' }],
+      events: [{ id: 'event-1', action: 'contratar', moduleName: 'SAC', companyName: 'Cliente Alfa', userName: 'Joao', createdAt: '2026-05-07 10:00:00', ip: '127.0.0.1', feedbackMotive: 'Melhorar operação', feedbackMessage: 'Solicitação interna.' }],
     })
     adminUpdateBillingStatusMock.mockResolvedValue({ success: true })
     adminCancelContractMock.mockResolvedValue({ success: true })
@@ -227,6 +239,7 @@ describe('agile-store pages', () => {
     expect(screen.getByRole('heading', { name: 'Performance por módulo' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Contratações e faturamento' })).toBeInTheDocument()
     expect((await screen.findAllByText('Cliente Alfa')).length).toBeGreaterThan(0)
+    expect((await screen.findAllByText('Solicitação interna.')).length).toBeGreaterThan(0)
 
     fireEvent.click(screen.getByRole('button', { name: 'Marcar faturado' }))
     expect(adminUpdateBillingStatusMock).not.toHaveBeenCalled()

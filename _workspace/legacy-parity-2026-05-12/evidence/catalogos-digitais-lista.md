@@ -17,6 +17,7 @@
 
 ## Corte pendente
 
+- Pendente temporariamente por base/dados locais desatualizados para validar o studio com segurança.
 - Studio de criação/edição.
 - Seções/blocos, upload de imagem e layout.
 - Produtos, coleções e precificação.

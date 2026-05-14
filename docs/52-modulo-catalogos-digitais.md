@@ -31,6 +31,8 @@ Esta primeira entrega não cria um editor parcial. Ela apenas habilita o acesso,
 
 ## Próximas fatias
 
+Status: pendente temporariamente até a base local estar atualizada o suficiente para validar o studio.
+
 1. Formulário/studio de criação e edição de catálogo.
 2. Blocos/seções e upload de imagens por empresa.
 3. Busca, resolução e importação de produtos/coleções.

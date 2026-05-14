@@ -73,7 +73,13 @@ describe('agile-store routes', () => {
   it('maps public action names to api v3 endpoints and sends tenant context', async () => {
     const request = new Request('http://localhost/api/agile-store/mod_sac/action', {
       method: 'POST',
-      body: JSON.stringify({ action: 'contract' }),
+      body: JSON.stringify({
+        action: 'contract',
+        feedback: {
+          motive: 'Melhorar operação',
+          message: 'Solicitação interna.',
+        },
+      }),
     })
 
     const response = await runModuleAction(request, { params: Promise.resolve({ id: 'mod_sac' }) })
@@ -88,6 +94,8 @@ describe('agile-store routes', () => {
         body: expect.objectContaining({
           id_empresa: 'empresa-1',
           user_agent: '',
+          feedback_motivo: 'Melhorar operação',
+          feedback_mensagem: 'Solicitação interna.',
         }),
       }),
     )

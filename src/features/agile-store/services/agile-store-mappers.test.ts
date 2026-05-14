@@ -68,9 +68,37 @@ describe('agile-store mappers', () => {
         preco: '490.00',
         moeda: 'BRL',
         ciclo_cobranca: 'mensal',
-        metadata: { beneficios: ['Chamados organizados'] },
+        metadata: {
+          beneficios: ['Fallback'],
+          beneficios_detalhe: ['Chamados organizados'],
+        },
         teste_gratis: { disponivel: true, dias: 15 },
         contratacao: { status: 'cancelado' },
+        midias: [
+          {
+            tipo: 'video',
+            url: 'https://cdn.test/sac.mp4',
+            titulo: 'Demonstração',
+            poster_url: 'https://cdn.test/sac-poster.png',
+          },
+        ],
+        historico: [
+          {
+            id: 'hist-1',
+            acao: 'contratar',
+            status: 'falha',
+            created_at: '2026-05-07 10:00:00',
+            message: 'Falha ao executar script.',
+            usuario: 'Joao',
+            ip: '127.0.0.1',
+            valor: '490.00',
+            moeda: 'BRL',
+            teste_gratis_ate: '2026-05-22',
+            erro: 'Erro de integração',
+            feedback_motivo: 'Melhorar operação',
+            feedback_mensagem: 'Comentário de contratação.',
+          },
+        ],
       },
     } as unknown as Parameters<typeof normalizeAgileStoreDetail>[0])
 
@@ -84,6 +112,18 @@ describe('agile-store mappers', () => {
       benefits: ['Chamados organizados'],
       trial: { available: true, days: 15 },
       contractStatus: 'cancelado',
+    })
+    expect(module.media[0]).toMatchObject({
+      posterUrl: 'https://cdn.test/sac-poster.png',
+    })
+    expect(module.history[0]).toMatchObject({
+      userName: 'Joao',
+      ip: '127.0.0.1',
+      value: 490,
+      trialUntil: '2026-05-22',
+      error: 'Erro de integração',
+      feedbackMotive: 'Melhorar operação',
+      feedbackMessage: 'Comentário de contratação.',
     })
   })
 
