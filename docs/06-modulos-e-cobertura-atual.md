@@ -88,6 +88,7 @@ ObservaÃ§Ã£o:
 - Fornecedores
 - Grades
 - Produtos x Departamentos
+- Catálogos Digitais
 
 ### Marketing
 
@@ -165,6 +166,7 @@ ObservaÃ§Ã£o:
 - `Cadastros > Componentes`, `Componentes Campos` e `Areas de Pagina` invalidam o cache completo da empresa ativa apos gravacao, exclusao e reordenacao bem-sucedidas, alinhando o efeito operacional do legado.
 - `Cadastros > E-mails Payloads` possui CRUD linear v2 com listagem, filtros, formulario em linhas e editor JSON para o payload.
 - `Cadastros > Apps` possui listagem v2 com acoes de compilacao, publicacao Android/iOS e logs; formulario em linhas com placeholders/defaults dos textos do app, arquivos privados S3 por empresa; e bridges server-side para sincronizar `config/clients.json` e disparar GitHub Actions sem expor token no client.
+- `Catálogos Digitais` possui a primeira superfície v2 em `/catalogos-digitais`, com mapeamento do componente dinâmico legado `catalogos-studio`, bridge server-side para `catalogos_digitais`, alerta de contratação da Agile Store (`mod_catalogos_digitais`) e listagem com status, publicação, produtos, blocos, vigência e URL pública. O studio de edição, produtos, preview, PDF e publicação permanece como próxima fatia do mesmo módulo.
 - `Notificacoes` do painel possui rota v2 em `/notificacoes-painel`, com listagem server-side, filtros do legado, formulario em abas, vinculo por empresa, pre-visualizacao, duplicacao, publicacao e modal de usuarios visualizadores.
 - `Cadastros > Categorias de Tarefas`, `Tarefas` e `Grupos de Relatorios` possuem CRUDs v2 com bridges dedicadas, formularios em linhas e lookups lazy para fases, categorias e empresas quando aplicavel.
 - `Cadastros > Relatorios v2` possui rota de cadastro separada da execucao operacional, com dados gerais, editor SQL executavel e mapeamento de campos da query.

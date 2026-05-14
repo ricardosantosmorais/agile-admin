@@ -47,8 +47,19 @@ This phase should not continue blindly from the old queue. It starts from the ne
 
 ## Next step
 
-Start with `catalogos-digitais` because it is the largest and most product-relevant new surface. Before implementing, compare:
+Continue `catalogos-digitais` because it is the largest and most product-relevant new surface.
+
+First slice completed in v2:
+
+- dynamic menu component `catalogos-studio` mapped to `/catalogos-digitais`;
+- feature access key `catalogosDigitais` mapped to legacy permissions;
+- bridge/list client for `catalogos_digitais`;
+- App Store contract lookup for `mod_catalogos_digitais`;
+- v2 list page with search, status, contract warning and table.
+
+Next slice:
 
 - legacy components/controllers/scripts for catalog studio;
-- existing v2 menu/features/routes for catalog/product/catalog admin;
-- API/backend contracts currently available to v2.
+- studio create/edit UI;
+- sections, image upload, product/collection import and pricing;
+- preview/PDF/publication contracts.
