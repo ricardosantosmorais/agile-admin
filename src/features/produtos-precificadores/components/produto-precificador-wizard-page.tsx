@@ -19,7 +19,7 @@ import { useI18n } from '@/src/i18n/use-i18n'
 import { formatInputDateTimeForDisplay } from '@/src/lib/date-time-input'
 import { formatLocalizedCurrency, formatLocalizedPercent } from '@/src/lib/formatters'
 import { currencyMask, decimalMask } from '@/src/lib/input-masks'
-import { parseInteger, parseLocalizedNumber } from '@/src/lib/value-parsers'
+import { formatLocalizedDecimal, parseInteger, parseLocalizedNumber } from '@/src/lib/value-parsers'
 import {
   buildWizardPayload,
   flattenWizardDraft,
@@ -177,9 +177,13 @@ function renderLookupTriggerClass(invalid = false) {
   ].join(' ')
 }
 
-function formatDefinitionValue(value: string, mode: 'currency' | 'percent') {
+function formatDefinitionValue(value: string, mode: 'currency' | 'percent' | 'decimal') {
   if (!value) {
     return '-'
+  }
+
+  if (mode === 'decimal') {
+    return formatLocalizedDecimal(value, 2) || '-'
   }
 
   return mode === 'percent'
@@ -187,9 +191,13 @@ function formatDefinitionValue(value: string, mode: 'currency' | 'percent') {
     : formatLocalizedCurrency(value)
 }
 
-function formatDefinitionValueFromRow(value: unknown, mode: 'currency' | 'percent') {
+function formatDefinitionValueFromRow(value: unknown, mode: 'currency' | 'percent' | 'decimal') {
   if (value == null || value === '') {
     return '-'
+  }
+
+  if (mode === 'decimal') {
+    return formatLocalizedDecimal(value, 2) || '-'
   }
 
   return mode === 'percent'
@@ -1007,19 +1015,19 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
                         ) : null}
 
                         <div className="space-y-2">
-                          <label className={labelClasses}>Pedido mínimo</label>
-                          <InputWithAffix prefix="R$" value={currentDefinition.pedido_minimo} onChange={(event) => patchDefinition(currentDefinition.id, { pedido_minimo: currencyMask(event.target.value) })} />
+                          <label className={labelClasses}>{t('priceStock.productPricers.fields.minimumItemQuantity', 'Quantidade mínima de itens')}</label>
+                          <input value={currentDefinition.pedido_minimo} onChange={(event) => patchDefinition(currentDefinition.id, { pedido_minimo: decimalMask(event.target.value) })} className={renderInputClass(false)} />
                         </div>
                         <div className="space-y-2">
-                          <label className={labelClasses}>Pedido máximo</label>
-                          <InputWithAffix prefix="R$" value={currentDefinition.pedido_maximo} onChange={(event) => patchDefinition(currentDefinition.id, { pedido_maximo: currencyMask(event.target.value) })} />
+                          <label className={labelClasses}>{t('priceStock.productPricers.fields.maximumItemQuantity', 'Quantidade máxima de itens')}</label>
+                          <input value={currentDefinition.pedido_maximo} onChange={(event) => patchDefinition(currentDefinition.id, { pedido_maximo: decimalMask(event.target.value) })} className={renderInputClass(false)} />
                         </div>
                         <div className="space-y-2">
-                          <label className={labelClasses}>Itens por pedido de</label>
+                          <label className={labelClasses}>{t('priceStock.productPricers.fields.minimumOrderItemQuantity', 'Quantidade mínima de itens no pedido')}</label>
                           <input value={currentDefinition.itens_pedido_de} onChange={(event) => patchDefinition(currentDefinition.id, { itens_pedido_de: event.target.value.replace(/\D+/g, '') })} className={renderInputClass(false)} />
                         </div>
                         <div className="space-y-2">
-                          <label className={labelClasses}>Itens por pedido até</label>
+                          <label className={labelClasses}>{t('priceStock.productPricers.fields.maximumOrderItemQuantity', 'Quantidade máxima de itens no pedido')}</label>
                           <input value={currentDefinition.itens_pedido_ate} onChange={(event) => patchDefinition(currentDefinition.id, { itens_pedido_ate: event.target.value.replace(/\D+/g, '') })} className={renderInputClass(false)} />
                         </div>
                       </div>
@@ -1144,10 +1152,10 @@ export function ProdutoPrecificadorWizardPage({ id }: { id?: string }) {
                             <p className={summaryTextClasses}>Preço: <span className={summaryStrongClasses}>{formatDefinitionValue(item.preco, 'currency')}</span></p>
                             <p className={summaryTextClasses}>Desconto: <span className={summaryStrongClasses}>{formatDefinitionValue(item.desconto, definitionMode === 'percent' ? 'percent' : 'currency')}</span></p>
                             <p className={summaryTextClasses}>Acréscimo: <span className={summaryStrongClasses}>{formatDefinitionValue(item.acrescimo, definitionMode === 'percent' ? 'percent' : 'currency')}</span></p>
-                            <p className={summaryTextClasses}>Pedido mínimo: <span className={summaryStrongClasses}>{formatDefinitionValue(item.pedido_minimo, 'currency')}</span></p>
-                            <p className={summaryTextClasses}>Pedido máximo: <span className={summaryStrongClasses}>{formatDefinitionValue(item.pedido_maximo, 'currency')}</span></p>
-                            <p className={summaryTextClasses}>Itens por pedido de: <span className={summaryStrongClasses}>{item.itens_pedido_de || '-'}</span></p>
-                            <p className={summaryTextClasses}>Itens por pedido até: <span className={summaryStrongClasses}>{item.itens_pedido_ate || '-'}</span></p>
+                            <p className={summaryTextClasses}>{t('priceStock.productPricers.fields.minimumItemQuantity', 'Quantidade mínima de itens')}: <span className={summaryStrongClasses}>{formatDefinitionValue(item.pedido_minimo, 'decimal')}</span></p>
+                            <p className={summaryTextClasses}>{t('priceStock.productPricers.fields.maximumItemQuantity', 'Quantidade máxima de itens')}: <span className={summaryStrongClasses}>{formatDefinitionValue(item.pedido_maximo, 'decimal')}</span></p>
+                            <p className={summaryTextClasses}>{t('priceStock.productPricers.fields.minimumOrderItemQuantity', 'Quantidade mínima de itens no pedido')}: <span className={summaryStrongClasses}>{item.itens_pedido_de || '-'}</span></p>
+                            <p className={summaryTextClasses}>{t('priceStock.productPricers.fields.maximumOrderItemQuantity', 'Quantidade máxima de itens no pedido')}: <span className={summaryStrongClasses}>{item.itens_pedido_ate || '-'}</span></p>
                           </div>
                         </div>
                       ))}

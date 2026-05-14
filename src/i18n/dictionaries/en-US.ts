@@ -2268,6 +2268,10 @@ export const enUS: TranslationDictionary = {
 				type: 'Type',
 				origin: 'Origin',
 				uf: 'State',
+				minimumItemQuantity: 'Minimum item quantity',
+				maximumItemQuantity: 'Maximum item quantity',
+				minimumOrderItemQuantity: 'Minimum item quantity in the order',
+				maximumOrderItemQuantity: 'Maximum item quantity in the order',
 			},
 			actions: {
 				wizard: 'Creation assistant',

@@ -2269,6 +2269,10 @@ export const ptBR: TranslationDictionary = {
 				type: 'Tipo',
 				origin: 'Origem',
 				uf: 'UF',
+				minimumItemQuantity: 'Quantidade mínima de itens',
+				maximumItemQuantity: 'Quantidade máxima de itens',
+				minimumOrderItemQuantity: 'Quantidade mínima de itens no pedido',
+				maximumOrderItemQuantity: 'Quantidade máxima de itens no pedido',
 			},
 			actions: {
 				wizard: 'Assistente de criação',

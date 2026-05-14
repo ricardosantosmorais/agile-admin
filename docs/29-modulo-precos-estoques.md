@@ -47,6 +47,7 @@
   - critérios de produtos
   - blocos de definição
   - condições e validade
+- em `Produtos x Precificadores`, `pedido_minimo` e `pedido_maximo` representam quantidades decimais de itens, sem prefixo monetário; `itens_pedido_de` e `itens_pedido_ate` continuam representando a quantidade inteira de itens no pedido
 - a bridge converte o rascunho em linhas cruzadas e resolve:
   - criação de pai e filhos
   - atualização por identidade da linha

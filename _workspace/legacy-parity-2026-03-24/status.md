@@ -93,7 +93,10 @@ Base date: 2026-03-24
 - Gateway endpoints/servicos fechou a pendencia do assistente de mapeamento: v2 agora carrega contexto do endpoint gateway selecionado no cadastro de Servicos, resolve variaveis obrigatorias, executa preview, permite selecionar amostras normalizadas e testa o Razor contra `agilesync_build_script`.
 - Forty-second batch checked: `billing/faixa-financeira`.
 - Billing/faixa-financeira nao teve migracao de producao: o commit ajusta apenas estilo inline do modal de pendencias em `billing-upgrade-controller.php`, superficie ja registrada como deferred por nao existir contrato/shell equivalente no v2 atual.
-- Next step: refresh the legacy `admin` history and generate the next pending batch list, because the current inventory is exhausted except deferred product-surface decisions.
+- Legacy `admin` history refreshed from `origin/master` through `4c6edd7a5` on 2026-05-14.
+- Forty-third batch checked: `produtos-precificadores/quantidades`.
+- Produtos x Precificadores precisou de paridade para o commit `65af09b5e`: `pedido_minimo`/`pedido_maximo` agora sao quantidades decimais sem prefixo monetario, o resumo deixou de formatar esses campos como moeda e os labels de quantidade por pedido foram alinhados ao legado.
+- Next step: continue the refreshed legacy queue from `371250d5d` (`Agile Store`) and the following non-merge commits.
 
 ## Completed batches
 
@@ -138,6 +141,7 @@ Base date: 2026-03-24
 - `autenticacao/sessao`: no additional migration needed; renew-cache token precedence, absence of FCM token logging and session-loss modal handling are already covered in v2.
 - `assets`: no runtime migration needed; quick access is state-driven in the v2 shell and legacy `ASSETS_VERSION` reload does not apply to the Next.js runtime. Added focused topbar coverage for quick access.
 - `billing/faixa-financeira`: no production migration needed; the legacy commit only adjusts inline modal typography/color inside the deferred billing/financial-pending banner flow.
+- `produtos-precificadores/quantidades`: migrated corrected quantity semantics for `pedido_minimo`/`pedido_maximo`, removed currency UI from those fields, updated review formatting, i18n, docs and mapper coverage.
 
 ## Known local noise excluded
 
