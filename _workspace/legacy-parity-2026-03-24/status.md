@@ -89,14 +89,16 @@ Base date: 2026-03-24
 - Autenticacao/sessao nao precisou de nova migracao: limpar cache ja prioriza token da sessao no v2, nao existe log de token FCM equivalente, e 401/TENANT_CONTEXT_INVALID ja disparam o fluxo global de sessao encerrada.
 - Fortieth batch checked: `assets`.
 - Assets nao precisou de migracao runtime: acesso rapido do v2 ja deriva do menu em estado React e nao depende de coleta de DOM pos-bootstrap; reload por `ASSETS_VERSION` do legado nao se aplica ao shell Next.js. Adicionada cobertura focada do acesso rapido.
-- Next step: check the next pending legacy batch, `integracao-erp/gateway-endpoints`, confirming file-by-file before any implementation.
+- Forty-first batch revisited: `integracao-erp/gateway-endpoints`.
+- Gateway endpoints/servicos fechou a pendencia do assistente de mapeamento: v2 agora carrega contexto do endpoint gateway selecionado no cadastro de Servicos, resolve variaveis obrigatorias, executa preview, permite selecionar amostras normalizadas e testa o Razor contra `agilesync_build_script`.
+- Next step: check the next pending legacy batch, `billing/faixa-financeira`, confirming file-by-file before any implementation.
 
 ## Completed batches
 
 - `gateways-pagamento`: no functional migration needed; added Cielo 3DS bridge tests.
 - `importar-planilha/processos-arquivos`: migrated `integra_planilha` field filtering in spreadsheet mapping and added mapper test coverage.
 - `notificacoes-painel`: migrated channel options, selected-company link behavior, channel-aware publishing, and audience channel display.
-- `integracao-erp/gateway-endpoints`: migrated OAuth2Cookie/cookie-token parity and masked read-only context variables for endpoint testing.
+- `integracao-erp/gateway-endpoints`: migrated OAuth2Cookie/cookie-token parity, masked read-only context variables for endpoint testing, and the service mapping assistant sample selector/script-preview flow for endpoint gateway services.
 - `integracao-erp/interfaces-consulta`: migrated consultation-map normalization for filter/order application mode and value-resolution config in template and override saves.
 - `simulador-precos`: migrated freight normalization in the API v2 bridge and added regression coverage for freight and packaging query format.
 - `pedidos`: migrated delivery statuses `devolvido`/`solicitado`, `exibe_juros_parcelas`, master-only filtering for technical logs, and master product actions for price memory/origin trace payloads.

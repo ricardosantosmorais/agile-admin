@@ -302,6 +302,8 @@ ObservaÃ§Ã£o:
   - exclusÃƒÂ£o em lote e abertura direta do arquivo, respeitando preview para formatos compatÃƒÂ­veis;
   - bridge dedicada via `app/api/arquivos` sem fallback para `/legacy/...`.
 
+- `Cadastros > Serviços` também cobre o assistente v2 de mapeamento para serviços do tipo `endpoint_gateway`: carrega contexto do endpoint, resolve variáveis de teste, seleciona amostras normalizadas e valida o script Razor contra o preview do legado.
+
 ## Estado arquitetural da cobertura
 
 ### CRUDs simples
