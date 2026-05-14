@@ -222,6 +222,7 @@ describe('agile-store pages', () => {
     expect(await screen.findByRole('heading', { name: 'Gestão da Agile Store' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Início' })).toHaveAttribute('href', '/dashboard')
     expect(await screen.findByTestId('agile-store-admin-line-chart')).toBeInTheDocument()
+    expect(screen.getByTestId('agile-store-admin-visits-table')).toHaveClass('[&_.app-table-shell]:max-h-[620px]')
     expect(screen.getByText('MRR contratado')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Performance por módulo' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Contratações e faturamento' })).toBeInTheDocument()

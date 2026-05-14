@@ -605,18 +605,23 @@ export function AgileStoreAdminPage() {
             </SectionCard>
 
             <SectionCard title={t('agileStore.admin.visitsEvents', 'Visitas e eventos')} description="Últimas visitas e eventos registrados na vitrine da Agile Store.">
-              <AppDataTable
-                rows={data.visits}
-                getRowId={(item) => item.id}
-                columns={visitColumns}
-                emptyMessage="Nenhuma visita encontrada para os filtros atuais."
-                mobileCard={{
-                  title: (item) => item.companyName,
-                  subtitle: (item) => item.moduleName,
-                  meta: (item) => formatDateTime(item.visitedAt),
-                  badges: (item) => <StatusBadge tone={conversionTone(item.conversionStatus)}>{conversionLabel(item.conversionStatus)}</StatusBadge>,
-                }}
-              />
+              <div
+                data-testid="agile-store-admin-visits-table"
+                className="[&_.app-table-shell]:max-h-[620px] [&_.app-table-shell]:overflow-auto [&_.app-table-shell_th]:sticky [&_.app-table-shell_th]:top-0 [&_.app-table-shell_th]:z-10 [&_.app-table-shell_th]:bg-[color:var(--app-panel-solid)]"
+              >
+                <AppDataTable
+                  rows={data.visits}
+                  getRowId={(item) => item.id}
+                  columns={visitColumns}
+                  emptyMessage="Nenhuma visita encontrada para os filtros atuais."
+                  mobileCard={{
+                    title: (item) => item.companyName,
+                    subtitle: (item) => item.moduleName,
+                    meta: (item) => formatDateTime(item.visitedAt),
+                    badges: (item) => <StatusBadge tone={conversionTone(item.conversionStatus)}>{conversionLabel(item.conversionStatus)}</StatusBadge>,
+                  }}
+                />
+              </div>
             </SectionCard>
 
             <SectionCard title={t('agileStore.admin.contractsBilling', 'Contratações e faturamento')} description="Contratações, status operacional e marcações de faturamento.">

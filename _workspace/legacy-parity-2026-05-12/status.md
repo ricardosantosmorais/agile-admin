@@ -21,6 +21,7 @@ This phase should not continue blindly from the old queue. It starts from the ne
 - The new legacy delta contains 66 commits, including merge commits.
 - The dominant new surface is `Catálogos Digitais`.
 - The legacy repo had a local dirty `boot.php` when this inventory was created; it was not modified by this run.
+- Gap before this range closed in the previous run: `371250d5d` (`Limita altura das visitas da Agile Store`) was migrated as `agile-store/visitas-altura` in `legacy-parity-2026-03-24`.
 
 ## Recommended execution order
 
@@ -51,4 +52,3 @@ Start with `catalogos-digitais` because it is the largest and most product-relev
 - legacy components/controllers/scripts for catalog studio;
 - existing v2 menu/features/routes for catalog/product/catalog admin;
 - API/backend contracts currently available to v2.
-

@@ -12,6 +12,7 @@ A Agile Store no v2 cobre as superfícies do legado em fatias:
 - bridges locais para a API v3;
 - retaguarda administrativa em `/agile-store/admin`, resolvida pelo componente legado `app-store-admin` quando o menu dinâmico vier do banco/perfil;
 - dashboard de visitas, conversões, cancelamentos, performance por módulo, visitas/eventos, contratações e faturamento;
+- tabela de visitas da retaguarda com altura limitada, scroll interno e cabeçalho fixo para listas longas;
 - ações administrativas de marcar faturamento e descontratar contrato por ID.
 
 ## Contratos

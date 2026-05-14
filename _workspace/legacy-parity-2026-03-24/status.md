@@ -96,7 +96,9 @@ Base date: 2026-03-24
 - Legacy `admin` history refreshed from `origin/master` through `4c6edd7a5` on 2026-05-14.
 - Forty-third batch checked: `produtos-precificadores/quantidades`.
 - Produtos x Precificadores precisou de paridade para o commit `65af09b5e`: `pedido_minimo`/`pedido_maximo` agora sao quantidades decimais sem prefixo monetario, o resumo deixou de formatar esses campos como moeda e os labels de quantidade por pedido foram alinhados ao legado.
-- Next step: continue the refreshed legacy queue from `371250d5d` (`Agile Store`) and the following non-merge commits.
+- Forty-fourth batch checked: `agile-store/visitas-altura`.
+- Agile Store admin precisou de paridade para o commit `371250d5d`: a tabela de visitas da retaguarda agora tem altura limitada, scroll proprio e cabeçalho fixo como no legado.
+- Next step: continue with the `legacy-parity-2026-05-12` phase, starting from `catalogos-digitais`.
 
 ## Completed batches
 
@@ -142,6 +144,7 @@ Base date: 2026-03-24
 - `assets`: no runtime migration needed; quick access is state-driven in the v2 shell and legacy `ASSETS_VERSION` reload does not apply to the Next.js runtime. Added focused topbar coverage for quick access.
 - `billing/faixa-financeira`: no production migration needed; the legacy commit only adjusts inline modal typography/color inside the deferred billing/financial-pending banner flow.
 - `produtos-precificadores/quantidades`: migrated corrected quantity semantics for `pedido_minimo`/`pedido_maximo`, removed currency UI from those fields, updated review formatting, i18n, docs and mapper coverage.
+- `agile-store/visitas-altura`: migrated the constrained visits table behavior for Agile Store admin, with local table-shell scroll, sticky headers and component coverage.
 
 ## Known local noise excluded
 
