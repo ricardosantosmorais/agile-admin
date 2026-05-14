@@ -197,16 +197,16 @@ export function ServicoGatewayMappingAssistant({ value, form, patch, readOnly = 
 						<div className="mt-3 text-lg font-black text-[color:var(--app-text)] [overflow-wrap:anywhere]">{endpointLabel}</div>
 						<p className="mt-1 text-xs leading-relaxed text-[color:var(--app-muted)]">Carregue uma amostra real do endpoint, selecione o registro e valide o Razor contra o mesmo payload usado pelo legado.</p>
 					</div>
-					<div className="flex flex-wrap gap-2">
-						<button type="button" className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold" onClick={() => void loadContext()} disabled={loadingContext}>
+					<div className="flex w-full flex-wrap gap-2 sm:w-auto sm:flex-nowrap lg:ml-auto lg:shrink-0">
+						<button type="button" className="app-button-secondary inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold" onClick={() => void loadContext()} disabled={loadingContext}>
 							{loadingContext ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
 							Contexto
 						</button>
-						<button type="button" className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold" onClick={() => void loadSampleData()} disabled={loadingContext || loadingData}>
+						<button type="button" className="app-button-secondary inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold" onClick={() => void loadSampleData()} disabled={loadingContext || loadingData}>
 							{loadingData ? <Loader2 className="h-4 w-4 animate-spin" /> : <Variable className="h-4 w-4" />}
 							Carregar dados
 						</button>
-						<button type="button" className="app-button-primary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold" onClick={() => void testScript()} disabled={testingScript || !selectedPayload}>
+						<button type="button" className="app-button-primary inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold" onClick={() => void testScript()} disabled={testingScript || !selectedPayload}>
 							{testingScript ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
 							Testar script
 						</button>
