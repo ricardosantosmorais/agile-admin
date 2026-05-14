@@ -91,7 +91,9 @@ Base date: 2026-03-24
 - Assets nao precisou de migracao runtime: acesso rapido do v2 ja deriva do menu em estado React e nao depende de coleta de DOM pos-bootstrap; reload por `ASSETS_VERSION` do legado nao se aplica ao shell Next.js. Adicionada cobertura focada do acesso rapido.
 - Forty-first batch revisited: `integracao-erp/gateway-endpoints`.
 - Gateway endpoints/servicos fechou a pendencia do assistente de mapeamento: v2 agora carrega contexto do endpoint gateway selecionado no cadastro de Servicos, resolve variaveis obrigatorias, executa preview, permite selecionar amostras normalizadas e testa o Razor contra `agilesync_build_script`.
-- Next step: check the next pending legacy batch, `billing/faixa-financeira`, confirming file-by-file before any implementation.
+- Forty-second batch checked: `billing/faixa-financeira`.
+- Billing/faixa-financeira nao teve migracao de producao: o commit ajusta apenas estilo inline do modal de pendencias em `billing-upgrade-controller.php`, superficie ja registrada como deferred por nao existir contrato/shell equivalente no v2 atual.
+- Next step: refresh the legacy `admin` history and generate the next pending batch list, because the current inventory is exhausted except deferred product-surface decisions.
 
 ## Completed batches
 
@@ -135,6 +137,7 @@ Base date: 2026-03-24
 - `banners/universos`: no additional migration needed; banner universe context types and open-on-focus lookup behavior are already covered by the v2 catalog universe implementation.
 - `autenticacao/sessao`: no additional migration needed; renew-cache token precedence, absence of FCM token logging and session-loss modal handling are already covered in v2.
 - `assets`: no runtime migration needed; quick access is state-driven in the v2 shell and legacy `ASSETS_VERSION` reload does not apply to the Next.js runtime. Added focused topbar coverage for quick access.
+- `billing/faixa-financeira`: no production migration needed; the legacy commit only adjusts inline modal typography/color inside the deferred billing/financial-pending banner flow.
 
 ## Known local noise excluded
 
