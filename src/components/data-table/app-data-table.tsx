@@ -109,6 +109,7 @@ function DataTableActions<TItem>({
             {action.href ? (
               <Link
                 href={action.href}
+                aria-label={action.label}
                 className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${actionButtonClasses(action.tone)}`}
               >
                 <Icon className="h-4 w-4" />
@@ -117,6 +118,7 @@ function DataTableActions<TItem>({
               <button
                 type="button"
                 disabled={action.disabled}
+                aria-label={action.label}
                 onClick={() => action.onClick?.(item)}
                 className={`inline-flex h-9 w-9 items-center justify-center rounded-full disabled:cursor-not-allowed disabled:opacity-60 ${actionButtonClasses(action.tone)}`}
               >

@@ -81,7 +81,9 @@ Base date: 2026-03-24
 - SAC anexos migrou upload de arquivos na resposta ao cliente, incluindo input multi-arquivo na modal do chamado, envio `multipart/form-data`, validação de extensão/tamanho conforme legado, upload S3 privado por tenant antes do POST para API v3 e renderização de anexos no histórico.
 - Thirty-sixth batch checked: `apps`.
 - Apps nao precisou de migracao de producao: a branch `develop` ja e o fallback central dos fluxos GitHub no v2, a remocao do redirect HTTPS de `boot.php` nao se aplica ao Next.js, o modal de logs ja e controlado por estado React sem handlers jQuery duplicados, e a listagem ja possui ordenacao/filtro separados para `nome_app` e `identificador_app`.
-- Next step: check the next pending legacy batch, likely `arquivos` or `banners/universos`, confirming file-by-file before any implementation.
+- Thirty-seventh batch checked: `arquivos`.
+- Arquivos precisou de paridade para o download direto de formatos sem preview: v2 agora abre diretamente arquivos nao previewaveis e mantem modal apenas para PDF/imagens, alem de nome acessivel nos botoes de acao da tabela compartilhada.
+- Next step: check the next pending legacy batch, `banners/universos`, confirming file-by-file before any implementation.
 
 ## Completed batches
 
@@ -121,6 +123,7 @@ Base date: 2026-03-24
 - `agile-store/admin-backoffice`: migrated Agile Store management dashboard, module performance, visits/events, contracts/billing, administrative billing status and cancellation actions, dynamic `app-store-admin` route mapping, API v3 bridges, mappers, i18n, docs and focused coverage.
 - `agile-store/sac-admin-anexos`: migrated SAC response attachment upload with multipart bridge, S3 private tenant upload, legacy extension/10MB validation, API v3 `anexos` payload parity, timeline attachment rendering, i18n, docs and focused coverage.
 - `apps`: no production migration needed; GitHub branch `develop`, list order/filter mapping and logs modal stability are already covered by the current v2 Apps architecture.
+- `arquivos`: migrated direct open/download parity for files without embedded preview and added accessible labels to shared table action buttons; previewable formats remain in the v2 modal.
 
 ## Known local noise excluded
 
