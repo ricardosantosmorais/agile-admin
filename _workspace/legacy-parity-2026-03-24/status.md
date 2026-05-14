@@ -83,7 +83,9 @@ Base date: 2026-03-24
 - Apps nao precisou de migracao de producao: a branch `develop` ja e o fallback central dos fluxos GitHub no v2, a remocao do redirect HTTPS de `boot.php` nao se aplica ao Next.js, o modal de logs ja e controlado por estado React sem handlers jQuery duplicados, e a listagem ja possui ordenacao/filtro separados para `nome_app` e `identificador_app`.
 - Thirty-seventh batch checked: `arquivos`.
 - Arquivos precisou de paridade para o download direto de formatos sem preview: v2 agora abre diretamente arquivos nao previewaveis e mantem modal apenas para PDF/imagens, alem de nome acessivel nos botoes de acao da tabela compartilhada.
-- Next step: check the next pending legacy batch, `banners/universos`, confirming file-by-file before any implementation.
+- Thirty-eighth batch checked: `banners/universos`.
+- Banners/universos nao precisou de nova migracao: os commits legados de universos por contexto e autocomplete aberto sem digitacao ja estavam cobertos no v2 por `CatalogUniversosTab`, `BannerFormPage` e `LookupSelect`.
+- Next step: check the next pending legacy batch, likely `autenticacao/sessao` or `contatos`, confirming file-by-file before any implementation.
 
 ## Completed batches
 
@@ -124,6 +126,7 @@ Base date: 2026-03-24
 - `agile-store/sac-admin-anexos`: migrated SAC response attachment upload with multipart bridge, S3 private tenant upload, legacy extension/10MB validation, API v3 `anexos` payload parity, timeline attachment rendering, i18n, docs and focused coverage.
 - `apps`: no production migration needed; GitHub branch `develop`, list order/filter mapping and logs modal stability are already covered by the current v2 Apps architecture.
 - `arquivos`: migrated direct open/download parity for files without embedded preview and added accessible labels to shared table action buttons; previewable formats remain in the v2 modal.
+- `banners/universos`: no additional migration needed; banner universe context types and open-on-focus lookup behavior are already covered by the v2 catalog universe implementation.
 
 ## Known local noise excluded
 
