@@ -56,6 +56,52 @@ describe('catalogos-digitais route', () => {
     }))
   })
 
+  it('forwards legacy code/name filters and applies validity overlap locally', async () => {
+    serverApiFetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        payload: {
+          data: [
+            {
+              id: 'CAT-1',
+              codigo: 'CAT-1',
+              nome: 'Campanha Maio',
+              metadata: JSON.stringify({ vigencia_inicio: '2026-05-01', vigencia_fim: '2026-05-31' }),
+            },
+            {
+              id: 'CAT-2',
+              codigo: 'CAT-2',
+              nome: 'Campanha Junho',
+              metadata: JSON.stringify({ vigencia_inicio: '2026-06-01', vigencia_fim: '2026-06-30' }),
+            },
+          ],
+          meta: { total: 2 },
+        },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        payload: { data: [] },
+      })
+
+    const request = new Request('http://localhost/api/catalogos-digitais?page=1&perpage=15&code=CAT&name=Campanha&status=pronto&validFrom=2026-05-10&validTo=2026-05-20')
+
+    const response = await GET(request)
+    const payload = await response.json()
+    const query = new URLSearchParams(serverApiFetchMock.mock.calls[0][0].split('?')[1])
+
+    expect(response.status).toBe(200)
+    expect(query.get('page')).toBe('1')
+    expect(query.get('perpage')).toBe('5000')
+    expect(query.get('status')).toBe('pronto')
+    expect(query.get('q')).toContain("codigo like '%CAT%'")
+    expect(query.get('q')).toContain("descricao like '%Campanha%'")
+    expect(payload.data).toHaveLength(1)
+    expect(payload.data[0].id).toBe('CAT-1')
+    expect(payload.meta).toEqual(expect.objectContaining({ page: 1, perpage: 15, total: 1, pages: 1 }))
+  })
+
   it('rejects requests without session', async () => {
     readAuthSessionMock.mockResolvedValue(null)
 

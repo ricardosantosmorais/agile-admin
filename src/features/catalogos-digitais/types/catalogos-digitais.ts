@@ -56,6 +56,17 @@ export type CatalogosDigitaisListResponse = {
   appStore: CatalogosDigitaisAppStoreSummary
 }
 
+export type CatalogosDigitaisListFilters = {
+  page?: number
+  perpage?: number
+  q?: string
+  code?: string
+  name?: string
+  status?: string
+  validFrom?: string
+  validTo?: string
+}
+
 export type CatalogoDigitalFormRecord = {
   id: string
   code: string

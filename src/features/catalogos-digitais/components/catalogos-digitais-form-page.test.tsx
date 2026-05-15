@@ -92,6 +92,33 @@ describe('CatalogoDigitalFormPage', () => {
     expect(pushMock).toHaveBeenCalledWith('/catalogos-digitais')
   })
 
+  it('organizes catalog editing in the same three-step studio flow as the legacy screen', async () => {
+    detailMock.mockResolvedValue({
+      ...createEmptyCatalogoDigitalForm(),
+      id: 'CAT-1',
+      code: 'CAT-1',
+      name: 'Campanha Maio',
+      products: [{ id: 'PROD-1' }],
+      sections: [{ id: 'sec-1', tipo: 'titulo' }],
+    })
+
+    render(<CatalogoDigitalFormPage id="CAT-1" />)
+
+    expect(await screen.findByRole('button', { name: /Geral/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Blocos/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Resumo/ })).toBeInTheDocument()
+    expect(screen.getByText('Dados básicos do catálogo')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /Blocos/ }))
+    expect(screen.getByText('Monte o catálogo com componentes visuais')).toBeInTheDocument()
+    expect(screen.getByText('Produtos')).toBeInTheDocument()
+    expect(screen.getAllByText('1').length).toBeGreaterThan(0)
+
+    fireEvent.click(screen.getByRole('button', { name: /Resumo/ }))
+    expect(screen.getByText('Revise, salve e gere PDF')).toBeInTheDocument()
+    expect(screen.getByText('Campanha Maio')).toBeInTheDocument()
+  })
+
   it('creates a new catalog from the default studio form', async () => {
     saveMock.mockResolvedValue({ id: 'CAT-NEW' })
 
