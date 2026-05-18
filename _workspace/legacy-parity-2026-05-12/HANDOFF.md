@@ -48,11 +48,25 @@ Para cada novo chat, comece com:
 6. Trabalhar em uma branch limpa a partir de `master` quando a frente for nova.
 7. Ao fechar a frente, atualizar o batch, `status.md` e o documento de módulo em `docs/`.
 
+## Regra de paridade integral por tela
+
+Uma tela só pode ser marcada como migrada quando a superfície inteira do legado tiver sido comparada e tratada. A migração deve preservar todas as funcionalidades visíveis e operacionais existentes no legado: botões, ações por linha, ações em massa, textos, alertas, labels, colunas, filtros, campos, modais, estados, permissões, payloads, validações e mensagens.
+
+Se alguma função do legado não puder ser entregue na fatia atual, ela deve ficar registrada no batch como pendência explícita, com motivo e contrato ausente quando aplicável. Não considerar uma tela completa apenas porque a rota abre, lista dados ou salva o formulário básico.
+
+Checklist mínimo antes de encerrar uma tela:
+
+- comparar HTML/PHP, JavaScript, controller, payloads e permissões do legado;
+- mapear cada botão e ação do legado para implementado, pendente por contrato/backend ou não aplicável com justificativa;
+- validar textos, campos, filtros, colunas, estados vazio/loading/erro, alertas e modais;
+- conferir permissões de listar, criar, editar, excluir e ações auxiliares;
+- atualizar o batch e o documento do módulo com qualquer corte funcional restante.
+
 ## Status consolidado dos batches
 
 | Ordem | Batch | Estado | Próximo uso |
 |---:|---|---|---|
-| 1 | `catalogos-digitais` | Parcialmente migrado | Continuar studio: blocos, produtos/coleções, precificação, preview/PDF/publicação e validação visual final. |
+| 1 | `catalogos-digitais` | Parcialmente migrado | Blocos básicos retomados; ações legadas da listagem recuperadas; completar upload de imagens, produtos/coleções, precificação, preview/PDF/publicação, link público no nome e validação visual final. |
 | 2 | `agile-store-ajustes` | Concluído | Usar apenas como referência; manter evidência de feedback/material/poster. |
 | 3 | `pedidos-logistica` | Concluído | Usar como referência para cancelamento, filial de entrega e status IBoltt. |
 | 4 | `formularios-arquivos` | Concluído | Usar como referência para links de arquivos tenant-aware e exibição em cliente/contato. |
@@ -72,7 +86,8 @@ Ainda precisa de uma frente dedicada para fechar a paridade visual/funcional com
 
 Pontos pendentes registrados:
 
-- studio de blocos completo;
+- fechar a listagem com link público no nome e prévia HTML equivalente quando não houver `url_publica`;
+- upload tenant-aware de imagens dos blocos;
 - importação/busca de produtos e coleções;
 - precificação com contexto comercial;
 - preview;
@@ -81,6 +96,8 @@ Pontos pendentes registrados:
 - confirmar se o backend atual já cobre todos os contratos usados pelo legado.
 
 Arquivo de referência: `batches/catalogos-digitais.md`.
+
+Evidência adicional: `evidence/catalogos-digitais-list-actions-lost-blob.md` registra a comparação das ações legadas da listagem, o blob Git inalcançável com uma implementação v2 anterior de Prévia, Copiar, Editar, Excluir e exclusão em massa, e a recuperação aplicada em 2026-05-18.
 
 ### Infraestrutura AWS
 

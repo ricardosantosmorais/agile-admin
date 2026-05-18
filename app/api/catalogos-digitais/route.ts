@@ -209,3 +209,35 @@ export async function POST(request: Request) {
 
   return NextResponse.json(result.payload)
 }
+
+export async function DELETE(request: Request) {
+  const session = await readAuthSession()
+  if (!session) {
+    return NextResponse.json({ message: 'Sessao expirada.' }, { status: 401 })
+  }
+
+  const body = asRecord(await request.json().catch(() => ({})))
+  const ids = Array.isArray(body.ids)
+    ? body.ids.map((id) => String(id).trim()).filter(Boolean)
+    : []
+
+  if (!ids.length) {
+    return NextResponse.json({ message: 'Nenhum catalogo informado para exclusao.' }, { status: 400 })
+  }
+
+  const result = await serverApiFetch('catalogos_digitais', {
+    method: 'DELETE',
+    token: session.token,
+    tenantId: session.currentTenantId,
+    body: ids.map((id) => ({
+      id,
+      id_empresa: session.currentTenantId,
+    })),
+  })
+
+  if (!result.ok) {
+    return NextResponse.json({ message: getErrorMessage(result.payload, 'Nao foi possivel excluir o catalogo digital.') }, { status: result.status || 400 })
+  }
+
+  return NextResponse.json({ success: true })
+}

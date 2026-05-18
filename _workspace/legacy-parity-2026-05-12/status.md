@@ -14,7 +14,7 @@ Consolidated handoff file created at `HANDOFF.md`.
 
 Use it before opening new chats or cleaning this branch. The current consolidated reading is:
 
-- `catalogos-digitais`: partial; still needs a dedicated continuation for studio blocks, products/collections, pricing, preview/PDF/publication and final visual validation.
+- `catalogos-digitais`: partial; basic studio block editing was resumed from `master` and the lost legacy list actions/bulk deletion were recovered, but the module still needs image upload, products/collections, pricing, preview/PDF/publication, public-name link behavior and final visual validation.
 - `infraestrutura-aws`: partial; v2 surfaces are prepared, but live AWS collection depends on server-side endpoints in `api-v3`.
 - `agile-store-ajustes`, `pedidos-logistica`, `formularios-arquivos`, `configuracoes-admin`, `shell-docs-operacao`, `status-plataforma`, `relatorios-data-hora`, `pedidos-brinde-aprovacao` and `vendedores-valida-horario`: recorded as completed for this parity phase.
 - Before any merge to `master`, reconcile this branch with the latest `origin/master` design/docs commit.
@@ -68,18 +68,31 @@ Completed in v2:
 - App Store contract lookup for `mod_catalogos_digitais`;
 - v2 list page with search, status, contract warning and table.
 - `Novo catalogo` action on the list;
-- edit action on each catalog row;
+- legacy row actions recovered on the list: preview by public URL, copy, edit and delete;
+- checkbox selection and bulk delete;
 - `/catalogos-digitais/novo` create route;
 - `/catalogos-digitais/[id]/editar` edit route;
 - detail bridge using `embed=produtos`;
 - save bridge preserving the legacy snapshot data for products/sections;
-- first studio form slice for general data and publication fields.
+- first studio form slice for general data and publication fields;
+- basic block editor in the `Blocos` step with legacy section types, edit/reorder/remove and snapshot persistence.
+
+Important parity gap:
+
+- The Catálogos Digitais list is closer to parity after recovering the lost actions from an unreachable Git blob. It still must not be marked complete until public-name link behavior, preview HTML without `url_publica`, and visual validation are closed or explicitly deferred with the required backend/API contract.
+
+Migration rule reinforced:
+
+- Each screen must be treated completely before being marked as done. Do not drop legacy buttons, actions, text, fields, filters, modals, permissions, payloads or validations just because the first usable slice is already open in v2.
 
 Next slice:
 
-- sections, image upload, product/collection import and pricing;
+- complete list actions and bulk deletion parity;
+- tenant-aware image upload, product/collection import and pricing;
 - preview/PDF/publication contracts.
 - final visual validation of the complete studio.
+
+Evidence: `evidence/catalogos-digitais-blocos.md`, `evidence/catalogos-digitais-list-actions-lost-blob.md`.
 
 `agile-store-ajustes` completed in this slice:
 

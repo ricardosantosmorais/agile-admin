@@ -6,7 +6,7 @@ Range: `99f6b7ee9..2d57cb13c`
 
 | Order | Batch | Legacy commits | Status | Why this grouping / next action |
 |---:|---|---:|---|---|
-| 1 | [catalogos-digitais](./catalogos-digitais.md) | 30+ | Partial | New product surface and most commits in the delta. Continue studio, products/collections, pricing, preview/PDF/publication and final visual validation. |
+| 1 | [catalogos-digitais](./catalogos-digitais.md) | 30+ | Partial | New product surface and most commits in the delta. Complete list actions, studio, products/collections, pricing, preview/PDF/publication and final visual validation. |
 | 2 | [agile-store-ajustes](./agile-store-ajustes.md) | 7+ | Done | Continuation of the Agile Store/SAC material and feedback work. |
 | 3 | [pedidos-logistica](./pedidos-logistica.md) | 4+ | Done | Operational order/logistics changes with backend contract risk. |
 | 4 | [formularios-arquivos](./formularios-arquivos.md) | 3+ | Done | File preview and form submission display parity. |
@@ -23,4 +23,5 @@ Range: `99f6b7ee9..2d57cb13c`
 - Merge commits were kept in the source range but should not drive migration by themselves.
 - Asset-only commits should be checked for visible v2 impact, not copied blindly.
 - Legacy-only infrastructure (`boot.php`, `.ebextensions`) remains subject to applicability checks.
+- A screen is only done when every legacy button, action, text, field, filter, modal, permission, payload and validation has been implemented or explicitly recorded as pending/not applicable.
 - Use [../HANDOFF.md](../HANDOFF.md) as the entrypoint for new chats and branch cleanup decisions.

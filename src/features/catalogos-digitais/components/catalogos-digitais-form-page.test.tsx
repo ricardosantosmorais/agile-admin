@@ -135,4 +135,34 @@ describe('CatalogoDigitalFormPage', () => {
     })
     expect(replaceMock).toHaveBeenCalledWith('/catalogos-digitais/CAT-NEW/editar')
   })
+
+  it('adds a visual block in the studio and saves it in the catalog snapshot', async () => {
+    saveMock.mockResolvedValue({ id: 'CAT-NEW' })
+
+    render(<CatalogoDigitalFormPage />)
+
+    fireEvent.change(screen.getByLabelText(/Nome do catálogo/), { target: { value: 'Campanha com blocos' } })
+    fireEvent.click(screen.getByRole('button', { name: /Blocos/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Banner/ }))
+
+    const titleAndSubtitleFields = await screen.findAllByLabelText(/tulo do bloco/i)
+    fireEvent.change(titleAndSubtitleFields[0], { target: { value: 'Abertura comercial' } })
+    fireEvent.change(screen.getByLabelText(/sub.*tulo do bloco/i), { target: { value: 'Condições especiais do mês' } })
+    fireEvent.change(screen.getByLabelText('URL da imagem do bloco'), { target: { value: 'https://cdn.example.com/banner.jpg' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Salvar bloco' }))
+
+    expect(screen.getByText('Abertura comercial')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Salvar catálogo/ }))
+
+    await waitFor(() => expect(saveMock).toHaveBeenCalled())
+    expect(saveMock.mock.calls[0][0].sections).toEqual([
+      expect.objectContaining({
+        tipo: 'banner',
+        modelo_secao: 'banner_full',
+        titulo: 'Abertura comercial',
+        subtitulo: 'Condições especiais do mês',
+        banner_url: 'https://cdn.example.com/banner.jpg',
+      }),
+    ])
+  })
 })

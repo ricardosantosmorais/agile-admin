@@ -125,6 +125,23 @@ describe('catalogos-digitais-mappers', () => {
   })
 
   it('builds a save payload preserving products and sections from the legacy snapshot', () => {
+    const bannerSection = {
+      id: 'sec-banner',
+      tipo: 'banner',
+      modelo_secao: 'banner_full',
+      titulo: 'Abertura comercial',
+      subtitulo: 'Condições especiais do mês',
+      banner_url: 'https://cdn.example.com/banner.jpg',
+      background: '#ffffff',
+      text_color: '#0f172a',
+      accent: '#40b2ae',
+      padding_y: 24,
+      font_size: 28,
+      mostrar_preco: true,
+      produtos: ['PROD-1'],
+      texto_html: '',
+      html_customizado: '',
+    }
     const form = {
       ...createEmptyCatalogoDigitalForm(),
       id: 'CAT-1',
@@ -140,7 +157,7 @@ describe('catalogos-digitais-mappers', () => {
       showPrice: false,
       active: true,
       products: [{ id: 'PROD-1' }],
-      sections: [{ id: 'sec-1', tipo: 'titulo' }],
+      sections: [bannerSection],
       snapshot: {
         origem_produtos: 'colecao',
         produtos: [{ id: 'PROD-1' }],
@@ -170,7 +187,7 @@ describe('catalogos-digitais-mappers', () => {
       ativo: true,
     })
     expect(snapshot.produtos).toEqual([{ id: 'PROD-1' }])
-    expect(snapshot.secoes).toEqual([{ id: 'sec-1', tipo: 'titulo' }])
+    expect(snapshot.secoes).toEqual([bannerSection])
     expect(outputs).toMatchObject({
       modo_publicacao: 'restrita_cliente',
       exibir_preco: false,

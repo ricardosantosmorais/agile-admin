@@ -84,3 +84,32 @@ export type CatalogoDigitalFormRecord = {
   sections: unknown[]
   snapshot: Record<string, unknown>
 }
+
+export type CatalogoDigitalSectionType =
+  | 'banner'
+  | 'titulo'
+  | 'produtos_grid'
+  | 'produtos_lista'
+  | 'texto'
+  | 'cta'
+  | 'divisor'
+  | 'espacador'
+  | 'quebra_pagina'
+
+export type CatalogoDigitalSection = {
+  id: string
+  tipo: CatalogoDigitalSectionType
+  modelo_secao: string
+  titulo: string
+  subtitulo: string
+  banner_url: string
+  background: string
+  text_color: string
+  accent: string
+  padding_y: number
+  font_size: number
+  mostrar_preco: boolean
+  produtos: string[]
+  texto_html: string
+  html_customizado: string
+}

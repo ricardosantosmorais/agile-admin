@@ -37,4 +37,11 @@ export const catalogosDigitaisClient = {
       body: JSON.stringify(toCatalogoDigitalSavePayload(form)),
     })
   },
+  async delete(ids: string[]) {
+    await httpClient('/api/catalogos-digitais', {
+      method: 'DELETE',
+      cache: 'no-store',
+      body: JSON.stringify({ ids }),
+    })
+  },
 }

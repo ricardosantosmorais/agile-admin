@@ -1,7 +1,6 @@
 'use client'
 
-import Link from 'next/link'
-import { AlertTriangle, Pencil, Plus, RefreshCcw, Store } from 'lucide-react'
+import { Copy, Eye, Pencil, Plus, RefreshCcw, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { AppDataTable } from '@/src/components/data-table/app-data-table'
 import { DataTableFiltersCard } from '@/src/components/data-table/data-table-filters'
@@ -10,6 +9,8 @@ import type { AppDataTableColumn, AppDataTableFilterConfig } from '@/src/compone
 import { AccessDeniedState } from '@/src/features/auth/components/access-denied-state'
 import { useFeatureAccess } from '@/src/features/auth/hooks/use-feature-access'
 import { AsyncState } from '@/src/components/ui/async-state'
+import { ConfirmDialog } from '@/src/components/ui/confirm-dialog'
+import { ModuleContractWarning } from '@/src/components/ui/module-contract-warning'
 import { PageHeader } from '@/src/components/ui/page-header'
 import { SectionCard } from '@/src/components/ui/section-card'
 import { StatusBadge } from '@/src/components/ui/status-badge'
@@ -76,24 +77,13 @@ function ContractWarning({ moduleId }: { moduleId: string }) {
   const { t } = useI18n()
 
   return (
-    <div
-      data-testid="catalogos-digitais-contract-warning"
-      className="app-card-modern flex flex-col gap-4 rounded-[1.1rem] border-orange-200 bg-orange-50 px-5 py-4 text-slate-900 shadow-sm md:flex-row md:items-center md:justify-between dark:border-orange-400/30 dark:bg-orange-400/10 dark:text-orange-50"
-    >
-      <div className="flex min-w-0 items-start gap-3">
-        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-700 dark:bg-orange-400/20 dark:text-orange-100">
-          <AlertTriangle className="h-4 w-4" />
-        </span>
-        <div className="min-w-0">
-          <p className="font-bold">{t('digitalCatalogs.contractWarning', 'Atenção: o módulo Catálogos Digitais ainda não está contratado para sua loja.')}</p>
-          <p className="mt-1 text-sm text-slate-700 dark:text-orange-50/80">{t('digitalCatalogs.contractWarningDescription', 'A listagem fica disponível para administração, mas a criação e edição dependem da contratação do módulo.')}</p>
-        </div>
-      </div>
-      <Link href={`/agile-store/${encodeURIComponent(moduleId)}`} className="app-button-secondary inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-bold">
-        <Store className="h-4 w-4" />
-        {t('sac.contractInAgileStore', 'Contratar na Agile Store')}
-      </Link>
-    </div>
+    <ModuleContractWarning
+      testId="catalogos-digitais-contract-warning"
+      title={t('digitalCatalogs.contractWarning', 'Atenção: o módulo Catálogos Digitais ainda não está contratado para sua loja.')}
+      description={t('digitalCatalogs.contractWarningDescription', 'A listagem fica disponível para administração, mas a criação e edição dependem da contratação do módulo.')}
+      actionLabel={t('digitalCatalogs.contractInAgileStore', 'Contratar na Agile Store')}
+      href={`/agile-store/${encodeURIComponent(moduleId)}`}
+    />
   )
 }
 
@@ -117,6 +107,10 @@ export function CatalogosDigitaisListPage() {
   const [filters, setFilters] = useState<CatalogosDigitaisListFilters>({ ...DEFAULT_FILTERS })
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(15)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [confirmDeleteIds, setConfirmDeleteIds] = useState<string[] | null>(null)
+  const [actionFeedback, setActionFeedback] = useState<string | null>(null)
+  const [actionLoading, setActionLoading] = useState(false)
 
   const listState = useAsyncData(
     () => catalogosDigitaisClient.list({ page, perpage: perPage, ...filters }),
@@ -128,6 +122,8 @@ export function CatalogosDigitaisListPage() {
   const appStore = data?.appStore
   const moduleContracted = appStore?.contracted === true
   const canCreateCatalog = access.canCreate && moduleContracted
+  const selectableIds = rows.map((item) => item.id || item.code).filter(Boolean)
+  const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selectedIds.includes(id))
 
   const filterConfig = useMemo<Array<AppDataTableFilterConfig<CatalogosDigitaisListFilters>>>(
     () => [
@@ -223,6 +219,81 @@ export function CatalogosDigitaisListPage() {
     setFilters({ ...DEFAULT_FILTERS })
   }
 
+  function toggleSelected(id: string) {
+    setSelectedIds((current) => (
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id]
+    ))
+  }
+
+  function toggleSelectAll() {
+    setSelectedIds((current) => (
+      allSelected
+        ? current.filter((id) => !selectableIds.includes(id))
+        : Array.from(new Set([...current, ...selectableIds]))
+    ))
+  }
+
+  function copiedCatalogName(name: string) {
+    const trimmed = name.trim()
+    if (!trimmed || /\(c[óo]pia\)$/i.test(trimmed)) return trimmed
+    return `${trimmed} (cópia)`
+  }
+
+  async function duplicateCatalog(item: CatalogosDigitaisCatalog) {
+    if (!moduleContracted) {
+      setActionFeedback(t('digitalCatalogs.actions.moduleRequired', 'Contrate o módulo para copiar catálogos.'))
+      return
+    }
+
+    setActionFeedback(null)
+    setActionLoading(true)
+    try {
+      const detail = await catalogosDigitaisClient.detail(item.id)
+      await catalogosDigitaisClient.save({
+        ...detail,
+        id: '',
+        code: '',
+        name: copiedCatalogName(detail.name || item.name),
+      })
+      setSelectedIds([])
+      await listState.reload()
+      setActionFeedback(t('digitalCatalogs.actions.copySuccess', 'Catálogo copiado. Revise os dados gerais e salve os ajustes necessários.'))
+    } catch (reason) {
+      setActionFeedback(reason instanceof Error ? reason.message : t('digitalCatalogs.actions.copyError', 'Não foi possível copiar o catálogo.'))
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  function previewCatalog(item: CatalogosDigitaisCatalog) {
+    if (item.publicUrl && typeof window !== 'undefined') {
+      window.open(item.publicUrl, '_blank', 'noopener,noreferrer')
+      return
+    }
+
+    setActionFeedback(t('digitalCatalogs.actions.previewUnavailable', 'Este catálogo ainda não possui URL pública para prévia.'))
+  }
+
+  async function deleteCatalogs(ids: string[]) {
+    if (!ids.length) return
+
+    setActionFeedback(null)
+    setActionLoading(true)
+    try {
+      await catalogosDigitaisClient.delete(ids)
+      setSelectedIds((current) => current.filter((id) => !ids.includes(id)))
+      setConfirmDeleteIds(null)
+      await listState.reload()
+      setActionFeedback(t('digitalCatalogs.actions.deleteSuccess', 'Catálogo excluído com sucesso.'))
+    } catch (reason) {
+      setActionFeedback(reason instanceof Error ? reason.message : t('digitalCatalogs.actions.deleteError', 'Não foi possível excluir o catálogo.'))
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
   if (!access.canOpen && !access.canList) {
     return <AccessDeniedState title={t('digitalCatalogs.title', 'Catálogos Digitais')} backHref="/dashboard" />
   }
@@ -238,6 +309,11 @@ export function CatalogosDigitaisListPage() {
       />
 
       {appStore && !moduleContracted ? <ContractWarning moduleId={appStore.moduleId} /> : null}
+      {actionFeedback ? (
+        <div className="app-warning-panel rounded-[1rem] px-4 py-3 text-sm font-semibold">
+          {actionFeedback}
+        </div>
+      ) : null}
 
       <AsyncState
         isLoading={listState.isLoading}
@@ -256,6 +332,14 @@ export function CatalogosDigitaisListPage() {
               />
               <DataTablePageActions
                 actions={[
+                  access.canDelete && selectedIds.length > 0
+                    ? {
+                        label: t('digitalCatalogs.deleteSelected', 'Excluir ({{count}})', { count: selectedIds.length }),
+                        icon: Trash2,
+                        onClick: () => setConfirmDeleteIds(selectedIds),
+                        tone: 'danger',
+                      }
+                    : null,
                   access.canCreate
                     ? {
                         label: t('digitalCatalogs.new', 'Novo catálogo'),
@@ -287,7 +371,26 @@ export function CatalogosDigitaisListPage() {
             getRowId={(item) => item.id || item.code}
             columns={columns}
             emptyMessage={t('digitalCatalogs.empty', 'Nenhum catálogo digital encontrado.')}
+            selectable={access.canDelete}
+            selectedIds={selectedIds}
+            allSelected={allSelected}
+            onToggleSelect={toggleSelected}
+            onToggleSelectAll={toggleSelectAll}
             rowActions={(item) => [
+              {
+                id: 'preview',
+                label: `${t('digitalCatalogs.previewCatalog', 'Visualizar catálogo')} ${item.name}`,
+                icon: Eye,
+                onClick: previewCatalog,
+                visible: access.canView || access.canEdit || access.canOpen,
+              },
+              {
+                id: 'copy',
+                label: `${t('digitalCatalogs.copyCatalog', 'Copiar catálogo')} ${item.name}`,
+                icon: Copy,
+                onClick: (catalog) => void duplicateCatalog(catalog),
+                visible: canCreateCatalog,
+              },
               {
                 id: 'edit',
                 label: `${t('digitalCatalogs.editCatalog', 'Editar catálogo')} ${item.name}`,
@@ -295,8 +398,17 @@ export function CatalogosDigitaisListPage() {
                 href: `/catalogos-digitais/${encodeURIComponent(item.id)}/editar`,
                 visible: access.canEdit || access.canView,
               },
+              {
+                id: 'delete',
+                label: `${t('digitalCatalogs.deleteCatalog', 'Excluir catálogo')} ${item.name}`,
+                icon: Trash2,
+                onClick: (catalog) => setConfirmDeleteIds([catalog.id]),
+                tone: 'danger',
+                visible: access.canDelete,
+              },
             ]}
             actionsLabel={t('digitalCatalogs.columns.actions', 'Ações')}
+            actionsColumnClassName="w-[180px] min-w-[180px] whitespace-nowrap"
             mobileCard={{
               title: (item) => item.name || item.code,
               subtitle: (item) => item.description || item.code,
@@ -319,6 +431,18 @@ export function CatalogosDigitaisListPage() {
           />
         </SectionCard>
       </AsyncState>
+      <ConfirmDialog
+        open={Boolean(confirmDeleteIds?.length)}
+        title={t('digitalCatalogs.deleteTitle', 'Excluir catálogo?')}
+        description={(confirmDeleteIds?.length ?? 0) > 1
+          ? t('digitalCatalogs.deleteManyDescription', 'Os catálogos selecionados serão excluídos. Esta ação não pode ser desfeita.')
+          : t('digitalCatalogs.deleteOneDescription', 'O catálogo selecionado será excluído. Esta ação não pode ser desfeita.')}
+        confirmLabel={t('common.delete', 'Excluir')}
+        cancelLabel={t('common.cancel', 'Cancelar')}
+        isLoading={actionLoading}
+        onClose={() => setConfirmDeleteIds(null)}
+        onConfirm={() => void deleteCatalogs(confirmDeleteIds ?? [])}
+      />
     </div>
   )
 }

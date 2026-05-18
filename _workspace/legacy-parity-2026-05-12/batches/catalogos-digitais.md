@@ -67,3 +67,56 @@ Analyze this batch first and split it into implementation slices:
 3. Products/customer/recalculation behavior.
 4. Publication/PDF/materials.
 5. Contract/functionality restrictions and tests.
+
+## Paridade obrigatória do batch
+
+Este batch não deve ser considerado completo por tela enquanto houver função do legado sem equivalente no v2. Cada tela precisa ser migrada integralmente, incluindo botões, ações por linha, ações em massa, textos, campos, filtros, colunas, modais, permissões, payloads, validações e mensagens.
+
+Quando uma função depender de endpoint/backend ainda inexistente, registrar a pendência com o contrato necessário. Quando existir no backend legado e houver contrato viável no v2/API bridge, migrar o equivalente necessário em vez de ocultar a funcionalidade.
+
+Para a listagem de catálogos, a comparação obrigatória inclui:
+
+- ações por linha do legado em `assets/js/components/catalogos-studio.js`: `preview-catalog` (Prévia), `copy-catalog` (Copiar), `edit-catalog` (Alterar) e `delete-catalog` (Excluir);
+- ação em massa `cs-btn-delete-selected`, exibida conforme permissão de deletar e seleção marcada;
+- checkbox de seleção por linha e selecionar todos;
+- link externo no nome quando `url_publica`, `publicado` e status `pronto` estiverem presentes;
+- botões de filtro/limpeza e textos/estados da DataTable;
+- permissões legadas `listar`, `criar`, `editar` e `deletar`;
+- contratação via `mod_catalogos_digitais`, mantendo listagem administrativa quando o módulo não estiver contratado.
+
+## Progress - 2026-05-18
+
+Slice migrated in `codex/catalogos-digitais-studio-slice`:
+
+- Studio step `Blocos` now has a basic section/block editor in the v2 form.
+- Supported legacy section types were mapped for creation/editing: `banner`, `titulo`, `produtos_grid`, `produtos_lista`, `texto`, `cta`, `divisor`, `espacador` and `quebra_pagina`.
+- The editor supports section model, title/subtitle, image URL, colors, spacing, font size, product IDs for product sections, rich HTML fields for text/CTA and show-price flag for product sections.
+- Created blocks can be edited, reordered and removed without leaving the form.
+- `sections` are saved back into the legacy `metadata.snapshot.secoes` contract, preserving the snapshot-based backend flow.
+- PT/EN dictionary entries were added for the new UI labels and accessible icon-button names.
+
+Evidence:
+
+- Legacy comparison: `components/catalogos-studio.php`, `controllers/catalogos-studio-controller.php`, `assets/js/components/catalogos-studio.js`.
+- v2 tests: `src/features/catalogos-digitais/components/catalogos-digitais-form-page.test.tsx`, `src/features/catalogos-digitais/services/catalogos-digitais-mappers.test.ts`.
+- Evidence note: `evidence/catalogos-digitais-blocos.md`.
+- Lost action-buttons evidence: `evidence/catalogos-digitais-list-actions-lost-blob.md`.
+
+Additional recovery on 2026-05-18:
+
+- reimplemented the legacy list actions recovered from the unreachable Git blob:
+  - `Prévia/Visualizar` opens the public catalog URL when available;
+  - `Copiar` loads the catalog detail, clears identity/code and saves a copy with `(cópia)` in the name;
+  - `Excluir` by row opens a confirmation modal and calls the v2 bridge;
+  - checkbox selection and bulk delete were restored through `AppDataTable`;
+- added `DELETE /api/catalogos-digitais` bridge using tenant context in the payload;
+- added component/API tests covering preview, copy, row/bulk delete and tenant-aware delete payload.
+
+Pending after this slice:
+
+- completar a listagem apenas no que ainda depende de contratos visuais/geração: link público no nome quando aplicável e prévia HTML equivalente ao Studio legado quando não houver `url_publica`;
+- tenant-aware image upload equivalent to legacy `uploadImagemSecao`;
+- product search/resolution and collection import;
+- pricing/recalculation with customer/commercial context;
+- preview HTML, PDF generation and publication outputs;
+- full visual validation in PT/EN, desktop/mobile, light/dark after the remaining studio flows are implemented.

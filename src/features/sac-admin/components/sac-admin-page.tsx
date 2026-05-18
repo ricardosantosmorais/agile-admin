@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle, Clock3, Eye, Paperclip, RefreshCcw, Save, Send, Store, X } from 'lucide-react'
+import { Clock3, Eye, Paperclip, RefreshCcw, Save, Send, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { AppDataTable } from '@/src/components/data-table/app-data-table'
@@ -11,6 +11,7 @@ import { AsyncState } from '@/src/components/ui/async-state'
 import { BooleanChoice } from '@/src/components/ui/boolean-choice'
 import { FormRow } from '@/src/components/ui/form-row'
 import { inputClasses } from '@/src/components/ui/input-styles'
+import { ModuleContractWarning } from '@/src/components/ui/module-contract-warning'
 import { PageHeader } from '@/src/components/ui/page-header'
 import { SectionCard } from '@/src/components/ui/section-card'
 import { StatCard } from '@/src/components/ui/stat-card'
@@ -233,21 +234,12 @@ function SacContractBanner({ config }: { config: SacModuleConfig }) {
   if (config.contracted) return null
 
   return (
-    <div className="app-warning-panel flex flex-col gap-3 rounded-[1.15rem] px-4 py-3 text-sm font-semibold md:flex-row md:items-center md:justify-between">
-      <div className="flex min-w-0 items-start gap-3">
-        <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-700">
-          <AlertTriangle className="h-4 w-4" />
-        </span>
-        <div>
-          <p className="text-[color:var(--app-text)]">{t('sacAdmin.contractWarning', 'Atenção: O módulo SAC ainda não está contratado para sua loja.')}</p>
-          <p className="mt-0.5 text-xs font-medium text-[color:var(--app-muted)]">{t('sacAdmin.contractWarningDescription', 'As telas ficam disponíveis para administração, mas a ativação no front depende da contratação do módulo.')}</p>
-        </div>
-      </div>
-      <a href="/agile-store/mod_sac" className="app-button-secondary inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold">
-        <Store className="h-4 w-4" />
-        {t('sacAdmin.contractInAgileStore', 'Contratar na Agile Store')}
-      </a>
-    </div>
+    <ModuleContractWarning
+      title={t('sacAdmin.contractWarning', 'Atenção: O módulo SAC ainda não está contratado para sua loja.')}
+      description={t('sacAdmin.contractWarningDescription', 'As telas ficam disponíveis para administração, mas a ativação no front depende da contratação do módulo.')}
+      actionLabel={t('sacAdmin.contractInAgileStore', 'Contratar na Agile Store')}
+      href="/agile-store/mod_sac"
+    />
   )
 }
 

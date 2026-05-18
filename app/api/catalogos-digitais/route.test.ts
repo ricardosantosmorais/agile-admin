@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { GET, POST } from '@/app/api/catalogos-digitais/route'
+import { DELETE, GET, POST } from '@/app/api/catalogos-digitais/route'
 import { GET as GET_DETAIL } from '@/app/api/catalogos-digitais/[id]/route'
 
 const {
@@ -149,6 +149,29 @@ describe('catalogos-digitais route', () => {
           id_empresa: 'empresa-1',
           nome: 'Campanha Junho',
         }),
+      }),
+    )
+  })
+
+  it('deletes catalogs with tenant context', async () => {
+    const request = new Request('http://localhost/api/catalogos-digitais', {
+      method: 'DELETE',
+      body: JSON.stringify({ ids: ['CAT-1', 'CAT-2'] }),
+    })
+
+    const response = await DELETE(request)
+
+    expect(response.status).toBe(200)
+    expect(serverApiFetchMock).toHaveBeenCalledWith(
+      'catalogos_digitais',
+      expect.objectContaining({
+        method: 'DELETE',
+        token: 'session-token',
+        tenantId: 'empresa-1',
+        body: [
+          { id: 'CAT-1', id_empresa: 'empresa-1' },
+          { id: 'CAT-2', id_empresa: 'empresa-1' },
+        ],
       }),
     )
   })
