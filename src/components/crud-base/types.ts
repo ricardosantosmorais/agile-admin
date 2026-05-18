@@ -91,7 +91,8 @@ export type CrudResource =
 	| 'produtos'
 	| 'promocoes'
 	| 'compre_ganhe'
-	| 'brindes';
+	| 'brindes'
+	| 'sac_areas';
 
 export type CrudRecord = {
 	id?: string;

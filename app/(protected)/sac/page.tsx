@@ -1,5 +1,5 @@
-import { SacAdminPage } from '@/src/features/sac-admin/components/sac-admin-page'
+import { redirect } from 'next/navigation'
 
 export default function SacAdminRoutePage() {
-  return <SacAdminPage />
+  redirect('/sac/dashboard')
 }

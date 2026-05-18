@@ -44,6 +44,7 @@ function normalizeMedia(media: AgileStoreRawMedia): AgileStoreModule['media'][nu
     url,
     title: text(media.titulo),
     description: text(media.descricao),
+    posterUrl: text(media.poster_url || media.poster),
   }
 }
 
@@ -54,6 +55,14 @@ function normalizeHistory(item: AgileStoreRawHistoryItem): AgileStoreModule['his
     status: text(item.status),
     createdAt: text(item.created_at),
     message: text(item.message),
+    userName: text(item.usuario),
+    ip: text(item.ip),
+    value: number(item.valor),
+    currency: text(item.moeda) || 'BRL',
+    trialUntil: text(item.teste_gratis_ate),
+    error: text(item.erro),
+    feedbackMotive: text(item.feedback_motivo),
+    feedbackMessage: text(item.feedback_mensagem),
   }
 }
 
@@ -78,7 +87,7 @@ export function normalizeAgileStoreDetail(response: AgileStoreRawDetailResponse)
     primaryColor: text(module.cor_primaria) || '#2f5bea',
     icon: text(module.icone) || 'far fa-cube',
     coverImageUrl: text(module.imagem_capa_url),
-    benefits: stringArray(module.metadata?.beneficios),
+    benefits: stringArray(module.metadata?.beneficios_detalhe || module.metadata?.beneficiosDetalhe || module.metadata?.ganhos || module.metadata?.beneficios),
     trial: {
       available: boolean(module.teste_gratis?.disponivel),
       days: number(module.teste_gratis?.dias),

@@ -95,7 +95,8 @@ O v2 reaproveita a mesma base de produto, mas com outra arquitetura:
 49. [Módulo Integrações > Clientes e Marketing](./49-modulo-integracoes-clientes-marketing.md)
 50. [Módulo Agile Store](./50-modulo-agile-store.md)
 51. [Módulo SAC Admin](./51-modulo-sac-admin.md)
-52. [ADRs](./adr/README.md)
+52. [Módulo Catálogos Digitais](./52-modulo-catalogos-digitais.md)
+53. [ADRs](./adr/README.md)
 
 ## Fontes principais usadas
 

@@ -55,6 +55,7 @@ export function buildAcaoPayload(record: CrudRecord): CrudRecord {
 		id_gateway: asTrimmedString(record.id_gateway) || null,
 		objeto: asTrimmedString(record.objeto),
 		url_filtro: asTrimmedString(record.url_filtro),
+		script: asTrimmedString(record.script) || null,
 	}
 	const id = asTrimmedString(record.id)
 	if (id) payload.id = id

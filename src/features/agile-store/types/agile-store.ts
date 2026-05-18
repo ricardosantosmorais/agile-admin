@@ -32,6 +32,8 @@ export type AgileStoreRawMedia = {
   url?: string | null
   titulo?: string | null
   descricao?: string | null
+  poster?: string | null
+  poster_url?: string | null
 }
 
 export type AgileStoreRawHistoryItem = {
@@ -40,6 +42,14 @@ export type AgileStoreRawHistoryItem = {
   status?: string | null
   created_at?: string | null
   message?: string | null
+  usuario?: string | null
+  ip?: string | null
+  valor?: string | number | null
+  moeda?: string | null
+  teste_gratis_ate?: string | null
+  erro?: string | null
+  feedback_motivo?: string | null
+  feedback_mensagem?: string | null
 }
 
 export type AgileStoreActionPolicy = {
@@ -113,6 +123,7 @@ export type AgileStoreMedia = {
   url: string
   title: string
   description: string
+  posterUrl: string
 }
 
 export type AgileStoreHistoryItem = {
@@ -121,6 +132,19 @@ export type AgileStoreHistoryItem = {
   status: string
   createdAt: string
   message: string
+  userName: string
+  ip: string
+  value: number
+  currency: string
+  trialUntil: string
+  error: string
+  feedbackMotive: string
+  feedbackMessage: string
+}
+
+export type AgileStoreActionFeedback = {
+  motive?: string
+  message?: string
 }
 
 export type AgileStoreListResponse = {
@@ -224,6 +248,8 @@ export type AgileStoreAdminCustomer = {
   contractedAt: string
   contractedBy: string
   canCancelContract: boolean
+  feedbackMotive: string
+  feedbackMessage: string
 }
 
 export type AgileStoreAdminEvent = {
@@ -234,6 +260,8 @@ export type AgileStoreAdminEvent = {
   userName: string
   createdAt: string
   ip: string
+  feedbackMotive: string
+  feedbackMessage: string
 }
 
 export type AgileStoreAdminDashboard = {

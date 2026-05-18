@@ -261,6 +261,19 @@ export function ConteudoArquivosPage() {
 		}
 	}
 
+	function handleOpenArquivo(record: ConteudoArquivoRecord) {
+		if (!record.arquivoUrl) {
+			return
+		}
+
+		if (record.isPreviewable) {
+			setPreviewTarget(record)
+			return
+		}
+
+		window.open(record.arquivoUrl, '_blank', 'noopener,noreferrer')
+	}
+
 	if (!access.canList) {
 		return <AccessDeniedState title={t('contentFiles.title', 'Arquivos')} backHref="/dashboard" />
 	}
@@ -348,7 +361,7 @@ export function ConteudoArquivosPage() {
 									? t('contentFiles.actions.view', 'Visualizar arquivo')
 									: t('contentFiles.actions.download', 'Abrir arquivo'),
 								icon: record.isPreviewable ? Eye : Download,
-								onClick: () => setPreviewTarget(record),
+								onClick: () => handleOpenArquivo(record),
 								visible: Boolean(record.arquivoUrl),
 							},
 							{

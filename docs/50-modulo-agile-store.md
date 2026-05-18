@@ -12,7 +12,12 @@ A Agile Store no v2 cobre as superfícies do legado em fatias:
 - bridges locais para a API v3;
 - retaguarda administrativa em `/agile-store/admin`, resolvida pelo componente legado `app-store-admin` quando o menu dinâmico vier do banco/perfil;
 - dashboard de visitas, conversões, cancelamentos, performance por módulo, visitas/eventos, contratações e faturamento;
+- tabela de visitas da retaguarda com altura limitada, scroll interno e cabeçalho fixo para listas longas;
 - ações administrativas de marcar faturamento e descontratar contrato por ID.
+
+- feedback obrigatório em contratação/descontratação, com os motivos do legado e mensagem opcional;
+- exibição de feedback no histórico do detalhe, nas contratações e nos eventos administrativos;
+- posters de vídeo e benefícios detalhados conforme payload atual da API.
 
 ## Contratos
 
@@ -41,6 +46,15 @@ O módulo usa as chaves do legado:
 No v2, `APP_STORE_CONTRATAR` corresponde à permissão de criação e `APP_STORE_DESCONTRATAR` à permissão de exclusão na avaliação local de acesso.
 
 A retaguarda administrativa continua protegida pela API v3, com a mesma regra do legado para usuários internos Agile e tenant interno. O v2 não cria item fixo de menu; apenas mapeia `app-store-admin` para `/agile-store/admin` quando essa funcionalidade vier do menu dinâmico.
+
+## Auditoria de feedback
+
+Nas ações públicas de contratar e descontratar, a bridge envia também:
+
+- `feedback_motivo`;
+- `feedback_mensagem`.
+
+Esses campos seguem o contrato adicionado no legado para auditoria de decisões comerciais na Agile Store.
 
 ## Fora Desta Fatia
 

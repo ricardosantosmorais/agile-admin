@@ -1,9 +1,11 @@
 'use client'
 
-import { ArrowLeft, CheckCircle2, ExternalLink, FileText, ImageIcon, Lock, PlayCircle, RefreshCcw, Store, XCircle } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, ExternalLink, FileText, ImageIcon, Lock, MessageSquare, PlayCircle, RefreshCcw, Store, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { AsyncState } from '@/src/components/ui/async-state'
+import { ConfirmDialog } from '@/src/components/ui/confirm-dialog'
+import { OverlayModal } from '@/src/components/ui/overlay-modal'
 import { PageHeader } from '@/src/components/ui/page-header'
 import { SectionCard } from '@/src/components/ui/section-card'
 import { StatusBadge } from '@/src/components/ui/status-badge'
@@ -43,6 +45,32 @@ function actionConfirmation(action: AgileStoreAction) {
     cancel: 'Confirme o cancelamento deste módulo para a empresa atual.',
     retry: 'A última ação com falha será executada novamente para esta empresa.',
   }[action]
+}
+
+function requiresFeedback(action: AgileStoreAction) {
+  return action === 'contract' || action === 'cancel'
+}
+
+function feedbackMotives(action: AgileStoreAction) {
+  if (action === 'cancel') {
+    return [
+      'Contratado por engano',
+      'Mudança de processo',
+      'Não atendeu a necessidade',
+      'Não utilizei',
+      'Redução de custo',
+      'Outro',
+    ]
+  }
+
+  return [
+    'Atender solicitação interna',
+    'Melhorar operação',
+    'Reduzir retrabalho',
+    'Substituir sistema já existente',
+    'Testar o módulo',
+    'Outro',
+  ]
 }
 
 function mediaGroup(mediaType: string) {
@@ -100,6 +128,10 @@ export function AgileStoreDetailPage({ moduleId, permissions }: { moduleId: stri
   const [error, setError] = useState('')
   const [actionMessage, setActionMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [pendingAction, setPendingAction] = useState<AgileStoreAction | null>(null)
+  const [feedbackMotive, setFeedbackMotive] = useState('')
+  const [feedbackMessage, setFeedbackMessage] = useState('')
+  const [feedbackError, setFeedbackError] = useState('')
 
   const resolvedPermissions = useMemo(() => {
     if (permissions) return permissions
@@ -133,7 +165,7 @@ export function AgileStoreDetailPage({ moduleId, permissions }: { moduleId: stri
     }
   }, [moduleId, t])
 
-  async function runAction() {
+  function openActionModal() {
     if (!module) return
     const action = actionForStatus(module.contractStatus)
     const actionStatus = getAgileStoreActionStatus(module, action, resolvedPermissions)
@@ -141,17 +173,39 @@ export function AgileStoreDetailPage({ moduleId, permissions }: { moduleId: stri
       setActionMessage('')
       return
     }
-    if (!window.confirm(actionConfirmation(action))) {
+    setPendingAction(action)
+    setFeedbackMotive('')
+    setFeedbackMessage('')
+    setFeedbackError('')
+  }
+
+  function closeActionModal() {
+    if (isSubmitting) return
+    setPendingAction(null)
+    setFeedbackMotive('')
+    setFeedbackMessage('')
+    setFeedbackError('')
+  }
+
+  async function confirmAction() {
+    if (!module || !pendingAction) return
+    if (requiresFeedback(pendingAction) && !feedbackMotive.trim()) {
+      setFeedbackError(t('agileStore.feedbackRequired', 'Selecione um motivo para continuar.'))
       return
     }
 
     setIsSubmitting(true)
     setActionMessage('')
+    setFeedbackError('')
     try {
-      await agileStoreClient.action(module.id, action)
+      await agileStoreClient.action(module.id, pendingAction, requiresFeedback(pendingAction) ? {
+        motive: feedbackMotive.trim(),
+        message: feedbackMessage.trim(),
+      } : undefined)
       const reloaded = await agileStoreClient.detail(module.id)
       setModule(reloaded)
       setActionMessage(t('agileStore.actionSuccess', 'Ação enviada com sucesso.'))
+      setPendingAction(null)
     } catch (reason) {
       setActionMessage(reason instanceof Error ? reason.message : t('agileStore.errors.action', 'Não foi possível processar a ação.'))
     } finally {
@@ -243,7 +297,7 @@ export function AgileStoreDetailPage({ moduleId, permissions }: { moduleId: stri
                 {videos.map((item) => (
                   <article key={item.url} className="app-pane overflow-hidden rounded-[1.1rem]">
                     {isVideoFile(item.url) ? (
-                      <video controls preload="metadata" src={item.url} className="aspect-video w-full bg-slate-950" />
+                      <video controls preload="metadata" poster={item.posterUrl || undefined} src={item.url} className="aspect-video w-full bg-slate-950" />
                     ) : null}
                     <div className="flex gap-3 p-4">
                       <PlayCircle className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
@@ -309,6 +363,16 @@ export function AgileStoreDetailPage({ moduleId, permissions }: { moduleId: stri
                         {item.status ? <StatusBadge tone="neutral">{item.status}</StatusBadge> : null}
                       </div>
                       {item.message ? <p className="mt-1 break-words font-medium">{item.message}</p> : null}
+                      {(item.feedbackMotive || item.feedbackMessage) ? (
+                        <div className="mt-3 rounded-[0.9rem] border border-line/70 bg-[color:var(--app-soft)]/70 px-3 py-2 text-xs">
+                          <strong className="flex items-center gap-2 text-[color:var(--app-text)]">
+                            <MessageSquare className="h-3.5 w-3.5 text-accent" />
+                            {item.feedbackMotive || t('agileStore.feedback', 'Feedback')}
+                          </strong>
+                          {item.feedbackMessage ? <span className="mt-1 block break-words leading-5 text-[color:var(--app-muted)]">{item.feedbackMessage}</span> : null}
+                        </div>
+                      ) : null}
+                      {item.error ? <p className="mt-2 break-words text-xs font-semibold text-rose-600">{item.error}</p> : null}
                       {item.createdAt ? <p className="mt-1 text-xs font-medium text-[color:var(--app-muted)]">{item.createdAt}</p> : null}
                     </div>
                   </div>
@@ -344,7 +408,7 @@ export function AgileStoreDetailPage({ moduleId, permissions }: { moduleId: stri
 
               <button
                 type="button"
-                onClick={() => void runAction()}
+                onClick={openActionModal}
                 disabled={isSubmitting}
                 className="app-button-primary inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60"
               >
@@ -357,6 +421,66 @@ export function AgileStoreDetailPage({ moduleId, permissions }: { moduleId: stri
           </SectionCard>
         </aside>
       </div>
+
+      <OverlayModal
+        open={Boolean(pendingAction && requiresFeedback(pendingAction))}
+        title={pendingAction ? actionLabel(pendingAction) : ''}
+        onClose={closeActionModal}
+        maxWidthClassName="max-w-xl"
+        bodyScrollable={false}
+      >
+        <div className="space-y-5">
+          <p className="text-sm leading-6 text-[color:var(--app-muted)]">{pendingAction ? actionConfirmation(pendingAction) : ''}</p>
+          <label className="space-y-2 text-sm font-semibold text-[color:var(--app-text)]">
+            <span>{t('agileStore.feedbackMotive', 'Motivo')} <span className="text-rose-500">*</span></span>
+            <select
+              className="app-input h-11"
+              value={feedbackMotive}
+              aria-invalid={Boolean(feedbackError)}
+              onChange={(event) => {
+                setFeedbackMotive(event.target.value)
+                if (event.target.value) setFeedbackError('')
+              }}
+            >
+              <option value="">{t('agileStore.feedbackMotivePlaceholder', 'Selecione um motivo')}</option>
+              {(pendingAction ? feedbackMotives(pendingAction) : []).map((motive) => (
+                <option key={motive} value={motive}>{motive}</option>
+              ))}
+            </select>
+            {feedbackError ? <span className="block text-xs font-semibold text-rose-600">{feedbackError}</span> : null}
+          </label>
+          <label className="space-y-2 text-sm font-semibold text-[color:var(--app-text)]">
+            <span>{t('agileStore.feedbackMessage', 'Mensagem opcional')}</span>
+            <textarea
+              className="app-input min-h-28 resize-y py-3"
+              maxLength={2000}
+              value={feedbackMessage}
+              onChange={(event) => setFeedbackMessage(event.target.value)}
+              placeholder={t('agileStore.feedbackMessagePlaceholder', 'Se quiser, registre um comentário para acompanhamento.')}
+            />
+          </label>
+          <div className="flex flex-wrap justify-end gap-3">
+            <button type="button" className="app-button-secondary rounded-full px-4 py-2.5 text-sm font-semibold" onClick={closeActionModal}>
+              {t('common.cancel', 'Cancelar')}
+            </button>
+            <button type="button" disabled={isSubmitting} className="app-button-primary rounded-full px-4 py-2.5 text-sm font-semibold disabled:opacity-60" onClick={() => void confirmAction()}>
+              {pendingAction ? actionLabel(pendingAction) : t('common.confirm', 'Confirmar')}
+            </button>
+          </div>
+        </div>
+      </OverlayModal>
+
+      <ConfirmDialog
+        open={Boolean(pendingAction && !requiresFeedback(pendingAction))}
+        title={pendingAction ? actionLabel(pendingAction) : ''}
+        description={pendingAction ? actionConfirmation(pendingAction) : ''}
+        confirmLabel={pendingAction ? actionLabel(pendingAction) : t('common.confirm', 'Confirmar')}
+        cancelLabel={t('common.cancel', 'Cancelar')}
+        tone="default"
+        isLoading={isSubmitting}
+        onClose={closeActionModal}
+        onConfirm={() => void confirmAction()}
+      />
     </div>
   )
 }

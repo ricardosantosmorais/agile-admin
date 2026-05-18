@@ -1,6 +1,6 @@
 import { StatusBadge } from '@/src/components/ui/status-badge'
 import { LookupSelect, type LookupOption } from '@/src/components/ui/lookup-select'
-import { ScriptCodeEditor } from '@/src/features/integracao-com-erp-scripts/components/script-code-editor'
+import { ServicoGatewayMappingAssistant } from '@/src/features/integracao-com-erp-cadastro-servicos/components/servico-gateway-mapping-assistant'
 import type { CrudModuleConfig, CrudResource } from '@/src/components/crud-base/types'
 import { loadErpCatalogLookup } from '@/src/lib/erp-catalog-lookups'
 import { httpClient } from '@/src/services/http/http-client'
@@ -178,7 +178,7 @@ export const INTEGRACAO_COM_ERP_CADASTRO_SERVICOS_CONFIG: CrudModuleConfig = {
 			title: 'Mapeamento (Razor)',
 			layout: 'rows',
 			fields: [
-				{ key: 'mapeamento', labelKey: 'maintenance.erpIntegration.catalogs.items.servicos.fields.mapping', label: 'Mapeamento (Razor)', type: 'custom', helperText: 'Carregue um exemplo do endpoint gateway, monte o script e aplique no formulário.', render: ({ value, patch, readOnly, disabled }) => <ScriptCodeEditor editorId="servico-mapeamento" language="razor" value={String(value ?? '')} onChange={(next) => patch('mapeamento', next)} readOnly={readOnly || disabled} height="420px" /> },
+				{ key: 'mapeamento', labelKey: 'maintenance.erpIntegration.catalogs.items.servicos.fields.mapping', label: 'Mapeamento (Razor)', type: 'custom', helperText: 'Carregue um exemplo do endpoint gateway, monte o script e aplique no formulário.', render: ({ value, form, patch, readOnly, disabled }) => <ServicoGatewayMappingAssistant value={String(value ?? '')} form={form} patch={patch} readOnly={readOnly || disabled} /> },
 			],
 		},
 	],

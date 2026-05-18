@@ -4,16 +4,19 @@
 
 A fatia administrativa do SAC cobre a operação principal de chamados:
 
-- dashboard resumido em `/sac`;
+- dashboard em `/sac/dashboard`, com os blocos do legado: indicadores, Abertos x Fechados, Status, Fechamentos, Volume por Área, Volume por Assunto, Pendentes Mais Antigos, Backlog por Idade, Top Clientes e Responsáveis;
+- listagem de chamados em `/sac/chamados`;
+- CRUD de áreas do SAC em `/sac/areas-assuntos`, com listagem padrão do v2, ações por linha e formulário tabulado para dados da área, assuntos e responsáveis;
+- configurações do módulo em `/sac/configuracoes`;
 - listagem de chamados com filtros de status, cliente, protocolo, área, assunto e responsável;
 - detalhe do chamado com dados principais, histórico de mensagens e anexos vinculados às mensagens;
 - resposta ao cliente com anexos, preservando `updated_at` para proteção contra edição concorrente;
 - nota interna, alteração de status, atribuição de responsável e transferência entre área/assunto, também preservando `updated_at`;
 - restrição de listagem por responsável quando o perfil não possui `SAC_FUNC_LISTAR_TODOS`, conforme o legado;
 - configurações do módulo SAC com `ativo`, e-mails permitidos, fechamento automático e prazo de reabertura;
-- manutenção de áreas, assuntos e responsáveis do SAC pela superfície administrativa dinâmica, sem inclusão de item fixo no menu;
+- manutenção de áreas, assuntos e responsáveis do SAC pela superfície administrativa dinâmica, usando `CrudListPage`, `TabbedCatalogFormPage` e abas relacionais reaproveitadas do padrão v2, sem inclusão de item fixo no menu;
 - bridges locais para os contratos `sac/admin/*` da API v3;
-- mapeamento de rota para os componentes legados `sac-dashboard` e `sac-chamados`, sem incluir módulos fixos no menu;
+- mapeamento de rota para os componentes legados `sac-dashboard`, `sac-chamados`, `sac-areas-assuntos` e `sac-configuracoes`, sem incluir módulos fixos no menu;
 - feature de permissão local `sac` baseada nas chaves e componentes legados `SAC_*`.
 
 ## Contratos
@@ -52,6 +55,8 @@ A feature `sac` reconhece componentes e chaves do legado como:
 
 - `sac-dashboard`;
 - `sac-chamados`;
+- `sac-areas-assuntos`;
+- `sac-configuracoes`;
 - `SAC_FUNC`;
 - `SAC_DASHBOARD`;
 - `SAC_LISTAR`;
@@ -65,6 +70,21 @@ A feature `sac` reconhece componentes e chaves do legado como:
 - `SAC_FUNC_TRANSFERIR`.
 
 A UI usa a leitura local de acesso para liberar listagem, visualização, resposta e ações avançadas. As ações continuam protegidas pela API v3.
+
+## Padrão Visual
+
+O dashboard administrativo do SAC deve seguir a linguagem atual do v2:
+
+- `PageHeader` com breadcrumb e ação `Atualizar`;
+- `AsyncState` para loading, vazio e erro;
+- `SectionCard` para blocos operacionais;
+- `StatCard` para indicadores principais;
+- `DataTableFiltersCard` e `AppDataTable` para `/sac/chamados`;
+- `CrudListPage` para `/sac/areas-assuntos`;
+- `TabbedCatalogFormPage` para `/sac/areas-assuntos/novo` e `/sac/areas-assuntos/{id}/editar`, com abas de dados, assuntos e responsáveis;
+- badges e botões compartilhados do v2, sem cards soltos ou componentes visuais fora do padrão.
+
+O conteúdo permanece equivalente ao legado, mas a organização visual prioriza leitura operacional e separa as quatro superfícies do menu legado. O dashboard não mistura fila nem configurações; chamados, áreas/assuntos e configurações carregam apenas seus próprios blocos.
 
 ## Fora Desta Fatia
 

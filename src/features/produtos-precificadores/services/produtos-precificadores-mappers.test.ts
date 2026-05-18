@@ -35,8 +35,8 @@ describe('produtos-precificadores-mappers', () => {
           preco: '10,00',
           desconto: '2,50',
           acrescimo: '',
-          pedido_minimo: '100,00',
-          pedido_maximo: '',
+          pedido_minimo: '12,50',
+          pedido_maximo: '24,75',
           itens_pedido_de: '2',
           itens_pedido_ate: '',
         },
@@ -57,7 +57,8 @@ describe('produtos-precificadores-mappers', () => {
       id_embalagem: '99',
       preco: 10,
       desconto: 2.5,
-      pedido_minimo: 100,
+      pedido_minimo: 12.5,
+      pedido_maximo: 24.75,
       itens_pedido_de: 2,
     })
     expect(rows[1].id_filial).toBe('2')

@@ -81,14 +81,31 @@ Base date: 2026-03-24
 - SAC anexos migrou upload de arquivos na resposta ao cliente, incluindo input multi-arquivo na modal do chamado, envio `multipart/form-data`, validação de extensão/tamanho conforme legado, upload S3 privado por tenant antes do POST para API v3 e renderização de anexos no histórico.
 - Thirty-sixth batch checked: `apps`.
 - Apps nao precisou de migracao de producao: a branch `develop` ja e o fallback central dos fluxos GitHub no v2, a remocao do redirect HTTPS de `boot.php` nao se aplica ao Next.js, o modal de logs ja e controlado por estado React sem handlers jQuery duplicados, e a listagem ja possui ordenacao/filtro separados para `nome_app` e `identificador_app`.
-- Next step: check the next pending legacy batch, likely `arquivos` or `banners/universos`, confirming file-by-file before any implementation.
+- Thirty-seventh batch checked: `arquivos`.
+- Arquivos precisou de paridade para o download direto de formatos sem preview: v2 agora abre diretamente arquivos nao previewaveis e mantem modal apenas para PDF/imagens, alem de nome acessivel nos botoes de acao da tabela compartilhada.
+- Thirty-eighth batch checked: `banners/universos`.
+- Banners/universos nao precisou de nova migracao: os commits legados de universos por contexto e autocomplete aberto sem digitacao ja estavam cobertos no v2 por `CatalogUniversosTab`, `BannerFormPage` e `LookupSelect`.
+- Thirty-ninth batch checked: `autenticacao/sessao`.
+- Autenticacao/sessao nao precisou de nova migracao: limpar cache ja prioriza token da sessao no v2, nao existe log de token FCM equivalente, e 401/TENANT_CONTEXT_INVALID ja disparam o fluxo global de sessao encerrada.
+- Fortieth batch checked: `assets`.
+- Assets nao precisou de migracao runtime: acesso rapido do v2 ja deriva do menu em estado React e nao depende de coleta de DOM pos-bootstrap; reload por `ASSETS_VERSION` do legado nao se aplica ao shell Next.js. Adicionada cobertura focada do acesso rapido.
+- Forty-first batch revisited: `integracao-erp/gateway-endpoints`.
+- Gateway endpoints/servicos fechou a pendencia do assistente de mapeamento: v2 agora carrega contexto do endpoint gateway selecionado no cadastro de Servicos, resolve variaveis obrigatorias, executa preview, permite selecionar amostras normalizadas e testa o Razor contra `agilesync_build_script`.
+- Forty-second batch checked: `billing/faixa-financeira`.
+- Billing/faixa-financeira nao teve migracao de producao: o commit ajusta apenas estilo inline do modal de pendencias em `billing-upgrade-controller.php`, superficie ja registrada como deferred por nao existir contrato/shell equivalente no v2 atual.
+- Legacy `admin` history refreshed from `origin/master` through `4c6edd7a5` on 2026-05-14.
+- Forty-third batch checked: `produtos-precificadores/quantidades`.
+- Produtos x Precificadores precisou de paridade para o commit `65af09b5e`: `pedido_minimo`/`pedido_maximo` agora sao quantidades decimais sem prefixo monetario, o resumo deixou de formatar esses campos como moeda e os labels de quantidade por pedido foram alinhados ao legado.
+- Forty-fourth batch checked: `agile-store/visitas-altura`.
+- Agile Store admin precisou de paridade para o commit `371250d5d`: a tabela de visitas da retaguarda agora tem altura limitada, scroll proprio e cabeçalho fixo como no legado.
+- Next step: continue with the `legacy-parity-2026-05-12` phase, starting from `catalogos-digitais`.
 
 ## Completed batches
 
 - `gateways-pagamento`: no functional migration needed; added Cielo 3DS bridge tests.
 - `importar-planilha/processos-arquivos`: migrated `integra_planilha` field filtering in spreadsheet mapping and added mapper test coverage.
 - `notificacoes-painel`: migrated channel options, selected-company link behavior, channel-aware publishing, and audience channel display.
-- `integracao-erp/gateway-endpoints`: migrated OAuth2Cookie/cookie-token parity and masked read-only context variables for endpoint testing.
+- `integracao-erp/gateway-endpoints`: migrated OAuth2Cookie/cookie-token parity, masked read-only context variables for endpoint testing, and the service mapping assistant sample selector/script-preview flow for endpoint gateway services.
 - `integracao-erp/interfaces-consulta`: migrated consultation-map normalization for filter/order application mode and value-resolution config in template and override saves.
 - `simulador-precos`: migrated freight normalization in the API v2 bridge and added regression coverage for freight and packaging query format.
 - `pedidos`: migrated delivery statuses `devolvido`/`solicitado`, `exibe_juros_parcelas`, master-only filtering for technical logs, and master product actions for price memory/origin trace payloads.
@@ -121,6 +138,13 @@ Base date: 2026-03-24
 - `agile-store/admin-backoffice`: migrated Agile Store management dashboard, module performance, visits/events, contracts/billing, administrative billing status and cancellation actions, dynamic `app-store-admin` route mapping, API v3 bridges, mappers, i18n, docs and focused coverage.
 - `agile-store/sac-admin-anexos`: migrated SAC response attachment upload with multipart bridge, S3 private tenant upload, legacy extension/10MB validation, API v3 `anexos` payload parity, timeline attachment rendering, i18n, docs and focused coverage.
 - `apps`: no production migration needed; GitHub branch `develop`, list order/filter mapping and logs modal stability are already covered by the current v2 Apps architecture.
+- `arquivos`: migrated direct open/download parity for files without embedded preview and added accessible labels to shared table action buttons; previewable formats remain in the v2 modal.
+- `banners/universos`: no additional migration needed; banner universe context types and open-on-focus lookup behavior are already covered by the v2 catalog universe implementation.
+- `autenticacao/sessao`: no additional migration needed; renew-cache token precedence, absence of FCM token logging and session-loss modal handling are already covered in v2.
+- `assets`: no runtime migration needed; quick access is state-driven in the v2 shell and legacy `ASSETS_VERSION` reload does not apply to the Next.js runtime. Added focused topbar coverage for quick access.
+- `billing/faixa-financeira`: no production migration needed; the legacy commit only adjusts inline modal typography/color inside the deferred billing/financial-pending banner flow.
+- `produtos-precificadores/quantidades`: migrated corrected quantity semantics for `pedido_minimo`/`pedido_maximo`, removed currency UI from those fields, updated review formatting, i18n, docs and mapper coverage.
+- `agile-store/visitas-altura`: migrated the constrained visits table behavior for Agile Store admin, with local table-shell scroll, sticky headers and component coverage.
 
 ## Known local noise excluded
 

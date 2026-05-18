@@ -29,7 +29,8 @@ Fluxo atual:
 Comportamento de entrada:
 - acessar `/` sem sessão válida redireciona para `/login`, sem parâmetros extras;
 - acessar `/` com sessão válida redireciona para `/dashboard`;
-- acessar `/login` com sessão válida redireciona diretamente para `/dashboard`;
+- acessar `/login` com sessão válida redireciona para `/dashboard` após validação da sessão pela camada client-side;
+- acessar `/login` com cookie local assinado, mas token inválido na API, permanece no login e deixa o `AuthProvider` limpar a sessão inválida;
 - acessar `/login` sem sessão válida não deve disparar probe inicial de `/api/auth/session` quando a aba está limpa e não existe 2FA pendente.
 
 O fluxo também suporta autenticação em duas etapas:

@@ -33,8 +33,13 @@ describe('sac-admin mappers', () => {
           evolucao: [{ data: '2026-05-07', label: '07/05', abertos: '3', fechados: 1 }],
           status: [{ label: 'novo', total: '4' }],
           areas: [{ label: 'Financeiro', total: 3 }],
+          assuntos: [{ label: 'Pedido', total: '2' }],
+          responsaveis: [{ label: 'Maria', total: '1' }],
+          fechamentos: [{ label: 'Resolvido pelo cliente', total: '5' }],
+          idade_backlog: [{ label: '8+ dias', total: '6' }],
         },
         rankings: {
+          clientes: [{ id: 'cliente-1', nome: 'Cliente Alfa', total: '7' }],
           atuacao: [{ id: '10', protocolo: 'SAC-10', titulo: 'Atraso', area: 'Logistica', ultima_interacao_em: '2026-05-07 08:00:00' }],
         },
       },
@@ -44,6 +49,11 @@ describe('sac-admin mappers', () => {
     expect(dashboard.summary.opened).toBe(12)
     expect(dashboard.summary.firstResponseSlaPercent).toBe(91.4)
     expect(dashboard.charts.evolution).toEqual([{ date: '2026-05-07', label: '07/05', opened: 3, closed: 1 }])
+    expect(dashboard.charts.subjects).toEqual([{ label: 'Pedido', total: 2 }])
+    expect(dashboard.charts.responsibles).toEqual([{ label: 'Maria', total: 1 }])
+    expect(dashboard.charts.closings).toEqual([{ label: 'Resolvido pelo cliente', total: 5 }])
+    expect(dashboard.charts.backlogAge).toEqual([{ label: '8+ dias', total: 6 }])
+    expect(dashboard.rankings.customers[0]).toMatchObject({ id: 'cliente-1', name: 'Cliente Alfa', total: 7 })
     expect(dashboard.rankings.pending[0]).toMatchObject({ id: '10', protocol: 'SAC-10', areaName: 'Logistica' })
   })
 

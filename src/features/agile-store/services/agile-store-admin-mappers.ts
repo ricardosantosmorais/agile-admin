@@ -111,6 +111,8 @@ function normalizeCustomer(row: Record<string, unknown>): AgileStoreAdminCustome
     contractedAt: text(row.contratado_em),
     contractedBy: text(row.contratado_por || row.contratado_por_email),
     canCancelContract: status === 'ativo',
+    feedbackMotive: text(row.feedback_motivo),
+    feedbackMessage: text(row.feedback_mensagem),
   }
 }
 
@@ -123,6 +125,8 @@ function normalizeEvent(row: Record<string, unknown>): AgileStoreAdminEvent {
     userName: text(row.usuario || row.nome_usuario || row.email_usuario),
     createdAt: text(row.created_at),
     ip: text(row.ip),
+    feedbackMotive: text(row.feedback_motivo),
+    feedbackMessage: text(row.feedback_mensagem),
   }
 }
 

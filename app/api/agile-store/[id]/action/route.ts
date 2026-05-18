@@ -32,21 +32,34 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ message: 'Sessao expirada.' }, { status: 401 })
   }
 
-  const body = await request.json().catch(() => ({})) as { action?: keyof typeof ACTION_ENDPOINTS }
+  const body = await request.json().catch(() => ({})) as {
+    action?: keyof typeof ACTION_ENDPOINTS
+    feedback?: {
+      motive?: string
+      message?: string
+    }
+  }
   const endpointAction = body.action ? ACTION_ENDPOINTS[body.action] : undefined
   if (!endpointAction) {
     return NextResponse.json({ message: 'Acao invalida.' }, { status: 400 })
   }
 
   const { id } = await context.params
+  const actionBody: Record<string, unknown> = {
+    id_empresa: session.currentTenantId,
+    user_agent: request.headers.get('user-agent') ?? '',
+  }
+
+  if (body.action === 'contract' || body.action === 'cancel') {
+    actionBody.feedback_motivo = String(body.feedback?.motive ?? '').trim()
+    actionBody.feedback_mensagem = String(body.feedback?.message ?? '').trim()
+  }
+
   const result = await serverApiFetch(`app-store/modulos/${encodeURIComponent(id)}/${endpointAction}`, {
     method: 'POST',
     token: session.token,
     tenantId: session.currentTenantId,
-    body: {
-      id_empresa: session.currentTenantId,
-      user_agent: request.headers.get('user-agent') ?? '',
-    },
+    body: actionBody,
   })
 
   if (!result.ok) {

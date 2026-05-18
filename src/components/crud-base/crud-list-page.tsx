@@ -19,6 +19,8 @@ import { useI18n } from '@/src/i18n/use-i18n'
 import { useCrudListController } from '@/src/components/crud-base/use-crud-list-controller'
 import type { CrudDataClient, CrudListFilters, CrudListRecord, CrudModuleConfig, CrudRecord } from '@/src/components/crud-base/types'
 
+type CrudAccessOverride = Partial<ReturnType<typeof useFeatureAccess>>
+
 function resolveFilterConfig(column: CrudModuleConfig['columns'][number], t: ReturnType<typeof useI18n>['t']): AppDataTableFilterConfig<CrudListFilters> | undefined {
   if (!column.filter) return undefined
 
@@ -51,9 +53,10 @@ function resolveFilterConfig(column: CrudModuleConfig['columns'][number], t: Ret
   }
 }
 
-export function CrudListPage({ config, client }: { config: CrudModuleConfig; client: CrudDataClient }) {
+export function CrudListPage({ config, client, accessOverride }: { config: CrudModuleConfig; client: CrudDataClient; accessOverride?: CrudAccessOverride }) {
   const { t } = useI18n()
-  const access = useFeatureAccess(config.featureKey)
+  const defaultAccess = useFeatureAccess(config.featureKey)
+  const access = { ...defaultAccess, ...accessOverride }
   const { session } = useAuth()
   const tenantUrl = session?.currentTenant.url ?? null
   const assetsBucketUrl = session?.currentTenant.assetsBucketUrl ?? null
