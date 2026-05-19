@@ -108,6 +108,9 @@ export function CrudFormSections({ config, form, isEditing, readOnly, patch, opt
 											folder: field.uploadFolder,
 										})
 									: undefined;
+								const allowBase64Images = typeof field.allowBase64Images === 'function'
+									? field.allowBase64Images({ form, isEditing: editingState })
+									: field.allowBase64Images;
 								const fieldClassName =
 									field.layoutClassName ??
 									(section.layout === 'rows'
@@ -180,7 +183,14 @@ export function CrudFormSections({ config, form, isEditing, readOnly, patch, opt
 											placeholder={field.placeholder}
 										/>
 									) : field.type === 'richtext' ? (
-										<RichTextEditor value={String(value ?? '')} onChange={(nextValue) => patch(field.key, nextValue)} disabled={readOnly || disabled} />
+										<RichTextEditor
+											value={String(value ?? '')}
+											onChange={(nextValue) => patch(field.key, nextValue)}
+											disabled={readOnly || disabled}
+											imageUploadHandler={uploadHandler}
+											acceptedImageTypes={field.accept ? Object.keys(field.accept).map((type) => type.toLowerCase()) : undefined}
+											allowBase64Images={allowBase64Images}
+										/>
 									) : field.type === 'lookup' ? (
 										<LookupSelect
 											label={label}

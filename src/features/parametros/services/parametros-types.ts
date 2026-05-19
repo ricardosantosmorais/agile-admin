@@ -5,7 +5,8 @@ export type ParametroListFilters = {
   sort: 'asc' | 'desc'
   id: string
   chave: string
-  filial: string
+  id_filial: string
+  id_filial_label: string
   descricao: string
   parametros: string
   posicao: string

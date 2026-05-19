@@ -106,7 +106,7 @@ export function resolveUploadTarget(input: {
       return {
         bucket: 'assets.agilecdn.com.br',
         baseUrl: 'https://assets.agilecdn.com.br',
-        keyPrefix: 'componentes',
+        keyPrefix: normalizeUrlLike(input.folder) || 'componentes',
         acl: 'public-read',
         isPublic: true,
       } satisfies ResolvedUploadTarget

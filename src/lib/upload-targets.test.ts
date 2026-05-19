@@ -30,4 +30,16 @@ describe('upload-targets', () => {
       isPublic: true,
     })
   })
+  it('allows public CDN uploads to use a feature-specific folder', () => {
+    expect(resolveUploadTarget({
+      profileId: 'public-cdn-components',
+      folder: 'notificacoes/email',
+    })).toEqual({
+      bucket: 'assets.agilecdn.com.br',
+      baseUrl: 'https://assets.agilecdn.com.br',
+      keyPrefix: 'notificacoes/email',
+      acl: 'public-read',
+      isPublic: true,
+    })
+  })
 })

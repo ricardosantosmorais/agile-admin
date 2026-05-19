@@ -43,6 +43,7 @@ Este bloco cobre os tres itens finais do menu de Configuracoes:
 
 ### Comportamento
 - listagem server-side com filtros por `ID`, `Chave`, `Filial`, `Descricao`, `Parametros`, `Posicao`, `Permissao` e `Ativo`;
+- filtro de `Filial` por autocomplete de filial, enviando `id_filial` para `empresas/parametros`;
 - acao `Visualizar` por linha, abrindo modal;
 - acao `Editar` por linha;
 - formulario com editor JSON compartilhado;

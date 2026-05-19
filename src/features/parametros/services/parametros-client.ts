@@ -23,7 +23,7 @@ export const parametrosClient = {
       sort: filters.sort,
       id: filters.id,
       chave: filters.chave,
-      filial: filters.filial,
+      id_filial: filters.id_filial,
       descricao: filters.descricao,
       parametros: filters.parametros,
       posicao: filters.posicao,

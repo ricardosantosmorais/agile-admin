@@ -17,12 +17,16 @@ import {
 	Underline,
 	Undo2,
 } from 'lucide-react'
-import { fileToDataUrl } from '@/src/lib/uploads'
+import { fileToDataUrl, normalizeUploadResult, type UploadAssetHandler } from '@/src/lib/uploads'
+import { useI18n } from '@/src/i18n/use-i18n'
 
 type RichTextEditorProps = {
 	value: string
 	onChange: (value: string) => void
 	disabled?: boolean
+	imageUploadHandler?: UploadAssetHandler
+	acceptedImageTypes?: string[]
+	allowBase64Images?: boolean
 }
 
 function isBase64OrBlobImage(src: string) {
@@ -64,7 +68,15 @@ function toolbarButtonClass(active = false, disabled = false) {
 	].join(' ')
 }
 
-export function RichTextEditor({ value, onChange, disabled = false }: RichTextEditorProps) {
+export function RichTextEditor({
+	value,
+	onChange,
+	disabled = false,
+	imageUploadHandler,
+	acceptedImageTypes,
+	allowBase64Images = true,
+}: RichTextEditorProps) {
+	const { t } = useI18n()
 	const fileInputRef = useRef<HTMLInputElement | null>(null)
 	const emitNormalizedRef = useRef<number | null>(null)
 
@@ -81,7 +93,7 @@ export function RichTextEditor({ value, onChange, disabled = false }: RichTextEd
 				},
 			}),
 			Image.configure({
-				allowBase64: true,
+				allowBase64: allowBase64Images,
 				inline: false,
 			}),
 			UnderlineExtension,
@@ -126,6 +138,10 @@ export function RichTextEditor({ value, onChange, disabled = false }: RichTextEd
 
 	async function emitNormalizedHtml() {
 		if (!editor) return
+		if (!allowBase64Images) {
+			onChange(editor.getHTML())
+			return
+		}
 		const normalizedHtml = await normalizeHtmlImagesToBase64(editor.getHTML())
 		if (normalizedHtml !== editor.getHTML()) {
 			editor.commands.setContent(normalizedHtml, { emitUpdate: false })
@@ -159,7 +175,17 @@ export function RichTextEditor({ value, onChange, disabled = false }: RichTextEd
 		const url = window.prompt('URL da imagem', 'https://')
 		if (!url || !url.trim()) return
 		editor.chain().focus().setImage({ src: url.trim() }).run()
-		scheduleNormalizeHtml()
+		if (allowBase64Images) {
+			scheduleNormalizeHtml()
+		}
+	}
+
+	function isAcceptedImageType(file: File) {
+		if (!acceptedImageTypes?.length) {
+			return true
+		}
+
+		return acceptedImageTypes.includes(file.type.toLowerCase())
 	}
 
 	async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
@@ -167,9 +193,28 @@ export function RichTextEditor({ value, onChange, disabled = false }: RichTextEd
 		event.target.value = ''
 		if (!editor || disabled || !file) return
 
-		const base64 = await fileToDataUrl(file)
-		editor.chain().focus().setImage({ src: base64 }).run()
-		onChange(editor.getHTML())
+		try {
+			if (!isAcceptedImageType(file)) {
+				throw new Error(t('uploads.invalidImageType', 'Formato não suportado.'))
+			}
+
+			if (imageUploadHandler) {
+				const result = normalizeUploadResult(await imageUploadHandler(file))
+				editor.chain().focus().setImage({ src: result.value }).run()
+				onChange(editor.getHTML())
+				return
+			}
+
+			if (!allowBase64Images) {
+				throw new Error(t('uploads.error', 'Não foi possível enviar o arquivo.'))
+			}
+
+			const base64 = await fileToDataUrl(file)
+			editor.chain().focus().setImage({ src: base64 }).run()
+			onChange(editor.getHTML())
+		} catch (error) {
+			window.alert(error instanceof Error ? error.message : t('uploads.error', 'Não foi possível enviar o arquivo.'))
+		}
 	}
 
 	if (!editor) {
@@ -178,7 +223,7 @@ export function RichTextEditor({ value, onChange, disabled = false }: RichTextEd
 
 	return (
 		<div className="app-pane w-full overflow-hidden rounded-[1rem]">
-			<input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(event) => void handleImageUpload(event)} />
+			<input ref={fileInputRef} type="file" accept={acceptedImageTypes?.join(',') || 'image/*'} className="hidden" onChange={(event) => void handleImageUpload(event)} />
 			<div className="flex flex-wrap items-center gap-2 border-b border-[color:var(--app-card-border)] px-3 py-3">
 				<button type="button" className={toolbarButtonClass(editor.isActive('bold'), disabled)} onClick={() => editor.chain().focus().toggleBold().run()} disabled={disabled}><Bold className="h-4 w-4" /></button>
 				<button type="button" className={toolbarButtonClass(editor.isActive('italic'), disabled)} onClick={() => editor.chain().focus().toggleItalic().run()} disabled={disabled}><Italic className="h-4 w-4" /></button>

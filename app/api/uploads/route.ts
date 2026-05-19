@@ -31,6 +31,30 @@ function isUploadProfileId(value: string): value is UploadProfileId {
   ].includes(value)
 }
 
+function isNotificationEmailCdnUpload(profileId: UploadProfileId, folder: string) {
+  return profileId === 'public-cdn-components' && folder.replace(/^\/+|\/+$/g, '').toLowerCase() === 'notificacoes/email'
+}
+
+function validateNotificationEmailImage(file: File) {
+  const name = file.name.toLowerCase()
+  const type = file.type.toLowerCase()
+  const extension = name.includes('.') ? name.slice(name.lastIndexOf('.') + 1) : ''
+
+  if (file.size <= 0 || file.size > 5 * 1024 * 1024) {
+    return 'A imagem deve ter até 5 MB.'
+  }
+
+  if (!['jpg', 'jpeg', 'png'].includes(extension)) {
+    return 'Formato não suportado. Use JPG ou PNG.'
+  }
+
+  if (type && !['image/jpeg', 'image/png'].includes(type)) {
+    return 'Formato não suportado. Use JPG ou PNG.'
+  }
+
+  return null
+}
+
 export const runtime = 'nodejs'
 
 export async function POST(request: Request) {
@@ -53,6 +77,13 @@ export async function POST(request: Request) {
 
     if (!isUploadProfileId(profileIdRaw)) {
       return NextResponse.json({ message: 'Profile de upload inválido.' }, { status: 400 })
+    }
+
+    if (isNotificationEmailCdnUpload(profileIdRaw, folder)) {
+      const invalidImageMessage = validateNotificationEmailImage(file)
+      if (invalidImageMessage) {
+        return NextResponse.json({ message: invalidImageMessage }, { status: 400 })
+      }
     }
 
     const target = resolveUploadTarget({

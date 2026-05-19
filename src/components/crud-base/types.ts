@@ -208,6 +208,7 @@ export type CrudFieldConfig = {
 	maxSizeLabel?: string;
 	uploadProfileId?: import('@/src/lib/upload-targets').UploadProfileId;
 	uploadFolder?: string;
+	allowBase64Images?: boolean | ((context: { form: CrudRecord; isEditing: boolean }) => boolean);
 	validate?: (context: { value: unknown; form: CrudRecord; isEditing: boolean }) => string | null;
 	render?: (context: {
 		value: unknown;

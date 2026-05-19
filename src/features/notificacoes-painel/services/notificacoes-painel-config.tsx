@@ -1,6 +1,14 @@
 import { StatusBadge } from '@/src/components/ui/status-badge'
 import type { CrudModuleConfig } from '@/src/components/crud-base/types'
-import { buildNotificacaoPainelPayload, getNotificacaoPainelChannelLabel, isPublished, normalizeNotificacaoPainelRecord, NOTIFICACAO_PAINEL_CHANNEL_OPTIONS } from '@/src/features/notificacoes-painel/services/notificacoes-painel-mappers'
+import {
+  buildNotificacaoPainelPayload,
+  getNotificacaoPainelChannelLabel,
+  getNotificacaoPainelEmailImageValidationMessage,
+  isPublished,
+  normalizeNotificacaoPainelRecord,
+  notificacaoPainelCanalEnviaEmail,
+  NOTIFICACAO_PAINEL_CHANNEL_OPTIONS,
+} from '@/src/features/notificacoes-painel/services/notificacoes-painel-mappers'
 
 function formatDate(value: string) {
   const normalized = value.includes('T') ? value : value.replace(' ', 'T')
@@ -74,7 +82,22 @@ export const NOTIFICACOES_PAINEL_CONFIG: CrudModuleConfig = {
         { key: 'canal', labelKey: 'panelNotifications.fields.channel', label: 'Canal', type: 'select', required: true, options: [{ value: '', label: 'Selecione' }, ...NOTIFICACAO_PAINEL_CHANNEL_OPTIONS] },
         { key: 'data_inicio', labelKey: 'panelNotifications.fields.startDate', label: 'Data de Início', type: 'date', required: true },
         { key: 'data_fim', labelKey: 'panelNotifications.fields.endDate', label: 'Data Fim', type: 'date', required: true },
-        { key: 'mensagem', labelKey: 'panelNotifications.fields.message', label: 'Mensagem', type: 'richtext' },
+        {
+          key: 'mensagem',
+          labelKey: 'panelNotifications.fields.message',
+          label: 'Mensagem',
+          type: 'richtext',
+          uploadProfileId: 'public-cdn-components',
+          uploadFolder: 'notificacoes/email',
+          accept: {
+            'image/jpeg': ['.jpg', '.jpeg'],
+            'image/png': ['.png'],
+          },
+          allowBase64Images: ({ form }) => !notificacaoPainelCanalEnviaEmail(form.canal),
+          helperTextKey: 'panelNotifications.fields.messageHelp',
+          helperText: 'Para e-mail ou todos, imagens devem ser enviadas pelo editor como JPG/PNG público no CDN.',
+          validate: ({ form }) => getNotificacaoPainelEmailImageValidationMessage(form),
+        },
       ],
     },
   ],

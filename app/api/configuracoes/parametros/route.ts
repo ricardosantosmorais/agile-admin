@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
   const filters: Record<string, string> = {
     id: searchParams.get('id') || '',
     'chave::like': searchParams.get('chave') || '',
-    'filial:nome_fantasia::like': searchParams.get('filial') || '',
+    id_filial: searchParams.get('id_filial') || '',
     'descricao::like': searchParams.get('descricao') || '',
     'parametros::like': searchParams.get('parametros') || '',
     posicao: searchParams.get('posicao') || '',

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { buildNotificacaoPainelPayload, normalizeNotificacaoPainelRecord, NOTIFICACAO_PAINEL_CHANNEL_OPTIONS } from '@/src/features/notificacoes-painel/services/notificacoes-painel-mappers'
+import {
+  buildNotificacaoPainelPayload,
+  getNotificacaoPainelEmailImageValidationMessage,
+  normalizeNotificacaoPainelRecord,
+  NOTIFICACAO_PAINEL_CHANNEL_OPTIONS,
+} from '@/src/features/notificacoes-painel/services/notificacoes-painel-mappers'
 
 describe('notificacoes-painel mappers', () => {
   it('normalizes API datetime fields to date inputs and linked companies', () => {
@@ -78,5 +83,14 @@ describe('notificacoes-painel mappers', () => {
 
   it('keeps only legacy-supported panel notification channels', () => {
     expect(NOTIFICACAO_PAINEL_CHANNEL_OPTIONS.map((option) => option.value)).toEqual(['todos', 'admin', 'email'])
+  })
+
+  it('blocks inline and SVG images only for e-mail notification channels', () => {
+    const invalidHtml = '<p>Oferta</p><img src="data:image/png;base64,abc"><svg viewBox="0 0 10 10" />'
+
+    expect(getNotificacaoPainelEmailImageValidationMessage({ canal: 'email', mensagem: invalidHtml })).toBe('panelNotifications.validation.emailImage')
+    expect(getNotificacaoPainelEmailImageValidationMessage({ canal: 'todos', mensagem: '<img src="https://cdn.exemplo.com/banner.svg">' })).toBe('panelNotifications.validation.emailImage')
+    expect(getNotificacaoPainelEmailImageValidationMessage({ canal: 'admin', mensagem: invalidHtml })).toBeNull()
+    expect(getNotificacaoPainelEmailImageValidationMessage({ canal: 'email', mensagem: '<img src="https://assets.agilecdn.com.br/notificacoes/email/banner.jpg">' })).toBeNull()
   })
 })

@@ -2,6 +2,9 @@ import type { CrudRecord } from '@/src/components/crud-base/types'
 import { normalizeLookupState } from '@/src/lib/lookup-options'
 import { asBoolean, asString } from '@/src/lib/api-payload'
 
+export const NOTIFICACAO_PAINEL_EMAIL_IMAGE_VALIDATION_KEY = 'panelNotifications.validation.emailImage'
+export const NOTIFICACAO_PAINEL_EMAIL_IMAGE_VALIDATION_MESSAGE = 'Para notificações por e-mail, envie imagens pelo botão do editor. SVG e imagens embutidas em base64 não são compatíveis com clientes de e-mail.'
+
 export const NOTIFICACAO_PAINEL_CHANNEL_OPTIONS = [
   { value: 'todos', labelKey: 'panelNotifications.channels.all', label: 'Todos' },
   { value: 'admin', labelKey: 'panelNotifications.channels.admin', label: 'Admin' },
@@ -23,6 +26,29 @@ function formatInputDateToApi(value: unknown, endOfDay = false) {
   const normalized = asString(value).trim()
   if (!normalized) return null
   return `${normalized} ${endOfDay ? '23:59:59' : '00:00:00'}`
+}
+
+export function notificacaoPainelCanalEnviaEmail(value: unknown) {
+  const normalized = asString(value).trim().toLowerCase()
+  return normalized === 'email' || normalized === 'todos'
+}
+
+export function notificacaoPainelHtmlTemImagemInvalida(html: unknown) {
+  const normalized = asString(html)
+  return /data:image/i.test(normalized)
+    || /<\s*svg\b/i.test(normalized)
+    || /\.svg(\?|["'\s>]|$)/i.test(normalized)
+    || /image\/svg\+xml/i.test(normalized)
+}
+
+export function getNotificacaoPainelEmailImageValidationMessage(record: Record<string, unknown>) {
+  if (!notificacaoPainelCanalEnviaEmail(record.canal) || !asString(record.mensagem).trim()) {
+    return null
+  }
+
+  return notificacaoPainelHtmlTemImagemInvalida(record.mensagem)
+    ? NOTIFICACAO_PAINEL_EMAIL_IMAGE_VALIDATION_KEY
+    : null
 }
 
 function normalizeEmpresas(record: CrudRecord) {

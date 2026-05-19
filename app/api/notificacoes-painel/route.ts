@@ -3,6 +3,10 @@ import { handleCrudCollectionDelete } from '@/src/services/http/crud-route'
 import { readAuthSession } from '@/src/features/auth/services/auth-session'
 import { serverApiFetch } from '@/src/services/http/server-api'
 import { getErrorMessage } from '@/app/api/notificacoes-painel/_shared'
+import {
+  getNotificacaoPainelEmailImageValidationMessage,
+  NOTIFICACAO_PAINEL_EMAIL_IMAGE_VALIDATION_MESSAGE,
+} from '@/src/features/notificacoes-painel/services/notificacoes-painel-mappers'
 
 const config = { resource: 'notificacoes_painel' as const }
 
@@ -102,6 +106,15 @@ export async function POST(request: NextRequest) {
 
   if (hasInvalidChannel) {
     return NextResponse.json({ message: 'Canal inválido. Selecione Admin, E-mail ou Todos.' }, { status: 400 })
+  }
+
+  const hasInvalidEmailImage = readRowsForValidation(body).some((row) => {
+    if (typeof row !== 'object' || row === null) return false
+    return Boolean(getNotificacaoPainelEmailImageValidationMessage(row as Record<string, unknown>))
+  })
+
+  if (hasInvalidEmailImage) {
+    return NextResponse.json({ message: NOTIFICACAO_PAINEL_EMAIL_IMAGE_VALIDATION_MESSAGE }, { status: 400 })
   }
 
   const result = await serverApiFetch(config.resource, {

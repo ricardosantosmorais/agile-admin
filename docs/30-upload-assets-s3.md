@@ -40,7 +40,8 @@ Comportamento:
 ### `public-cdn-components`
 - destino: CDN público global;
 - URL base observada: `https://assets.agilecdn.com.br`;
-- pasta: `componentes/`;
+- pasta padrão: `componentes/`;
+- pasta específica: `notificacoes/email/` para imagens de notificações por e-mail;
 - formatos observados: imagens.
 
 ### `private-app-files`
@@ -77,6 +78,7 @@ Rollout já ligado para envio real em bridge/S3:
 - `Grupos de Combos`
 - `Listas`
 - `Marcas`
+- `Notificações` do painel, apenas para imagens JPG/PNG inseridas no HTML de canais que enviam e-mail (`email` ou `todos`)
 
 Regra atual do v2:
 - todos os módulos públicos usam o mesmo profile técnico de imagem pública do tenant;

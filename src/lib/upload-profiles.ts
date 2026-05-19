@@ -42,9 +42,9 @@ export const UPLOAD_PROFILES: UploadProfile[] = [
     storage: 'legacy-controller',
     visibility: 'public',
     legacyController: 'controllers/componentes-controller.php',
-    keyPattern: 'https://assets.agilecdn.com.br/componentes/{slug}-{timestamp}.{ext}',
+    keyPattern: 'https://assets.agilecdn.com.br/{folder}/{slug}-{timestamp}.{ext}',
     acceptedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
-    currentV2Modules: ['Componentes'],
+    currentV2Modules: ['Componentes', 'Notificações do painel'],
   },
   {
     id: 'private-app-files',
@@ -79,6 +79,7 @@ export const CURRENT_IMAGE_UPLOAD_USAGE = [
   { module: 'Listas', field: 'imagem_mobile', profileId: 'tenant-public-images', folder: 'listas' },
   { module: 'Marcas', field: 'imagem', profileId: 'tenant-public-images', folder: 'marcas' },
   { module: 'Marcas', field: 'imagem_mobile', profileId: 'tenant-public-images', folder: 'marcas' },
+  { module: 'Notificações do painel', field: 'mensagem', profileId: 'public-cdn-components', folder: 'notificacoes/email' },
 ] as const
 
 export function getUploadProfile(profileId?: string | null) {

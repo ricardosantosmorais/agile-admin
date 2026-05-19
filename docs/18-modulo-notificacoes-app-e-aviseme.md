@@ -19,6 +19,9 @@ Arquivos-base analisados:
 - `Notificações App` com listagem, formulário, duplicação e segmentação por universos.
 - `Avise-me` com listagem agregada, filtros lazy e modal de detalhes por produto/filial.
 
+## Regra de e-mail
+- `Notificações` do painel usa upload público no CDN para imagens inseridas no HTML quando o canal envia e-mail (`email` ou `todos`), bloqueando `data:image` e SVG antes do save.
+
 ## Decisão de composição
 - `Notificações App` usa página própria de listagem e `TabbedCatalogFormPage` no formulário, porque o legado combina CRUD com segmentação relacional.
 - `Avise-me` usa página operacional própria com `AppDataTable`, filtros customizados e modal de detalhe.

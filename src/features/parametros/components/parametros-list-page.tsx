@@ -2,6 +2,7 @@
 
 import { Eye, Pencil, Plus, RefreshCcw } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { loadCrudLookupOptions } from '@/src/components/crud-base/crud-client'
 import { AppDataTable } from '@/src/components/data-table/app-data-table'
 import { DataTableFiltersCard } from '@/src/components/data-table/data-table-filters'
 import { DataTableFilterToggleAction, DataTablePageActions, DataTableSectionAction } from '@/src/components/data-table/data-table-toolbar'
@@ -24,7 +25,8 @@ const DEFAULT_FILTERS: ParametroListFilters = {
   sort: 'asc',
   id: '',
   chave: '',
-  filial: '',
+  id_filial: '',
+  id_filial_label: '',
   descricao: '',
   parametros: '',
   posicao: '',
@@ -51,6 +53,11 @@ function formatParametroJson(value: string) {
   } catch {
     return value || '{}'
   }
+}
+
+async function loadFilialLookup(query: string, page: number, perPage: number) {
+  const options = await loadCrudLookupOptions('filiais', query, page, perPage)
+  return options.map((option) => ({ id: option.value, label: option.label }))
 }
 
 export function ParametrosListPage() {
@@ -93,7 +100,13 @@ export function ParametrosListPage() {
           sortKey: 'filial:nome_fantasia',
           visibility: 'lg',
           cell: (row: ParametroListRecord) => row.filial,
-          filter: { kind: 'text', id: 'filial', key: 'filial', label: t('parameters.fields.branch', 'Filial') },
+          filter: {
+            kind: 'lookup',
+            id: 'id_filial',
+            key: 'id_filial',
+            label: t('parameters.fields.branch', 'Filial'),
+            loadOptions: loadFilialLookup,
+          },
         },
         {
           id: 'descricao',
