@@ -514,8 +514,17 @@ export function IntegracaoComErpServicosPage() {
 											setActivationReason('');
 										},
 									},
+									{
+										id: 'edit',
+										label: access.canEdit
+											? t('maintenance.erpIntegration.services.actions.edit', 'Editar')
+											: t('maintenance.erpIntegration.services.actions.view', 'Visualizar'),
+										icon: access.canEdit ? Pencil : Eye,
+										href: `/integracao-com-erp/servicos/${row.idServico}/editar`,
+										visible: access.canEdit || access.canView,
+									},
 								]}
-								actionsColumnClassName="w-[88px]"
+								actionsColumnClassName="w-[132px]"
 								pagination={inactiveState.data?.meta}
 								onPageChange={inactiveTableState.setPage}
 								pageSize={{

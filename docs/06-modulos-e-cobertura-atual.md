@@ -236,6 +236,7 @@ ObservaÃ§Ã£o:
   - `Cadastros > Endpoints` agora já possui módulo próprio no v2 em `/integracao-com-erp/cadastros/endpoints`, com listagem server-side, campos condicionais por `tipo_retorno` e aba de perfis em edição;
   - `Cadastros > Serviços` mantém paridade do modo `dataset_consolidado` do legado, exibindo campos de mapeamento consolidado apenas para `endpoint_gateway`, limpando payload obsoleto fora desse modo e preservando o modal operacional de log com copiar conteúdo e download;
   - páginas diretas já disponíveis no v2 para `Parâmetros`, `Imagens`, `API`, `Banco de Dados`, `Instalação do Integrador`, `Dashboard ERP`, `Rotinas Integradas`, `Serviços` e `Serviços com Falha`;
+  - `Serviços` preserva o modal de ativação de serviços inativos e mantém acesso aos detalhes do serviço pela rota de edição/visualização já existente;
   - `Integrações > Logística > Frenet` preserva somente os campos visíveis do legado atual, ocultando `Token Parceiro` e `Enviar apenas pedidos com nota fiscal` enquanto mantém o payload compatível;
   - bridges dedicadas em `app/api/integracoes/*` para todos os módulos do menu;
   - bridge dedicada em `app/api/integracao-com-erp/*` para configuração e leitura operacional do dashboard ERP;
