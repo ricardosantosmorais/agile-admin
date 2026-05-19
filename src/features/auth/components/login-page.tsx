@@ -7,7 +7,12 @@ import { useAuth } from '@/src/features/auth/hooks/use-auth'
 import { loadPendingLogin } from '@/src/features/auth/services/auth-tab-storage'
 import { useI18n } from '@/src/i18n/use-i18n'
 
-export function LoginPage() {
+type LoginPageProps = {
+  defaultEmail?: string
+  defaultPassword?: string
+}
+
+export function LoginPage({ defaultEmail = 'ricardo@empresa.com.br', defaultPassword = '123456' }: LoginPageProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { t } = useI18n()
@@ -19,8 +24,8 @@ export function LoginPage() {
     status,
     submitAuthenticationCode,
   } = useAuth()
-  const [email, setEmail] = useState('ricardo@empresa.com.br')
-  const [senha, setSenha] = useState('123456')
+  const [email, setEmail] = useState(defaultEmail)
+  const [senha, setSenha] = useState(defaultPassword)
   const [codigoAutenticacao, setCodigoAutenticacao] = useState('')
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')

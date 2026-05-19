@@ -98,12 +98,18 @@ Uso:
 - o repositório possui [../amplify.yml](../amplify.yml) para copiar as variáveis necessárias antes do `npm run build`;
 - sem esse passo, rotas `app/api/*` podem subir com `process.env` vazio no runtime publicado, mesmo com a variável cadastrada no painel do Amplify.
 
-## Validação mínima antes de subir mudanças
-O ciclo mínimo esperado continua sendo:
-- `npm run lint`
-- `npm run typecheck`
-- `npm run build`
+## Validacao pragmatica
 
-Quando a tarefa tocar uma feature com cobertura existente:
-- rodar também os testes unitários do módulo;
-- rodar o E2E principal da feature, sempre que tecnicamente viável.
+Durante o desenvolvimento de uma rodada, a validacao deve ficar focada no que foi tocado:
+- testes dos modulos, services, componentes, rotas e arquivos alterados ou diretamente afetados;
+- `lint` e `typecheck` no menor escopo tecnicamente viavel, quando o ferramental permitir;
+- `build` total apenas quando houver risco real de integracao, mudanca estrutural, App Router, SSR, bundling, providers, i18n ampla ou shareds de alto impacto.
+
+Nao e necessario rodar a suite completa de testes, lint global, typecheck global ou build total a cada fatia pequena. Isso deve ficar reservado para:
+- fechamento de um modulo;
+- publicacao, merge ou PR;
+- mudanca transversal;
+- pedido explicito do programador;
+- suspeita concreta de regressao fora do modulo alterado.
+
+Quando a tarefa tocar uma feature com cobertura existente, rodar os testes unitarios/componentes do modulo e o E2E principal da feature quando tecnicamente viavel.

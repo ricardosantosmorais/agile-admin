@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowDown, ArrowLeft, ArrowUp, Plus, Save, Trash2 } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowUp, Eye, Plus, RefreshCcw, Save, Search, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { AsyncState } from '@/src/components/ui/async-state'
+import { AssetUploadField } from '@/src/components/ui/asset-upload-field'
 import { BooleanSegmentedField } from '@/src/components/ui/boolean-segmented-field'
 import { FormRow } from '@/src/components/ui/form-row'
 import { inputClasses } from '@/src/components/ui/input-styles'
@@ -13,16 +14,19 @@ import { PageToast } from '@/src/components/ui/page-toast'
 import { SectionCard } from '@/src/components/ui/section-card'
 import { StepIndicator } from '@/src/components/ui/step-indicator'
 import { AccessDeniedState } from '@/src/features/auth/components/access-denied-state'
+import { useAuth } from '@/src/features/auth/hooks/use-auth'
 import { useFeatureAccess } from '@/src/features/auth/hooks/use-feature-access'
 import { catalogosDigitaisClient } from '@/src/features/catalogos-digitais/services/catalogos-digitais-client'
 import { createEmptyCatalogoDigitalForm } from '@/src/features/catalogos-digitais/services/catalogos-digitais-mappers'
-import type { CatalogoDigitalFormRecord, CatalogoDigitalSection, CatalogoDigitalSectionType } from '@/src/features/catalogos-digitais/types/catalogos-digitais'
+import type { CatalogoDigitalFormRecord, CatalogoDigitalPricingOptions, CatalogoDigitalProduct, CatalogoDigitalSection, CatalogoDigitalSectionType } from '@/src/features/catalogos-digitais/types/catalogos-digitais'
 import { extractSavedId } from '@/src/lib/api-payload'
 import { useRouteParams } from '@/src/next/route-context'
 import { useI18n } from '@/src/i18n/use-i18n'
 
 type StudioStep = 'general' | 'blocks' | 'summary'
 type SectionDraft = CatalogoDigitalSection & { editingIndex: number | null }
+type PricingOptionsData = CatalogoDigitalPricingOptions['data']
+type PricingContext = Record<string, string>
 
 const SECTION_TYPE_DEFINITIONS: Array<{
   type: CatalogoDigitalSectionType
@@ -42,6 +46,15 @@ const SECTION_TYPE_DEFINITIONS: Array<{
   { type: 'espacador', model: 'spacer_medium', labelKey: 'digitalCatalogs.form.sectionTypes.spacer', label: 'Espaçador', descriptionKey: 'digitalCatalogs.form.sectionTypeDescriptions.spacer', description: 'Respiro vertical controlado entre blocos.' },
   { type: 'quebra_pagina', model: 'page_break', labelKey: 'digitalCatalogs.form.sectionTypes.pageBreak', label: 'Quebra de página', descriptionKey: 'digitalCatalogs.form.sectionTypeDescriptions.pageBreak', description: 'Força o próximo bloco a começar em uma nova página.' },
 ]
+
+const BLOCK_IMAGE_ACCEPT = {
+  'image/jpeg': ['.jpg', '.jpeg'],
+  'image/png': ['.png'],
+  'image/gif': ['.gif'],
+  'image/webp': ['.webp'],
+}
+
+const BLOCK_IMAGE_MAX_SIZE = 5 * 1024 * 1024
 
 function asCatalogoDigitalSection(value: unknown): CatalogoDigitalSection {
   const source = typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
@@ -102,8 +115,52 @@ function publicationModeLabel(value: string, t: (key: string, fallback?: string)
   return labels[value] || value || '-'
 }
 
+function asCatalogProduct(value: unknown): CatalogoDigitalProduct {
+  const source = typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
+
+  return {
+    ...source,
+    id: String(source.id || ''),
+    codigo: String(source.codigo || source.code || ''),
+    sku: String(source.sku || ''),
+    nome: String(source.nome || source.name || source.id || 'Produto'),
+    descricao: String(source.descricao || source.description || ''),
+    marca: String(source.marca || ''),
+    imagem: String(source.imagem || source.image || ''),
+    url: String(source.url || ''),
+    ativo: source.ativo === undefined ? true : Boolean(source.ativo),
+    disponivel: source.disponivel === undefined ? true : Boolean(source.disponivel),
+  }
+}
+
+function productLabel(product: CatalogoDigitalProduct) {
+  return [product.nome, product.codigo].filter(Boolean).join(' - ')
+}
+
+function asPlainRecord(value: unknown): Record<string, unknown> {
+  return typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
+}
+
+function asPricingContext(value: unknown): PricingContext {
+  const source = asPlainRecord(value)
+  return {
+    id_filial: String(source.id_filial || ''),
+    id_forma_pagamento: String(source.id_forma_pagamento || ''),
+    id_condicao_pagamento: String(source.id_condicao_pagamento || ''),
+    cliente_busca: String(source.cliente_busca || source.codigo_cliente || source.id_cliente || source.cnpj_cpf_cliente || ''),
+    id_tabela_preco: String(source.id_tabela_preco || ''),
+    id_vendedor: String(source.id_vendedor || ''),
+    codigo_vendedor: String(source.codigo_vendedor || ''),
+    cnpj_cpf_vendedor: String(source.cnpj_cpf_vendedor || ''),
+    id_embalagem: String(source.id_embalagem || ''),
+    quantidade: String(source.quantidade || '1'),
+    valor_frete_item: String(source.valor_frete_item || ''),
+  }
+}
+
 export function CatalogoDigitalFormPage({ id: forcedId }: { id?: string }) {
   const { t } = useI18n()
+  const { session } = useAuth()
   const router = useRouter()
   const routeParams = useRouteParams<{ id?: string }>()
   const id = forcedId ?? routeParams.id
@@ -116,10 +173,29 @@ export function CatalogoDigitalFormPage({ id: forcedId }: { id?: string }) {
   const [feedback, setFeedback] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [sectionDraft, setSectionDraft] = useState<SectionDraft | null>(null)
+  const [productSearchQuery, setProductSearchQuery] = useState('')
+  const [productCodeList, setProductCodeList] = useState('')
+  const [collectionId, setCollectionId] = useState('')
+  const [productResults, setProductResults] = useState<CatalogoDigitalProduct[]>([])
+  const [productLoading, setProductLoading] = useState(false)
+  const [previewing, setPreviewing] = useState(false)
+  const [pricingOptions, setPricingOptions] = useState<PricingOptionsData | null>(null)
+  const [pricingLoading, setPricingLoading] = useState(false)
+  const [pricingContext, setPricingContext] = useState<PricingContext>(() => asPricingContext({}))
+  const [recalculatingPrices, setRecalculatingPrices] = useState(false)
   const readOnly = isEditing && !access.canEdit && access.canView
   const canAccess = isEditing ? access.canEdit || access.canView : access.canCreate
   const formId = 'catalogo-digital-form'
   const sections = useMemo(() => form.sections.map(asCatalogoDigitalSection), [form.sections])
+  const products = useMemo(() => form.products.map(asCatalogProduct).filter((product) => product.id), [form.products])
+  const productsById = useMemo(() => {
+    const map = new Map<string, CatalogoDigitalProduct>()
+    for (const product of products) {
+      if (product.id) map.set(product.id, product)
+      if (product.codigo) map.set(product.codigo, product)
+    }
+    return map
+  }, [products])
 
   useEffect(() => {
     if (!isEditing || !id) return
@@ -128,7 +204,9 @@ export function CatalogoDigitalFormPage({ id: forcedId }: { id?: string }) {
     setLoading(true)
     setError(null)
     void catalogosDigitaisClient.detail(id).then((detail) => {
-      if (alive) setForm(detail)
+      if (!alive) return
+      setForm(detail)
+      setPricingContext(asPricingContext(asPlainRecord(detail.snapshot).precificacao))
     }).catch((reason) => {
       if (alive) setError(reason instanceof Error ? reason.message : t('digitalCatalogs.form.loadError', 'Não foi possível carregar o catálogo.'))
     }).finally(() => {
@@ -139,6 +217,33 @@ export function CatalogoDigitalFormPage({ id: forcedId }: { id?: string }) {
       alive = false
     }
   }, [id, isEditing, t])
+
+  useEffect(() => {
+    if (activeStep !== 'summary' || pricingOptions) return
+
+    let alive = true
+    setPricingLoading(true)
+    void catalogosDigitaisClient.pricingOptions().then((result) => {
+      if (!alive) return
+      setPricingOptions(result.data)
+      setPricingContext((current) => {
+        const next = { ...current }
+        if (!next.quantidade) next.quantidade = '1'
+        if (!next.cliente_busca && result.data.modo_ecommerce !== 'b2b' && result.data.cliente_padrao_codigo) {
+          next.cliente_busca = result.data.cliente_padrao_codigo
+        }
+        return next
+      })
+    }).catch((reason) => {
+      if (alive) setFeedback(reason instanceof Error ? reason.message : t('digitalCatalogs.form.pricing.optionsError', 'Não foi possível carregar opções de precificação.'))
+    }).finally(() => {
+      if (alive) setPricingLoading(false)
+    })
+
+    return () => {
+      alive = false
+    }
+  }, [activeStep, pricingOptions, t])
 
   const breadcrumbs = useMemo(() => (
     isEditing
@@ -164,6 +269,14 @@ export function CatalogoDigitalFormPage({ id: forcedId }: { id?: string }) {
 
   function patch<K extends keyof CatalogoDigitalFormRecord>(key: K, value: CatalogoDigitalFormRecord[K]) {
     setForm((current) => ({ ...current, [key]: value }))
+  }
+
+  function patchPricingContext(key: string, value: string) {
+    setPricingContext((current) => ({ ...current, [key]: value }))
+  }
+
+  function pricingOptionLabel(option: { codigo?: string; nome: string }) {
+    return [option.codigo, option.nome].filter(Boolean).join(' - ')
   }
 
   function patchSection<K extends keyof CatalogoDigitalSection>(key: K, value: CatalogoDigitalSection[K]) {
@@ -208,6 +321,193 @@ export function CatalogoDigitalFormPage({ id: forcedId }: { id?: string }) {
       .split(/[\n,;]/)
       .map((item) => item.trim())
       .filter(Boolean)
+  }
+
+  function mergeProducts(incoming: CatalogoDigitalProduct[]) {
+    setForm((current) => {
+      const byId = new Map(current.products.map(asCatalogProduct).filter((product) => product.id).map((product) => [product.id, product]))
+      for (const product of incoming) {
+        if (product.id) byId.set(product.id, product)
+      }
+      return { ...current, products: Array.from(byId.values()) }
+    })
+  }
+
+  function addProductToCurrentSection(product: CatalogoDigitalProduct) {
+    if (!sectionDraft || readOnly || !product.id) return
+    mergeProducts([product])
+    setSectionDraft((current) => {
+      if (!current) return current
+      const ids = new Set(current.produtos)
+      ids.add(product.id)
+      return { ...current, produtos: Array.from(ids) }
+    })
+  }
+
+  async function loadProductsFromSearch() {
+    if (!productSearchQuery.trim()) return
+    setProductLoading(true)
+    setFeedback(null)
+    try {
+      const result = await catalogosDigitaisClient.searchProducts({ q: productSearchQuery, perpage: 18 })
+      const found = result.data.map(asCatalogProduct)
+      setProductResults(found)
+      if (!found.length) {
+        setFeedback(t('digitalCatalogs.form.products.emptySearch', 'Nenhum produto encontrado para esta busca.'))
+      }
+    } catch (reason) {
+      setFeedback(reason instanceof Error ? reason.message : t('digitalCatalogs.form.products.searchError', 'Não foi possível buscar produtos.'))
+    } finally {
+      setProductLoading(false)
+    }
+  }
+
+  async function loadProductsFromCodes() {
+    if (!productCodeList.trim()) return
+    setProductLoading(true)
+    setFeedback(null)
+    try {
+      const result = await catalogosDigitaisClient.searchProducts({ codigos: productCodeList })
+      setProductResults(result.data.map(asCatalogProduct))
+      if (result.not_found?.length) {
+        setFeedback(t('digitalCatalogs.form.products.notFound', 'Alguns códigos não foram localizados.'))
+      }
+    } catch (reason) {
+      setFeedback(reason instanceof Error ? reason.message : t('digitalCatalogs.form.products.resolveError', 'Não foi possível consultar a lista de produtos.'))
+    } finally {
+      setProductLoading(false)
+    }
+  }
+
+  async function importCollectionProducts() {
+    if (!collectionId.trim()) return
+    setProductLoading(true)
+    setFeedback(null)
+    try {
+      const result = await catalogosDigitaisClient.importCollection(collectionId)
+      const imported = result.data.map(asCatalogProduct)
+      setProductResults(imported)
+      mergeProducts(imported)
+      setSectionDraft((current) => current ? { ...current, produtos: Array.from(new Set([...current.produtos, ...imported.map((product) => product.id).filter(Boolean)])) } : current)
+      setFeedback(t('digitalCatalogs.form.products.collectionLoaded', 'Coleção carregada nos resultados. Revise os produtos adicionados ao bloco.'))
+    } catch (reason) {
+      setFeedback(reason instanceof Error ? reason.message : t('digitalCatalogs.form.products.collectionError', 'Não foi possível importar a coleção.'))
+    } finally {
+      setProductLoading(false)
+    }
+  }
+
+  function buildDraftSnapshot(): Record<string, unknown> {
+    const snapshotOutputs = typeof form.snapshot.saidas === 'object' && form.snapshot.saidas !== null ? form.snapshot.saidas as Record<string, unknown> : {}
+    const draftSections = sectionDraft
+      ? (() => {
+          const { editingIndex, ...draft } = sectionDraft
+          const nextSections = [...sections]
+          if (editingIndex === null) {
+            nextSections.push(draft)
+          } else {
+            nextSections[editingIndex] = draft
+          }
+          return nextSections
+        })()
+      : sections
+    return {
+      ...form.snapshot,
+      nome: form.name.trim(),
+      chamada_capa: form.coverCall.trim(),
+      modelo: form.model,
+      template: form.template,
+      objetivo: form.objective,
+      vigencia_inicio: form.validFrom,
+      vigencia_fim: form.validTo,
+      produtos: products,
+      secoes: draftSections,
+      precificacao: pricingContext,
+      saidas: {
+        ...snapshotOutputs,
+        modo_publicacao: form.publicationMode,
+        exibir_preco: form.showPrice,
+        vigencia_inicio: form.validFrom,
+        vigencia_fim: form.validTo,
+      },
+    }
+  }
+
+  async function openDraftPreview() {
+    if (previewing) return
+    setPreviewing(true)
+    setFeedback(null)
+    const previewWindow = window.open('about:blank', '_blank')
+    if (!previewWindow) {
+      setFeedback(t('digitalCatalogs.form.previewBlocked', 'O navegador bloqueou a janela de prévia. Libere pop-ups para este endereço e tente novamente.'))
+      setPreviewing(false)
+      return
+    }
+
+    try {
+      const html = await catalogosDigitaisClient.previewDraft(buildDraftSnapshot())
+      previewWindow.document.open()
+      previewWindow.document.write(html)
+      previewWindow.document.close()
+      previewWindow.focus()
+    } catch (reason) {
+      setFeedback(reason instanceof Error ? reason.message : t('digitalCatalogs.form.previewError', 'Não foi possível gerar a prévia do rascunho.'))
+    } finally {
+      setPreviewing(false)
+    }
+  }
+
+  async function recalculatePrices() {
+    if (readOnly || recalculatingPrices) return
+
+    setRecalculatingPrices(true)
+    setFeedback(null)
+    try {
+      const result = await catalogosDigitaisClient.recalculateSnapshot(buildDraftSnapshot())
+      const payload = asPlainRecord(result.payload)
+      const nextProducts = Array.isArray(payload.produtos) ? payload.produtos : form.products
+      const nextSections = Array.isArray(payload.secoes) ? payload.secoes : sections
+
+      setForm((current) => ({
+        ...current,
+        products: nextProducts,
+        sections: nextSections,
+        snapshot: {
+          ...current.snapshot,
+          ...payload,
+        },
+      }))
+      setPricingContext(asPricingContext(payload.precificacao || pricingContext))
+
+      const count = Number(result.meta?.precificados || 0)
+      setFeedback(count === 1
+        ? t('digitalCatalogs.form.pricing.recalculatedOne', '1 produto precificado.')
+        : t('digitalCatalogs.form.pricing.recalculatedMany', '{{count}} produtos precificados.').replace('{{count}}', String(count)))
+    } catch (reason) {
+      setFeedback(reason instanceof Error ? reason.message : t('digitalCatalogs.form.pricing.recalculateError', 'Não foi possível recalcular os preços.'))
+    } finally {
+      setRecalculatingPrices(false)
+    }
+  }
+
+  async function uploadBlockImage(file: File) {
+    const extension = file.name.includes('.') ? `.${file.name.split('.').pop()?.toLowerCase() || ''}` : ''
+    const validExtension = Object.values(BLOCK_IMAGE_ACCEPT).flat().includes(extension)
+    const validMime = Object.keys(BLOCK_IMAGE_ACCEPT).includes(file.type)
+
+    if (!validExtension || !validMime) {
+      throw new Error(t('digitalCatalogs.form.validation.blockImageFormat', 'Envie uma imagem JPG, PNG, GIF ou WEBP.'))
+    }
+
+    if (file.size > BLOCK_IMAGE_MAX_SIZE) {
+      throw new Error(t('digitalCatalogs.form.validation.blockImageSize', 'A imagem deve ter no máximo 5 MB.'))
+    }
+
+    return catalogosDigitaisClient.uploadSectionImage(file, {
+      catalogId: id || form.id,
+      tenantBucketUrl: session?.currentTenant.assetsBucketUrl || '',
+      tenantId: session?.currentTenant.id || '',
+    })
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -442,15 +742,25 @@ export function CatalogoDigitalFormPage({ id: forcedId }: { id?: string }) {
                             <FormRow label={t('digitalCatalogs.form.fields.blockTitle', 'Título do bloco')}>
                               <input aria-label={t('digitalCatalogs.form.fields.blockTitle', 'Título do bloco')} className={inputClasses()} value={sectionDraft.titulo} onChange={(event) => patchSection('titulo', event.target.value)} disabled={readOnly} />
                             </FormRow>
-                            <FormRow label={t('digitalCatalogs.form.fields.blockSubtitle', 'SubtÃ­tulo do bloco')}>
-                              <textarea aria-label={t('digitalCatalogs.form.fields.blockSubtitle', 'SubtÃ­tulo do bloco')} className={`${inputClasses()} min-h-20 resize-y py-3`} value={sectionDraft.subtitulo} onChange={(event) => patchSection('subtitulo', event.target.value)} disabled={readOnly} />
+                            <FormRow label={t('digitalCatalogs.form.fields.blockSubtitle', 'Subtítulo do bloco')}>
+                              <textarea aria-label={t('digitalCatalogs.form.fields.blockSubtitle', 'Subtítulo do bloco')} className={`${inputClasses()} min-h-20 resize-y py-3`} value={sectionDraft.subtitulo} onChange={(event) => patchSection('subtitulo', event.target.value)} disabled={readOnly} />
                             </FormRow>
                           </>
                         ) : null}
 
                         {sectionSupportsImage(sectionDraft.tipo) ? (
                           <FormRow label={t('digitalCatalogs.form.fields.blockImageUrl', 'URL da imagem do bloco')}>
-                            <input aria-label={t('digitalCatalogs.form.fields.blockImageUrl', 'URL da imagem do bloco')} className={inputClasses()} value={sectionDraft.banner_url} onChange={(event) => patchSection('banner_url', event.target.value)} disabled={readOnly} />
+                            <AssetUploadField
+                              kind="image"
+                              value={sectionDraft.banner_url}
+                              onChange={(value) => patchSection('banner_url', value)}
+                              disabled={readOnly}
+                              onUploadFile={uploadBlockImage}
+                              title={t('digitalCatalogs.form.upload.blockImageTitle', 'Enviar imagem do bloco')}
+                              description={t('digitalCatalogs.form.upload.blockImageDescription', 'A imagem será enviada para o bucket da empresa ativa e usada na prévia, no PDF e na página publicada.')}
+                              formatsLabel={t('digitalCatalogs.form.upload.blockImageFormats', 'Formatos JPG, PNG, GIF ou WEBP')}
+                              maxSizeLabel={t('digitalCatalogs.form.upload.blockImageMaxSize', 'até 5 MB')}
+                            />
                           </FormRow>
                         ) : null}
 
@@ -480,6 +790,73 @@ export function CatalogoDigitalFormPage({ id: forcedId }: { id?: string }) {
                             <FormRow label={t('digitalCatalogs.form.fields.blockProductIds', 'Produtos do bloco')}>
                               <textarea aria-label={t('digitalCatalogs.form.fields.blockProductIds', 'Produtos do bloco')} className={`${inputClasses()} min-h-24 resize-y py-3`} value={productIdsValue(sectionDraft)} onChange={(event) => patchSection('produtos', parseProductIds(event.target.value))} disabled={readOnly} />
                             </FormRow>
+                            <div className="app-pane space-y-4 rounded-[1rem] p-4">
+                              <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)]">
+                                <FormRow label={t('digitalCatalogs.form.products.searchLabel', 'Buscar produtos')}>
+                                  <div className="flex flex-col gap-2 sm:flex-row">
+                                    <input aria-label={t('digitalCatalogs.form.products.searchLabel', 'Buscar produtos')} className={inputClasses()} value={productSearchQuery} onChange={(event) => setProductSearchQuery(event.target.value)} disabled={readOnly || productLoading} />
+                                    <button type="button" className="app-button-secondary inline-flex items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold" onClick={loadProductsFromSearch} disabled={readOnly || productLoading || !productSearchQuery.trim()}>
+                                      <Search className="h-4 w-4" />
+                                      {t('digitalCatalogs.form.products.searchButton', 'Buscar produtos')}
+                                    </button>
+                                  </div>
+                                </FormRow>
+                                <FormRow label={t('digitalCatalogs.form.products.codeListLabel', 'Códigos ou IDs')}>
+                                  <div className="flex flex-col gap-2 sm:flex-row">
+                                    <input aria-label={t('digitalCatalogs.form.products.codeListLabel', 'Códigos ou IDs')} className={inputClasses()} value={productCodeList} onChange={(event) => setProductCodeList(event.target.value)} disabled={readOnly || productLoading} />
+                                    <button type="button" className="app-button-secondary inline-flex items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold" onClick={loadProductsFromCodes} disabled={readOnly || productLoading || !productCodeList.trim()}>
+                                      <Search className="h-4 w-4" />
+                                      {t('digitalCatalogs.form.products.resolveButton', 'Resolver lista')}
+                                    </button>
+                                  </div>
+                                </FormRow>
+                                <FormRow label={t('digitalCatalogs.form.products.collectionLabel', 'Coleção')}>
+                                  <div className="flex flex-col gap-2 sm:flex-row">
+                                    <input aria-label={t('digitalCatalogs.form.products.collectionLabel', 'Coleção')} className={inputClasses()} value={collectionId} onChange={(event) => setCollectionId(event.target.value)} disabled={readOnly || productLoading} />
+                                    <button type="button" className="app-button-secondary inline-flex items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold" onClick={importCollectionProducts} disabled={readOnly || productLoading || !collectionId.trim()}>
+                                      <Search className="h-4 w-4" />
+                                      {t('digitalCatalogs.form.products.importCollectionButton', 'Importar')}
+                                    </button>
+                                  </div>
+                                </FormRow>
+                              </div>
+
+                              <div className="grid gap-4 lg:grid-cols-2">
+                                <div>
+                                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[color:var(--app-muted)]">{t('digitalCatalogs.form.products.results', 'Resultados')}</p>
+                                  <div className="mt-2 space-y-2">
+                                    {productResults.length ? productResults.map((product) => (
+                                      <div key={product.id} className="flex items-center justify-between gap-3 rounded-[0.9rem] border border-[color:var(--app-border-subtle)] bg-[color:var(--app-surface)] px-3 py-2">
+                                        <span className="min-w-0 text-sm text-[color:var(--app-text)]">
+                                          <span className="block truncate font-semibold">{product.nome}</span>
+                                          {[product.codigo, product.marca].filter(Boolean).length ? <span className="block truncate text-xs text-[color:var(--app-muted)]">{[product.codigo, product.marca].filter(Boolean).join(' - ')}</span> : null}
+                                        </span>
+                                        <button type="button" aria-label={`${t('digitalCatalogs.form.products.addProduct', 'Adicionar')} ${product.nome}`} className="app-button-secondary inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold" onClick={() => addProductToCurrentSection(product)} disabled={readOnly || Boolean(productsById.get(product.id) && sectionDraft.produtos.includes(product.id))}>
+                                          {t('digitalCatalogs.form.products.addProduct', 'Adicionar')}
+                                        </button>
+                                      </div>
+                                    )) : (
+                                      <p className="rounded-[0.9rem] border border-dashed border-[color:var(--app-border-subtle)] px-3 py-4 text-sm text-[color:var(--app-muted)]">{t('digitalCatalogs.form.products.emptyResults', 'Busque produtos, resolva códigos ou importe uma coleção.')}</p>
+                                    )}
+                                  </div>
+                                </div>
+                                <div>
+                                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[color:var(--app-muted)]">{t('digitalCatalogs.form.products.selected', 'Selecionados no bloco')}</p>
+                                  <div className="mt-2 space-y-2">
+                                    {sectionDraft.produtos.length ? sectionDraft.produtos.map((productId) => {
+                                      const product = productsById.get(productId)
+                                      return (
+                                        <div key={productId} className="rounded-[0.9rem] border border-[color:var(--app-border-subtle)] bg-[color:var(--app-surface)] px-3 py-2 text-sm text-[color:var(--app-text)]">
+                                          <span className="block truncate font-semibold">{product ? productLabel(product) : productId}</span>
+                                        </div>
+                                      )
+                                    }) : (
+                                      <p className="rounded-[0.9rem] border border-dashed border-[color:var(--app-border-subtle)] px-3 py-4 text-sm text-[color:var(--app-muted)]">{t('digitalCatalogs.form.products.emptySelected', 'Nenhum produto selecionado para este bloco.')}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                             <FormRow label={t('digitalCatalogs.form.fields.blockShowPrice', 'Exibir preço no bloco')}>
                               <BooleanSegmentedField value={sectionDraft.mostrar_preco} onChange={(value) => patchSection('mostrar_preco', value)} disabled={readOnly} />
                             </FormRow>
@@ -513,6 +890,80 @@ export function CatalogoDigitalFormPage({ id: forcedId }: { id?: string }) {
               title={t('digitalCatalogs.form.summaryTitle', 'Revise, salve e gere PDF')}
               description={t('digitalCatalogs.form.summaryDescription', 'Conferência final antes de salvar o catálogo e manter as saídas do Studio atualizadas.')}
             >
+              <div className="mb-4 flex flex-wrap justify-end gap-2">
+                <button type="button" className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold" onClick={openDraftPreview} disabled={previewing}>
+                  <Eye className="h-4 w-4" />
+                  {t('digitalCatalogs.form.previewDraft', 'Prévia do rascunho')}
+                </button>
+              </div>
+              <div className="app-pane mb-4 rounded-[1rem] p-4">
+                <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-sm font-bold text-[color:var(--app-text)]">{t('digitalCatalogs.form.pricing.title', 'Contexto de precificação')}</h3>
+                    <p className="mt-1 text-xs leading-5 text-[color:var(--app-muted)]">
+                      {t('digitalCatalogs.form.pricing.description', 'Recalcule os preços dos produtos do snapshot usando filial, cliente, pagamento e tabela de preço do contexto comercial legado.')}
+                    </p>
+                  </div>
+                  <button type="button" className="app-button-secondary inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold" onClick={recalculatePrices} disabled={readOnly || pricingLoading || recalculatingPrices}>
+                    <RefreshCcw className="h-4 w-4" />
+                    {recalculatingPrices ? t('digitalCatalogs.form.pricing.recalculating', 'Recalculando...') : t('digitalCatalogs.form.pricing.recalculate', 'Recalcular preços')}
+                  </button>
+                </div>
+
+                {pricingLoading ? (
+                  <p className="rounded-[0.9rem] border border-dashed border-[color:var(--app-border-subtle)] px-3 py-4 text-sm text-[color:var(--app-muted)]">
+                    {t('digitalCatalogs.form.pricing.loading', 'Carregando opções comerciais...')}
+                  </p>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <FormRow label={t('digitalCatalogs.form.pricing.fields.branch', 'Filial')}>
+                      <select aria-label={t('digitalCatalogs.form.pricing.fields.branch', 'Filial')} className={inputClasses()} value={pricingContext.id_filial || ''} onChange={(event) => patchPricingContext('id_filial', event.target.value)} disabled={readOnly}>
+                        <option value="">{t('common.select', 'Selecione')}</option>
+                        {(pricingOptions?.filiais || []).map((option) => <option key={option.id} value={option.id}>{pricingOptionLabel(option)}</option>)}
+                      </select>
+                    </FormRow>
+                    <FormRow label={t('digitalCatalogs.form.pricing.fields.paymentMethod', 'Forma de pagamento')}>
+                      <select aria-label={t('digitalCatalogs.form.pricing.fields.paymentMethod', 'Forma de pagamento')} className={inputClasses()} value={pricingContext.id_forma_pagamento || ''} onChange={(event) => patchPricingContext('id_forma_pagamento', event.target.value)} disabled={readOnly}>
+                        <option value="">{t('common.select', 'Selecione')}</option>
+                        {(pricingOptions?.formas_pagamento || []).map((option) => <option key={option.id} value={option.id}>{pricingOptionLabel(option)}</option>)}
+                      </select>
+                    </FormRow>
+                    <FormRow label={t('digitalCatalogs.form.pricing.fields.paymentTerm', 'Prazo de pagamento')}>
+                      <select aria-label={t('digitalCatalogs.form.pricing.fields.paymentTerm', 'Prazo de pagamento')} className={inputClasses()} value={pricingContext.id_condicao_pagamento || ''} onChange={(event) => patchPricingContext('id_condicao_pagamento', event.target.value)} disabled={readOnly}>
+                        <option value="">{t('common.select', 'Selecione')}</option>
+                        {(pricingOptions?.condicoes_pagamento || []).map((option) => <option key={option.id} value={option.id}>{pricingOptionLabel(option)}</option>)}
+                      </select>
+                    </FormRow>
+                    <FormRow label={t('digitalCatalogs.form.pricing.fields.customer', 'Cliente')}>
+                      <input aria-label={t('digitalCatalogs.form.pricing.fields.customer', 'Cliente')} className={inputClasses()} value={pricingContext.cliente_busca || ''} onChange={(event) => patchPricingContext('cliente_busca', event.target.value)} disabled={readOnly} />
+                    </FormRow>
+                    <FormRow label={t('digitalCatalogs.form.pricing.fields.priceTable', 'Tabela de preço')}>
+                      <select aria-label={t('digitalCatalogs.form.pricing.fields.priceTable', 'Tabela de preço')} className={inputClasses()} value={pricingContext.id_tabela_preco || ''} onChange={(event) => patchPricingContext('id_tabela_preco', event.target.value)} disabled={readOnly}>
+                        <option value="">{t('common.select', 'Selecione')}</option>
+                        {(pricingOptions?.tabelas_preco || []).map((option) => <option key={option.id} value={option.id}>{pricingOptionLabel(option)}</option>)}
+                      </select>
+                    </FormRow>
+                    <FormRow label={t('digitalCatalogs.form.pricing.fields.sellerId', 'ID do vendedor')}>
+                      <input aria-label={t('digitalCatalogs.form.pricing.fields.sellerId', 'ID do vendedor')} className={inputClasses()} value={pricingContext.id_vendedor || ''} onChange={(event) => patchPricingContext('id_vendedor', event.target.value)} disabled={readOnly} />
+                    </FormRow>
+                    <FormRow label={t('digitalCatalogs.form.pricing.fields.sellerCode', 'Código do vendedor')}>
+                      <input aria-label={t('digitalCatalogs.form.pricing.fields.sellerCode', 'Código do vendedor')} className={inputClasses()} value={pricingContext.codigo_vendedor || ''} onChange={(event) => patchPricingContext('codigo_vendedor', event.target.value)} disabled={readOnly} />
+                    </FormRow>
+                    <FormRow label={t('digitalCatalogs.form.pricing.fields.sellerDocument', 'CNPJ/CPF do vendedor')}>
+                      <input aria-label={t('digitalCatalogs.form.pricing.fields.sellerDocument', 'CNPJ/CPF do vendedor')} className={inputClasses()} value={pricingContext.cnpj_cpf_vendedor || ''} onChange={(event) => patchPricingContext('cnpj_cpf_vendedor', event.target.value)} disabled={readOnly} />
+                    </FormRow>
+                    <FormRow label={t('digitalCatalogs.form.pricing.fields.quantity', 'Quantidade')}>
+                      <input aria-label={t('digitalCatalogs.form.pricing.fields.quantity', 'Quantidade')} type="number" min={1} className={inputClasses()} value={pricingContext.quantidade || '1'} onChange={(event) => patchPricingContext('quantidade', event.target.value)} disabled={readOnly} />
+                    </FormRow>
+                    <FormRow label={t('digitalCatalogs.form.pricing.fields.packagingId', 'ID da embalagem')}>
+                      <input aria-label={t('digitalCatalogs.form.pricing.fields.packagingId', 'ID da embalagem')} className={inputClasses()} value={pricingContext.id_embalagem || ''} onChange={(event) => patchPricingContext('id_embalagem', event.target.value)} disabled={readOnly} />
+                    </FormRow>
+                    <FormRow label={t('digitalCatalogs.form.pricing.fields.itemFreight', 'Frete do item')}>
+                      <input aria-label={t('digitalCatalogs.form.pricing.fields.itemFreight', 'Frete do item')} className={inputClasses()} value={pricingContext.valor_frete_item || ''} onChange={(event) => patchPricingContext('valor_frete_item', event.target.value)} disabled={readOnly} />
+                    </FormRow>
+                  </div>
+                )}
+              </div>
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                 <div className="app-pane rounded-[1rem] p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[color:var(--app-muted)]">{t('digitalCatalogs.columns.name', 'Nome')}</p>

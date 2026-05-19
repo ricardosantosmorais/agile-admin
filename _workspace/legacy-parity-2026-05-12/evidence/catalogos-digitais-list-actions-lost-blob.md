@@ -79,6 +79,16 @@ Applied on 2026-05-18 in `codex/catalogos-digitais-studio-slice`:
 
 Remaining list gaps:
 
-- render the catalog name as an external public link when legacy conditions apply;
-- implement the equivalent HTML preview flow when `url_publica` is absent;
 - complete visual validation in PT/EN, desktop/mobile, light/dark.
+
+Follow-up applied on 2026-05-18:
+
+- `Copiar` is visible by the same legacy `can("criar")` rule, with the module-contract guard kept inside the action.
+- The catalog name only renders as an external public link when `url_publica`, `publicado` and `status === "pronto"` are all true, matching the legacy DataTable renderer.
+- `Prévia/Visualizar` now uses the same public-link condition; without it, the UI opens the v2 HTML preview bridge instead of opening a non-public URL.
+
+HTML preview bridge applied on 2026-05-18:
+
+- Legacy comparison confirmed that list `preview-catalog` runs `loadCatalogForOutput(id, openPreviewTab)`, then `openPreviewTab` calls controller action `previewHtml` with the current snapshot payload.
+- v2 now exposes `GET /api/catalogos-digitais/[id]/preview-html`, fetches the tenant-scoped detail with `embed=produtos`, and renders HTML from the saved snapshot.
+- The list action opens the public URL only when `url_publica`, `publicado` and `status === "pronto"` match; otherwise it opens the v2 HTML preview bridge for the saved catalog snapshot.

@@ -57,6 +57,7 @@ Se a tarefa tocar arquitetura ou padroes:
   - modais;
   - regras de permissao;
   - validacoes e payloads.
+- Depois de cada migracao legado -> v2, executar uma validacao visual comparativa contra o legado antes de considerar a fatia fechada. Essa validacao deve conferir se layout, densidade, labels, botoes, estados, cores, dark mode, responsividade e fluxo principal continuam equivalentes ao comportamento esperado do legado, ainda que a arquitetura v2 seja diferente.
 - Reaproveitar padroes existentes. Nao introduzir nova base sem necessidade real.
 - Antes de alterar componente compartilhado, mapear explicitamente quais modulos e telas dependem dele e tratar a mudanca como alteracao de alto impacto.
 - Em ajustes visuais, preferir evolucao incremental sobre reestilizacao ampla. Nao trocar a linguagem visual inteira de uma vez sem validar o efeito nos shareds e nos dois temas.
@@ -66,9 +67,12 @@ Se a tarefa tocar arquitetura ou padroes:
 - Se a tarefa for grande, propor primeiro um plano curto com passos e arquivos.
 - Validacoes devem seguir cadencia pragmatica para evitar custo e latencia desnecessarios:
   - durante exploracao, leitura de legado, analise, debugging inicial ou alinhamento de abordagem, nao rodar `lint` ou `build` por padrao;
+  - durante o desenvolvimento de uma rodada, restringir testes aos modulos, services, componentes, rotas e arquivos realmente tocados ou diretamente afetados;
+  - durante o desenvolvimento de uma rodada, restringir `lint` e `typecheck` ao menor escopo tecnicamente viavel quando o ferramental permitir; se o script disponivel for apenas global, executar global somente no fechamento do bloco principal ou quando houver risco real;
   - em ajustes pequenos e localizados, validar apenas no fechamento do bloco de alteracao, preferindo a menor validacao suficiente;
   - `lint` deve ser executado no fechamento da tarefa ou do bloco principal de mudancas, nao a cada interacao;
-  - `build` deve ser executado apenas quando a natureza da mudanca justificar, por exemplo alteracoes estruturais, rotas, bundling, SSR, providers, i18n ampla ou risco real de integracao;
+  - `build` total nao deve ser executado a todo momento; executar apenas quando a natureza da mudanca justificar, por exemplo alteracoes estruturais, rotas, bundling, SSR, providers, i18n ampla, shareds de alto impacto ou risco real de integracao;
+  - a suite completa de testes (`npm run test` / `vitest run` sem filtro) deve ficar reservada para fechamento de modulo, publicacao/merge, mudancas transversais ou pedido explicito do programador;
   - evitar rerodar a mesma validacao duas ou mais vezes na mesma interacao sem que uma nova alteracao relevante tenha invalidado o resultado anterior.
 - Toda feature nova deve nascer com cobertura minima de testes:
   - testes unitarios para mapeadores, validadores, helpers e regras de transformacao;
@@ -219,6 +223,7 @@ Se a tarefa tocar arquitetura ou padroes:
   - se o legado tinha aba, modal, dual list, treeview ou detalhe expansivel;
   - se existe tela auxiliar de senha, logs ou relacao vinculada;
   - se a permissao vem do menu, do boot ou de regras operacionais especificas.
+- Ao concluir qualquer migracao, registrar nos artefatos da rodada se a validacao visual comparativa com o legado foi executada, quais cenarios foram conferidos e quais diferencas ficaram pendentes ou justificadas.
 
 ### 4.9 Testes
 
@@ -289,6 +294,7 @@ Se a tarefa tocar arquitetura ou padroes:
 - verificar permissao de listar, criar, editar e excluir quando houver;
 - verificar se breadcrumb, toolbar, filtros, tabela e formulario seguem o padrao atual;
 - verificar regressao visual em PT e EN, desktop e mobile;
+- em migracoes, verificar visualmente contra o legado antes de fechar a fatia;
 - verificar se nao ha texto truncado, codificacao quebrada ou chave literal na tela.
 
 ## 5) Guardrails de qualidade e seguranca
@@ -303,13 +309,16 @@ Se a tarefa tocar arquitetura ou padroes:
 ## 6) Definition of Done (DoD) minimo
 
 - Implementacao segue os padroes do repositorio.
-- `lint` foi executado.
+- Durante uma rodada em andamento, foram executadas validacoes focadas nos arquivos/modulos tocados ou foi registrado o motivo tecnico para nao executar.
+- No fechamento de modulo, publicacao/merge ou mudanca transversal, ampliar a validacao para a suite completa relevante.
+- `lint` foi executado no menor escopo suficiente; no fechamento de modulo ou alteracao transversal, usar a validacao global quando viavel.
 - `build` foi executado quando a mudanca justificar.
 - Testes unitarios e E2E da feature foram criados ou atualizados, ou a ausencia foi declarada com motivo tecnico real.
 - Fluxo principal da tela ou componente foi validado no contexto correto.
 - Strings novas foram traduzidas.
 - Documentacao em `docs/` foi atualizada quando houve mudanca de comportamento, arquitetura ou padrao.
 - O resultado ficou consistente com o legado quando a tarefa for migracao.
+- Toda migracao teve validacao visual comparativa com o legado registrada, ou uma pendencia explicita quando bloqueada por ambiente, credencial ou dado operacional.
 
 ## 7) Branching e integracao
 

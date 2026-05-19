@@ -56,7 +56,7 @@ vi.mock('next/link', () => ({
   default: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => <a href={href} {...props}>{children}</a>,
 }))
 
-function mockListResponse(contracted = false) {
+function mockListResponse(contracted = false, catalogOverrides: Record<string, unknown> = {}) {
   listMock.mockResolvedValue({
     items: [{
       id: 'CAT-1',
@@ -78,6 +78,7 @@ function mockListResponse(contracted = false) {
       active: true,
       updatedAt: '2026-05-12 10:00:00',
       createdAt: '2026-05-10 10:00:00',
+      ...catalogOverrides,
     }],
     meta: { page: 1, perPage: 15, total: 1, pages: 1 },
     appStore: { moduleId: 'mod_catalogos_digitais', contracted, status: contracted ? 'ativo' : 'cancelado', error: '' },
@@ -139,7 +140,10 @@ describe('CatalogosDigitaisListPage', () => {
     expect(screen.queryByRole('link', { name: 'Novo catálogo' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Novo catálogo' })).toBeDisabled()
     expect(screen.getAllByRole('button', { name: 'Visualizar catálogo Campanha Maio' })[0]).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Copiar catálogo Campanha Maio' })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Copiar catálogo Campanha Maio' })[0]).toBeInTheDocument()
+    fireEvent.click(screen.getAllByRole('button', { name: 'Copiar catálogo Campanha Maio' })[0])
+    expect(await screen.findByText('Contrate o módulo para copiar catálogos.')).toBeInTheDocument()
+    expect(detailMock).not.toHaveBeenCalled()
     expect(screen.getAllByRole('link', { name: 'Editar catálogo Campanha Maio' })[0]).toHaveAttribute('href', '/catalogos-digitais/CAT-1/editar')
     expect(screen.getAllByRole('button', { name: 'Excluir catálogo Campanha Maio' })[0]).toBeInTheDocument()
     await waitFor(() => expect(listMock).toHaveBeenCalledWith({ page: 1, perpage: 15, code: '', name: '', status: '', validFrom: '', validTo: '' }))
@@ -211,5 +215,23 @@ describe('CatalogosDigitaisListPage', () => {
 
     await waitFor(() => expect(deleteMock).toHaveBeenCalledWith(['CAT-1']))
     await waitFor(() => expect(listMock).toHaveBeenCalledTimes(3))
+  })
+
+  it('uses the v2 HTML preview bridge when the public URL does not match the legacy rule', async () => {
+    mockListResponse(true, {
+      status: 'rascunho',
+      published: false,
+      publicUrl: 'https://loja.test/catalogos/rascunho',
+    })
+
+    render(<CatalogosDigitaisListPage />)
+
+    await waitFor(() => expect(screen.getAllByText('Campanha Maio').length).toBeGreaterThan(0))
+    expect(screen.queryByRole('link', { name: 'Campanha Maio' })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Visualizar catálogo Campanha Maio' })[0])
+
+    expect(window.open).toHaveBeenCalledWith('/api/catalogos-digitais/CAT-1/preview-html', '_blank', 'noopener,noreferrer')
+    expect(screen.queryByText('Não foi possível abrir a prévia HTML deste catálogo.')).not.toBeInTheDocument()
   })
 })

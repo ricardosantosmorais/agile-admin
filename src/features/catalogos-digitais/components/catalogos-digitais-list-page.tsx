@@ -73,6 +73,10 @@ function validityLabel(item: CatalogosDigitaisCatalog, locale: Locale, t: Transl
   return '-'
 }
 
+function hasLegacyPublicCatalogUrl(item: CatalogosDigitaisCatalog) {
+  return Boolean(item.publicUrl && item.published && item.status === 'pronto')
+}
+
 function ContractWarning({ moduleId }: { moduleId: string }) {
   const { t } = useI18n()
 
@@ -177,7 +181,7 @@ export function CatalogosDigitaisListPage() {
         label: t('digitalCatalogs.columns.name', 'Nome'),
         cell: (item) => (
           <div className="min-w-0">
-            {item.publicUrl ? (
+            {hasLegacyPublicCatalogUrl(item) ? (
               <a href={item.publicUrl} target="_blank" rel="noreferrer" className="font-semibold text-[color:var(--app-text)] transition hover:text-accent">
                 {item.name || '-'}
               </a>
@@ -268,12 +272,17 @@ export function CatalogosDigitaisListPage() {
   }
 
   function previewCatalog(item: CatalogosDigitaisCatalog) {
-    if (item.publicUrl && typeof window !== 'undefined') {
+    if (hasLegacyPublicCatalogUrl(item) && typeof window !== 'undefined') {
       window.open(item.publicUrl, '_blank', 'noopener,noreferrer')
       return
     }
 
-    setActionFeedback(t('digitalCatalogs.actions.previewUnavailable', 'Este catálogo ainda não possui URL pública para prévia.'))
+    if (item.id && typeof window !== 'undefined') {
+      window.open(`/api/catalogos-digitais/${encodeURIComponent(item.id)}/preview-html`, '_blank', 'noopener,noreferrer')
+      return
+    }
+
+    setActionFeedback(t('digitalCatalogs.actions.previewUnavailable', 'Não foi possível abrir a prévia HTML deste catálogo.'))
   }
 
   async function deleteCatalogs(ids: string[]) {
@@ -389,7 +398,7 @@ export function CatalogosDigitaisListPage() {
                 label: `${t('digitalCatalogs.copyCatalog', 'Copiar catálogo')} ${item.name}`,
                 icon: Copy,
                 onClick: (catalog) => void duplicateCatalog(catalog),
-                visible: canCreateCatalog,
+                visible: access.canCreate,
               },
               {
                 id: 'edit',

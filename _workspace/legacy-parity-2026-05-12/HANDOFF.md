@@ -17,7 +17,7 @@ Use este handoff junto com:
 
 ## Estado atual do repositório
 
-- Branch de trabalho: `codex/legacy-parity-2026-05-12`
+- Branch de trabalho: `codex/catalogos-digitais-listagem-publica`
 - Branch remota da fase: `origin/codex/legacy-parity-2026-05-12`
 - A branch tem histórico de migração já publicado no remoto da própria branch.
 - `origin/master` avançou depois com documentação de design.
@@ -66,7 +66,7 @@ Checklist mínimo antes de encerrar uma tela:
 
 | Ordem | Batch | Estado | Próximo uso |
 |---:|---|---|---|
-| 1 | `catalogos-digitais` | Parcialmente migrado | Blocos básicos retomados; ações legadas da listagem recuperadas; completar upload de imagens, produtos/coleções, precificação, preview/PDF/publicação, link público no nome e validação visual final. |
+| 1 | `catalogos-digitais` | Parcialmente migrado | Blocos básicos retomados; ações legadas da listagem recuperadas; link público do nome, prévia HTML de snapshot salvo, upload tenant-aware de imagens, busca/resolução/importação de produtos/coleções, prévia de rascunho e recálculo de preços com contexto comercial fechados; completar PDF/publicação e validação funcional/visual final. |
 | 2 | `agile-store-ajustes` | Concluído | Usar apenas como referência; manter evidência de feedback/material/poster. |
 | 3 | `pedidos-logistica` | Concluído | Usar como referência para cancelamento, filial de entrega e status IBoltt. |
 | 4 | `formularios-arquivos` | Concluído | Usar como referência para links de arquivos tenant-aware e exibição em cliente/contato. |
@@ -86,18 +86,21 @@ Ainda precisa de uma frente dedicada para fechar a paridade visual/funcional com
 
 Pontos pendentes registrados:
 
-- fechar a listagem com link público no nome e prévia HTML equivalente quando não houver `url_publica`;
-- upload tenant-aware de imagens dos blocos;
-- importação/busca de produtos e coleções;
-- precificação com contexto comercial;
-- preview;
+- validação visual final da listagem em PT/EN, desktop/mobile, light/dark;
 - PDF/publicação conforme contrato disponível;
-- validação visual em light/dark e responsivo;
+- validação funcional completa com dados reais;
+- validação visual em PT/EN, desktop/mobile, light/dark;
 - confirmar se o backend atual já cobre todos os contratos usados pelo legado.
 
 Arquivo de referência: `batches/catalogos-digitais.md`.
 
 Evidência adicional: `evidence/catalogos-digitais-list-actions-lost-blob.md` registra a comparação das ações legadas da listagem, o blob Git inalcançável com uma implementação v2 anterior de Prévia, Copiar, Editar, Excluir e exclusão em massa, e a recuperação aplicada em 2026-05-18.
+
+Evidência adicional: `evidence/catalogos-digitais-upload-imagens-blocos.md` registra a comparação do legado `uploadImagemSecao` e a implementação v2 via `/api/uploads` com contexto da empresa ativa.
+
+Evidência adicional: `evidence/catalogos-digitais-produtos-preview-rascunho.md` registra a comparação do legado para busca/resolução/importação de produtos e prévia HTML de rascunho, mais os contratos que permanecem pendentes para precificação/PDF/publicação.
+
+Evidência adicional: `evidence/catalogos-digitais-precificacao-pdf-publicacao.md` registra a comparação do legado para precificação, a implementação v2 via API v2 `produtos` e a pendência real de contrato para PDF/publicação.
 
 ### Infraestrutura AWS
 
@@ -128,7 +131,7 @@ Arquivos de design/documentação novos devem ser reconciliados com `origin/mast
 1. Consolidar/validar esta documentação de handoff.
 2. Reconciliar a branch com `origin/master`.
 3. Decidir se a branch atual será enviada inteira para `master` depois de validação, ou usada apenas como checkpoint para abrir novas branches limpas por batch.
-4. Abrir o próximo chat para `catalogos-digitais`, porque ainda é a maior pendência funcional.
+4. Abrir o próximo chat para `catalogos-digitais`, focando PDF/publicação, validação funcional com dados reais e validação visual completa.
 5. Manter `infraestrutura-aws` separado, pois depende de backend.
 
 ## Comandos úteis

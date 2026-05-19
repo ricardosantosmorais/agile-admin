@@ -85,6 +85,65 @@ export type CatalogoDigitalFormRecord = {
   snapshot: Record<string, unknown>
 }
 
+export type CatalogoDigitalProduct = {
+  id: string
+  codigo: string
+  sku: string
+  nome: string
+  descricao: string
+  marca: string
+  imagem: string
+  url: string
+  ativo: boolean
+  disponivel: boolean
+  [key: string]: unknown
+}
+
+export type CatalogoDigitalCollection = {
+  id: string
+  codigo: string
+  nome: string
+}
+
+export type CatalogoDigitalProductsResult = {
+  data: CatalogoDigitalProduct[]
+  meta?: Record<string, unknown>
+  not_found?: string[]
+  colecao?: CatalogoDigitalCollection
+}
+
+export type CatalogoDigitalPricingOption = {
+  id: string
+  codigo?: string
+  nome: string
+  indice?: string
+}
+
+export type CatalogoDigitalPricingOptions = {
+  data: {
+    filiais: CatalogoDigitalPricingOption[]
+    formas_pagamento: CatalogoDigitalPricingOption[]
+    condicoes_pagamento: CatalogoDigitalPricingOption[]
+    tabelas_preco: CatalogoDigitalPricingOption[]
+    modo_ecommerce: string
+    cliente_padrao_codigo: string
+  }
+}
+
+export type CatalogoDigitalPricingSnapshotResult = {
+  payload: Record<string, unknown>
+  meta?: {
+    precificado?: boolean
+    precificados?: number
+    erros?: number
+    rejeitados?: number
+    motivo?: string
+    [key: string]: unknown
+  }
+  errors?: CatalogoDigitalProduct[]
+  rejected?: CatalogoDigitalProduct[]
+}
+
 export type CatalogoDigitalSectionType =
   | 'banner'
   | 'titulo'

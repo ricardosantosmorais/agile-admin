@@ -14,7 +14,7 @@ Consolidated handoff file created at `HANDOFF.md`.
 
 Use it before opening new chats or cleaning this branch. The current consolidated reading is:
 
-- `catalogos-digitais`: partial; basic studio block editing was resumed from `master` and the lost legacy list actions/bulk deletion were recovered, but the module still needs image upload, products/collections, pricing, preview/PDF/publication, public-name link behavior and final visual validation.
+- `catalogos-digitais`: partial; basic studio block editing was resumed from `master`, the lost legacy list actions/bulk deletion were recovered, saved-snapshot HTML preview from the list now has a v2 bridge, block image upload is tenant-aware through the shared upload bridge, product search/resolution/collection import plus draft HTML preview are migrated, and the Studio now recalculates product pricing from a commercial context through the API v2 contract; the module still needs PDF/publication and final functional/visual validation.
 - `infraestrutura-aws`: partial; v2 surfaces are prepared, but live AWS collection depends on server-side endpoints in `api-v3`.
 - `agile-store-ajustes`, `pedidos-logistica`, `formularios-arquivos`, `configuracoes-admin`, `shell-docs-operacao`, `status-plataforma`, `relatorios-data-hora`, `pedidos-brinde-aprovacao` and `vendedores-valida-horario`: recorded as completed for this parity phase.
 - Before any merge to `master`, reconcile this branch with the latest `origin/master` design/docs commit.
@@ -69,17 +69,22 @@ Completed in v2:
 - v2 list page with search, status, contract warning and table.
 - `Novo catalogo` action on the list;
 - legacy row actions recovered on the list: preview by public URL, copy, edit and delete;
+- HTML preview bridge for saved catalog snapshots without a public URL;
 - checkbox selection and bulk delete;
 - `/catalogos-digitais/novo` create route;
 - `/catalogos-digitais/[id]/editar` edit route;
 - detail bridge using `embed=produtos`;
 - save bridge preserving the legacy snapshot data for products/sections;
 - first studio form slice for general data and publication fields;
-- basic block editor in the `Blocos` step with legacy section types, edit/reorder/remove and snapshot persistence.
+- basic block editor in the `Blocos` step with legacy section types, edit/reorder/remove and snapshot persistence;
+- tenant-aware image upload for Studio blocks, using the active tenant bucket/folder through `/api/uploads`.
+- Studio product search, product code/ID resolution and collection import through `POST /api/catalogos-digitais/studio`;
+- draft HTML preview from the current unsaved builder state in the Resumo step, now validated in an observable new tab.
+- pricing options and snapshot recalculation in the Resumo step, using the legacy commercial context and the real API v2 `produtos` pricing contract.
 
 Important parity gap:
 
-- The Catálogos Digitais list is closer to parity after recovering the lost actions from an unreachable Git blob. It still must not be marked complete until public-name link behavior, preview HTML without `url_publica`, and visual validation are closed or explicitly deferred with the required backend/API contract.
+- The Catálogos Digitais list is closer to parity after recovering the lost actions from an unreachable Git blob. Public-name link behavior now follows the legacy `url_publica` + `publicado` + `status=pronto` rule, `Copiar` follows the legacy create-permission visibility, and `Prévia/Visualizar` now opens a v2 HTML bridge for saved snapshots when no public URL is valid. It still must not be marked complete until visual validation is closed.
 
 Migration rule reinforced:
 
@@ -87,12 +92,23 @@ Migration rule reinforced:
 
 Next slice:
 
-- complete list actions and bulk deletion parity;
-- tenant-aware image upload, product/collection import and pricing;
-- preview/PDF/publication contracts.
+- complete final visual validation for the list;
+- PDF/publication contracts.
+- final functional validation with real operational data.
 - final visual validation of the complete studio.
 
 Evidence: `evidence/catalogos-digitais-blocos.md`, `evidence/catalogos-digitais-list-actions-lost-blob.md`.
+
+Validation checkpoint 2026-05-19:
+
+- Authenticated local validation resumed successfully at `http://127.0.0.1:3000`.
+- Menu path validated: `Catalogo > Catalogos Digitais`.
+- Catalog list, edit flow, `Geral`, `Blocos`, product resolution, `Resumo` and pricing panel were exercised with tenant/demo data in PT desktop/light.
+- EN desktop/light was partially validated on list and edit entry.
+- Dark/mobile were rechecked in MCP Playwright and popup-visible draft preview now opens an observable rendered tab.
+- Rendered legacy comparison and positive pricing with aligned operational data remain open.
+- PDF/publication remains a real contract gap and the module must not be marked complete.
+- Evidence: `evidence/catalogos-digitais-validacao-visual-funcional-2026-05-19.md`, `evidence/catalogos-digitais-preview-pdf-publicacao-2026-05-19.md`.
 
 `agile-store-ajustes` completed in this slice:
 
