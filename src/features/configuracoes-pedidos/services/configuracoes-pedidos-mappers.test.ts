@@ -55,6 +55,7 @@ describe('configuracoes-pedidos-mappers', () => {
       observacoes: '',
       oculta_timeline: '',
       opcoes_falta: '',
+      ordem_carrinho: 'nome_az',
       ordem_compra: '',
       ordem_compra_pedido: '',
       permite_pedido_recorrente: '',
@@ -95,6 +96,25 @@ describe('configuracoes-pedidos-mappers', () => {
       options: [
         { value: '1', label: 'Sim' },
         { value: '0', label: 'Não' },
+      ],
+    }))
+  })
+
+  it('mantem a configuracao legada de ordenacao do carrinho', () => {
+    const result = normalizeConfiguracoesPedidosRecord({ data: [] })
+    const field = getConfiguracoesPedidosFieldDefinitions((_, fallback) => fallback)
+      .find((definition) => definition.key === 'ordem_carrinho')
+
+    expect(result.values.ordem_carrinho).toBe('nome_az')
+    expect(field).toEqual(expect.objectContaining({
+      key: 'ordem_carrinho',
+      section: 'experience',
+      label: 'Ordenação do Carrinho',
+      helper: 'Define a ordem de exibição dos produtos no carrinho',
+      options: [
+        { value: 'nome_az', label: 'Nome (A-Z)' },
+        { value: 'insercao', label: 'Data de Inclusão' },
+        { value: 'quantidade', label: 'Quantidade (Maior-Menor)' },
       ],
     }))
   })

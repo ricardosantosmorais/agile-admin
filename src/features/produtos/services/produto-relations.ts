@@ -50,3 +50,28 @@ export function decodeProdutoEmbalagemRowId(value: string): ProdutoEmbalagemRow 
     id_filial: decodeURIComponent(id_filial),
   }
 }
+
+export function getProdutoEmbalagemApiId(
+  value: unknown,
+  id_produto: unknown,
+  id_filial: unknown,
+) {
+  const rawId = String(value ?? '').trim()
+  if (!rawId) {
+    return null
+  }
+
+  let apiId = rawId.includes('|')
+    ? decodeProdutoEmbalagemRowId(rawId).id || ''
+    : rawId
+
+  const productId = String(id_produto ?? '').trim()
+  const branchId = String(id_filial ?? '').trim()
+  const legacySuffix = `${productId}${branchId}`
+
+  if (legacySuffix && apiId.length > legacySuffix.length && apiId.endsWith(legacySuffix)) {
+    apiId = apiId.slice(0, -legacySuffix.length)
+  }
+
+  return apiId || null
+}

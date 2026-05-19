@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readAuthSession } from '@/src/features/auth/services/auth-session'
-import { encodeProdutoEmbalagemRowId } from '@/src/features/produtos/services/produto-relations'
+import { encodeProdutoEmbalagemRowId, getProdutoEmbalagemApiId } from '@/src/features/produtos/services/produto-relations'
 import { serverApiFetch } from '@/src/services/http/server-api'
 
 function getErrorMessage(payload: unknown, fallback: string) {
@@ -70,11 +70,11 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
   const body = await request.json() as Record<string, unknown>
   const payload = {
     ...body,
+    id: getProdutoEmbalagemApiId(body.id, id, body.id_filial),
     id_empresa: session.currentTenantId,
     id_produto: id,
     ativo: parseBoolean(body.ativo),
   }
-  delete (payload as Record<string, unknown>).id
 
   const result = await serverApiFetch('produtos_embalagens', {
     method: 'POST',
@@ -100,7 +100,7 @@ export async function DELETE(request: NextRequest) {
   const rows = Array.isArray(body.rows) ? body.rows : []
   const payload = rows.map((row) => ({
     id_empresa: session.currentTenantId,
-    id: String(row.id || '').trim() || null,
+    id: getProdutoEmbalagemApiId(row.id, row.id_produto, row.id_filial),
     id_produto: String(row.id_produto || ''),
     id_filial: String(row.id_filial || ''),
   }))

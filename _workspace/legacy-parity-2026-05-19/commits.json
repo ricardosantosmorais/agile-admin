@@ -1,0 +1,2000 @@
+﻿[
+    {
+        "hash":  "6cb86acbd370ff0bfaa601fded7e15d276554a10",
+        "short":  "6cb86acbd",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "2d57cb13c573a2b6530c7453cb439097dd526630"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrigir cobertura EC2 com Savings Plans",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-financeiro-aws.js",
+                      "includes/aws-platform-monitor/live.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "9610d78ba6e04130480f1daa58f7f5664537c03f",
+        "short":  "9610d78ba",
+        "date":  "2026-05-12",
+        "author":  "felipeps04",
+        "parents":  [
+                        "6cb86acbd370ff0bfaa601fded7e15d276554a10"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajuste do tema escuro para Agile Store",
+        "batch":  "agile-store-tema",
+        "module":  "Agile Store: tema escuro",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "components/app-store-detail.php",
+                      "components/app-store-list.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "92bf674c70b2bdeeeb6d576397a5826d3b96f136",
+        "short":  "92bf674c7",
+        "date":  "2026-05-12",
+        "author":  "felipeps04",
+        "parents":  [
+                        "9610d78ba6e04130480f1daa58f7f5664537c03f"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajuste de boot",
+        "batch":  "asset-version-refresh-legado",
+        "module":  "Legado: boot e asset version",
+        "disposition":  "nao-aplicavel-v2",
+        "priority":  "P4",
+        "files":  [
+                      "boot.php"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "c6f1a3602b715e9f39d8fc45d1367205ed57976a",
+        "short":  "c6f1a3602",
+        "date":  "2026-05-12",
+        "author":  "Ricardo Morais",
+        "parents":  [
+                        "6cb86acbd370ff0bfaa601fded7e15d276554a10",
+                        "92bf674c70b2bdeeeb6d576397a5826d3b96f136"
+                    ],
+        "is_merge":  true,
+        "subject":  "Merge pull request #735 from agileecommerce/fix/theme-agile-store",
+        "batch":  "agile-store-tema",
+        "module":  "Agile Store: tema escuro",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+
+                  ],
+        "file_count":  0
+    },
+    {
+        "hash":  "0c5f152aa67799b5dca03ce307fb8a5a70c9e1c1",
+        "short":  "0c5f152aa",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "c6f1a3602b715e9f39d8fc45d1367205ed57976a"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta leitura de evictions no painel de saúde",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "components/infraestrutura-saude-plataforma.php",
+                      "includes/aws-platform-monitor/live.php",
+                      "includes/aws-platform-monitor/snapshot.php"
+                  ],
+        "file_count":  4
+    },
+    {
+        "hash":  "9514dc994689c61033fec01e4fcbb7b645e9bf56",
+        "short":  "9514dc994",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "0c5f152aa67799b5dca03ce307fb8a5a70c9e1c1"
+                    ],
+        "is_merge":  false,
+        "subject":  "Incrementa versão de assets do admin",
+        "batch":  "asset-version-refresh-legado",
+        "module":  "Legado: boot e asset version",
+        "disposition":  "nao-aplicavel-v2",
+        "priority":  "P4",
+        "files":  [
+                      "boot.php"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "6de8adb15e892011a32e8a094067e268aaec5fa7",
+        "short":  "6de8adb15",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "9514dc994689c61033fec01e4fcbb7b645e9bf56"
+                    ],
+        "is_merge":  false,
+        "subject":  "Adiciona configuracao de ordenacao do carrinho",
+        "batch":  "configuracoes-pedidos-carrinho",
+        "module":  "Configuracoes \u003e Pedidos: ordenacao do carrinho",
+        "disposition":  "nao-migrado",
+        "priority":  "P1",
+        "files":  [
+                      "components/configuracoes-pedidos-form.php"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "b92cf4285301833d045dd9c7624b399ed5bb9e23",
+        "short":  "b92cf4285",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "6de8adb15e892011a32e8a094067e268aaec5fa7"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta alerta de storage RDS com autoscale",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "includes/aws-platform-monitor/live.php",
+                      "includes/aws-platform-monitor/snapshot.php",
+                      "tests/aws-rds-storage-status.test.php"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "bea05a713c3e54f2f18950774dfb6efd49c88d35",
+        "short":  "bea05a713",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "b92cf4285301833d045dd9c7624b399ed5bb9e23"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta labels da ordenacao do carrinho",
+        "batch":  "configuracoes-pedidos-carrinho",
+        "module":  "Configuracoes \u003e Pedidos: ordenacao do carrinho",
+        "disposition":  "nao-migrado",
+        "priority":  "P1",
+        "files":  [
+                      "components/configuracoes-pedidos-form.php"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "77fd0336e145a36805bab1e65b5259e3cd18d6a8",
+        "short":  "77fd0336e",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "bea05a713c3e54f2f18950774dfb6efd49c88d35"
+                    ],
+        "is_merge":  false,
+        "subject":  "Adiciona status da plataforma para tenant",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php",
+                      "components/status-plataforma.php",
+                      "controllers/status-plataforma-controller.php",
+                      "docs/superpowers/plans/2026-05-11-dashboard-infraestrutura-aws.md",
+                      "docs/superpowers/plans/2026-05-12-status-plataforma-tenant-health.md",
+                      "includes/header.php",
+                      "includes/menu.php",
+                      "includes/status-plataforma-monitor.php"
+                  ],
+        "file_count":  9
+    },
+    {
+        "hash":  "3f88999c60aaa330ec854f1fb76e08928c932a9c",
+        "short":  "3f88999c6",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "77fd0336e145a36805bab1e65b5259e3cd18d6a8"
+                    ],
+        "is_merge":  false,
+        "subject":  "Evita grave falso quando monitor v2 indisponivel",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "includes/status-plataforma-monitor.php"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "d7b6606eb1362c397f7dab5e740d8ec0fadc94c2",
+        "short":  "d7b6606eb",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "3f88999c60aaa330ec854f1fb76e08928c932a9c"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta exibicao de monitoramento parcial",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php",
+                      "components/status-plataforma.php"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "55191520650322b500c0a40b6141e92c9cb6a2ef",
+        "short":  "551915206",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "d7b6606eb1362c397f7dab5e740d8ec0fadc94c2"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta pluralizacao de servicos no status",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "8ffa1998058d05d7ee33488283a40c38eb567639",
+        "short":  "8ffa19980",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "55191520650322b500c0a40b6141e92c9cb6a2ef"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta pluralizacao dos textos de status",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "06ce364f58b1c33be81c9b412cb8cacceaf5d2ae",
+        "short":  "06ce364f5",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "8ffa1998058d05d7ee33488283a40c38eb567639"
+                    ],
+        "is_merge":  false,
+        "subject":  "Revisa consistencia das mensagens do status",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php",
+                      "includes/status-plataforma-monitor.php"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "7b580d96f6a61bb65f7735a46df4e4b5bd7e08b0",
+        "short":  "7b580d96f",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "06ce364f58b1c33be81c9b412cb8cacceaf5d2ae"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta N/D no status geral da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "2e4f3fbc4904aae61f5a0b004af55c19350bbb5d",
+        "short":  "2e4f3fbc4",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "7b580d96f6a61bb65f7735a46df4e4b5bd7e08b0"
+                    ],
+        "is_merge":  false,
+        "subject":  "Troca icone por indicador online no status",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "boot.php",
+                      "components/status-plataforma.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "aa66dabb04a996bc2aefca539f63eb2de9bc7b34",
+        "short":  "aa66dabb0",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "2e4f3fbc4904aae61f5a0b004af55c19350bbb5d"
+                    ],
+        "is_merge":  false,
+        "subject":  "Remove subtitulo do status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "components/status-plataforma.php"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "221e9e1a5ea8232966ee7ac131f7a82db90b30c8",
+        "short":  "221e9e1a5",
+        "date":  "2026-05-12",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "aa66dabb04a996bc2aefca539f63eb2de9bc7b34"
+                    ],
+        "is_merge":  false,
+        "subject":  "Exibe status da plataforma para validação",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php",
+                      "components/status-plataforma.php",
+                      "controllers/status-plataforma-controller.php",
+                      "includes/status-plataforma-monitor.php"
+                  ],
+        "file_count":  5
+    },
+    {
+        "hash":  "012cb01c768c2c5ca990af3ceb16cb51a5f8ef87",
+        "short":  "012cb01c7",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "221e9e1a5ea8232966ee7ac131f7a82db90b30c8"
+                    ],
+        "is_merge":  false,
+        "subject":  "Atualiza status da plataforma do tenant",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php",
+                      "components/status-plataforma.php",
+                      "docs/projetos/README.md",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "includes/status-plataforma-monitor.php"
+                  ],
+        "file_count":  6
+    },
+    {
+        "hash":  "61764117f8048b1a369bab460876cd997a5a590a",
+        "short":  "61764117f",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "012cb01c768c2c5ca990af3ceb16cb51a5f8ef87"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta status da plataforma por tenant",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php",
+                      "components/status-plataforma.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "docs/superpowers/plans/2026-05-12-status-plataforma-tenant-health.md",
+                      "includes/status-plataforma-monitor.php"
+                  ],
+        "file_count":  6
+    },
+    {
+        "hash":  "5a59ad2f7c4499b8f274f689cf55e5d3a15f02d2",
+        "short":  "5a59ad2f7",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "61764117f8048b1a369bab460876cd997a5a590a"
+                    ],
+        "is_merge":  false,
+        "subject":  "Revert \"Ajusta status da plataforma por tenant\"",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php",
+                      "components/status-plataforma.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "docs/superpowers/plans/2026-05-12-status-plataforma-tenant-health.md",
+                      "includes/status-plataforma-monitor.php"
+                  ],
+        "file_count":  6
+    },
+    {
+        "hash":  "0e0b3d7462bf3dc910d77e5fb17121cfe24654da",
+        "short":  "0e0b3d746",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "5a59ad2f7c4499b8f274f689cf55e5d3a15f02d2"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta cobertura e ordenacao do painel AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-financeiro-aws.js",
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "boot.php",
+                      "components/infraestrutura-financeiro-aws.php",
+                      "includes/aws-platform-monitor/live.php",
+                      "includes/aws-platform-monitor/snapshot.php",
+                      "includes/aws-platform-monitor/sort.php",
+                      "tests/aws-ec2-size-flex-reservation.test.php",
+                      "tests/aws-platform-row-sort.test.php"
+                  ],
+        "file_count":  9
+    },
+    {
+        "hash":  "eb874b2e44a0e6f75d371c0e5b8346e3ffc9094d",
+        "short":  "eb874b2e4",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "0e0b3d7462bf3dc910d77e5fb17121cfe24654da"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta status da plataforma por tenant",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php",
+                      "components/status-plataforma.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "includes/status-plataforma-monitor.php"
+                  ],
+        "file_count":  5
+    },
+    {
+        "hash":  "50c2d11d26a9a7cb6b34dddc3eaed857f794fada",
+        "short":  "50c2d11d2",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "eb874b2e44a0e6f75d371c0e5b8346e3ffc9094d"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrige rota do status da plataforma na api v3",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "includes/status-plataforma-monitor.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "57c425d4f2367037c147e3c46a7cf913648fefdf",
+        "short":  "57c425d4f",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "50c2d11d26a9a7cb6b34dddc3eaed857f794fada"
+                    ],
+        "is_merge":  false,
+        "subject":  "Atualiza plano do status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "docs/superpowers/plans/2026-05-12-status-plataforma-tenant-health.md"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "f7880d17127282ad671dd49ee9bba883318696da",
+        "short":  "f7880d171",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "57c425d4f2367037c147e3c46a7cf913648fefdf"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta painel AWS financeiro e saude",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-financeiro-aws.js",
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "components/infraestrutura-saude-plataforma.php",
+                      "includes/aws-platform-monitor/live.php",
+                      "includes/aws-platform-monitor/snapshot.php",
+                      "includes/aws-platform-monitor/sort.php",
+                      "tests/aws-platform-health-compute-alerts.test.php",
+                      "tests/aws-platform-live-invoices.test.php"
+                  ],
+        "file_count":  8
+    },
+    {
+        "hash":  "5b23f9eab5281d3f757cb7ed16f6c0d0590af68b",
+        "short":  "5b23f9eab",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "f7880d17127282ad671dd49ee9bba883318696da"
+                    ],
+        "is_merge":  false,
+        "subject":  "Incrementa versao de assets do painel AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "boot.php"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "003c02d231386df73cea9e98981a38985520eb03",
+        "short":  "003c02d23",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "5b23f9eab5281d3f757cb7ed16f6c0d0590af68b"
+                    ],
+        "is_merge":  false,
+        "subject":  "Documenta fallback DNS do status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "8148b41e6dbf2dca851a1fcd2112508874267163",
+        "short":  "8148b41e6",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "003c02d231386df73cea9e98981a38985520eb03"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrige ordenacao de faturas AWS por status",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-financeiro-aws.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "5a1efc72803ebecac2d199b8f082fdc480f0cbb2",
+        "short":  "5a1efc728",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "8148b41e6dbf2dca851a1fcd2112508874267163"
+                    ],
+        "is_merge":  false,
+        "subject":  "Prioriza faturas vencidas no painel AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-financeiro-aws.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "fbf435419983401e2f39a29c773895b4b65560e5",
+        "short":  "fbf435419",
+        "date":  "2026-05-13",
+        "author":  "felipeps04",
+        "parents":  [
+                        "5b23f9eab5281d3f757cb7ed16f6c0d0590af68b"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajuste de formulário para edição de embalagens do produto",
+        "batch":  "produtos-embalagens-edicao",
+        "module":  "Produtos: edicao de embalagens",
+        "disposition":  "nao-migrado",
+        "priority":  "P1",
+        "files":  [
+                      "components/produtos-embalagens-form.php"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "7a4f6a1171420a971a49708e1db5cbabfe5f2376",
+        "short":  "7a4f6a117",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "5a1efc72803ebecac2d199b8f082fdc480f0cbb2"
+                    ],
+        "is_merge":  false,
+        "subject":  "Exibe variacao no mes atual AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-financeiro-aws.js",
+                      "boot.php",
+                      "components/infraestrutura-financeiro-aws.php"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "50f84971a001b164a94903832353c8e9853629a9",
+        "short":  "50f84971a",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "7a4f6a1171420a971a49708e1db5cbabfe5f2376"
+                    ],
+        "is_merge":  false,
+        "subject":  "Simplifica Redis no painel de saude AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "boot.php",
+                      "components/infraestrutura-saude-plataforma.php"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "343d99b8c600afc29c2024f10dff35cecab04663",
+        "short":  "343d99b8c",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "50f84971a001b164a94903832353c8e9853629a9"
+                    ],
+        "is_merge":  false,
+        "subject":  "Documenta configuracao curta de integracoes do status",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "4080d7759c8e29dd245d67ec02a058a2af6347ae",
+        "short":  "4080d7759",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "343d99b8c600afc29c2024f10dff35cecab04663"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta ordenacao dos paineis AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-financeiro-aws.js",
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "boot.php",
+                      "includes/aws-platform-monitor/live.php",
+                      "includes/aws-platform-monitor/snapshot.php",
+                      "includes/aws-platform-monitor/sort.php",
+                      "tests/aws-platform-row-sort.test.php"
+                  ],
+        "file_count":  7
+    },
+    {
+        "hash":  "eb482432b50e8ed160e1815c2a90767f7fa572a9",
+        "short":  "eb482432b",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "4080d7759c8e29dd245d67ec02a058a2af6347ae"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta status da plataforma no topo e DNS",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "includes/header.php"
+                  ],
+        "file_count":  5
+    },
+    {
+        "hash":  "0d79d4547b683166823d0895cc410f1b3c391b3e",
+        "short":  "0d79d4547",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "eb482432b50e8ed160e1815c2a90767f7fa572a9"
+                    ],
+        "is_merge":  false,
+        "subject":  "Documenta prioridade de incidentes ativos",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "38111c0e62587c47552da05d316ae64541806fe7",
+        "short":  "38111c0e6",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "0d79d4547b683166823d0895cc410f1b3c391b3e"
+                    ],
+        "is_merge":  false,
+        "subject":  "Detalha recheck de incidentes ativos",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "19d8be82ac4a1aef49ab5ed1f738cf64fc71fb51",
+        "short":  "19d8be82a",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "38111c0e62587c47552da05d316ae64541806fe7"
+                    ],
+        "is_merge":  false,
+        "subject":  "Documenta monitor apenas em producao",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "63e343b96a8b30f41844cc3f5d8c6704a7e2416e",
+        "short":  "63e343b96",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "19d8be82ac4a1aef49ab5ed1f738cf64fc71fb51"
+                    ],
+        "is_merge":  false,
+        "subject":  "Reduz janela de evictions Redis",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "boot.php",
+                      "includes/aws-platform-monitor/live.php",
+                      "includes/aws-platform-monitor/snapshot.php",
+                      "includes/aws-platform-monitor/sort.php",
+                      "tests/aws-platform-row-sort.test.php"
+                  ],
+        "file_count":  6
+    },
+    {
+        "hash":  "02a6c2587e5aa3ddec787bcadaa012084c8bff61",
+        "short":  "02a6c2587",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "63e343b96a8b30f41844cc3f5d8c6704a7e2416e"
+                    ],
+        "is_merge":  false,
+        "subject":  "Adiciona status Elastic Beanstalk na saude AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "boot.php",
+                      "components/infraestrutura-saude-plataforma.php",
+                      "includes/aws-platform-monitor/live.php",
+                      "includes/aws-platform-monitor/snapshot.php",
+                      "tests/aws-platform-health-compute-alerts.test.php"
+                  ],
+        "file_count":  6
+    },
+    {
+        "hash":  "557cdeebaffe305181e28f1665addd443ccd7d10",
+        "short":  "557cdeeba",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "02a6c2587e5aa3ddec787bcadaa012084c8bff61"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta tabela Elastic Beanstalk",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "boot.php",
+                      "components/infraestrutura-saude-plataforma.php"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "903792726571d89bcafe5f74f51053c7a1fcdc2f",
+        "short":  "903792726",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "557cdeebaffe305181e28f1665addd443ccd7d10"
+                    ],
+        "is_merge":  false,
+        "subject":  "Adiciona refresh por bloco na saude AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "boot.php",
+                      "components/infraestrutura-saude-plataforma.php"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "adc53043f490e45bf33a61368590eef98a65d190",
+        "short":  "adc53043f",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "903792726571d89bcafe5f74f51053c7a1fcdc2f"
+                    ],
+        "is_merge":  false,
+        "subject":  "Aprimora paineis de saude da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "assets/js/scripts.js",
+                      "components/status-plataforma.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "includes/aws-platform-monitor/live.php",
+                      "includes/header.php",
+                      "tests/aws-platform-health-compute-alerts.test.php"
+                  ],
+        "file_count":  7
+    },
+    {
+        "hash":  "7217945836896f9044da7a3a2ebc65a077bbcca9",
+        "short":  "721794583",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "adc53043f490e45bf33a61368590eef98a65d190"
+                    ],
+        "is_merge":  false,
+        "subject":  "Adiciona refresh por bloco no financeiro AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-financeiro-aws.js",
+                      "boot.php",
+                      "components/infraestrutura-financeiro-aws.php"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "1a6c6063d05f26be22450cf5d65663543efc301c",
+        "short":  "1a6c6063d",
+        "date":  "2026-05-13",
+        "author":  "Ricardo Morais",
+        "parents":  [
+                        "7217945836896f9044da7a3a2ebc65a077bbcca9"
+                    ],
+        "is_merge":  false,
+        "subject":  "Remove asset version auto refresh again",
+        "batch":  "asset-version-refresh-legado",
+        "module":  "Legado: boot e asset version",
+        "disposition":  "nao-aplicavel-v2",
+        "priority":  "P4",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "tests/asset-version-refresh.test.js"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "c83e6ba5fbf6b9f9656d5dc3127f76fdc27ab99a",
+        "short":  "c83e6ba5f",
+        "date":  "2026-05-13",
+        "author":  "Ricardo Morais",
+        "parents":  [
+                        "7217945836896f9044da7a3a2ebc65a077bbcca9",
+                        "1a6c6063d05f26be22450cf5d65663543efc301c"
+                    ],
+        "is_merge":  true,
+        "subject":  "Merge pull request #737 from agileecommerce/codex/remove-asset-version-refresh-again",
+        "batch":  "asset-version-refresh-legado",
+        "module":  "Legado: boot e asset version",
+        "disposition":  "nao-aplicavel-v2",
+        "priority":  "P4",
+        "files":  [
+
+                  ],
+        "file_count":  0
+    },
+    {
+        "hash":  "71ad943e56c067ead9c9c6bac0625381a98b4521",
+        "short":  "71ad943e5",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "c83e6ba5fbf6b9f9656d5dc3127f76fdc27ab99a"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrige contexto do status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "assets/js/scripts.js",
+                      "components/status-plataforma.php",
+                      "includes/header.php",
+                      "includes/status-plataforma-monitor.php"
+                  ],
+        "file_count":  5
+    },
+    {
+        "hash":  "3110ae638ffdb58450288478ca26bc041aae3211",
+        "short":  "3110ae638",
+        "date":  "2026-05-13",
+        "author":  "Ricardo Morais",
+        "parents":  [
+                        "71ad943e56c067ead9c9c6bac0625381a98b4521",
+                        "fbf435419983401e2f39a29c773895b4b65560e5"
+                    ],
+        "is_merge":  true,
+        "subject":  "Merge pull request #736 from agileecommerce/fix-produtos-embalagens",
+        "batch":  "produtos-embalagens-edicao",
+        "module":  "Produtos: edicao de embalagens",
+        "disposition":  "nao-migrado",
+        "priority":  "P1",
+        "files":  [
+
+                  ],
+        "file_count":  0
+    },
+    {
+        "hash":  "150b97b84e7f676deecdb4baa51d6248258f8521",
+        "short":  "150b97b84",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "3110ae638ffdb58450288478ca26bc041aae3211"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta micro status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "includes/header.php"
+                  ],
+        "file_count":  4
+    },
+    {
+        "hash":  "f8c26ee8bfb3c4330eb0108a942392913da22f5c",
+        "short":  "f8c26ee8b",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "150b97b84e7f676deecdb4baa51d6248258f8521"
+                    ],
+        "is_merge":  false,
+        "subject":  "Adiciona novas conexoes no Redis AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "boot.php",
+                      "components/infraestrutura-saude-plataforma.php",
+                      "includes/aws-platform-monitor/live.php",
+                      "includes/aws-platform-monitor/snapshot.php",
+                      "includes/aws-platform-monitor/sort.php",
+                      "tests/aws-platform-row-sort.test.php"
+                  ],
+        "file_count":  7
+    },
+    {
+        "hash":  "d9dbe84bdb09e21efe6b1db3c2051bbed0d69126",
+        "short":  "d9dbe84bd",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "f8c26ee8bfb3c4330eb0108a942392913da22f5c"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta status de processamentos no topo",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "ff2888db040263a6bf131d61c5d778c95b44c610",
+        "short":  "ff2888db0",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "d9dbe84bdb09e21efe6b1db3c2051bbed0d69126"
+                    ],
+        "is_merge":  false,
+        "subject":  "Aprimora metricas de conexao Redis AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "boot.php",
+                      "components/infraestrutura-saude-plataforma.php",
+                      "includes/aws-platform-monitor/live.php",
+                      "includes/aws-platform-monitor/snapshot.php",
+                      "includes/aws-platform-monitor/sort.php",
+                      "includes/header.php",
+                      "tests/aws-platform-row-sort.test.php"
+                  ],
+        "file_count":  8
+    },
+    {
+        "hash":  "f384059da98d1041be602b0a2e43e18d801e4d26",
+        "short":  "f384059da",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "ff2888db040263a6bf131d61c5d778c95b44c610"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta prioridade de ordenacao Redis AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "boot.php",
+                      "includes/aws-platform-monitor/sort.php",
+                      "tests/aws-platform-row-sort.test.php"
+                  ],
+        "file_count":  4
+    },
+    {
+        "hash":  "6c1091c8e13cc4e2e701abef6f74e1a4acbe4d91",
+        "short":  "6c1091c8e",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "f384059da98d1041be602b0a2e43e18d801e4d26"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrige atualizacao do status da plataforma no topo",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "8f48b48eeccf4f72ea10a0e60c14aa2d2abc4197",
+        "short":  "8f48b48ee",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "6c1091c8e13cc4e2e701abef6f74e1a4acbe4d91"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta carregamento inicial do micro status",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "includes/header.php"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "62ffa28b12507677cd4da7766f3b0f4c75983e7d",
+        "short":  "62ffa28b1",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "8f48b48eeccf4f72ea10a0e60c14aa2d2abc4197"
+                    ],
+        "is_merge":  false,
+        "subject":  "Exibe papel e tipo nos recursos AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "boot.php",
+                      "components/infraestrutura-saude-plataforma.php",
+                      "includes/aws-platform-monitor/live.php",
+                      "includes/aws-platform-monitor/snapshot.php",
+                      "includes/aws-platform-monitor/sort.php"
+                  ],
+        "file_count":  6
+    },
+    {
+        "hash":  "2d3cfcd58f7895947eaf5b30c7894093af9f83a4",
+        "short":  "2d3cfcd58",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "62ffa28b12507677cd4da7766f3b0f4c75983e7d"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta rotulo N8N no Redis AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "includes/aws-platform-monitor/live.php",
+                      "includes/aws-platform-monitor/snapshot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "f6f48e2aca50be9241f971111e836243107a8d80",
+        "short":  "f6f48e2ac",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "2d3cfcd58f7895947eaf5b30c7894093af9f83a4"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrige refresh do status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "controllers/status-plataforma-controller.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "includes/status-plataforma-monitor.php"
+                  ],
+        "file_count":  6
+    },
+    {
+        "hash":  "81ade9fd0681f512c253401311818fa4318b999a",
+        "short":  "81ade9fd0",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "f6f48e2aca50be9241f971111e836243107a8d80"
+                    ],
+        "is_merge":  false,
+        "subject":  "Adiciona graficos de metricas AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "assets/js/components/infraestrutura-saude-plataforma.js",
+                      "boot.php",
+                      "components/infraestrutura-saude-plataforma.php",
+                      "controllers/infraestrutura-saude-plataforma-controller.php",
+                      "includes/aws-platform-monitor/live.php",
+                      "includes/aws-platform-monitor/snapshot.php",
+                      "tests/aws-platform-metric-series.test.php"
+                  ],
+        "file_count":  7
+    },
+    {
+        "hash":  "f42944729d6686206b0b0c9d4b4c019d5e588dff",
+        "short":  "f42944729",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "81ade9fd0681f512c253401311818fa4318b999a"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta granularidade dos graficos AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "includes/aws-platform-monitor/snapshot.php",
+                      "tests/aws-platform-metric-series.test.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "53674504d59a0c20b52decee1b3fc8edda27040a",
+        "short":  "53674504d",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "f42944729d6686206b0b0c9d4b4c019d5e588dff"
+                    ],
+        "is_merge":  false,
+        "subject":  "Remove icone dos links de metricas AWS",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "components/infraestrutura-saude-plataforma.php"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "2ad3a1498332a9d34eea739efe2175e2cf2f7369",
+        "short":  "2ad3a1498",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "53674504d59a0c20b52decee1b3fc8edda27040a"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrige refresh do status no topo",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "05c83006fe8119c7b448234a21dfac206dcaeb51",
+        "short":  "05c83006f",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "2ad3a1498332a9d34eea739efe2175e2cf2f7369"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrige troca de empresa no status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "ca25892f1d6169c455702efd487953b32bf28572",
+        "short":  "ca25892f1",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "05c83006fe8119c7b448234a21dfac206dcaeb51"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrige corrida na troca de empresa do admin",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "76474ac649c7d4b62dd130243bdece9e6ca9c934",
+        "short":  "76474ac64",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "ca25892f1d6169c455702efd487953b32bf28572"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrige evento do seletor de empresa",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "2d7796606510583a523065c5b48d700505c26cb7",
+        "short":  "2d7796606",
+        "date":  "2026-05-13",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "76474ac649c7d4b62dd130243bdece9e6ca9c934"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrige troca de empresa pelo seletor do admin",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "includes/header.php"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "3e4c806657e110c3dbd01792893258ee31403774",
+        "short":  "3e4c80665",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "2d7796606510583a523065c5b48d700505c26cb7"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrige contexto do status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "includes/header.php"
+                  ],
+        "file_count":  5
+    },
+    {
+        "hash":  "17df06b0a467c38e155563c68ea7f1cc00390cec",
+        "short":  "17df06b0a",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "3e4c806657e110c3dbd01792893258ee31403774"
+                    ],
+        "is_merge":  false,
+        "subject":  "Sincroniza coracao do status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md"
+                  ],
+        "file_count":  4
+    },
+    {
+        "hash":  "99eba2712d93850b6ec03cfc4ddebca53a2a2f60",
+        "short":  "99eba2712",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "17df06b0a467c38e155563c68ea7f1cc00390cec"
+                    ],
+        "is_merge":  false,
+        "subject":  "Estabiliza micro status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "fd2fafc080b0c710844f27ed81b0229c55d794bc",
+        "short":  "fd2fafc08",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "99eba2712d93850b6ec03cfc4ddebca53a2a2f60"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrige refresh do micro status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "9f1e0f4ce59b70683daf4a16d8e92d33ea2c7fb6",
+        "short":  "9f1e0f4ce",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "fd2fafc080b0c710844f27ed81b0229c55d794bc"
+                    ],
+        "is_merge":  false,
+        "subject":  "Garante navegacao do coracao da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "c047f62854aa8a5eb0843a240e2559cef2ac9f38",
+        "short":  "c047f6285",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "9f1e0f4ce59b70683daf4a16d8e92d33ea2c7fb6"
+                    ],
+        "is_merge":  false,
+        "subject":  "Reforca clique do coracao da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "71e80cbb70b13f2e2e071cb58e28faa897fb86e8",
+        "short":  "71e80cbb7",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "c047f62854aa8a5eb0843a240e2559cef2ac9f38"
+                    ],
+        "is_merge":  false,
+        "subject":  "Estabiliza navegacao do coracao da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "includes/header.php"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "3ecdf1a16eb8b1a6784ebd5261b68b60383e9f1c",
+        "short":  "3ecdf1a16",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "71e80cbb70b13f2e2e071cb58e28faa897fb86e8"
+                    ],
+        "is_merge":  false,
+        "subject":  "Remove atalho legado do coracao da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "includes/header.php"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "8c600e1b0da2f5f5cc6ba0b58c9bf59e1b966443",
+        "short":  "8c600e1b0",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "3ecdf1a16eb8b1a6784ebd5261b68b60383e9f1c"
+                    ],
+        "is_merge":  false,
+        "subject":  "Estabiliza micro status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "5aa124d7bb38fe6ac4a3fd932e12e2246839a555",
+        "short":  "5aa124d7b",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "8c600e1b0da2f5f5cc6ba0b58c9bf59e1b966443"
+                    ],
+        "is_merge":  false,
+        "subject":  "Estabiliza coração do status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "924ad1336ac50bcfda8d78e6a278ab175025e382",
+        "short":  "924ad1336",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "5aa124d7bb38fe6ac4a3fd932e12e2246839a555"
+                    ],
+        "is_merge":  false,
+        "subject":  "Corrige troca de tenant no status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "0fc060f23bbb8dfc32a7423fc1d8373407c44988",
+        "short":  "0fc060f23",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "924ad1336ac50bcfda8d78e6a278ab175025e382"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta severidade de latencia ALB",
+        "batch":  "infraestrutura-aws",
+        "module":  "Infraestrutura AWS: Saude da Plataforma e Financeiro AWS",
+        "disposition":  "depende-backend-contrato",
+        "priority":  "P2",
+        "files":  [
+                      "includes/aws-platform-monitor/live.php",
+                      "tests/aws-platform-health-compute-alerts.test.php"
+                  ],
+        "file_count":  2
+    },
+    {
+        "hash":  "d62e770dd120df847f99fe7a58acb433255b994f",
+        "short":  "d62e770dd",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "0fc060f23bbb8dfc32a7423fc1d8373407c44988"
+                    ],
+        "is_merge":  false,
+        "subject":  "Liberar status da plataforma para usuarios do admin",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php",
+                      "components/status-plataforma.php",
+                      "controllers/status-plataforma-controller.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "includes/header.php",
+                      "includes/menu.php"
+                  ],
+        "file_count":  7
+    },
+    {
+        "hash":  "a5dec3a794db4e83037cbdc8c1afaa0f36423a1e",
+        "short":  "a5dec3a79",
+        "date":  "2026-05-14",
+        "author":  "Ricardo Morais",
+        "parents":  [
+                        "0fc060f23bbb8dfc32a7423fc1d8373407c44988"
+                    ],
+        "is_merge":  false,
+        "subject":  "ajuste de data e hora nos campos dos relatorios",
+        "batch":  "relatorios-data-hora",
+        "module":  "Relatorios: filtro dinamico data_hora",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/processos-relatorios-list.js",
+                      "components/processos-relatorios-list.php",
+                      "controllers/processos-relatorios-controller.php"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "a96b60bbc8db97aaaacfbea61c92aa747126ee41",
+        "short":  "a96b60bbc",
+        "date":  "2026-05-14",
+        "author":  "Ricardo Morais",
+        "parents":  [
+                        "a5dec3a794db4e83037cbdc8c1afaa0f36423a1e"
+                    ],
+        "is_merge":  false,
+        "subject":  "boot",
+        "batch":  "asset-version-refresh-legado",
+        "module":  "Legado: boot e asset version",
+        "disposition":  "nao-aplicavel-v2",
+        "priority":  "P4",
+        "files":  [
+                      "boot.php"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "15fa22eb21b2a4ddb8e53f3bda714c437f6018cb",
+        "short":  "15fa22eb2",
+        "date":  "2026-05-14",
+        "author":  "Ricardo Morais",
+        "parents":  [
+                        "d62e770dd120df847f99fe7a58acb433255b994f",
+                        "a96b60bbc8db97aaaacfbea61c92aa747126ee41"
+                    ],
+        "is_merge":  true,
+        "subject":  "Merge pull request #738 from agileecommerce/fix/relatorios_data_hora",
+        "batch":  "relatorios-data-hora",
+        "module":  "Relatorios: filtro dinamico data_hora",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+
+                  ],
+        "file_count":  0
+    },
+    {
+        "hash":  "c2c206b5b6f26884dd9e92ad4c8e85f8ef2d3107",
+        "short":  "c2c206b5b",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "15fa22eb21b2a4ddb8e53f3bda714c437f6018cb"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta status pendente da integracao no monitor",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php",
+                      "components/status-plataforma.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md"
+                  ],
+        "file_count":  4
+    },
+    {
+        "hash":  "4c6edd7a57ec60aa62ad9e2e9b214cde445acad8",
+        "short":  "4c6edd7a5",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "c2c206b5b6f26884dd9e92ad4c8e85f8ef2d3107"
+                    ],
+        "is_merge":  false,
+        "subject":  "Sincroniza atualizacao do status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md"
+                  ],
+        "file_count":  3
+    },
+    {
+        "hash":  "d32d2af723879cda43bb93a6859e0e30932506b7",
+        "short":  "d32d2af72",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "4c6edd7a57ec60aa62ad9e2e9b214cde445acad8"
+                    ],
+        "is_merge":  false,
+        "subject":  "Torna status da plataforma assincrono",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "controllers/status-plataforma-controller.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "tests/status-platform-async.test.js"
+                  ],
+        "file_count":  5
+    },
+    {
+        "hash":  "9b05fa6751019835b346597a91e297f756178344",
+        "short":  "9b05fa675",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "d32d2af723879cda43bb93a6859e0e30932506b7"
+                    ],
+        "is_merge":  false,
+        "subject":  "Consulta status da plataforma sob demanda",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "tests/status-platform-async.test.js"
+                  ],
+        "file_count":  4
+    },
+    {
+        "hash":  "706d020278a3076c65505838809ff1e1b8998c94",
+        "short":  "706d02027",
+        "date":  "2026-05-14",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "9b05fa6751019835b346597a91e297f756178344"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta frequencia do status da plataforma",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/scripts.js",
+                      "boot.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md",
+                      "tests/status-platform-async.test.js"
+                  ],
+        "file_count":  4
+    },
+    {
+        "hash":  "795d17719184ee2f3492ea7d1c021e05dfb021bb",
+        "short":  "795d17719",
+        "date":  "2026-05-15",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "706d020278a3076c65505838809ff1e1b8998c94"
+                    ],
+        "is_merge":  false,
+        "subject":  "Ajusta leitura do status de integração",
+        "batch":  "status-plataforma-shell",
+        "module":  "Shell: status da plataforma, micro status e troca de tenant",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "assets/js/components/status-plataforma.js",
+                      "boot.php",
+                      "controllers/servicos-integracao-controller.php",
+                      "docs/projetos/status-plataforma/regras-monitoramento-tenant.md"
+                  ],
+        "file_count":  4
+    },
+    {
+        "hash":  "1e69cf3b4eb033fa36e52e973388f90247bd4a89",
+        "short":  "1e69cf3b4",
+        "date":  "2026-05-15",
+        "author":  "felipeps04",
+        "parents":  [
+                        "795d17719184ee2f3492ea7d1c021e05dfb021bb"
+                    ],
+        "is_merge":  false,
+        "subject":  "Inclusão de Lógica para mudança de status ao aprovar pedidos com brinde",
+        "batch":  "pedidos-brinde-aprovacao",
+        "module":  "Pedidos: aprovacao em cascata de brinde",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "controllers/pedidos-controller.php"
+                  ],
+        "file_count":  1
+    },
+    {
+        "hash":  "e1f66b55967d7d9e4569fc87122c67bf56b4ee45",
+        "short":  "e1f66b559",
+        "date":  "2026-05-15",
+        "author":  "Ricardo Morais",
+        "parents":  [
+                        "795d17719184ee2f3492ea7d1c021e05dfb021bb",
+                        "1e69cf3b4eb033fa36e52e973388f90247bd4a89"
+                    ],
+        "is_merge":  true,
+        "subject":  "Merge pull request #739 from agileecommerce/fix/aprovacao-pedidos-brinde",
+        "batch":  "pedidos-brinde-aprovacao",
+        "module":  "Pedidos: aprovacao em cascata de brinde",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+
+                  ],
+        "file_count":  0
+    },
+    {
+        "hash":  "9376476b405d4b2f71df294593646d89635fcefb",
+        "short":  "9376476b4",
+        "date":  "2026-05-15",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "e1f66b55967d7d9e4569fc87122c67bf56b4ee45"
+                    ],
+        "is_merge":  false,
+        "subject":  "docs: aprimora fluxo IA-first",
+        "batch":  "docs-ai-first-legado",
+        "module":  "Legado: documentacao IA-first",
+        "disposition":  "nao-aplicavel-v2",
+        "priority":  "P4",
+        "files":  [
+                      "AGENTS.md",
+                      "docs/README.md",
+                      "docs/ai/README.md",
+                      "docs/ai/catalogs/README.md",
+                      "docs/ai/context-pack.md",
+                      "docs/ai/cross-repo-routing.md",
+                      "docs/ai/quality-gates/executable-gates.md",
+                      "docs/ai/support-diagnostic-packet.md",
+                      "scripts/ai/verify.sh"
+                  ],
+        "file_count":  9
+    },
+    {
+        "hash":  "6cb70a741bd9dedb2efaea3c2c5454562d8ec829",
+        "short":  "6cb70a741",
+        "date":  "2026-05-15",
+        "author":  "Luiz Rodrigues",
+        "parents":  [
+                        "9376476b405d4b2f71df294593646d89635fcefb"
+                    ],
+        "is_merge":  false,
+        "subject":  "Adiciona flag de horario no vendedor",
+        "batch":  "vendedores-valida-horario",
+        "module":  "Vendedores: flag de horario",
+        "disposition":  "ja-migrado",
+        "priority":  "P3",
+        "files":  [
+                      "components/vendedores-form.php",
+                      "controllers/vendedores-controller.php"
+                  ],
+        "file_count":  2
+    }
+]

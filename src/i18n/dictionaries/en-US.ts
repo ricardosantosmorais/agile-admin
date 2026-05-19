@@ -3939,6 +3939,7 @@ export const enUS: TranslationDictionary = {
 				legacy: 'V1 (legacy)',
 				atualizar_carrinho: { auto: 'Automatic', manual: 'Manual' },
 				codigo_vendedor: { select: 'Select existing', code: 'Enter code', none: 'Do not inform' },
+				ordem_carrinho: { nome_az: 'Name (A-Z)', insercao: 'Date Added', quantidade: 'Quantity (High-Low)' },
 				split_pedidos: { channel: 'Distribution channel', branch: 'Branch', seller: 'Seller', none: 'None (no split)' },
 			},
 			fields: {
@@ -3971,6 +3972,7 @@ export const enUS: TranslationDictionary = {
 				observacoes: { label: 'Notes', helper: 'Shows a notes field in checkout.' },
 				oculta_timeline: { label: 'Hide timeline', helper: 'Hides the timeline on the order detail.' },
 				opcoes_falta: { label: 'Shortage options', helper: 'Shows the field used to decide what to do when items are missing.' },
+				ordem_carrinho: { label: 'Cart Sorting', helper: 'Defines the display order of products in the cart' },
 				ordem_compra_pedido: { label: 'Order purchase reference', helper: 'Allows entering a purchase order on the order.' },
 				ordem_compra: { label: 'Item purchase reference', helper: 'Allows entering a purchase order per item.' },
 				importar_carrinho: { label: 'Import cart', helper: 'Allows importing items into the cart via spreadsheet.' },

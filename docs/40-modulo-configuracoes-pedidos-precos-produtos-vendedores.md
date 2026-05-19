@@ -22,6 +22,7 @@ Migrar os formulários diretos de parâmetros restantes do grupo `Configuraçõe
 ### Pedidos
 - concentra regras de checkout, pagamento, split e experiência;
 - mantém os enums operacionais do legado, como atualização de carrinho e tipo de split;
+- preserva a chave legada `ordem_carrinho`, com default `nome_az`, para ordenar os produtos exibidos no carrinho;
 - preserva a chave legada `exibe_juros_parcelas`, usada para exibir informação de juros das condições nas parcelas do cartão no checkout.
 
 ### Preços

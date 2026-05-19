@@ -22,6 +22,7 @@ export type ConfiguracoesPedidosFieldKey =
   | 'observacoes'
   | 'oculta_timeline'
   | 'opcoes_falta'
+  | 'ordem_carrinho'
   | 'ordem_compra'
   | 'ordem_compra_pedido'
   | 'permite_pedido_recorrente'

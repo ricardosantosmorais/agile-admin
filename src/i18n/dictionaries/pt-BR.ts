@@ -3693,6 +3693,7 @@ export const ptBR: TranslationDictionary = {
 				legacy: 'V1 (legado)',
 				atualizar_carrinho: { auto: 'Automático', manual: 'Manual' },
 				codigo_vendedor: { select: 'Selecionar existente', code: 'Digitar código', none: 'Não informar' },
+				ordem_carrinho: { nome_az: 'Nome (A-Z)', insercao: 'Data de Inclusão', quantidade: 'Quantidade (Maior-Menor)' },
 				split_pedidos: { channel: 'Canal de distribuição', branch: 'Filial', seller: 'Vendedor', none: 'Nenhum (sem quebra)' },
 			},
 			fields: {
@@ -3725,6 +3726,7 @@ export const ptBR: TranslationDictionary = {
 				observacoes: { label: 'Observações', helper: 'Exibe campo de observações no checkout.' },
 				oculta_timeline: { label: 'Oculta timeline', helper: 'Oculta a timeline no detalhe do pedido.' },
 				opcoes_falta: { label: 'Opções de falta', helper: 'Mostra o campo para decidir o que fazer na falta de itens.' },
+				ordem_carrinho: { label: 'Ordenação do Carrinho', helper: 'Define a ordem de exibição dos produtos no carrinho' },
 				ordem_compra_pedido: { label: 'Ordem de compra do pedido', helper: 'Permite informar ordem de compra no pedido.' },
 				ordem_compra: { label: 'Ordem de compra dos produtos', helper: 'Permite informar ordem de compra por item.' },
 				importar_carrinho: { label: 'Importar carrinho', helper: 'Permite importar itens no carrinho por planilha.' },

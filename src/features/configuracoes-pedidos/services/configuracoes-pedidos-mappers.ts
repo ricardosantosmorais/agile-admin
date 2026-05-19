@@ -20,6 +20,10 @@ function toStringValue(value: unknown) {
   return String(value ?? '').trim()
 }
 
+const defaultConfiguracoesPedidosValues: Partial<Record<ConfiguracoesPedidosFieldKey, string>> = {
+  ordem_carrinho: 'nome_az',
+}
+
 export function getConfiguracoesPedidosFieldDefinitions(t: Translate): ConfiguracoesPedidosFieldDefinition[] {
   const yesNoOptions = [
     { value: '1', label: t('common.yes', 'Sim') },
@@ -56,6 +60,7 @@ export function getConfiguracoesPedidosFieldDefinitions(t: Translate): Configura
     { key: 'observacoes', section: 'experience', type: 'enum', label: t('configuracoes.orders.fields.observacoes.label', 'Observações'), helper: t('configuracoes.orders.fields.observacoes.helper', 'Exibe campo de observações no checkout.'), options: [...yesNoOptions] },
     { key: 'oculta_timeline', section: 'experience', type: 'enum', label: t('configuracoes.orders.fields.oculta_timeline.label', 'Oculta timeline'), helper: t('configuracoes.orders.fields.oculta_timeline.helper', 'Oculta a timeline no detalhe do pedido.'), options: [...yesNoOptions] },
     { key: 'opcoes_falta', section: 'experience', type: 'enum', label: t('configuracoes.orders.fields.opcoes_falta.label', 'Opções de falta'), helper: t('configuracoes.orders.fields.opcoes_falta.helper', 'Mostra o campo para decidir o que fazer na falta de itens.'), options: [...yesNoOptions] },
+    { key: 'ordem_carrinho', section: 'experience', type: 'enum', label: t('configuracoes.orders.fields.ordem_carrinho.label', 'Ordenação do Carrinho'), helper: t('configuracoes.orders.fields.ordem_carrinho.helper', 'Define a ordem de exibição dos produtos no carrinho'), options: [{ value: 'nome_az', label: t('configuracoes.orders.options.ordem_carrinho.nome_az', 'Nome (A-Z)') }, { value: 'insercao', label: t('configuracoes.orders.options.ordem_carrinho.insercao', 'Data de Inclusão') }, { value: 'quantidade', label: t('configuracoes.orders.options.ordem_carrinho.quantidade', 'Quantidade (Maior-Menor)') }] },
     { key: 'ordem_compra_pedido', section: 'experience', type: 'enum', label: t('configuracoes.orders.fields.ordem_compra_pedido.label', 'Ordem de compra do pedido'), helper: t('configuracoes.orders.fields.ordem_compra_pedido.helper', 'Permite informar ordem de compra no pedido.'), options: [...yesNoOptions] },
     { key: 'ordem_compra', section: 'experience', type: 'enum', label: t('configuracoes.orders.fields.ordem_compra.label', 'Ordem de compra dos produtos'), helper: t('configuracoes.orders.fields.ordem_compra.helper', 'Permite informar ordem de compra por item.'), options: [...yesNoOptions] },
     { key: 'importar_carrinho', section: 'experience', type: 'enum', label: t('configuracoes.orders.fields.importar_carrinho.label', 'Importar carrinho'), helper: t('configuracoes.orders.fields.importar_carrinho.helper', 'Permite importar itens no carrinho por planilha.'), options: [...yesNoOptions] },
@@ -69,7 +74,7 @@ export const configuracoesPedidosParameterKeys = configuracoesPedidosFieldDefini
 
 export function createEmptyConfiguracoesPedidosForm(): ConfiguracoesPedidosFormValues {
   return configuracoesPedidosFieldDefinitions.reduce((accumulator, field) => {
-    accumulator[field.key] = ''
+    accumulator[field.key] = defaultConfiguracoesPedidosValues[field.key] ?? ''
     return accumulator
   }, {} as ConfiguracoesPedidosFormValues)
 }
@@ -86,7 +91,7 @@ export function normalizeConfiguracoesPedidosRecord(payload: unknown): Configura
       continue
     }
 
-    values[key] = toStringValue(parameter.parametros)
+    values[key] = toStringValue(parameter.parametros) || defaultConfiguracoesPedidosValues[key] || ''
 
     const updatedAt = toStringValue(parameter.created_at)
     const updatedBy = toStringValue(asRecord(parameter.usuario).nome)
